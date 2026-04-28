@@ -75,8 +75,8 @@ class StigController extends AbstractController
                     $date = (string)(count($query) > 0 ? $query[0] : "");
 
 		    $query = $xml->xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()");
-		    $released = (string)(count($query) > 0 ? $query[0] : ""); 
-		    $released = explode("Date:", $released)[1];
+		    $released = (string)(count($query) > 0 ? $query[0] : "");
+		    $released = explode("Date:", $released)[1] ?? "";
 
                     $query = $xml->xpath('/xmlns:Benchmark/xmlns:version/text()');
                     $version = (string)(count($query) > 0 ? $query[0] : "");
