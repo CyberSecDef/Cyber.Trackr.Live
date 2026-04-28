@@ -1,0 +1,227 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compare STIGs{% endblock %}
+
+{% block body %}
+    <style>
+@media print
+{    
+    @page {size: landscape}
+    body{
+        font-size:8pt;
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
+    }
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+    .sidemenu, .sidemenu * {
+        display: none !important;
+    }
+}
+    </style>
+    <div class="doc-title">
+        <h1>{{ stig1.xpath("/xmlns:Benchmark/xmlns:title")[0] }} - V{{v1}}R{{r1}} vs. V{{v2}}R{{r2}}</h1>
+    </div>
+
+    <div class="doc-summary border no-print">
+        <div class="card" style="width: 36rem;">
+            <div class="card-body ">
+                <h6 class="card-subtitle"><b>Compare</b></h6>
+                <p class="card-text">Select any two versions of this STIG to compare the individual requirements</p>
+				<div class="input-group">
+
+                    <select class="form-select" id="compare_stig1">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="form-select" id="compare_stig2">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="button" onclick="stig_app.compare()">Compare</button>
+                </div>
+
+            </div>
+
+			<div class="card-body border">
+                <h6 class="card-subtitle"><b>View</b></h6>
+                <p class="card-text">Select any old version/release of this STIG to view the previous requirements</p>
+				<div class="input-group">
+                    <select class="form-select" id="view_stig" aria-label="Example select with button addon">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="button" onclick="stig_app.view()">View</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    {% for group in stig2.xpath("/xmlns:Benchmark/xmlns:Group") %}
+        {% set stig2_vuln = group.attributes.id %}
+        {% set stig2_leg_vuln = group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first : '' %}
+        {% set stig1_group = stig1.xpath("//xmlns:Group[@id='" ~ stig2_vuln ~ "']") %}
+
+        {% if stig1_group is not defined or stig1_group is null %}
+            {% set stig1_group = stig1.xpath("//xmlns:Group[@id='" ~ stig2_leg_vuln ~ "']") %}
+        {% endif %}
+
+        <div class="compare-container collapse">
+            <div class="req-header">
+                <div class="row text-sm">
+                    <div class="col"><strong>Vuln ID: </strong><br />{{group.attributes.id}}</div>
+                    <div class="col"><strong>Rule ID: </strong><br />{{group.Rule.attributes.id}}</div>
+                    <div class="col"><strong>Group ID: </strong><br />{{group.title}}</div>
+                    <div class="col"><strong>Version: </strong><br />{{group.Rule.version}}</div>
+                    <div class="col"><strong>CCI: </strong><br />{{group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'CCI-')|first : '' }}</div>
+                    <div class="col"><strong>Severity:  </strong><br />{{group.Rule.attributes.severity|title }}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col vuln_desc" style="">
+                    <strong>Description:</strong>
+                    <div class="desc_diff"></div>
+                    <div class="collapse desc1">{{group.Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}</div>
+                    <div class="collapse desc2">{% if stig1_group is defined and stig1_group is not null and stig1_group|length > 0%}{{stig1_group[0].Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
+                </div>
+
+                <div class="col vuln_check"  style="">
+                    <strong>Check:</strong>
+                    <div class="desc_check"></div>
+                    <div class="collapse check1">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</div>
+                    <div class="collapse check2">{% if stig1_group is defined and stig1_group is not null and stig1_group|length > 0%}{{stig1_group[0].Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
+                </div>
+
+                <div class="col vuln_fix"  style="">
+                    <strong>Fix:</strong>
+                    <div class="desc_fix"></div>
+                    <div class="collapse fix1">{{ group.Rule.fixtext }}</div>
+                    <div class="collapse fix2">{% if stig1_group is defined and stig1_group is not null and stig1_group|length > 0%}{{stig1_group[0].Rule.fixtext}}{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- this is to show items in stig 1 that aren't in stig 2 -->
+    {% for group in stig1.xpath("/xmlns:Benchmark/xmlns:Group") %}
+        {% if group.attributes.id|trim() not in stig2.xpath("/xmlns:Benchmark/xmlns:Group")|map( r => r.attributes.id|trim()) %}
+            
+            {% set stig1_vuln = group.attributes.id %}
+            {% set stig1_leg_vuln = group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first : '' %}
+            {% set stig2_group = stig2.xpath("//xmlns:Group[@id='" ~ stig1_vuln|trim() ~ "']") %}
+
+            {% if stig2_group is not defined or stig2_group is null %}
+                {% set stig2_group = stig2.xpath("//xmlns:Group[@id='" ~ stig1_leg_vuln ~ "']") %}
+            {% endif %}
+
+            <div class="compare-container collapse">
+                <div class="req-header">
+                    <div class="row text-sm">
+                        <div class="col"><strong>Vuln ID: </strong><br />{{group.attributes.id}}</div>
+                        <div class="col"><strong>Rule ID: </strong><br />{{group.Rule.attributes.id}}</div>
+                        <div class="col"><strong>Group ID: </strong><br />{{group.title}}</div>
+                        <div class="col"><strong>Version: </strong><br />{{group.Rule.version}}</div>
+                        <div class="col"><strong>CCI: </strong><br />{{group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'CCI-')|first : '' }}</div>
+                        <div class="col"><strong>Severity:  </strong><br />{{group.Rule.attributes.severity|title }}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col vuln_desc" style="">
+                        <strong>Description:</strong>
+                        <div class="desc_diff"></div>
+                        <div class="collapse desc2">{{group.Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}</div>
+                        <div class="collapse desc1">{% if stig2_group is defined and stig2_group is not null and stig2_group|length > 0%}{{stig2_group[0].Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
+                    </div>
+
+                    <div class="col vuln_check"  style="">
+                        <strong>Check:</strong>
+                        <div class="desc_check"></div>
+                        <div class="collapse check2">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</div>
+                        <div class="collapse check1">{% if stig2_group is defined and stig2_group is not null and stig2_group|length > 0%}{{stig2_group[0].Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
+                    </div>
+
+                    <div class="col vuln_fix"  style="">
+                        <strong>Fix:</strong>
+                        <div class="desc_fix"></div>
+                        <div class="collapse fix2">{{ group.Rule.fixtext }}</div>
+                        <div class="collapse fix1">{% if stig2_group is defined and stig2_group is not null and stig2_group|length > 0%}{{stig2_group[0].Rule.fixtext}}{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+    {% endfor %}
+
+
+
+
+    <script>
+        const stig_app = {
+            init(){
+                let dmp = new diff_match_patch();
+                dmp.Diff_EditCost = 4;
+                $('.vuln_desc').each( (i, e) => {
+                    text1 = $(e).find('div.desc1').text().trim();
+                    text2 = $(e).find('div.desc2').text().trim();
+                    d = dmp.diff_main(text2, text1);
+                    dmp.diff_cleanupSemantic(d);
+                    ds = dmp.diff_prettyHtml(d);
+                    $(e).find('div.desc_diff').html(ds.replace(/&para;/ig,''));
+                })
+                $('.vuln_check').each( (i, e) => {
+                    text1 = $(e).find('div.check1').text().trim();
+                    text2 = $(e).find('div.check2').text().trim();
+                    d = dmp.diff_main(text2, text1);
+                    dmp.diff_cleanupSemantic(d);
+                    ds = dmp.diff_prettyHtml(d);
+                    $(e).find('div.desc_check').html(ds.replace(/&para;/ig,''));
+                })
+                $('.vuln_fix').each( (i, e) => {
+                    text1 = $(e).find('div.fix1').text().trim();
+                    text2 = $(e).find('div.fix2').text().trim();
+                    d = dmp.diff_main(text2, text1);
+                    dmp.diff_cleanupSemantic(d);
+                    ds = dmp.diff_prettyHtml(d);
+                    $(e).find('div.desc_fix').html(ds.replace(/&para;/ig,''));
+                })
+                $('ins').parent().parent().parent().parent().removeClass('collapse')
+                $('del').parent().parent().parent().parent().removeClass('collapse')
+            },
+            view(){
+                if($('#view_stig').val().trim() != ''){
+                    const info = $('#view_stig').val().trim().split('|');
+                    window.location.href = "{{ path('stig_view', {title: 'XXXX', version: 9999, release: 8888}) }}"
+                        .replace('XXXX',"{{title}}")
+                        .replace('9999',info[0])
+                        .replace('8888',info[1])
+                }
+            },
+            compare(){
+                if($('#compare_stig1').val().trim() != '' && $('#compare_stig2').val().trim() != '' ){
+                    const compare_1 = $('#compare_stig1').val().trim().split('|');
+                    const compare_2 = $('#compare_stig2').val().trim().split('|');
+                    window.location.href = "{{ path('stig_compare', {title: 'XXXX', v1: 9999, r1: 8888, v2: 7777, r2: 6666}) }}"
+                            .replace('XXXX',"{{title}}")
+                            .replace('9999',compare_1[0])
+                            .replace('8888',compare_1[1])
+                            .replace('7777',compare_2[0])
+                            .replace('6666',compare_2[1])
+                }
+            },
+        }
+
+        $(document).ready( () => {
+            stig_app.init();
+        })
+    </script>
+{% endblock %}

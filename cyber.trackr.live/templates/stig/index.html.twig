@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}STIGs!{% endblock %}
+
+{% block body %}
+    <style>
+        #stigs td { padding:0px !important; font-family:"Linux Libertine", Georgia, Times, serif;}
+    </style>
+    <h1>Security Technical Implementation Guides - STIGs</h1>
+    <table id="stigs" class="table table-hover table-striped nowrap compact p-0" style="width:100%;"> 
+        <thead>
+            <tr>
+                <th>STIG</th>
+                <th>Version</th>
+                <th>Release</th>
+                <th>Published</th>
+                <th>Released</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stig in stigs|keys %}
+                {% set s = stigs[stig]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
+                <tr>
+                    <td class="text-nowrap">
+                        <a 
+                            href="{{ path('stig_view', {title: stig, version: s.version, release: s.release}) }}"
+                        >
+                            {{stig}}
+                        </a> 
+                    </td>
+                    <td>{{s.version}}</td>
+                    <td>{{s.release}}</td>
+                    <td>{{s.date}}</td>
+		    <td>{{s.released|trim != '' ? s.released | date("Y-m-d") }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        const stig_app = {
+            init(){
+                $('#stigs').DataTable( {
+                    dom: '<"top"f<\'dt_len\'li>p>rt<"bottom"<\'dt_len\'l>p><"clear">', 
+                    pageLength: 25,
+                    order: [[ 0, "asc" ]],
+                    colReorder: true,
+                } )     
+            }
+        }
+
+        $(document).ready( () => {
+            stig_app.init();
+        })
+    </script>
+{% endblock %}

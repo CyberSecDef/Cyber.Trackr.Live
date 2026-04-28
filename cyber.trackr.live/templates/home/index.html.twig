@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cyber Trackr!{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row ">
+            <div class="col-12 border border-1 mt-2 bg-light logo-text">
+                <h1 class="text-center display-6">Welcome to the Cyber Trackr</h1>
+                <p class="text-center">The Free Compliance Library</p>
+            </div>
+        </div>
+
+        <div class="row ">
+            <div class="col-4 border border-1 mt-2 bg-primary bg-opacity-10">
+                <p class="bg-primary-subtle mt-2 border border-1">About Us</p>
+                <p class="">
+                    This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements.  While this site is hosted on the public domain, it was inspired by the various complex efforts for DoD RMF Package Management.  This suite was originally designed to make the crosslinking between Vulnerabilities and STIG Rules easier to manage and has grown into a full  RMF Tool Suite.
+                </p> 
+                <p class="">
+                    My name is Robert Weber and I am a Cyber Enthusiast and work as a DoD Contractor during the day in multiple IT/IA fields.  This includes virtually all aspects of Cyber Security (RMF,STIG Implementation, SCAP Compliance, Vulnerability Scans, etc.)  I developed this suite on my off hours in order to allow me to grow this suite in the best way possible for my community of users.  As such, there is no corporate backing or funding.  I attempt to make new feature updates and releases as regularly as my free time permits. 
+                </p>
+                <p class="">
+                    This suite is the culmination of virtually all IT fields.  It might not have an official backing, but the information provided is an aggregation of multiple Cyber Security data sets.  I strive to make this the best tool available for your Cyber needs and your feedback is always welcome.  
+                </p>
+            </div>
+
+            <div class="ml-4 col-8 border border-1 mt-2 bg-info bg-opacity-10 body-text">
+                <div id="hideme" class="collapse">
+
+                
+                <style>
+                    #stigs td { padding:0px !important; font-family:"Linux Libertine", Georgia, Times, serif;}
+                </style>
+                <table id="stigs" class="table table-hover table-striped nowrap compact p-0" style="width:100%;"> 
+                    <thead>
+                        <tr>
+                            <th>Recent STIGs</th>
+                            <th>Version</th>
+                            <th>Release</th>
+                            <th>Published</th>
+                            <th>Released</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stig in stigs|keys %}
+                            {% set s = stigs[stig]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
+                            <tr>
+                                <td class="text-nowrap">
+                                    <a 
+                                        href="{{ path('stig_view', {title: stig, version: s.version, release: s.release}) }}"
+                                    >
+                                        {{stig}}
+                                    </a> 
+                                </td>
+                                <td>{{s.version}}</td>
+                                <td>{{s.release}}</td>
+                                <td>{{s.date}}</td>
+                                <td>{{s.released|trim != '' ? s.released | date("Y-m-d") }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const stig_app = {
+        init(){
+            $('#stigs').DataTable( {
+                dom: '<"top">rt<"bottom"<>p><"clear">', 
+                pageLength: 25,
+                order: [[ 3, "desc" ]],
+                colReorder: false,
+            } );
+            $('#hideme').show();     
+        }
+    }
+
+    $(document).ready( () => {
+        stig_app.init();
+    })
+</script>
+{% endblock %}

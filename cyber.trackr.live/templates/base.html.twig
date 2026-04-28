@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html >
+    <head>
+        <meta charset="UTF-8">
+
+        
+        <meta name="description" content="This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements.">
+        <meta name="keywords" content="RMF, STIG, SCAP, CCI">
+
+
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}
+            
+            <link rel="stylesheet" href="/css/bootstrap.min.css" />
+            <link rel="stylesheet" href="/css/bootstrap-icons.css" />
+            <link rel="stylesheet" href="/css/datatables.min.css" />
+            
+        {% endblock %}
+
+        {% block javascripts %}
+            <script src="/js/jquery-3.7.1.min.js"></script>
+            <script src="/js/bootstrap.bundle.min.js"></script>
+            <script src="/js/datatables.min.js"></script>
+            <script src="/js/diff_match_patch.js"></script>
+            <script src="/js/dist_masonry.pkgd.min.js"></script>
+            <script src="/js/js.cookie.min.js"></script>
+        {% endblock %}
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+        <link rel="manifest" href="/images/site.webmanifest">
+        
+        <style>
+            html {
+                min-height: 100%;
+            }
+            
+            body{
+                font-family: sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                background-color: #f6f6f6;
+                height:100%;
+                min-height: 100vh;
+            }
+            
+            .logo-text{
+                font-family:"Linux Libertine", Georgia, Times, serif;
+            }
+            a{
+                color:#339 !important;
+            }
+
+            #quadrant-4{
+                border-left: 2px solid #a7d7f9;
+                border-top: 1px solid #a7d7f9;
+                background:#fff;
+            }
+
+            dt.inline {
+                float: left;
+                clear: left;
+                width: 110px;
+                font-weight: bold;
+            }
+      
+            dt.inline::after {
+                content: ":";
+            }
+
+
+            .body-container{
+                height:110vh;
+            }
+            
+            .sidemenu{
+                font-family: sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                font-size:14px;
+                
+            }
+            .doc-title{
+                font-family: sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                font-size: 28.8px;
+                font-weight:400;
+                line-height: 39.6px;
+                border-bottom: 1px solid #ccc;
+                padding-top:20px;
+                margin-bottom:20px;
+            }
+            .doc-desc{
+                font-family: sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                font-size:14px;
+                margin-bottom:20px;
+            }
+            .doc-summary{
+                float: right;
+                border: 1px solid black;
+                
+                background: #f3f3f3;
+                margin:10px;
+            }
+
+            .sec-title{
+                font-family: sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                font-size: 20px;
+                font-weight:400;
+                line-height: 1.2em;
+                border-bottom: 1px solid #999;
+                padding-top:10px;
+                margin-bottom:5px;
+            }
+            .req-header{
+                font-family: sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                display:block;
+                border-bottom: 1px solid #ccc;
+                
+                font-size: 1.2em;
+                margin-top:20px;                
+            }
+            .req-desc{
+                font-family:  sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                margin-left: 5px;
+                font-size: 14px;
+                line-height: 22.4px;
+                padding-bottom:20px;
+            }
+            .requirement{
+                border-bottom: 1px solid #fff;
+            }
+            .reference{
+                font-size:12px;
+                
+            }
+
+            .text-justify{
+                text-align: justify;
+                text-justify: inter-word;
+            }
+
+            .sec-header{
+                font-family:  sans-serif;
+                /*font-family: "Linux Libertine", Georgia, Times, serif;*/
+                display:block;
+                border-bottom: 1px solid black;
+                padding-left:5px;
+                
+                font-size: 1.2em;
+                font-weight:bold;
+                
+            }
+
+
+            .text-sm{
+                font-size: .7em;
+            }
+            .text-md{
+                font-size: .9em;
+            }
+
+        </style>
+        <script>
+            const app = {
+                init(){
+                    $("#search_terms").keyup(function(event) {
+                        if (event.keyCode === 13) {
+                            app.search();
+                        }
+                    });
+                },
+                search(){
+                    window.location.href = "{{path('search', {query: 'REPLACE_THIS'} ) }}".replace('REPLACE_THIS', $('#search_terms').val())
+                }
+            }
+            $(document).ready( () => {
+                app.init();
+            })
+        </script>
+    </head>
+    <body>
+        <div class="container-fluid body-container" id="body-container">
+            <div class="row">
+                <div class="col-3 logo-text" id="quadrant-1">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-2">
+                                <a href="{{path('home')}}" style="text-decoration:none; color:black;">
+                                    <img src="/images/cyber.trackr.png" height="50" width="50" alt="Cyber Trackr - Free Compliance Library"/>
+                                </a>
+                            </div>
+                            <div class="col-10">
+                                <a href="{{path('home')}}" style="text-decoration:none; color:black;">
+                                    <div style="font-size: 16pt; font-weight:bold; ">Cyber Trackr</div>
+                                    <div class="pt-0 mt-0" style="font-size: 10pt;">The Free Compliance Library</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9" id="quadrant-2">
+                    <div class="input-group pt-2 mb-3">
+                        <input type="text" id="search_terms" class="form-control" placeholder="Search Term" aria-label="Search Term" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="app.search();">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1 sidemenu" id="quadrant-3">
+                    {% include "sidebar.html.twig" %}
+                </div>
+                <div class="col-11" id="quadrant-4" style="min-height:1024px;">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        
+    </body>
+</html>

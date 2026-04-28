@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CCIs!{% endblock %}
+
+{% block body %}
+    <div class="collapse" id="cci_container" >
+        <h1>Common Control Idenfiers - CCIs</h1>
+        <table id="ccis" class="table table-hover table-striped compact p-0 text-sm border border-1 " style="width:100%;"> 
+            <thead>
+                <tr>
+                    <th>CCI</th>
+                    <th>CCI Definition</th>
+                    <th>CCI Auditor</th>
+                    <th>CCI Guidance</th>
+                    <th>Control Name</th>
+                    <th>Control</th>
+                    <th>Assessment Procedure</th>
+                    <th>Control Guidance</th>
+                    <th>Control Definition</th>
+                </tr>
+            </thead>
+            <tbody>                
+                {% for r in results %}
+                    <tr>
+                        <td style="white-space:nowrap;">{{r.cci}}</td>
+                        <td style="white-space:pre-wrap;">{{r.cci_definition|default()}}</td>
+                        <td style="white-space:pre-wrap;">{{r.cci_auditor|default()}}</td>
+                        <td style="white-space:pre-wrap;">{{r.cci_guidance|default()}}</td>
+                        <td>{{r.name|default()}}</td>
+                        <td>{{r.rmf|default()}}</td>
+                        <td>{{r.ap_acronym|default()}}</td>
+                        <td class="col-3" style="white-space:pre-wrap;">{{r.rmf_guidance|default()}}</td>
+                        <td class="col-3" style="white-space:pre-wrap;">{{r.rmf_definition|default()}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <br />
+    <script>
+        const cci_app = {
+            init(){
+                $('#ccis').DataTable( {
+                    dom: '<"top"f<\'dt_len\'li>pB>rt<"bottom"<\'dt_len\'l>p><"clear">', 
+                    pageLength: 25,
+                    order: [[ 0, "asc" ]],
+                    colReorder: true,
+                    buttons: [
+                        {
+                            extend:    'copyHtml5',
+                            text:      '<i class="bi bi-copy p-0 m-0"></i>',
+                            titleAttr: 'Copy',
+                        },
+                        {
+                            extend:    'excelHtml5',
+                            text:      '<i class="bi bi-file-excel p-0 m-0"></i>',
+                            className: 'btn-primary',
+                            titleAttr: 'Excel',
+                        },
+                        {
+                            extend:    'csvHtml5',
+                            text:      '<i class="bi bi-filetype-csv p-0 m-0"></i>',
+                            titleAttr: 'CSV',
+                        },
+                        {
+                            extend:    'pdfHtml5',
+                            text:      '<i class="bi bi-file-pdf p-0 m-0"></i>',
+                            titleAttr: 'PDF',
+                            orientation: 'landscape',
+                            pageSize: 'LEGAL',
+                        },
+                        {
+                            extend:    'print',
+                            text:      '<i class="bi bi-printer m-0 p-0"></i>',
+                            titleAttr: 'Print'
+                        }
+                    ],
+                    
+                } )     
+                $('#cci_container').show();
+            }
+        }
+
+        $(document).ready( () => {
+            cci_app.init();
+        })
+    </script>
+{% endblock %}

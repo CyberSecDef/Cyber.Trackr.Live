@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cyber Trackr!{% endblock %}
+
+{% block body %}
+
+    <div class="card my-2" style="">
+        <div class="card-body">
+            <strong>Query Terms:</strong> {{query}}
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6 ">
+                <div 
+                    class="sec-title bg-primary-subtle p-2  border border-1 border-primary" 
+                    onclick="$('#rmfv4_results').toggle();" 
+                    role="button"
+                >
+                    RMFv4 Controls - [ {{results.rmfv4|length}} ]
+                </div>
+                <div class="collapse" id="rmfv4_results">
+                    {% for c in results.rmfv4 %}
+                        <div class="req-header">
+                            <a href="{{ path('rmf_v4_view') }}#rmf_{{c.id}}">
+                                {{c.id}} - {{c.title}}
+                            </a>
+                        </div>
+                        <div style="max-height:10rem; overflow-y: auto; ">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '' )}}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-6">
+                <div 
+                    class="sec-title bg-primary-subtle p-2  border border-1 border-primary" 
+                    onclick="$('#rmfv5_results').toggle();" 
+                    role="button"
+                >
+                    RMFv5 Controls - [ {{results.rmfv5|length}} ]
+                </div>
+                <div class="collapse" id="rmfv5_results">
+                    {% for c in results.rmfv5 %}
+                        <div class="req-header"><a href="{{ path('rmf_v5_view') }}#rmf_{{c.id}}">{{c.id}} - {{c.title}}</a></div>
+                        <div style="max-height:10rem; overflow-y: auto; ">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '' ) }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <div class="col-6">
+                <div 
+                    class="sec-title bg-primary-subtle p-2  border border-1 border-primary" 
+                    onclick="$('#ccis_results').toggle();" 
+                    role="button"
+                >
+                    CCI - [ {{results.ccis|length}} ]
+                </div>
+                <div class="collapse" id="ccis_results">
+                    {% for c in results.ccis %}
+                        <div class="req-header">
+                            {{c.id}}
+                        </div>
+                        <div style="max-height:10rem; overflow-y: auto; ">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '' ) }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div 
+                    class="sec-title bg-primary-subtle p-2  border border-1 border-primary" 
+                    onclick="$('#aps_results').toggle();" 
+                    role="button"
+                >
+                    APs - [ {{results.aps|length}} ]
+                </div>
+                <div class="collapse" id="aps_results">
+                    {% for c in results.aps %}
+                        <div class="req-header">{{c.id}} - {{c.title}}</div>
+                        <div style="max-height:10rem; overflow-y: auto; ">
+                            {{c.description}}
+                            {{c.note}}
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <div class="col-12">
+                <div 
+                    class="sec-title bg-primary-subtle p-2  border border-1 border-primary" 
+                    onclick="$('#vuln_results').toggle();" 
+                    role="button"
+                >
+                    Vulnerability Requirements - [ {{ (results.vulns|length < 500) ? results.vulns|length : 500  }} ]
+                </div>
+                <div class="collapse" id="vuln_results">
+                    {% for c in results.vulns|slice(0,500) %}
+                        <div class="req-header">
+                            <dl class="m-0 p-0 text-sm">
+                                <dt class="inline">STIG</dt>
+                                <dd><a href="{{ path('stig_view', { title: c.stig_title, version: c.version, release: c.release}) }}">{{c.stig_title}}</a> </dd>
+                                
+                                <dt class="inline">Rule</dt>
+                                <dd>{{c.note}}</dd>
+
+                                <dt class="inline">Vuln ID</dt>
+                                <dd>
+                                    <a href="{{ path('stig_view', { title: c.stig_title, version: c.version, release: c.release}) }}#req_{{c.group}}">
+                                        {{c.vuln}}
+                                    </a><br />
+                                    
+                                </dd>
+
+                                <dt class="inline">Rule ID</dt>
+                                <dd>
+                                    {{c.rule}}
+                                </dd>
+
+                            </dl>
+
+                            <div style="max-height:10rem; overflow-y: auto; ">
+                                {{c.description|regex_replace('/<[^>]*>/is', '' )}}
+                                {{c.note|regex_replace('/<[^>]*>/is', '' )}}
+                            </div>
+                        </div>
+                        
+                    {% endfor %}
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const search_app = {
+            init(){
+                search_app.bolderize('#rmfv4_results');
+                search_app.bolderize('#rmfv5_results');
+            },
+            bolderize(el) {
+                $(el).html(
+                    $(el).html().replace(/\[([^\]]+)\]/gm, '<strong>[$1]</strong>')
+                )
+            }
+        }
+
+        $(document).ready( () => {
+            search_app.init();
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,66 @@
+# php_value memory_limit 512M
+
+ErrorDocument 401 "Error"
+ErrorDocument 403 "Error"
+
+# DENY ACCESS TO IP ADDRESS
+<RequireAll>
+    Require all granted
+    Require not ip 45.33.21.243
+    Require not ip 45.56.71.143
+    Require not ip 45.56.79.182
+    Require not ip 45.56.127.147
+    Require not ip 76.187.121.29
+    Require not ip 64.79.55.161
+</RequireAll>
+
+
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_URI} ^/(stats|failed_auth\.html).*$ [NC]
+RewriteRule . - [L]
+</IfModule>
+
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    #RewriteBase /
+
+    #force https
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # get rid of double slashes
+    RewriteCond %{REQUEST_URI} !=/server-info
+    RewriteCond %{REQUEST_URI} !=/server-status
+    RewriteCond %{REQUEST_URI} ^(.*)//(.*)$
+    RewriteRule . %1/%2 [R=301,L]
+
+    # Handle Authorization Header
+    RewriteCond %{REQUEST_URI} !=/server-info
+    RewriteCond %{REQUEST_URI} !=/server-status
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_URI} !=/server-info
+    RewriteCond %{REQUEST_URI} !=/server-status
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_URI} !=/server-info
+    RewriteCond %{REQUEST_URI} !=/server-status
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L] 
+</IfModule>

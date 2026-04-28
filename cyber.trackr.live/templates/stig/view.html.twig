@@ -1,0 +1,409 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}View STIG - {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }} V{{ version }}R{{ release }} {% endblock %}
+
+{% block body %}
+    <div class="doc-title">
+        <h1>
+            <button class="btn btn-primary m-2 py-1 px-2" onclick="stig_app.download();">
+                <i class="bi bi-cloud-download"></i>
+            </button>
+
+            <button class="btn btn-primary m-2 py-1 px-2" onclick="pdf_app.exec();">
+                <i class="bi bi-printer-fill"></i>
+            </button>
+
+            {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }}
+            - V{{ version }}R{{ release }}
+        </h1>
+    </div>
+    
+    <div class="doc-summary">
+        <div class="card shadow-lg" style="width: 36rem;">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><b>Version/Release:</b> V{{ version }}R{{ release }} </li>
+                <li class="list-group-item"><b>Published: </b> {{ stig.xpath("/xmlns:Benchmark/xmlns:status/@date")|first }} </li>
+                <li class="list-group-item"><b>Released: </b> {{ stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first | split('Date:')[1] | date("Y-m-d")}} </li>
+
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3"><b>Expand All:</b></div>
+                        <div class="col-9">
+                            <div class="form-check form-switch from-switch-inline">
+                                <label class="form-check-label" for="flexSwitchCheckChecked"></label>
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="stig_app.expCol(this);">
+                            </div>    
+                        </div>
+                    </div>
+
+                </li>
+                <li class="list-group-item"><b>Severity:</b> 
+
+                    <button type="button" class="btn btn-outline-success p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this);">
+                        Low - {{ stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'low']")|length }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-warning p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this);">
+                        Medium - {{ stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'medium']")|length }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-danger p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this);">
+                        High - {{ stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'high']")|length }}
+                    </button>
+                </li>
+                <li class="list-group-item">
+                    <b>Sort:</b> 
+                    
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions1" value="control" onclick="stig_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions1">Control</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions2" value="severity" onclick="stig_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions2">Severity</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions3" value="vuln" onclick="stig_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions3">Vuln</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions4" value="title" onclick="stig_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions4">Title</label>
+                    </div>
+                    
+                    
+                </li>
+            </ul>
+
+            <div class="card-body border ">	
+                <h6 class="card-subtitle"><b>Compare</b></h6>
+                <p class="card-text">Select any two versions of this STIG to compare the individual requirements</p>
+				<div class="input-group">
+
+                    <select class="form-select" id="compare_stig1">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="form-select" id="compare_stig2">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="button" onclick="stig_app.compare()">Compare</button>
+                </div>
+
+            </div>
+
+			<div class="card-body border">	
+                <h6 class="card-subtitle"><b>View</b></h6>
+                <p class="card-text">Select any old version/release of this STIG to view the previous requirements</p>
+				<div class="input-group">
+                    <select class="form-select" id="view_stig" aria-label="Example select with button addon">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="button" onclick="stig_app.view()">View</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="doc-desc">
+        {{ stig.xpath("/xmlns:Benchmark/xmlns:description")|first }}
+    </div>
+
+    <div id="requirements" class="collapse">
+        {% for group in stig.xpath("/xmlns:Benchmark/xmlns:Group") %}
+            <div class="stig-group requirement {{group.Rule.attributes.severity}}">
+                <div class="collapse severity"> 
+                    {% if group.Rule.attributes.severity == 'high' %}
+                        c
+                    {% elseif group.Rule.attributes.severity == 'medium' %}
+                        b
+                    {% else %}
+                        a
+                    {% endif %}
+                </div>
+
+                {% if group.Rule.ident is defined and group.Rule.ident is not null and group.Rule.ident|length > 0 %}
+                    {% set CCI_NUM = group.Rule.ident|filter( v => v.__toString() starts with 'CCI-')|first %}
+                {% else %}
+                    {% set CCI_NUM = "" %}
+                {% endif %}
+                
+                <div class="req-header title" onclick="stig_app.showhide(this);">
+                    <div  class="text-md requirement-title" style=" cursor: pointer; font-style: italic;">
+                        {{group.Rule.title}}
+                    </div>
+                    <a name="req_{{group.attributes.id}}"></a>
+                    <div class="title-details text-md collapse">
+                        {% if CCI_NUM != '' %}
+                            {{ cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first.references.reference|first.attributes.index|split(' ')|first  }} -
+                        {% endif %}
+                        {{group.Rule.attributes.severity|title }} - 
+                        {% if CCI_NUM != '' %}
+                            {{ CCI_NUM }} - 
+                        {% endif %}
+                        {{group.attributes.id}} - 
+                        {{group.Rule.attributes.id}} 
+                    </div>
+                    
+                    
+                </div>
+
+                <div class="container-fluid requirement-details">
+                    <div class="row">
+                        <dl class="col-2 mb-0 p-0 pl-1 g-0 border border-1 bg-light">
+                            <dt class="">RMF Control</dt>
+                            <dd class="control">
+                            {% if CCI_NUM != '' %}
+                                {{ cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first.references.reference|first.attributes.index|split(' ')|first  }}
+                            {% endif %}
+                            </dd>
+
+                            <dt class="">Severity</dt>
+                            <dd >
+                                <span class="badge 
+                                    {% if group.Rule.attributes.severity == 'high' %}
+                                        text-bg-danger
+                                    {% elseif group.Rule.attributes.severity == 'medium' %}
+                                        text-bg-warning
+                                    {% else %}
+                                        text-bg-success
+                                    {% endif %}
+                                ">
+                                    {{group.Rule.attributes.severity|title }}
+                                </span>
+                                
+                            </dd>
+
+                            <dt class="">CCI</dt>
+                            <dd class="">{{CCI_NUM}}</dd>
+
+                            <dt class="">Version</dt>
+                            <dd class="">{{group.Rule.version }}</dd>
+
+                            <dt class="">Vuln IDs</dt>
+                            <dd class="">
+                                <ul class="list-unstyled">
+                                    <li class="vuln">{{group.attributes.id}}</li>
+                                    <li>
+                                        {% if group.Rule.ident is defined and group.Rule.ident is not null and group.Rule.ident|length > 0 %}
+                                            {{group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first}}
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </dd>
+
+                            <dt class="">Rule IDs</dt>
+                            <dd class="">
+                                <ul class="list-unstyled">
+                                    <li>{{group.Rule.attributes.id}}</li>
+                                    <li>
+                                        {% if group.Rule.ident is defined and group.Rule.ident is not null and group.Rule.ident|length > 0 %}
+                                            {{group.Rule.ident|filter( v => v.__toString() starts with 'SV-')|first}}
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </dd>                    
+                        </dl>    
+                        <div class="col-10 ">
+
+                            <div class="req-desc">
+                                {{group.Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}
+                            </div>
+
+                            <h6><u><strong>Checks</strong>: {{ group.Rule.check.attributes.system }}</u></h6>
+                            <p style="white-space:pre-wrap;">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</p>
+            
+                            <h6><u><strong>Fix: </strong>{{ group.Rule.fix.attributes.id }}</u></h6>
+                            <p style="white-space:pre-wrap;">{{ group.Rule.fixtext }}</p>
+
+                            <h6> 
+                                <button class="btn btn-outline-secondary m-2 py-1 " onclick="stig_app.mitigate(this, '{{ group.attributes.id }}', '{{ group.Rule.title|sha1 }}');"><i class="bi bi-cloud-plus"></i>
+                                    <strong>Generate Mitigation Statement:</strong>
+                                </button>
+                            </h6>
+                            <p style="">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+    <script>
+        const stig_app = {
+            md: null,
+            init(){
+                const expCol = Cookies.get('state')
+                if(expCol == 'collapse'){
+                    $('#flexSwitchCheckChecked').trigger('click')
+                }
+                $('#requirements').removeClass('collapse')
+                stig_app.md = window.markdownit()
+            },
+            view(){
+                if($('#view_stig').val().trim() != ''){
+                    const info = $('#view_stig').val().trim().split('|');
+                    window.location.href = "{{ path('stig_view', {title: 'XXXX', version: 9999, release: 8888}) }}"
+                        .replace('XXXX',"{{title}}")
+                        .replace('9999',info[0])
+                        .replace('8888',info[1])
+                }
+            },
+            compare(){
+                if($('#compare_stig1').val().trim() != '' && $('#compare_stig2').val().trim() != '' ){
+                    const compare_1 = $('#compare_stig1').val().trim().split('|');
+                    const compare_2 = $('#compare_stig2').val().trim().split('|');
+                    window.location.href = "{{ path('stig_compare', {title: 'XXXX', v1: 9999, r1: 8888, v2: 7777, r2: 6666}) }}"
+                            .replace('XXXX',"{{title}}")
+                            .replace('9999',compare_1[0])
+                            .replace('8888',compare_1[1])
+                            .replace('7777',compare_2[0])
+                            .replace('6666',compare_2[1])
+                }
+            },
+            download(){
+                window.open( window.location.href + '/download' );
+            },
+            mitigate(elem, vuln_id, m){
+                console.log(elem);
+                console.log(vuln_id);
+                console.log(m);
+                let mit = $( elem ).parent().next( 'p' );
+                $( elem ).prop('disabled',true); 
+                $( mit ).addClass(" border border-secondary ");
+		$( mit ).text("Please wait....generating statement")
+                $.getJSON( "https://cyber.trackr.live/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id + "?m=" + m)
+  .done(function( json ) {
+    $(mit).html( stig_app.md.render( json['mitigation-statement'] ) );
+  })
+  .fail(function( jqxhr, textStatus, error ) {
+    var err = textStatus + ", " + error;
+    console.log( "Request Failed: " + err );
+}); 
+                //$( elem ).parent().next( 'p' ).text( "https://cyber.trackr.live/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id)
+            },
+            toggleFilter(elem){
+                switch(true) {
+                    case $(elem).text().trim().toLowerCase().includes('low'):
+                        if($(elem).hasClass('active')){
+                            $('div.stig-group.low').removeClass('collapse')
+                        }else{
+                            $('div.stig-group.low').removeClass('collapse').addClass('collapse')
+                        }
+                        break;
+                    case $(elem).text().trim().toLowerCase().includes('medium'):
+                        if($(elem).hasClass('active')){
+                            $('div.stig-group.medium').removeClass('collapse')
+                        }else{
+                            $('div.stig-group.medium').removeClass('collapse').addClass('collapse')
+                        }
+                        break;
+                    case $(elem).text().trim().toLowerCase().includes('high'):
+                        if($(elem).hasClass('active')){
+                            $('div.stig-group.high').removeClass('collapse')
+                        }else{
+                            $('div.stig-group.high').removeClass('collapse').addClass('collapse')
+                        }
+                        break;
+                }
+            },
+            sort(elem){
+                var sort_field = $(elem).val();
+                var list = $('div.stig-group')
+                var itemsArr = []
+                $(list).each( (i, e) => {
+                    itemsArr.push(e)
+                })
+                
+                itemsArr.sort(function(a, b) {
+                return $(a).find('.' + sort_field).text().trim() == $(b).find('.' + sort_field).text().trim()
+                        ? 0
+                        : ($(a).find('.' + sort_field).text().trim() > $(b).find('.' + sort_field).text().trim() ? 1 : -1);
+                });
+
+                $('div#requirements').empty()
+                itemsArr.forEach( (e, i) => {
+                    $('div#requirements').append(e);
+                })
+            },
+            expCol(elem){
+
+                if($(elem).is(":checked")){
+                    Cookies.set('state', 'expand')                    
+                    $('.requirement-details').removeClass('collapse')
+                    $('.title-details').removeClass('collapse').addClass('collapse')
+                    $('.requirement-title').removeClass('text-truncate')
+                }else{
+                    Cookies.set('state', 'collapse')
+                    $('.requirement-details').removeClass('collapse').addClass('collapse')
+                    $('.title-details').removeClass('collapse')
+                    $('.requirement-title').addClass('text-truncate')
+                }
+            },
+            showhide(elem){
+                if(
+                    $(elem).siblings('div.requirement-details').hasClass('collapse')
+                ){
+                    $(elem).siblings('div.requirement-details').removeClass('collapse');
+                    
+                }else{
+                    $(elem).siblings('div.requirement-details').removeClass('collapse').addClass('collapse');
+                }
+                
+            }
+        }
+
+        pdf_app = {
+	toTitleCase(str){
+	  return str.replace(
+		/\w\S*/g,
+		text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+	  );
+	},
+	exec(){
+		let printWindow = window.open('', '', 'height=1024,width=1280');
+		printWindow.document.write('<html><head><title>' + $("div#quadrant-4 > div.doc-title > h1").text() + '</title>');
+		printWindow.document.write('<style>body{font-family:arial;} ul{list-style: none;}</style>');
+		printWindow.document.write('</head><body >');
+		
+		printWindow.document.write("<h1>" + $("div#quadrant-4 > div.doc-title > h1").text() +  "</h1>");
+		
+		$('#requirements > div.requirement').each( (i, e)=>{
+			printWindow.document.write("<h2>" + $(e).find("div.requirement-title").text() + "</h2>");
+			printWindow.document.write( $(e).find("div.requirement-details > div.row > div.col-10 > div.req-desc").html() );	
+		
+			printWindow.document.write( "<dl style='display: grid; grid-template-columns: max-content auto;'>" );
+			printWindow.document.write( $(e).find("div.requirement-details > div.row > dl").html().replace(/\s+/g,' ') );
+			printWindow.document.write ( "</dl>" );
+
+			printWindow.document.write("<h3>Checks</h3>");
+			printWindow.document.write("<blockquote>")
+			printWindow.document.write("<p style='white-space:pre-wrap;'>"  + $(e).find("div.requirement-details > div.row > div.col-10 > p")[0].innerHTML + "</p>");
+			printWindow.document.write("</blockquote>")
+			
+			printWindow.document.write("<h3>Fixes</h3>");
+			printWindow.document.write("<blockquote>")
+			printWindow.document.write("<p style='white-space:pre-wrap;'>"  + $(e).find("div.requirement-details > div.row > div.col-10 > p")[1].innerHTML + "</p>");
+			printWindow.document.write("</blockquote>")
+			printWindow.document.write("<hr />"  )			
+		})
+		printWindow.document.write('</body></html>');
+		printWindow.document.close();
+	}
+};
+
+        $(document).ready( () => {
+            stig_app.init();
+        })
+    </script>
+{% endblock %}

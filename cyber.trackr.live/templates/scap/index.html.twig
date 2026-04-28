@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SCAPs!{% endblock %}
+
+{% block body %}
+    <style>
+        #scaps td { padding:0px !important; font-family:"Linux Libertine", Georgia, Times, serif;}
+    </style>
+    <h1>Security Content Automation Protocols - SCAPs</h1>
+    <table id="scaps" class="table table-hover table-striped nowrap compact p-0" style="width:100%;"> 
+        <thead>
+            <tr>
+                <th>SCAP</th>
+                <th>Version</th>
+                <th>Release</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for scap in scaps|keys %}
+                {% set s = scaps[scap]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
+                <tr>
+                    <td class="text-nowrap">
+                        <a 
+                            href="{{ path('scap_view', {title: scap, version: s.version, release: s.release}) }}"
+                        >
+                            {{scap}}
+                        </a> 
+                    </td>
+                    <td>{{s.version}}</td>
+                    <td>{{s.release}}</td>
+                    <td>{{s.date}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        const scap_app = {
+            init(){
+                $('#scaps').DataTable( {
+                dom: '<"top"f<\'dt_len\'li>p>rt<"bottom"<\'dt_len\'l>p><"clear">', 
+                pageLength: 25,
+                order: [[ 3, "desc" ]],
+                colReorder: false,
+            } );     
+            }
+        }
+
+        $(document).ready( () => {
+            scap_app.init();
+        })
+    </script>
+{% endblock %}

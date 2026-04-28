@@ -1,0 +1,240 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}View SCAP - {{ scap.xpath("//xccdf:Benchmark/xccdf:title")|first }} V{{ version }}R{{ release }}{% endblock %}
+
+{% block body %}
+    <div class="doc-title">
+        <h1>
+            <button class="btn btn-primary m-2 py-1 px-2" onclick="scap_app.download();">
+                <i class="bi bi-cloud-download"></i>
+            </button>
+            {{ scap.xpath("//xccdf:Benchmark/xccdf:title")|first }}
+        </h1>
+    </div>
+    
+    <div class="doc-summary">
+        <div class="card shadow-lg " style="width: 36rem;">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><b>Version/Release:</b> V{{ version }}R{{ release }} </li>
+                <li class="list-group-item"><b>Published: </b> {{ scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first }} </li>
+
+                <li class="list-group-item"><b>Severity:</b> 
+
+                    <button type="button" class="btn btn-outline-success p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this);">
+                        Low - {{ scap.xpath(".//xccdf:Rule[@severity = 'low']")|length }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-warning p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this);">
+                        Medium - {{ scap.xpath(".//xccdf:Rule[@severity = 'medium']")|length }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-danger p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this);">
+                        High - {{ scap.xpath(".//xccdf:Rule[@severity = 'high']")|length }}
+                    </button>
+                </li>
+
+                <li class="list-group-item">
+                    <b>Sort:</b> 
+                    
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions1" value="control" onclick="scap_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions1">Control</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions2" value="severity" onclick="scap_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions2">Severity</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions3" value="vuln" onclick="scap_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions3">Vuln</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions4" value="title" onclick="scap_app.sort(this);">
+                        <label class="form-check-label" for="sortOptions4">Title</label>
+                    </div>
+                    
+                    
+                </li>
+
+            </ul>
+
+
+
+
+
+
+
+            <div class="card-body border">	
+                <h6 class="card-subtitle"><b>View</b></h6>
+                <p class="card-text">Select any old version/release of this SCAP to view the previous requirements</p>
+				<div class="input-group">
+                    <select class="form-select" id="view_scap" aria-label="Example select with button addon">
+                        <option value="" selected="selected">Choose...</option>
+                        {% for s in scaps|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="button" onclick="scap_app.view()">View</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="doc-desc">
+        {{ scap.xpath("//xccdf:Benchmark/xccdf:description")|first }}
+    </div>
+
+    <div id="requirements" class="">
+    {% set groups = scap.xpath("//xccdf:Benchmark/xccdf:Group") %}
+    {% for group in groups %}
+        <div class="scap-group requirement {{group.xpath('.//xccdf:Rule/@severity')|first}}">
+            <div class="collapse severity"> 
+                {% if group.xpath('.//xccdf:Rule/@severity')|first == 'high' %}
+                    c
+                {% elseif group.xpath('.//xccdf:Rule/@severity')|first == 'medium' %}
+                    b
+                {% else %}
+                    a
+                {% endif %}
+            </div>
+            
+            {% if group.xpath('.//xccdf:Rule/xccdf:ident')|filter( v => v.__toString() starts with 'CCI-')|length > 0 %}
+                {% set CCI_NUM = group.xpath('.//xccdf:Rule/xccdf:ident')|filter( v => v.__toString() starts with 'CCI-')|first %}
+            {% else %}
+                {% set CCI_NUM = "" %}
+            {% endif %}
+            
+            <div class="req-header title">
+                {{group.xpath('.//xccdf:Rule/xccdf:title')|first}}
+            </div>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <dl class="col-2 mb-0 p-0 pl-1 g-0 border border-1 bg-light">
+                        <dt class="">RMF Control</dt>
+                        <dd class="control">
+                        {% if CCI_NUM != '' %}
+                            {{ cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first.references.reference|first.attributes.index|split(' ')|first  }}
+                        {% endif %}
+                        </dd>
+
+                        <dt class="">Severity</dt>
+                        <dd class="">
+                            <span class="badge 
+                                {% if group.xpath('.//xccdf:Rule/@severity')|first == 'high' %}
+                                    text-bg-danger
+                                {% elseif group.xpath('.//xccdf:Rule/@severity')|first == 'medium' %}
+                                    text-bg-warning
+                                {% else %}
+                                    text-bg-success
+                                {% endif %}
+                            ">
+                                {{group.xpath('.//xccdf:Rule/@severity')|first|title }}
+                            </span>
+                            
+                        </dd>
+
+                        <dt class="">CCI</dt>
+                        <dd class="">{{CCI_NUM}}</dd>
+
+                        <dt class="">Version</dt>
+                        <dd class="">{{group.xpath('.//xccdf:Rule/xccdf:version')|first  }}</dd>
+
+                        <dt class="">Vuln IDs</dt>
+                        <dd class="vuln">{{group.xpath('.//@id')|first|replace({'xccdf_mil.disa.stig_group_':''})}}</dd>
+
+                        <dt class="">Rule IDs</dt>
+                        <dd class="">{{group.xpath('.//xccdf:Rule/@id')|first|replace({'xccdf_mil.disa.stig_rule_':''})}}</dd>                    
+                    </dl>    
+                    <div class="col-10 ">
+
+                        <div class="req-desc">
+                            {{group.xpath('.//xccdf:Rule/xccdf:description')|first|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}
+                        </div>
+
+                        <h6><u><strong>Fix: </strong>{{ group.xpath('.//xccdf:Rule/xccdf:fix/@id')|first }}</u></h6>
+                        <p style="white-space:pre-wrap;">{{ group.xpath('.//xccdf:Rule/xccdf:fixtext/text()')|first }}</p>
+                    </div>
+                </div>
+            </div>
+
+            
+                            
+            
+        </div>
+    {% endfor %}
+    </div>
+    <script>
+        const scap_app = {
+            init(){
+              $('#scaps').DataTable( {
+                dom: '<"top">rt<"bottom"<>p><"clear">', 
+                pageLength: 25,
+                order: [[ 3, "desc" ]],
+                colReorder: false,
+            } );       
+            },
+            view(){
+                if($('#view_scap').val().trim() != ''){
+                    const info = $('#view_scap').val().trim().split('|');
+                    window.location.href = "{{ path('scap_view', {title: 'XXXX', version: 9999, release: 8888}) }}"
+                        .replace('XXXX',"{{title}}")
+                        .replace('9999',info[0])
+                        .replace('8888',info[1])
+                }
+            },
+            download(){
+                window.open( window.location.href + '/download' );
+            },
+            toggleFilter(elem){
+                switch(true) {
+                    case $(elem).text().trim().toLowerCase().includes('low'):
+                        if($(elem).hasClass('active')){
+                            $('div.scap-group.low').removeClass('collapse')
+                        }else{
+                            $('div.scap-group.low').removeClass('collapse').addClass('collapse')
+                        }
+                        break;
+                    case $(elem).text().trim().toLowerCase().includes('medium'):
+                        if($(elem).hasClass('active')){
+                            $('div.scap-group.medium').removeClass('collapse')
+                        }else{
+                            $('div.scap-group.medium').removeClass('collapse').addClass('collapse')
+                        }
+                        break;
+                    case $(elem).text().trim().toLowerCase().includes('high'):
+                        if($(elem).hasClass('active')){
+                            $('div.scap-group.high').removeClass('collapse')
+                        }else{
+                            $('div.scap-group.high').removeClass('collapse').addClass('collapse')
+                        }
+                        break;
+                }
+            },
+            sort(elem){
+                var sort_field = $(elem).val();
+                var list = $('div.scap-group')
+                var itemsArr = []
+                $(list).each( (i, e) => {
+                    itemsArr.push(e)
+                })
+                
+                itemsArr.sort(function(a, b) {
+                return $(a).find('.' + sort_field).text().trim() == $(b).find('.' + sort_field).text().trim()
+                        ? 0
+                        : ($(a).find('.' + sort_field).text().trim() > $(b).find('.' + sort_field).text().trim() ? 1 : -1);
+                });
+
+                $('div#requirements').empty()
+                itemsArr.forEach( (e, i) => {
+                    $('div#requirements').append(e);
+                })
+            },
+        }
+
+        $(document).ready( () => {
+            scap_app.init();
+        })
+    </script>
+{% endblock %}

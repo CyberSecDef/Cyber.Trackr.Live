@@ -1,0 +1,189 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RMF Rev 5 Controls{% endblock %}
+
+{% block body %}
+    <div class="doc-title">
+        <h1>
+            <i class="bi bi-printer-fill" onclick="pdf_app.exec();"></i> - 
+            800-53 (Rev. 5) Risk Management Framework - RMF Security Controls
+
+        </h1>
+    </div>
+    
+    <div class="doc-desc">
+        Information security controls protect the confidentiality, integrity and/or availability of information (the so-called CIA Triad). Again, some would add further categories such as non-repudiation and accountability, depending on how narrowly or broadly the CIA Triad is defined.
+
+        Individual controls are often designed to act together to increase effective protection. Systems of controls can be referred to as frameworks or standards. Frameworks can enable an organization to manage security controls across different types of assets with consistency. For example, a framework can help an organization manage controls over access regardless of the type of computer operating system. This also enables an organization to assess overall risk. Risk-aware organizations may choose proactively to specify, design, implement, operate and maintain their security controls, usually by assessing the risks and implementing a comprehensive security management framework such as ISO27001:2013, the Information Security Forum's Standard of Good Practice for Information Security, or NIST SP 800-53.
+
+    </div>
+
+    {% for control in rmf.xpath("/controls:controls/controls:control") %}
+        <a id="rmf_{{control.number}}"></a>
+        {% set res = control.registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0") %}
+        {% set res = control.registerXPathNamespace("controls", "http://scap.nist.gov/schema/sp800-53/feed/2.0") %}
+        {% set res = rmf.registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0") %}
+        {% set res = rmf.registerXPathNamespace("controls", "http://scap.nist.gov/schema/sp800-53/feed/2.0") %}
+        <div class="req-header">
+            {{control.title}}
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <dl class="col-2 mb-0 p-0 pl-1 g-0 border border-1 bg-light">
+                    <dt class="">RMF Control</dt>
+                    <dd class="">{{control.number}}</dd>
+
+                    <dt class="">Subject Area</dt>
+                    <dd class="">{{control.family}}</dd>
+                        
+                    <dt class="">Baseline Areas</dt>
+                    <dd class="">{{ control.xpath('./aaa:baseline')|join(', ') }}</dd>
+                    
+                </dl>    
+                <div class="col-7 pt-0 mt-0">
+<div class="sec-header">Description</div>
+<div class="req-desc" style="white-space:pre-wrap;">{% for i in control.xpath('./aaa:discussion/aaa:description/aaa:p') %}{{ i.asXml()|striptags|trans}}
+{% endfor %}</div>
+<div class="sec-header">Instructions</div>
+{{control.xpath('./aaa:statement/aaa:description')|join(', ')}}
+<dl>{% for i in control.xpath('./aaa:statement/aaa:statement') %}
+    <dt class="inline">{{ i.number }}</dt>
+    <dd>{{ i.description }}</dd>
+{% endfor %}
+</dl>
+
+<div class="sec-header">Assessment Procedures</div>
+<div class="container">
+<dl>
+{% for r in rmfs_json%}
+{% if r.id == control.number %}
+{% for ap in r.ccis %}
+<dt >{{ap.ap_acronym}} - {{ap.id}}</dt>
+<dd class="text-sm">{{ ap.definition }}</dd>
+{% endfor %}
+{% endif %}
+{% endfor %}
+</dl>
+</div>
+
+<div class="sec-header">Related Controls</div>
+<div class="container">
+<ol class="row">  
+{% for r in control.xpath('./aaa:related') %}
+    <li class="col-3  reference">
+        <a href="#rmf_{{r}}">
+            {{r}} 
+        </a>
+        -
+        {{ rmf.xpath("/controls:controls/controls:control[aaa:number='" ~ r ~ "']")|first.title|title }}
+    </li>
+    
+{% endfor %}
+</ol>
+</div>
+
+
+<div class="sec-header">References</div>
+<div class="container">
+<ol class="row">  
+{% for r in control.xpath('./aaa:references/aaa:reference') %}
+    <li class="col-4  reference">
+        {{r.item.text}},
+        "{{r.short_name}}"
+        <a href="{{r.item.attributes.href}}">
+            {{"%.50s"|format(r.item.attributes.href)}}
+        </a>
+        
+    </li>
+{% endfor %}
+</ol>
+</div>
+
+                </div>
+
+                <div class="col-3 mb-0 p-0 pl-1 g-0 border border-1 bg-light">                    
+<div class="sec-header">Enhancements</div>                        
+<dl class="text-sm">
+{% for r in control.xpath('./aaa:control-enhancements/aaa:control-enhancement') %}
+    <dt class="">
+        {{r.number}} - {{ r.title|title }}
+        
+    </dt>
+    <dd>{{r.statement.description}}</dd>
+{% endfor %}
+</dl>
+                </div>    
+
+
+            </div>
+        </div>
+
+        {% set break = true %}
+    {% endfor %}
+    <script>
+        const rmf_app = {
+            init(){
+                     
+            },
+        };
+
+        pdf_app = {
+	toTitleCase(str){
+	  return str.replace(
+		/\w\S*/g,
+		text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+	  );
+	},
+	exec(){
+		let printWindow = window.open('', '', 'height=1024,width=1280');
+		printWindow.document.write('<html><head><title>RMFv5 Controls</title>');
+		printWindow.document.write('<style>body{font-family:arial;}</style>');
+		printWindow.document.write('</head><body >');
+		
+		$('.req-header').each( (i, e)=>{
+			printWindow.document.write("<h1>" + $(e).next('div').find('div.row > dl > dd')[0].innerText + " - " + e.innerText + "</h1>");
+			printWindow.document.write("<p>" + pdf_app.toTitleCase($(e).next('div').find('div.row > dl > dd')[1].innerText) + " - " + pdf_app.toTitleCase($(e).next('div').find('div.row > dl > dd')[2].innerText) + "</p>")
+			
+			printWindow.document.write("<h2>Description:</h2>")
+			printWindow.document.write("<p>" + $(e).next('div').find('div.row > div.col-7 > div.req-desc').html() + "</p>")
+		
+			printWindow.document.write("<blockquote>")
+				printWindow.document.write("<h2>Instructions:</h2>")
+				$(e).next('div').find('div.row > div.col-7 > dl').each( (ii, ee)=>{
+					printWindow.document.write($(ee).html())
+				})
+				
+				printWindow.document.write("<h2>Assessment Procedures:</h2>")
+				$(e).next('div').find('div.row > div.col-7 > div.container > dl').each( (ii, ee)=>{
+					printWindow.document.write($(ee).html())
+				})
+				
+				printWindow.document.write("<h2>Related Controls:</h2>")
+				$(e).next('div').find('div.row > div > div.container > ol > li.col-3.reference').each( (ii, ee)=>{
+					printWindow.document.write("<li>" + $(ee).text().trim().replaceAll("\n","").replace(/\s+/g, ' ') + "</li>")
+				})
+				
+				printWindow.document.write("<h2>Enhancements:</h2>")
+				$(e).next('div').find('div.row > div.col-3 > dl').each( (ii, ee)=>{
+					printWindow.document.write($(ee).html())
+				})
+				
+				printWindow.document.write("<h2>References:</h2>")
+				$(e).next('div').find('div.row > div > div.container > ol > li.col-4.reference').each( (ii, ee)=>{
+					printWindow.document.write("<li style='font-size:8pt;'>" + $(ee).html() + "</li>" )
+				})
+			
+			printWindow.document.write("</blockquote>")
+			printWindow.document.write("<hr />"  )			
+		})
+		printWindow.document.write('</body></html>');
+		printWindow.document.close();
+	}
+};
+
+        $(document).ready( () => {
+            rmf_app.init();
+        })
+    </script>
+{% endblock %}
