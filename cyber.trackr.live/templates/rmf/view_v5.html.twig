@@ -73,12 +73,15 @@
 {% for r in control.xpath('./aaa:related') %}
     <li class="col-3  reference">
         <a href="#rmf_{{r}}">
-            {{r}} 
+            {{r}}
         </a>
         -
-        {{ rmf.xpath("/controls:controls/controls:control[aaa:number='" ~ r ~ "']")|first.title|title }}
+        {% set related_control = rmf.xpath("/controls:controls/controls:control[aaa:number='" ~ r ~ "']")|first %}
+        {% if related_control %}
+            {{ related_control.title|title }}
+        {% endif %}
     </li>
-    
+
 {% endfor %}
 </ol>
 </div>

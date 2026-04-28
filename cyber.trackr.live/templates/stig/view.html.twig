@@ -144,7 +144,10 @@
                     <a name="req_{{group.attributes.id}}"></a>
                     <div class="title-details text-md collapse">
                         {% if CCI_NUM != '' %}
-                            {{ cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first.references.reference|first.attributes.index|split(' ')|first  }} -
+                            {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
+                            {% if cci_match %}
+                                {{ cci_match.references.reference|first.attributes.index|split(' ')|first }} -
+                            {% endif %}
                         {% endif %}
                         {{group.Rule.attributes.severity|title }} - 
                         {% if CCI_NUM != '' %}
@@ -163,7 +166,10 @@
                             <dt class="">RMF Control</dt>
                             <dd class="control">
                             {% if CCI_NUM != '' %}
-                                {{ cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first.references.reference|first.attributes.index|split(' ')|first  }}
+                                {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
+                                {% if cci_match %}
+                                    {{ cci_match.references.reference|first.attributes.index|split(' ')|first }}
+                                {% endif %}
                             {% endif %}
                             </dd>
 
