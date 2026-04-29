@@ -3,24 +3,6 @@
 {% block title %}Compare STIGs{% endblock %}
 
 {% block body %}
-    <style>
-@media print
-{    
-    @page {size: landscape}
-    body{
-        font-size:8pt;
-        -webkit-print-color-adjust:exact !important;
-        print-color-adjust:exact !important;
-    }
-    .no-print, .no-print *
-    {
-        display: none !important;
-    }
-    .sidemenu, .sidemenu * {
-        display: none !important;
-    }
-}
-    </style>
     <div class="doc-title">
         <h1>{{ stig1.xpath("/xmlns:Benchmark/xmlns:title")[0] }} - V{{v1}}R{{r1}} vs. V{{v2}}R{{r2}}</h1>
     </div>
