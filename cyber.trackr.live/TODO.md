@@ -65,13 +65,14 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Spots intentionally left unwrapped: HTML id attributes, severity text (→ `.sev` in §2.2), `<option>` children (HTML disallows spans inside; → `.chip` in §4), JS string parameters.
 - **Note for §4:** the list views (`home/index`, `stig/index`, `scap/index`) currently render two adjacent pills per row (V* + R*) since version/release are separate columns. The spec's combined V2R7 single-pill comes when Group 4 redesigns the table column structure.
 
-### 2.2 Severity pill `.sev` (§4)  *(global)*
+### 2.2 Severity pill `.sev` (§4)  *(global)*  ✓ done (homepage tile aggregate deferred)
 
-- [ ] Add `.sev` base + `.sev.high`, `.sev.med`, `.sev.low` modifiers to `app.css`.
-- [ ] Add Twig macro `{{ ui.sev('high', 30) }}` rendering `<span class="sev high" aria-label="High severity, 30 rules">H · 30</span>`.
-- [ ] Apply in `templates/stig/view.html.twig` lines 42–52 — replace the three Bootstrap `<button class="btn-outline-{success,warning,danger}">` filter buttons. Note: those buttons currently double as filters (toggle visibility via `stig_app.toggleFilter`). Either keep the button behavior and just restyle as `.sev` with click handler, or extract filter UI to a separate `.chip` row above the rule list. **Recommend the latter** for clarity.
-- [ ] Apply in `templates/scap/view.html.twig` (similar severity buttons exist).
-- [ ] Apply in any aggregated severity displays added on the homepage (§8 STIG tile).
+- [x] Add `.sev` base + `.sev.high`, `.sev.med`, `.sev.low` modifiers to `app.css` (section 0c). Plus `.sev.is-filter` interactive variant and `button.sev` chrome reset.
+- [x] Twig macro `{{ ui.sev(level, count = null) }}` added to `macros.html.twig`. Renders short letter (H/M/L) + optional count, with adaptive aria-label.
+- [x] `templates/stig/view.html.twig` filter buttons replaced; per-rule severity badge replaced. Decision on filter UI: kept the buttons in place and restyled (chose path A in the spec note rather than extracting to a separate `.chip` row) — that extract belongs to Group 4 when those pages get the full redesign.
+- [x] `templates/scap/view.html.twig` same treatment.
+- [x] **JS refactor:** `stig_app.toggleFilter` and `scap_app.toggleFilter` now take severity level as a 2nd argument instead of parsing visible button text. Old text-parsing approach was broken by the format change (`Low - 30` → `L · 30`).
+- [ ] **Deferred to §4 (homepage):** aggregated severity displays on the STIG tile (§8). Will be added when the home tile grid lands and severity counts are pulled from `stig_toc.json` per §4.3a.
 
 ### 2.3 Severity bar `.sev-bar` (§5)  *(global)*
 
