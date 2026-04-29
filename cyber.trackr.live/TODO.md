@@ -57,20 +57,13 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ## Group 2 · Reusable Components
 
-### 2.1 Identifier pill `.ident` (§3)  *(global, highest-impact)*
+### 2.1 Identifier pill `.ident` (§3)  *(global, highest-impact)*  ✓ done
 
-- [ ] Add `.ident` class to `app.css` per spec.
-- [ ] Sweep the codebase and wrap **every** technical identifier:
-  - `templates/home/index.html.twig` lines 56–57: `{{s.version}}` / `{{s.release}}` → wrap in `.ident`.
-  - `templates/stig/index.html.twig` lines 31–32: same.
-  - `templates/stig/view.html.twig` line 17: `V{{ version }}R{{ release }}`, line 24: same, lines 86–93 (compare/view selects' option text), and **all rule/CCI references inside the rule loop** (severities, vuln IDs, CCI numbers around lines 134–166).
-  - `templates/scap/index.html.twig` similar version/release columns.
-  - `templates/scap/view.html.twig` lines 4, 16, 18, 19 + rule loop.
-  - `templates/cci/index.html.twig` line 25 (`{{r.cci}}`) and the `r.rmf` column (line 30) — these are CCI and RMF control IDs respectively.
-  - `templates/rmf/view_v5.html.twig` line 79 (`r` for related control IDs), line 76 (`{{r}}` link text), and the control number/name displays.
-  - `templates/rmf/view_v4.html.twig` similar.
-  - `templates/home/search.html.twig` — every result row has IDs that need wrapping.
-- [ ] Decision: Twig macro vs raw class. Recommend a Twig macro `{% import 'macros.html.twig' as ui %}` with `{{ ui.ident('AC-2') }}` for cleaner sweep — create `templates/macros.html.twig` for this. Lower friction than `<span class="ident">{{ x }}</span>` everywhere.
+- [x] Add `.ident` class to `app.css` per spec.
+- [x] Created `templates/macros.html.twig` with `{{ ui.ident(value) }}` macro (trims input to handle xpath whitespace).
+- [x] Sweep across 8 templates: `home/index`, `stig/index`, `scap/index` (version/release columns); `stig/view`, `scap/view` (titles, summary, rule loop CCI/vuln/rule IDs and references); `cci/index` (CCI + RMF columns); `rmf/view_v5`, `rmf/view_v4` (control numbers, APs, related controls, enhancement numbers); `home/search` (all result row IDs + vuln details).
+- [x] Spots intentionally left unwrapped: HTML id attributes, severity text (→ `.sev` in §2.2), `<option>` children (HTML disallows spans inside; → `.chip` in §4), JS string parameters.
+- **Note for §4:** the list views (`home/index`, `stig/index`, `scap/index`) currently render two adjacent pills per row (V* + R*) since version/release are separate columns. The spec's combined V2R7 single-pill comes when Group 4 redesigns the table column structure.
 
 ### 2.2 Severity pill `.sev` (§4)  *(global)*
 
