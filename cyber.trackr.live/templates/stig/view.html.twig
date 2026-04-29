@@ -38,18 +38,22 @@
                     </div>
 
                 </li>
-                <li class="list-group-item"><b>Severity:</b> 
+                <li class="list-group-item"><b>Severity:</b>
 
-                    <button type="button" class="btn btn-outline-success p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this);">
-                        Low - {{ stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'low']")|length }}
+                    {% set hi_count  = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'high']")|length %}
+                    {% set med_count = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'medium']")|length %}
+                    {% set low_count = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'low']")|length %}
+
+                    <button type="button" class="sev high is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'high');" aria-label="Toggle high-severity rules ({{ hi_count }})">
+                        H · {{ hi_count }}
                     </button>
 
-                    <button type="button" class="btn btn-outline-warning p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this);">
-                        Medium - {{ stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'medium']")|length }}
+                    <button type="button" class="sev med is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'medium');" aria-label="Toggle medium-severity rules ({{ med_count }})">
+                        M · {{ med_count }}
                     </button>
 
-                    <button type="button" class="btn btn-outline-danger p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this);">
-                        High - {{ stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'high']")|length }}
+                    <button type="button" class="sev low is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'low');" aria-label="Toggle low-severity rules ({{ low_count }})">
+                        L · {{ low_count }}
                     </button>
                 </li>
                 <li class="list-group-item">
@@ -175,19 +179,8 @@
                             </dd>
 
                             <dt class="">Severity</dt>
-                            <dd >
-                                <span class="badge 
-                                    {% if group.Rule.attributes.severity == 'high' %}
-                                        text-bg-danger
-                                    {% elseif group.Rule.attributes.severity == 'medium' %}
-                                        text-bg-warning
-                                    {% else %}
-                                        text-bg-success
-                                    {% endif %}
-                                ">
-                                    {{group.Rule.attributes.severity|title }}
-                                </span>
-                                
+                            <dd>
+                                {{ ui.sev(group.Rule.attributes.severity) }}
                             </dd>
 
                             <dt class="">CCI</dt>
@@ -301,29 +294,12 @@
 }); 
                 //$( elem ).parent().next( 'p' ).text( "https://cyber.trackr.live/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id)
             },
-            toggleFilter(elem){
-                switch(true) {
-                    case $(elem).text().trim().toLowerCase().includes('low'):
-                        if($(elem).hasClass('active')){
-                            $('div.stig-group.low').removeClass('collapse')
-                        }else{
-                            $('div.stig-group.low').removeClass('collapse').addClass('collapse')
-                        }
-                        break;
-                    case $(elem).text().trim().toLowerCase().includes('medium'):
-                        if($(elem).hasClass('active')){
-                            $('div.stig-group.medium').removeClass('collapse')
-                        }else{
-                            $('div.stig-group.medium').removeClass('collapse').addClass('collapse')
-                        }
-                        break;
-                    case $(elem).text().trim().toLowerCase().includes('high'):
-                        if($(elem).hasClass('active')){
-                            $('div.stig-group.high').removeClass('collapse')
-                        }else{
-                            $('div.stig-group.high').removeClass('collapse').addClass('collapse')
-                        }
-                        break;
+            toggleFilter(elem, level){
+                const $groups = $('div.stig-group.' + level);
+                if($(elem).hasClass('active')){
+                    $groups.removeClass('collapse');
+                }else{
+                    $groups.removeClass('collapse').addClass('collapse');
                 }
             },
             sort(elem){

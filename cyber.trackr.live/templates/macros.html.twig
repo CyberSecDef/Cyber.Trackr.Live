@@ -21,3 +21,26 @@
  # into the rendered pill. Do NOT pass HTML — value is escaped.
  #}
 {% macro ident(value) %}<span class="ident">{{ value|trim }}</span>{% endmacro %}
+
+{#
+ # sev — severity pill.
+ #
+ # Accepts level as 'high' | 'medium' | 'med' | 'low'. Optional count appends
+ # a · separator. Renders short-form letter by default ("H · 30").
+ #
+ # Examples:
+ #   {{ ui.sev('high', 30) }}       → <span class="sev high" aria-…>H · 30</span>
+ #   {{ ui.sev(rule.severity) }}    → <span class="sev high">H</span>
+ #
+ # For interactive filter buttons (Bootstrap data-bs-toggle="button"), apply
+ # .sev .high/.med/.low .is-filter classes directly on the button element
+ # rather than calling this macro.
+ #}
+{% macro sev(level, count = null) %}
+{%- set lvl = level|lower -%}
+{%- set cls = {high: 'high', medium: 'med', med: 'med', low: 'low'}[lvl]|default(lvl) -%}
+{%- set short = {high: 'H', med: 'M', low: 'L'}[cls]|default(lvl|first|upper) -%}
+{%- set lbl = {high: 'High', med: 'Medium', low: 'Low'}[cls]|default(lvl|capitalize) -%}
+{%- set aria = lbl ~ ' severity' ~ (count is not null ? ', ' ~ count ~ ' rules' : '') -%}
+<span class="sev {{ cls }}" aria-label="{{ aria }}">{{ short }}{% if count is not null %} · {{ count }}{% endif %}</span>
+{%- endmacro %}

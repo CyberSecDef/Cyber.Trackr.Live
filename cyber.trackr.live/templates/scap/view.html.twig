@@ -19,18 +19,22 @@
                 <li class="list-group-item"><b>Version/Release:</b> {{ ui.ident('V' ~ version ~ 'R' ~ release) }} </li>
                 <li class="list-group-item"><b>Published: </b> {{ scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first }} </li>
 
-                <li class="list-group-item"><b>Severity:</b> 
+                <li class="list-group-item"><b>Severity:</b>
 
-                    <button type="button" class="btn btn-outline-success p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this);">
-                        Low - {{ scap.xpath(".//xccdf:Rule[@severity = 'low']")|length }}
+                    {% set hi_count  = scap.xpath(".//xccdf:Rule[@severity = 'high']")|length %}
+                    {% set med_count = scap.xpath(".//xccdf:Rule[@severity = 'medium']")|length %}
+                    {% set low_count = scap.xpath(".//xccdf:Rule[@severity = 'low']")|length %}
+
+                    <button type="button" class="sev high is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'high');" aria-label="Toggle high-severity rules ({{ hi_count }})">
+                        H · {{ hi_count }}
                     </button>
 
-                    <button type="button" class="btn btn-outline-warning p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this);">
-                        Medium - {{ scap.xpath(".//xccdf:Rule[@severity = 'medium']")|length }}
+                    <button type="button" class="sev med is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'medium');" aria-label="Toggle medium-severity rules ({{ med_count }})">
+                        M · {{ med_count }}
                     </button>
 
-                    <button type="button" class="btn btn-outline-danger p-1 active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this);">
-                        High - {{ scap.xpath(".//xccdf:Rule[@severity = 'high']")|length }}
+                    <button type="button" class="sev low is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'low');" aria-label="Toggle low-severity rules ({{ low_count }})">
+                        L · {{ low_count }}
                     </button>
                 </li>
 
@@ -125,18 +129,7 @@
 
                         <dt class="">Severity</dt>
                         <dd class="">
-                            <span class="badge 
-                                {% if group.xpath('.//xccdf:Rule/@severity')|first == 'high' %}
-                                    text-bg-danger
-                                {% elseif group.xpath('.//xccdf:Rule/@severity')|first == 'medium' %}
-                                    text-bg-warning
-                                {% else %}
-                                    text-bg-success
-                                {% endif %}
-                            ">
-                                {{group.xpath('.//xccdf:Rule/@severity')|first|title }}
-                            </span>
-                            
+                            {{ ui.sev(group.xpath('.//xccdf:Rule/@severity')|first) }}
                         </dd>
 
                         <dt class="">CCI</dt>
@@ -191,29 +184,12 @@
             download(){
                 window.open( window.location.href + '/download' );
             },
-            toggleFilter(elem){
-                switch(true) {
-                    case $(elem).text().trim().toLowerCase().includes('low'):
-                        if($(elem).hasClass('active')){
-                            $('div.scap-group.low').removeClass('collapse')
-                        }else{
-                            $('div.scap-group.low').removeClass('collapse').addClass('collapse')
-                        }
-                        break;
-                    case $(elem).text().trim().toLowerCase().includes('medium'):
-                        if($(elem).hasClass('active')){
-                            $('div.scap-group.medium').removeClass('collapse')
-                        }else{
-                            $('div.scap-group.medium').removeClass('collapse').addClass('collapse')
-                        }
-                        break;
-                    case $(elem).text().trim().toLowerCase().includes('high'):
-                        if($(elem).hasClass('active')){
-                            $('div.scap-group.high').removeClass('collapse')
-                        }else{
-                            $('div.scap-group.high').removeClass('collapse').addClass('collapse')
-                        }
-                        break;
+            toggleFilter(elem, level){
+                const $groups = $('div.scap-group.' + level);
+                if($(elem).hasClass('active')){
+                    $groups.removeClass('collapse');
+                }else{
+                    $groups.removeClass('collapse').addClass('collapse');
                 }
             },
             sort(elem){
