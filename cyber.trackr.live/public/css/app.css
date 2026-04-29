@@ -5,15 +5,92 @@
  * the site live here; no inline <style> blocks in templates.
  *
  * Sections:
- *   1. Base / shell           (current — preserved during migration)
- *   2. Detail-page typography (current — preserved during migration)
- *   3. List-table compact     (current — consolidated from per-template style blocks)
+ *   0. Design tokens          (light + dark themes, spacing, radius, severity, freshness)
+ *   1. Base / shell
+ *   2. Detail-page typography (legacy — hardcoded colors retained until Group 4)
+ *   3. List-table compact     (legacy)
+ *   4. Print
  *
  * Future additions per TODO.md:
- *   - Design tokens (§1.2)
- *   - Typography utilities (§1.3)
- *   - Component layer (§2.x)
+ *   - Typography utilities (§1.3 — Fraunces, IBM Plex)
+ *   - Component layer       (§2.x — .ident, .sev, .sev-bar, .dot, .chip, .tile)
+ *   - Layout shell           (§3.x — header, footer, atmospheric)
  */
+
+
+/* =============================================================================
+ * 0. Design tokens
+ *    Light theme on :root; dark theme via [data-theme="dark"] on <html>.
+ *    Never hardcode color values in components — always reference tokens.
+ * ========================================================================== */
+
+:root {
+    /* Surface & text — warm paper aesthetic */
+    --bg:             #f4efe2;
+    --surface:        #fbf8ee;
+    --surface-2:      #ebe3cd;
+    --text:           #1a1612;
+    --text-muted:     #6f655a;
+    --border:         #d8cdb1;
+    --border-strong:  #b5a684;
+    --accent:         #7a1e1e;
+    --accent-hover:   #5e1414;
+
+    /* Severity (DISA convention) */
+    --sev-high:       #9a1a1a;
+    --sev-med:        #a86415;
+    --sev-low:        #1f4f8c;
+
+    /* Freshness — STIG age indicators */
+    --fresh:          #3d6b3d;
+    --stale:          #a86415;
+    --aged:           #8a3a1a;
+    --old:            #6f655a;
+
+    /* Spacing scale (4-based, strict) */
+    --space-1:        4px;
+    --space-2:        8px;
+    --space-3:        12px;
+    --space-4:        16px;
+    --space-5:        24px;
+    --space-6:        32px;
+    --space-7:        48px;
+    --space-8:        64px;
+    --space-9:        80px;
+    --space-10:       112px;
+
+    /* Border-radius scale */
+    --radius-sm:      2px;   /* chips, sev pills */
+    --radius-md:      3px;   /* idents, kbd */
+    --radius-lg:      4px;   /* buttons, inputs */
+    --radius-xl:      6px;   /* tiles, cards */
+}
+
+[data-theme="dark"] {
+    --bg:             #15120c;
+    --surface:        #1d1912;
+    --surface-2:      #2a2418;
+    --text:           #ece2c8;
+    --text-muted:     #8c7f66;
+    --border:         #2e2820;
+    --border-strong:  #4a3f2c;
+    --accent:         #d4a04a;   /* warm amber */
+    --accent-hover:   #e8b85a;
+
+    --sev-high:       #e85d5d;
+    --sev-med:        #d4a04a;
+    --sev-low:        #6ba3d0;
+
+    --fresh:          #7ab57a;
+    --stale:          #d4a04a;
+    --aged:           #d4763a;
+    --old:            #6e6452;
+}
+
+::selection {
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--text);
+}
 
 
 /* =============================================================================
@@ -26,13 +103,18 @@ html {
 
 body {
     font-family: sans-serif;
-    background-color: #f6f6f6;
+    background: var(--bg);
+    color: var(--text);
     height: 100%;
     min-height: 100vh;
 }
 
 a {
-    color: #339 !important;
+    color: var(--accent) !important;
+}
+
+a:hover {
+    color: var(--accent-hover) !important;
 }
 
 .logo-text {
