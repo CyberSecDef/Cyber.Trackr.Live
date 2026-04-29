@@ -25,33 +25,33 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ## Group 1 · Foundations
 
-### 1.1 Stylesheet & file structure  *(global, prerequisite for everything below)*
+### 1.1 Stylesheet & file structure  *(global, prerequisite for everything below)*  ✓ done
 
-- [ ] Create `public/css/app.css` as the new home for all custom styles. Load it in `base.html.twig` *after* `bootstrap.min.css`, `bootstrap-icons.css`, `datatables.min.css` so it can override.
-- [ ] Move the inline `<style>` block from `base.html.twig` (lines 39–171) into `public/css/app.css`. Preserve every selector currently used by detail pages (`.doc-title`, `.doc-summary`, `.doc-desc`, `.sec-title`, `.sec-header`, `.req-header`, `.req-desc`, `.requirement`, `.reference`, `.sidemenu`, `.text-sm`, `.text-md`, `.body-container`, `.logo-text`, `.text-justify`, `dt.inline`).
-- [ ] Remove the per-template `<style>` blocks duplicated across `home/index.html.twig`, `stig/index.html.twig`, `scap/index.html.twig` (each has the `#stigs td { padding:0px ... }` snippet); replace with a single rule in `app.css`.
-- [ ] Create `public/js/app.js` for shared utilities (theme toggle, freshness, relTime). Load before per-page scripts. Wrap in IIFE or expose as `window.app = { theme, freshness, relTime, ... }`.
+- [x] Create `public/css/app.css` as the new home for all custom styles. Load it in `base.html.twig` *after* `bootstrap.min.css`, `bootstrap-icons.css`, `datatables.min.css` so it can override.
+- [x] Move the inline `<style>` block from `base.html.twig` (lines 39–171) into `public/css/app.css`. Preserved every selector. Also moved the `@media print` rules from `stig/compare.html.twig` into a new section 4 of `app.css`.
+- [x] Remove the per-template `<style>` blocks duplicated across `home/index.html.twig`, `stig/index.html.twig`, `scap/index.html.twig`; consolidated into a single rule (`#stigs td, #scaps td, #ccis td`) in `app.css`.
+- [x] Create `public/js/app.js` with `window.app = { init, search }`. Theme toggle, freshness, relTime utilities will be added here in §5.1 / §2.4. Search route URL passed via `window.routes` set in `base.html.twig` (since static JS can't use Twig's `path()` helper).
 
-### 1.2 Design tokens (§1)  *(global)*
+### 1.2 Design tokens (§1)  *(global)*  ✓ done
 
-- [ ] Add `:root` block in `app.css` with all light-theme tokens listed in spec §1.
-- [ ] Add `[data-theme="dark"]` block with dark-theme overrides.
-- [ ] Spacing scale: enforce `--space-1` through `--space-10` (4, 8, 12, 16, 24, 32, 48, 64, 80, 112). Codify even though Bootstrap utilities will continue to be used; tokens are for custom CSS.
-- [ ] Border-radius scale: define `--radius-sm` (2px), `--radius-md` (3px), `--radius-lg` (4px), `--radius-xl` (6px). Don't introduce `border-radius: 999px` except for `.chip` (§9) and status dots.
-- [ ] Severity tokens (`--sev-high`, `--sev-med`, `--sev-low`) per theme.
-- [ ] Freshness tokens (`--fresh`, `--stale`, `--aged`, `--old`) per theme.
-- [ ] Add a `body { background: var(--bg); color: var(--text); }` rule and verify the existing `body { background-color: #f6f6f6 }` from base.html.twig is removed/replaced.
-- [ ] Custom `::selection` color (§14): `background: color-mix(in srgb, var(--accent) 30%, transparent); color: var(--text)`.
+- [x] Add `:root` block in `app.css` with all light-theme tokens.
+- [x] Add `[data-theme="dark"]` block with dark-theme overrides. Theme toggle JS wiring still pending (§5.1).
+- [x] Spacing scale: `--space-1` through `--space-10` (4, 8, 12, 16, 24, 32, 48, 64, 80, 112).
+- [x] Border-radius scale: `--radius-sm` (2px) / `--radius-md` (3px) / `--radius-lg` (4px) / `--radius-xl` (6px).
+- [x] Severity tokens per theme.
+- [x] Freshness tokens per theme.
+- [x] `body { background: var(--bg); color: var(--text); }`. Also updated `a { color: var(--accent) !important; }` and added `a:hover { color: var(--accent-hover) !important; }`.
+- [x] Custom `::selection` color via `color-mix`.
 
-### 1.3 Typography system (§2)  *(global)*
+### 1.3 Typography system (§2)  *(global)*  ✓ done (with noted deferrals)
 
-- [ ] Add `<link rel="preconnect">` for `fonts.googleapis.com` and `fonts.gstatic.com` in `base.html.twig` `<head>`.
-- [ ] Add `<link>` for: Fraunces (variable, weights 300–900, italic axis), IBM Plex Sans (300/400/500/600/700), IBM Plex Mono (400/500/600). Use `display=swap`.
-- [ ] Preload the Fraunces variable font file (`<link rel="preload" as="font" type="font/woff2" crossorigin>`) — used by hero, no FOUT acceptable.
-- [ ] Set body default in `app.css`: `font-family: 'IBM Plex Sans', system-ui, sans-serif`, `font-feature-settings: 'ss02' on, 'ss03' on`, `-webkit-font-smoothing: antialiased`.
-- [ ] Add utility classes: `.font-display` (Fraunces, opsz 144, SOFT 30, letter-spacing -0.025em), `.font-display-italic` (Fraunces italic, opsz 144, SOFT 100), `.font-mono` (IBM Plex Mono).
-- [ ] Add eyebrow utility: `.eyebrow` → `font-mono`, 11px, uppercase, letter-spacing 0.18em, color `var(--text-muted)`. Used everywhere section headings appear (§7, §8, §10, §11, §12, §13).
-- [ ] Audit existing inline `font-family: "Linux Libertine"` / `'Linux Libertine'` references (in `base.html.twig`'s inline CSS, repeated in per-template `<style>` blocks). Replace with `.font-display` (Fraunces) where appropriate.
+- [x] Add `<link rel="preconnect">` for `fonts.googleapis.com` and `fonts.gstatic.com`.
+- [x] Add `<link>` for: Fraunces (with `opsz` and `SOFT` variable axes), IBM Plex Sans (300/400/500/600/700), IBM Plex Mono (400/500/600). `display=swap` set.
+- [ ] **Deferred to Group 6 (Performance):** Preload the Fraunces variable font woff2. Needs a stable URL — Google's CDN paths can change. Will revisit during the perf pass; either preload the gstatic URL directly (acceptable risk) or self-host the woff2 in `public/fonts/`.
+- [x] Body default in `app.css`: IBM Plex Sans with system fallback, `font-feature-settings: 'ss02' on, 'ss03' on`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`.
+- [x] Utility classes added: `.font-display`, `.font-display-italic`, `.font-mono`.
+- [x] `.eyebrow` utility added.
+- [ ] **Deferred to Group 4 (page redesigns):** Audit and replace existing `font-family: "Linux Libertine"` references. They're still in section 2 and 3 of `app.css` and will be removed when those classes are rewritten / those pages are redesigned per Group 4.
 
 ---
 
