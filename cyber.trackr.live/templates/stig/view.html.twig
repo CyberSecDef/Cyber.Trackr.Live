@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
 
 {% block title %}View STIG - {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }} V{{ version }}R{{ release }} {% endblock %}
 
@@ -14,14 +15,14 @@
             </button>
 
             {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }}
-            - V{{ version }}R{{ release }}
+            - {{ ui.ident('V' ~ version ~ 'R' ~ release) }}
         </h1>
     </div>
     
     <div class="doc-summary">
         <div class="card shadow-lg" style="width: 36rem;">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><b>Version/Release:</b> V{{ version }}R{{ release }} </li>
+                <li class="list-group-item"><b>Version/Release:</b> {{ ui.ident('V' ~ version ~ 'R' ~ release) }} </li>
                 <li class="list-group-item"><b>Published: </b> {{ stig.xpath("/xmlns:Benchmark/xmlns:status/@date")|first }} </li>
                 <li class="list-group-item"><b>Released: </b> {{ stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first | split('Date:')[1] | date("Y-m-d")}} </li>
 
@@ -146,15 +147,15 @@
                         {% if CCI_NUM != '' %}
                             {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
                             {% if cci_match %}
-                                {{ cci_match.references.reference|first.attributes.index|split(' ')|first }} -
+                                {{ ui.ident(cci_match.references.reference|first.attributes.index|split(' ')|first) }} -
                             {% endif %}
                         {% endif %}
-                        {{group.Rule.attributes.severity|title }} - 
+                        {{group.Rule.attributes.severity|title }} -
                         {% if CCI_NUM != '' %}
-                            {{ CCI_NUM }} - 
+                            {{ ui.ident(CCI_NUM) }} -
                         {% endif %}
-                        {{group.attributes.id}} - 
-                        {{group.Rule.attributes.id}} 
+                        {{ ui.ident(group.attributes.id) }} -
+                        {{ ui.ident(group.Rule.attributes.id) }}
                     </div>
                     
                     
@@ -168,7 +169,7 @@
                             {% if CCI_NUM != '' %}
                                 {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
                                 {% if cci_match %}
-                                    {{ cci_match.references.reference|first.attributes.index|split(' ')|first }}
+                                    {{ ui.ident(cci_match.references.reference|first.attributes.index|split(' ')|first) }}
                                 {% endif %}
                             {% endif %}
                             </dd>
@@ -190,18 +191,19 @@
                             </dd>
 
                             <dt class="">CCI</dt>
-                            <dd class="">{{CCI_NUM}}</dd>
+                            <dd class="">{% if CCI_NUM != '' %}{{ ui.ident(CCI_NUM) }}{% endif %}</dd>
 
                             <dt class="">Version</dt>
-                            <dd class="">{{group.Rule.version }}</dd>
+                            <dd class="">{{ ui.ident(group.Rule.version) }}</dd>
 
                             <dt class="">Vuln IDs</dt>
                             <dd class="">
                                 <ul class="list-unstyled">
-                                    <li class="vuln">{{group.attributes.id}}</li>
+                                    <li class="vuln">{{ ui.ident(group.attributes.id) }}</li>
                                     <li>
                                         {% if group.Rule.ident is defined and group.Rule.ident is not null and group.Rule.ident|length > 0 %}
-                                            {{group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first}}
+                                            {% set v_id = group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first %}
+                                            {% if v_id %}{{ ui.ident(v_id) }}{% endif %}
                                         {% endif %}
                                     </li>
                                 </ul>
@@ -210,10 +212,11 @@
                             <dt class="">Rule IDs</dt>
                             <dd class="">
                                 <ul class="list-unstyled">
-                                    <li>{{group.Rule.attributes.id}}</li>
+                                    <li>{{ ui.ident(group.Rule.attributes.id) }}</li>
                                     <li>
                                         {% if group.Rule.ident is defined and group.Rule.ident is not null and group.Rule.ident|length > 0 %}
-                                            {{group.Rule.ident|filter( v => v.__toString() starts with 'SV-')|first}}
+                                            {% set sv_id = group.Rule.ident|filter( v => v.__toString() starts with 'SV-')|first %}
+                                            {% if sv_id %}{{ ui.ident(sv_id) }}{% endif %}
                                         {% endif %}
                                     </li>
                                 </ul>
@@ -228,7 +231,7 @@
                             <h6><u><strong>Checks</strong>: {{ group.Rule.check.attributes.system }}</u></h6>
                             <p style="white-space:pre-wrap;">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</p>
             
-                            <h6><u><strong>Fix: </strong>{{ group.Rule.fix.attributes.id }}</u></h6>
+                            <h6><u><strong>Fix: </strong>{{ ui.ident(group.Rule.fix.attributes.id) }}</u></h6>
                             <p style="white-space:pre-wrap;">{{ group.Rule.fixtext }}</p>
 
                             <h6> 

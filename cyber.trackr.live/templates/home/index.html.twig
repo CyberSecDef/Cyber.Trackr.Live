@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
 
 {% block title %}Cyber Trackr!{% endblock %}
 
@@ -49,8 +50,8 @@
                                         {{stig}}
                                     </a> 
                                 </td>
-                                <td>{{s.version}}</td>
-                                <td>{{s.release}}</td>
+                                <td>{{ ui.ident('V' ~ s.version) }}</td>
+                                <td>{{ ui.ident('R' ~ s.release) }}</td>
                                 <td>{{s.date}}</td>
                                 <td>{{s.released|trim != '' ? s.released | date("Y-m-d") }}</td>
                             </tr>

@@ -129,6 +129,27 @@
 
 
 /* =============================================================================
+ * 0b. Component layer — Identifiers
+ *    .ident wraps every technical identifier across the site:
+ *    STIG version strings (V2R7), RMF control IDs (AC-2), CCI numbers
+ *    (CCI-000196), rule IDs, vuln IDs, SRG references.
+ *    Use via the {{ ui.ident(value) }} macro in templates/macros.html.twig.
+ * ========================================================================== */
+
+.ident {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.84em;
+    font-weight: 500;
+    padding: 0.1em 0.42em;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+
+/* =============================================================================
  * 1. Base / shell
  * ========================================================================== */
 

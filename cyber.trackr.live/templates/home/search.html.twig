@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
 
 {% block title %}Cyber Trackr!{% endblock %}
 
@@ -24,7 +25,7 @@
                     {% for c in results.rmfv4 %}
                         <div class="req-header">
                             <a href="{{ path('rmf_v4_view') }}#rmf_{{c.id}}">
-                                {{c.id}} - {{c.title}}
+                                {{ ui.ident(c.id) }} - {{c.title}}
                             </a>
                         </div>
                         <div style="max-height:10rem; overflow-y: auto; ">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '' )}}</div>
@@ -41,7 +42,7 @@
                 </div>
                 <div class="collapse" id="rmfv5_results">
                     {% for c in results.rmfv5 %}
-                        <div class="req-header"><a href="{{ path('rmf_v5_view') }}#rmf_{{c.id}}">{{c.id}} - {{c.title}}</a></div>
+                        <div class="req-header"><a href="{{ path('rmf_v5_view') }}#rmf_{{c.id}}">{{ ui.ident(c.id) }} - {{c.title}}</a></div>
                         <div style="max-height:10rem; overflow-y: auto; ">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '' ) }}</div>
                     {% endfor %}
                 </div>
@@ -58,7 +59,7 @@
                 <div class="collapse" id="ccis_results">
                     {% for c in results.ccis %}
                         <div class="req-header">
-                            {{c.id}}
+                            {{ ui.ident(c.id) }}
                         </div>
                         <div style="max-height:10rem; overflow-y: auto; ">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '' ) }}</div>
                     {% endfor %}
@@ -75,7 +76,7 @@
                 </div>
                 <div class="collapse" id="aps_results">
                     {% for c in results.aps %}
-                        <div class="req-header">{{c.id}} - {{c.title}}</div>
+                        <div class="req-header">{{ ui.ident(c.id) }} - {{c.title}}</div>
                         <div style="max-height:10rem; overflow-y: auto; ">
                             {{c.description}}
                             {{c.note}}
@@ -106,14 +107,14 @@
                                 <dt class="inline">Vuln ID</dt>
                                 <dd>
                                     <a href="{{ path('stig_view', { title: c.stig_title, version: c.version, release: c.release}) }}#req_{{c.group}}">
-                                        {{c.vuln}}
+                                        {{ ui.ident(c.vuln) }}
                                     </a><br />
-                                    
+
                                 </dd>
 
                                 <dt class="inline">Rule ID</dt>
                                 <dd>
-                                    {{c.rule}}
+                                    {{ ui.ident(c.rule) }}
                                 </dd>
 
                             </dl>

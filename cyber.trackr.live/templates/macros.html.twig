@@ -1,0 +1,23 @@
+{#
+ # UI macros — small reusable presentation primitives.
+ #
+ # Import in templates with:
+ #   {% import 'macros.html.twig' as ui %}
+ #
+ # Then call:
+ #   {{ ui.ident('CCI-000196') }}
+ #
+ # Macros here should be cheap, dumb, and dependency-free. No xpath, no logic
+ # beyond formatting. If a macro grows complex, promote it to a Twig extension.
+ #}
+
+{#
+ # ident — wraps a technical identifier in a monospace pill.
+ #
+ # Use for: STIG version strings (V2R7), RMF control IDs (AC-2), CCI numbers
+ # (CCI-000196), rule IDs, vuln IDs, SRG references.
+ #
+ # Trims the value so accidental whitespace from xpath results doesn't leak
+ # into the rendered pill. Do NOT pass HTML — value is escaped.
+ #}
+{% macro ident(value) %}<span class="ident">{{ value|trim }}</span>{% endmacro %}

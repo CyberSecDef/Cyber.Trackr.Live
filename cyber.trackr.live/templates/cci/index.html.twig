@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
 
 {% block title %}CCIs!{% endblock %}
 
@@ -22,12 +23,12 @@
             <tbody>                
                 {% for r in results %}
                     <tr>
-                        <td style="white-space:nowrap;">{{r.cci}}</td>
+                        <td>{{ ui.ident(r.cci) }}</td>
                         <td style="white-space:pre-wrap;">{{r.cci_definition|default()}}</td>
                         <td style="white-space:pre-wrap;">{{r.cci_auditor|default()}}</td>
                         <td style="white-space:pre-wrap;">{{r.cci_guidance|default()}}</td>
                         <td>{{r.name|default()}}</td>
-                        <td>{{r.rmf|default()}}</td>
+                        <td>{% if r.rmf|default %}{{ ui.ident(r.rmf) }}{% endif %}</td>
                         <td>{{r.ap_acronym|default()}}</td>
                         <td class="col-3" style="white-space:pre-wrap;">{{r.rmf_guidance|default()}}</td>
                         <td class="col-3" style="white-space:pre-wrap;">{{r.rmf_definition|default()}}</td>
