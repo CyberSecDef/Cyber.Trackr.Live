@@ -325,14 +325,14 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ---
 
-## Group 7 · Code Hygiene (§22)
+## Group 7 · Code Hygiene (§22)  ✓ done
 
-- [ ] All custom CSS uses tokens — grep `app.css` for hardcoded hex values once written; replace.
-- [ ] All identifiers wrapped in `.ident` — covered in §2.1 sweep above; verify with grep over templates after the fact.
-- [ ] All severity references use `.sev` pills — covered in §2.2.
-- [ ] All release dates paired with freshness dot — covered in §2.4 application list.
-- [ ] No inline `style=""` attributes except for: severity bar widths (computed), animation delays (per-element timing). Sweep with grep over `templates/`.
-- [ ] No `<style>` blocks inside templates (move all to `app.css`) — covered in §1.1.
+- [x] All custom CSS hex values audited — all are inside `:root` / `[data-theme="dark"]` token definitions or comments. Component CSS uses tokens exclusively.
+- [x] `.ident` wrapping verified site-wide (§2.1).
+- [x] `.sev` pills verified (§2.2).
+- [x] Release dates paired with freshness dot (§2.4).
+- [x] Inline `style=""` swept. Three small utility classes added (`.pre-wrap`, `.requirement-title`, `.u-mt-0`); five templates updated. Only inline styles remaining are spec-allowed: sev-bar computed widths in macros.html.twig, animation delays (none currently), and functional cases (`display:none` on hidden file input, iframe sizing on download templates not yet redesigned).
+- [x] `<style>` blocks in templates: only inside `printWindow.document.write(...)` (JS-generated print popup CSS). Acceptable.
 
 ---
 
