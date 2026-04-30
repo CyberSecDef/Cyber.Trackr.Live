@@ -19,11 +19,9 @@
             })();
         </script>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        {# Push the font CSS request earlier in the waterfall via preload as=style. #}
-        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,300..900;1,9..144,0..100,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,300..900;1,9..144,0..100,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
+        {# Self-hosted fonts — @font-face declarations live in app.css. Preload
+           the Fraunces normal woff2 since it's used by every hero h1 above the fold. #}
+        <link rel="preload" href="/fonts/fraunces-300_900-normal.woff2" as="font" type="font/woff2" crossorigin>
 
         {% block stylesheets %}
             <link rel="stylesheet" href="/css/bootstrap.min.css" />
