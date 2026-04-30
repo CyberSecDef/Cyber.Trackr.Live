@@ -20,6 +20,31 @@ window.app = {
                 window.app.search();
             }
         });
+
+        // Sync theme-toggle aria-pressed with the active theme on load.
+        $(".theme-toggle").attr("aria-pressed", window.app.theme.get() === "dark" ? "true" : "false");
+
+        // Cmd/Ctrl + K — focus the header search input from anywhere on the page.
+        $(document).on("keydown", function (e) {
+            if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+                const $input = $("#search_terms");
+                if ($input.length) {
+                    e.preventDefault();
+                    $input.trigger("focus").trigger("select");
+                }
+            }
+        });
+
+        // React to system theme changes only when the user hasn't set a preference.
+        if (window.matchMedia) {
+            try {
+                window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+                    if (!localStorage.getItem("theme")) {
+                        window.app.theme.set(e.matches ? "dark" : "light", { persist: false });
+                    }
+                });
+            } catch (err) { /* older browsers without addEventListener on MQL */ }
+        }
     },
 
     search() {
@@ -63,6 +88,27 @@ window.app = {
         const y = days / 365;
         if (y < 10) return y.toFixed(1) + " years ago";
         return Math.floor(y) + " years ago";
+    },
+
+    /**
+     * Theme management. The preflight script in base.html.twig sets
+     * document.documentElement.dataset.theme synchronously to prevent FOUC,
+     * so .get() always returns the active theme on load.
+     */
+    theme: {
+        get() {
+            return document.documentElement.dataset.theme || "light";
+        },
+        set(theme, opts = { persist: true }) {
+            document.documentElement.dataset.theme = theme;
+            if (opts.persist) {
+                try { localStorage.setItem("theme", theme); } catch (e) { /* ignore */ }
+            }
+            $(".theme-toggle").attr("aria-pressed", theme === "dark" ? "true" : "false");
+        },
+        toggle() {
+            this.set(this.get() === "dark" ? "light" : "dark");
+        },
     },
 };
 

@@ -345,11 +345,11 @@
 	},
 	exec(){
 		let printWindow = window.open('', '', 'height=1024,width=1280');
-		printWindow.document.write('<html><head><title>' + $("div#quadrant-4 > div.doc-title > h1").text() + '</title>');
+		printWindow.document.write('<html><head><title>' + $("div.doc-title > h1").first().text() + '</title>');
 		printWindow.document.write('<style>body{font-family:arial;} ul{list-style: none;}</style>');
 		printWindow.document.write('</head><body >');
 		
-		printWindow.document.write("<h1>" + $("div#quadrant-4 > div.doc-title > h1").text() +  "</h1>");
+		printWindow.document.write("<h1>" + $("div.doc-title > h1").first().text() +  "</h1>");
 		
 		$('#requirements > div.requirement').each( (i, e)=>{
 			printWindow.document.write("<h2>" + $(e).find("div.requirement-title").text() + "</h2>");

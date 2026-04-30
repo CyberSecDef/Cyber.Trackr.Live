@@ -1,14 +1,24 @@
 <!DOCTYPE html>
-<html >
+<html lang="en">
     <head>
         <meta charset="UTF-8">
-
-        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements.">
         <meta name="keywords" content="RMF, STIG, SCAP, CCI">
 
-
         <title>{% block title %}Welcome!{% endblock %}</title>
+
+        {# Preflight: apply stored / system theme synchronously to prevent FOUC. #}
+        <script>
+            (function () {
+                try {
+                    var stored = localStorage.getItem('theme');
+                    var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                    document.documentElement.dataset.theme = theme;
+                } catch (e) { /* localStorage unavailable — fall back to default */ }
+            })();
+        </script>
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,300..900;1,9..144,0..100,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
@@ -41,41 +51,45 @@
         <link rel="manifest" href="/images/site.webmanifest">
     </head>
     <body>
-        <div class="container-fluid body-container" id="body-container">
-            <div class="row">
-                <div class="col-3 logo-text" id="quadrant-1">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-2">
-                                <a href="{{path('home')}}" style="text-decoration:none; color:black;">
-                                    <img src="/images/cyber.trackr.png" height="50" width="50" alt="Cyber Trackr - Free Compliance Library"/>
-                                </a>
-                            </div>
-                            <div class="col-10">
-                                <a href="{{path('home')}}" style="text-decoration:none; color:black;">
-                                    <div style="font-size: 16pt; font-weight:bold; ">Cyber Trackr</div>
-                                    <div class="pt-0 mt-0" style="font-size: 10pt;">The Free Compliance Library</div>
-                                </a>
-                            </div>
-                        </div>
+        <a class="skip-link" href="#main">Skip to content</a>
+
+        <header class="site-header">
+            <div class="site-header__inner">
+                <a href="{{ path('home') }}" class="site-brand" aria-label="Cyber Trackr — home">
+                    <span class="seal" aria-hidden="true">CT</span>
+                    <span class="site-brand__label">
+                        <span class="site-brand__name">Cyber · Trackr</span>
+                        <span class="site-brand__tagline font-display-italic">The Free Compliance Library</span>
+                    </span>
+                </a>
+
+                <nav class="site-nav" aria-label="Primary">
+                    <a href="{{ path('stig') }}">STIGs</a>
+                    <a href="{{ path('rmf_v5_view') }}">800-53 r5</a>
+                    <a href="{{ path('rmf_v4_view') }}">800-53 r4</a>
+                    <a href="{{ path('cci') }}">CCIs</a>
+                    <a href="{{ path('scap') }}">SCAP</a>
+                    <a href="{{ path('report_generator') }}">Scans &rsaquo; Reports</a>
+                    <a href="{{ path('api_summary') }}">API</a>
+                    <a href="{{ path('contact_us') }}">Contact</a>
+                </nav>
+
+                <div class="site-actions">
+                    <div class="site-search">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                        <input type="search" id="search_terms" class="site-search__input" placeholder="Search the library&hellip;" aria-label="Search the library" autocomplete="off">
+                        <kbd class="site-search__kbd" title="Press Cmd/Ctrl + K to focus search">&#8984;K</kbd>
                     </div>
-                </div>
-                <div class="col-9" id="quadrant-2">
-                    <div class="input-group pt-2 mb-3">
-                        <input type="text" id="search_terms" class="form-control" placeholder="Search Term" aria-label="Search Term" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="app.search();">Search</button>
-                    </div>
+                    <button type="button" class="theme-toggle" onclick="window.app.theme.toggle()" aria-label="Toggle color theme" aria-pressed="false">
+                        <i class="bi bi-moon-stars" data-theme-icon="show-in-light" aria-hidden="true"></i>
+                        <i class="bi bi-sun" data-theme-icon="show-in-dark" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-1 sidemenu" id="quadrant-3">
-                    {% include "sidebar.html.twig" %}
-                </div>
-                <div class="col-11" id="quadrant-4" style="min-height:1024px;">
-                    {% block body %}{% endblock %}
-                </div>
-            </div>
-        </div>
-        
+        </header>
+
+        <main id="main" class="site-main">
+            {% block body %}{% endblock %}
+        </main>
     </body>
 </html>

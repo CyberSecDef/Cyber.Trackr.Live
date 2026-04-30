@@ -442,7 +442,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg);
     color: var(--text);
-    height: 100%;
+    margin: 0;
     min-height: 100vh;
 }
 
@@ -454,23 +454,262 @@ a:hover {
     color: var(--accent-hover) !important;
 }
 
+/* .logo-text is still used by home/index.html.twig — will be replaced when
+   that page gets the hero treatment in §4.1. */
 .logo-text {
     font-family: "Linux Libertine", Georgia, Times, serif;
 }
 
-.body-container {
-    height: 110vh;
+
+/* =============================================================================
+ * 1a. Layout shell — Skip link, sticky header, main
+ *    Replaces the old 4-quadrant grid (sidebar + body) with a sticky
+ *    horizontal nav over a centered main column. Footer comes in §3.3.
+ * ========================================================================== */
+
+.skip-link {
+    position: absolute;
+    left: var(--space-2);
+    top: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--text);
+    color: var(--bg) !important;
+    border-radius: var(--radius-lg);
+    text-decoration: none !important;
+    transform: translateY(-200%);
+    transition: transform 0.15s ease;
+    z-index: 1000;
 }
 
-.sidemenu {
-    font-family: sans-serif;
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 64px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    max-width: 1400px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+}
+
+.site-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none !important;
+    color: var(--text) !important;
+    flex-shrink: 0;
+}
+
+.site-brand__label {
+    display: none;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+@media (min-width: 576px) {
+    .site-brand__label {
+        display: flex;
+    }
+}
+
+.site-brand__name {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text);
+}
+
+.site-brand__tagline {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Concentric "seal" monogram badge — left-most element of the brand */
+.seal {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text);
+    background: var(--surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    user-select: none;
+}
+
+.seal::before,
+.seal::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.seal::before {
+    inset: 3px;
+    border: 1px solid var(--text);
+    opacity: 0.45;
+}
+
+.seal::after {
+    inset: 6px;
+    border: 1px dashed var(--text);
+    opacity: 0.3;
+}
+
+/* Center cluster: primary nav (hidden on small viewports) */
+.site-nav {
+    display: none;
+    align-items: center;
+    gap: var(--space-5);
+    flex: 1;
+    justify-content: center;
     font-size: 14px;
 }
 
-#quadrant-4 {
-    border-left: 2px solid #a7d7f9;
-    border-top: 1px solid #a7d7f9;
-    background: #fff;
+.site-nav a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+}
+
+.site-nav a:hover {
+    color: var(--accent) !important;
+}
+
+@media (min-width: 992px) {
+    .site-nav {
+        display: inline-flex;
+    }
+}
+
+/* Right cluster: search + theme toggle */
+.site-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: auto;
+}
+
+@media (min-width: 992px) {
+    .site-actions {
+        margin-left: 0;
+    }
+}
+
+.site-search {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    height: 36px;
+    padding: 0 var(--space-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-muted);
+    transition: border-color 0.15s ease;
+}
+
+.site-search:focus-within {
+    border-color: var(--accent);
+}
+
+.site-search__input {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--text);
+    font-size: 13px;
+    width: 180px;
+}
+
+.site-search__input::placeholder {
+    color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+    .site-search {
+        display: inline-flex;
+    }
+}
+
+kbd, .site-search__kbd {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.theme-toggle {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Show moon in light mode (= "switch to dark"), sun in dark mode. */
+.theme-toggle [data-theme-icon="show-in-dark"] {
+    display: none;
+}
+
+[data-theme="dark"] .theme-toggle [data-theme-icon="show-in-light"] {
+    display: none;
+}
+
+[data-theme="dark"] .theme-toggle [data-theme-icon="show-in-dark"] {
+    display: inline-flex;
+}
+
+.site-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-5);
 }
 
 
