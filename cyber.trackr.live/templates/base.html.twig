@@ -63,7 +63,7 @@
                     </span>
                 </a>
 
-                <nav class="site-nav" aria-label="Primary">
+                <nav id="site-nav" class="site-nav" aria-label="Primary">
                     <a href="{{ path('stig') }}">STIGs</a>
                     <a href="{{ path('rmf_v5_view') }}">800-53 r5</a>
                     <a href="{{ path('rmf_v4_view') }}">800-53 r4</a>
@@ -83,6 +83,9 @@
                     <button type="button" class="theme-toggle" onclick="window.app.theme.toggle()" aria-label="Toggle color theme" aria-pressed="false">
                         <i class="bi bi-moon-stars" data-theme-icon="show-in-light" aria-hidden="true"></i>
                         <i class="bi bi-sun" data-theme-icon="show-in-dark" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="nav-toggle icon-btn" onclick="window.app.navToggle(this)" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-nav">
+                        <i class="bi bi-list" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>

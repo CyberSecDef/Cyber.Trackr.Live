@@ -100,6 +100,14 @@ window.app = {
         window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(query));
     },
 
+    /** Mobile nav hamburger — toggles the .is-open class on the nav panel. */
+    navToggle(btn) {
+        const $nav = $("#site-nav");
+        const open = !$nav.hasClass("is-open");
+        $nav.toggleClass("is-open", open);
+        $(btn).attr("aria-expanded", open ? "true" : "false");
+    },
+
     /**
      * Registry of per-table sort callbacks. Keyed by the <table> element id;
      * value is `(field, type, dir) => void`. The generic header click handler

@@ -332,6 +332,14 @@ button.chip {
     -webkit-appearance: none;
 }
 
+/* Touch-target bump — chips are small for fingers on mobile. */
+@media (max-width: 767.98px) {
+    .chip {
+        min-height: 36px;
+        padding: 8px 14px;
+    }
+}
+
 .chip-group {
     display: inline-flex;
     flex-wrap: wrap;
@@ -595,7 +603,7 @@ a:hover {
     opacity: 0.3;
 }
 
-/* Center cluster: primary nav (hidden on small viewports) */
+/* Center cluster: primary nav (hidden on small viewports — replaced by .nav-toggle below lg). */
 .site-nav {
     display: none;
     align-items: center;
@@ -619,6 +627,49 @@ a:hover {
 @media (min-width: 992px) {
     .site-nav {
         display: inline-flex;
+    }
+}
+
+/* Hamburger toggle — visible only below lg where the inline nav hides. */
+.nav-toggle {
+    /* uses .icon-btn structure from §2e */
+}
+
+@media (min-width: 992px) {
+    .nav-toggle {
+        display: none !important;
+    }
+}
+
+/* Mobile nav: full-width fixed panel under the header when .is-open. */
+@media (max-width: 991.98px) {
+    .site-nav.is-open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border-strong);
+        padding: var(--space-3) var(--space-5);
+        gap: 0;
+        z-index: 99;
+        max-height: calc(100vh - 64px);
+        overflow-y: auto;
+    }
+
+    .site-nav.is-open a {
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 16px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    .site-nav.is-open a:last-child {
+        border-bottom: 0;
     }
 }
 
@@ -1382,6 +1433,65 @@ kbd, .site-search__kbd {
 
 .data-table tbody tr:hover {
     background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+/* Card-view rendering below md: each row stacks as a labeled card.
+   Templates supply data-label="..." on every <td> for the row labels.
+   Skips the thead and the .data-table-scroll max-height clamp. */
+@media (max-width: 767.98px) {
+    .data-table-scroll {
+        max-height: none;
+    }
+
+    .data-table thead {
+        display: none;
+    }
+
+    .data-table,
+    .data-table tbody,
+    .data-table tbody tr,
+    .data-table tbody td {
+        display: block;
+        width: 100%;
+    }
+
+    .data-table tbody tr {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--border-strong);
+    }
+
+    .data-table tbody tr:hover {
+        background: transparent;
+    }
+
+    .data-table tbody td {
+        padding: 6px 0;
+        border-bottom: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-3);
+        text-align: left;
+    }
+
+    .data-table tbody td.num {
+        text-align: left;
+    }
+
+    .data-table tbody td::before {
+        content: attr(data-label);
+        font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 10.5px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-muted);
+        flex-shrink: 0;
+    }
+
+    .data-table tbody td:not([data-label])::before {
+        content: none;
+    }
 }
 
 .data-table tbody td a {

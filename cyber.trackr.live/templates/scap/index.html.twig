@@ -58,10 +58,10 @@
                                 data-version="V{{ s.version }}R{{ s.release }}"
                                 data-age="{{ tag }}"
                                 data-released="{{ date_iso }}">
-                                <td><a href="{{ path('scap_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
-                                <td>{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
-                                <td>{% if date_trim %}{{ s.date|date("d M Y") }}{% endif %}</td>
-                                <td>{% if date_trim %}{{ ui.freshness(s.date) }}{% endif %}</td>
+                                <td data-label="Name"><a href="{{ path('scap_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
+                                <td data-label="Version">{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
+                                <td data-label="Date">{% if date_trim %}{{ s.date|date("d M Y") }}{% endif %}</td>
+                                <td data-label="Freshness">{% if date_trim %}{{ ui.freshness(s.date) }}{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

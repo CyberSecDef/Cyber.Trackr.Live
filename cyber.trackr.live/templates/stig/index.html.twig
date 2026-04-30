@@ -65,10 +65,10 @@
                                 data-age="{{ tag }}"
                                 data-released="{{ rel_iso }}"
                                 data-rules="{{ rules_total }}">
-                                <td><a href="{{ path('stig_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
-                                <td>{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
-                                <td>{% if rel_trim %}{{ s.released|date("d M Y") }}{% endif %}</td>
-                                <td>
+                                <td data-label="Name"><a href="{{ path('stig_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
+                                <td data-label="Version">{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
+                                <td data-label="Released">{% if rel_trim %}{{ s.released|date("d M Y") }}{% endif %}</td>
+                                <td data-label="Severity Mix">
                                     <span class="sev-mix">
                                         {{ ui.sev_bar(hi, med, low) }}
                                         {% if hi  > 0 %}{{ ui.sev('high', hi) }}{% endif %}
@@ -76,8 +76,8 @@
                                         {% if low > 0 %}{{ ui.sev('low',  low) }}{% endif %}
                                     </span>
                                 </td>
-                                <td class="num">{{ rules_total|number_format }}</td>
-                                <td>{% if rel_trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
+                                <td data-label="Rules" class="num">{{ rules_total|number_format }}</td>
+                                <td data-label="Freshness">{% if rel_trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
