@@ -228,11 +228,11 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 - [x] Mirrors §4.9 RMF v5 layout. Breadcrumb includes "800-53 r5" intermediate to signal v4 is the legacy revision. "NIST SP 800-53 · Legacy" eyebrow + Fraunces "Risk Management Framework *Rev. 4*" + meta with control count.
 
-### 4.11 CCI list page  *(`templates/cci/index.html.twig`)*
+### 4.11 CCI list page  *(`templates/cci/index.html.twig`)*  ✓ done
 
-- [ ] Wrap CCI numbers (`{{r.cci}}` line 25) and RMF control refs (`{{r.rmf}}` line 30) in `.ident`.
-- [ ] **Keep DataTables export buttons here** — they're heavily used (Excel/CSV/PDF/Print export at lines 49–77). Just restyle the toolbar with token colors.
-- [ ] Eyebrow + Fraunces title replacing the `<h1>` at line 7.
+- [x] CCI numbers and RMF control refs wrapped in `.ident` (done in §2.1 sweep).
+- [x] DataTables retained per Group 8 decision; new app.css §2g overrides skin the toolbar (filter input, length select, info row, paginate buttons, .dt-button export bar) and the table headers/rows to tokens. All 5 export buttons (Copy/Excel/CSV/PDF/Print) preserved.
+- [x] Page wrapped in `.lib-page`; new `.lib-page__header` with eyebrow + Fraunces "Common Control *Identifiers*" + lede with live count. Also fixed legacy typo "Idenfiers" → "Identifiers".
 
 ### 4.12 Search results page  *(`templates/home/search.html.twig`)*
 
