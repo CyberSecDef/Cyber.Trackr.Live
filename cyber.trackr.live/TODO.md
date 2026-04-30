@@ -194,15 +194,15 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Page header: .lib-page__title-large Fraunces with italic accent + .lib-page__lede subhead + eyebrow.
 - [x] Bonus: extracted per-title rollup to `StigTocBuilder::latestPerTitle()`, reused in both HomeController and StigController. Generic sort-handler registry in app.tableSortHandlers makes the third (§4.8) and any future managed table trivial to plug in.
 
-### 4.6 STIG detail page (§20)  *(`templates/stig/view.html.twig`)*
+### 4.6 STIG detail page (§20)  *(`templates/stig/view.html.twig`)*  ✓ done
 
-- [ ] Add breadcrumbs at top: `STIGs › {vendor} › {name} › {version}` (vendor extraction from title is heuristic — may need a controller-side helper).
-- [ ] Replace the `<h1>` at line 7 with `.font-display` title + freshness dot+date below + eyebrow above.
-- [ ] Replace the `.doc-summary` card (lines 21–115) with a new layout:
-  - Three severity stat-cards across the top (high/med/low) with severity color border-left, 36px Fraunces count, mono uppercase label
-  - Versions panel (replace inline `<select>` controls at lines 81–96 and 100–113 with `.chip`-styled compare/view controls — `.chip` rows of version pills)
-- [ ] Apply `.ident` to: vuln IDs (`group.attributes.id`), rule IDs (`group.Rule.attributes.id`), CCI numbers (`CCI_NUM`), RMF controls (the xpath result from the cci lookup), severity (replace text with `.sev` pill).
-- [ ] Sticky table headers + mono header style for the rule list (currently each rule is rendered as a card-like block — see lines 121+ — not a table; either keep card layout but apply token-driven styling, or convert to table per spec).
+- [x] Breadcrumbs: simple "STIGs › {title}". Vendor heuristic deferred (would need a controller-side helper).
+- [x] Header rewrite: eyebrow + Fraunces title from XCCDF Benchmark/title + meta row with `.ident` pill / freshness / released date / rule count, plus 40px `.icon-btn` download/print on the right.
+- [x] `.doc-summary` card removed entirely. Replaced with: 3-up `.stat-cards` (severity border-left, big Fraunces count in matching color, mono uppercase label — clickable as filters via `stig_app.toggleFilter`); `.versions-panel` 2-col grid with Compare + View `<select>`s + CTA-primary submit; `.rule-controls` bar with sort chips + Expand-All toggle.
+- [x] `.ident` and `.sev` already applied throughout the rule loop in Groups 2.1 / 2.2.
+- [x] Rule-loop card markup preserved (existing JS depends on it). Supporting CSS in §2 fully tokenized — `.req-header` / `.req-desc` / `.sec-header` / `.doc-desc` / `dt.inline` / `.reference` all now use `--text` / `--border` / `--border-strong` / `--text-muted` instead of hardcoded grays.
+- [ ] **Deferred:** chip-row replacement for the Compare/View `<select>` controls. Current selects work; chip-row UX would need multi-select state JS for Compare. Future enhancement.
+- [ ] **Deferred:** rule-list-as-table. Spec offered "either keep card or convert to table" — chose card to preserve the rich expand/collapse + per-rule details.
 
 ### 4.7 SCAP detail page  *(`templates/scap/view.html.twig`)*
 
