@@ -180,9 +180,9 @@ class ScapController extends AbstractController
         // Set the cookies
         $cookies = [
             "CookieConsentPolicy" => "0:1",
-            "LSKey-c$CookieConsentPolicy" => "0:1",
+            'LSKey-c$CookieConsentPolicy' => "0:1",
             "_ga" => "GA1.1.2133560557.1755112757",
-            "_ga_6XQ570DY75" => "GS2.1.s175511275$o1$g$t1755112873$j5$l0$h0"
+            "_ga_6XQ570DY75" => 'GS2.1.s175511275$o1$g$t1755112873$j5$l0$h0'
         ];
         
         $headers = [
@@ -226,9 +226,9 @@ class ScapController extends AbstractController
         
         $phpObject = json_decode($response);
         $index = 0;
-        echo "<pre>\n";
+        echo "<pre style='color:rgb(236, 226, 200);'>\n";
         foreach($phpObject->returnValue as $item){
-            preg_match_all('/https:.*wp-content.*stigs.*U_.*\.zip/', $web_contents, $matches);
+            //preg_match_all('/https:.*wp-content.*stigs.*U_.*\.zip/', $web_contents, $matches);
             $link = $item->DownloadLink;
             if (stristr((string) $link, "Benchmark") && !stristr((string) $link, "STIGViewer") && !stristr((string) $link, "STIG_Library") && stristr((string) $link, "wp-content") && stristr((string) $link, "U_") && stristr((string) $link, ".zip")) {
                 $index++;

@@ -19,3 +19,8 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+# DISA SRG-STIG Compilation zips — these are aggregated bundles that can run
+# 100+ MB and exceed GitHub's per-file limit. The individual STIG zips in
+# resources/data/zips/ stay tracked; only Compilation bundles are excluded.
+*Compilation*.zip
