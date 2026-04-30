@@ -62,7 +62,7 @@
                 </dl>    
                 <div class="col-7 pt-0 mt-0">
 <div class="sec-header">Description</div>
-<div class="req-desc" style="white-space:pre-wrap;">{% for i in control.xpath('./aaa:discussion/aaa:description/aaa:p') %}{{ i.asXml()|striptags|trans}}
+<div class="req-desc pre-wrap">{% for i in control.xpath('./aaa:discussion/aaa:description/aaa:p') %}{{ i.asXml()|striptags|trans}}
 {% endfor %}</div>
 <div class="sec-header">Instructions</div>
 {{control.xpath('./aaa:statement/aaa:description')|join(', ')}}

@@ -2236,6 +2236,23 @@ kbd, .site-search__kbd {
     font-size: 0.9em;
 }
 
+/* Preserve whitespace + line wrapping in scan output / xpath text dumps. */
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+/* Clickable italic title for collapsible rule headers (stig/view, scap/view). */
+.requirement-title {
+    cursor: pointer;
+    font-style: italic;
+}
+
+/* Tightener — drop leading margin where two paragraphs need to read as one
+   block (used by the report-generator lede continuation). */
+.u-mt-0 {
+    margin-top: 0 !important;
+}
+
 dt.inline {
     float: left;
     clear: left;

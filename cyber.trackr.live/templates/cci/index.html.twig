@@ -18,7 +18,7 @@
         </header>
 
         <div class="collapse" id="cci_container" >
-        <table id="ccis" class="table table-hover table-striped compact p-0 text-sm" style="width:100%;">
+        <table id="ccis" class="table table-hover table-striped compact p-0 text-sm w-100">
             <thead>
                 <tr>
                     <th>CCI</th>
@@ -36,14 +36,14 @@
                 {% for r in results %}
                     <tr>
                         <td>{{ ui.ident(r.cci) }}</td>
-                        <td style="white-space:pre-wrap;">{{r.cci_definition|default()}}</td>
-                        <td style="white-space:pre-wrap;">{{r.cci_auditor|default()}}</td>
-                        <td style="white-space:pre-wrap;">{{r.cci_guidance|default()}}</td>
+                        <td class="pre-wrap">{{r.cci_definition|default()}}</td>
+                        <td class="pre-wrap">{{r.cci_auditor|default()}}</td>
+                        <td class="pre-wrap">{{r.cci_guidance|default()}}</td>
                         <td>{{r.name|default()}}</td>
                         <td>{% if r.rmf|default %}{{ ui.ident(r.rmf) }}{% endif %}</td>
                         <td>{{r.ap_acronym|default()}}</td>
-                        <td class="col-3" style="white-space:pre-wrap;">{{r.rmf_guidance|default()}}</td>
-                        <td class="col-3" style="white-space:pre-wrap;">{{r.rmf_definition|default()}}</td>
+                        <td class="col-3 pre-wrap">{{r.rmf_guidance|default()}}</td>
+                        <td class="col-3 pre-wrap">{{r.rmf_definition|default()}}</td>
                     </tr>
                 {% endfor %}
             </tbody>

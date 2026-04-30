@@ -137,7 +137,7 @@
                 {% endif %}
                 
                 <div class="req-header title" onclick="stig_app.showhide(this);">
-                    <div  class="text-md requirement-title" style=" cursor: pointer; font-style: italic;">
+                    <div class="text-md requirement-title">
                         {{group.Rule.title}}
                     </div>
                     <a name="req_{{group.attributes.id}}"></a>
@@ -216,10 +216,10 @@
                             </div>
 
                             <h6><u><strong>Checks</strong>: {{ group.Rule.check.attributes.system }}</u></h6>
-                            <p style="white-space:pre-wrap;">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</p>
+                            <p class="pre-wrap">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</p>
             
                             <h6><u><strong>Fix: </strong>{{ ui.ident(group.Rule.fix.attributes.id) }}</u></h6>
-                            <p style="white-space:pre-wrap;">{{ group.Rule.fixtext }}</p>
+                            <p class="pre-wrap">{{ group.Rule.fixtext }}</p>
 
                             <h6> 
                                 <button class="btn btn-outline-secondary m-2 py-1 " onclick="stig_app.mitigate(this, '{{ group.attributes.id }}', '{{ group.Rule.title|sha1 }}');"><i class="bi bi-cloud-plus"></i>
