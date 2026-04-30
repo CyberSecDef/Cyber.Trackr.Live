@@ -46,21 +46,37 @@
                             <th data-sort-key="name"     data-sort-type="string">Name <span class="sort-ind"></span></th>
                             <th data-sort-key="version"  data-sort-type="string">Version <span class="sort-ind"></span></th>
                             <th data-sort-key="released" data-sort-type="date" class="sorted desc" aria-sort="descending">Date <span class="sort-ind">&darr;</span></th>
+                            <th>Severity Mix</th>
+                            <th data-sort-key="rules"    data-sort-type="number" class="num">Rules <span class="sort-ind"></span></th>
                             <th>Freshness</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for s in scaps_latest %}
+                            {% set hi  = s.sev.h|default(0) %}
+                            {% set med = s.sev.m|default(0) %}
+                            {% set low = s.sev.l|default(0) %}
+                            {% set rules_total = hi + med + low %}
                             {% set date_trim = s.date|default('')|trim %}
                             {% set tag = date_trim is empty ? 'old' : (s.date|freshness_tag) %}
                             {% set date_iso = date_trim is empty ? '' : (s.date|date('Y-m-d')) %}
                             <tr data-name="{{ s.title|replace({'_': ' '})|lower }}"
                                 data-version="V{{ s.version }}R{{ s.release }}"
                                 data-age="{{ tag }}"
-                                data-released="{{ date_iso }}">
+                                data-released="{{ date_iso }}"
+                                data-rules="{{ rules_total }}">
                                 <td data-label="Name"><a href="{{ path('scap_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
                                 <td data-label="Version">{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
                                 <td data-label="Date">{% if date_trim %}{{ s.date|date("d M Y") }}{% endif %}</td>
+                                <td data-label="Severity Mix">
+                                    <span class="sev-mix">
+                                        {{ ui.sev_bar(hi, med, low) }}
+                                        {% if hi  > 0 %}{{ ui.sev('high', hi) }}{% endif %}
+                                        {% if med > 0 %}{{ ui.sev('med',  med) }}{% endif %}
+                                        {% if low > 0 %}{{ ui.sev('low',  low) }}{% endif %}
+                                    </span>
+                                </td>
+                                <td data-label="Rules" class="num">{{ rules_total|number_format }}</td>
                                 <td data-label="Freshness">{% if date_trim %}{{ ui.freshness(s.date) }}{% endif %}</td>
                             </tr>
                         {% endfor %}

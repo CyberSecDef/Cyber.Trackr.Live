@@ -14,109 +14,40 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ScapController extends AbstractController
 {
     #[Route('/scap', name: 'scap')]
-    public function scap(): Response
+    public function scap(\App\Service\ScapTocBuilder $tocBuilder): Response
     {
-        $filesystem = new Filesystem();
-        $finder = new Finder();
+        $scaps = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
+        // Index every filename already in the toc so we only parse genuinely new files.
         $existing_files = [];
-
-        $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
-        $scaps = json_decode(file_get_contents($toc_path), true) ?: [];
-        $new_scap = false;
-
-        //get all files listed in toc
         foreach ($scaps as $instances) {
             foreach ($instances as $instance) {
                 $existing_files[] = $instance['filename'];
             }
         }
 
-        //see if existing file is in toc, if not...add it
-        $finder->files()->in(__DIR__ . "/../../resources/data/scap/");
+        $new = 0;
+        $finder = (new Finder())->files()->in($tocBuilder->scapDir())->name('*.xml');
         foreach ($finder as $file) {
-            if (!in_array(basename($file), $existing_files)) {
-                $ext = pathinfo($file, PATHINFO_EXTENSION);
-                if ($ext == 'xml') {
-                    $new_scap = true;
-                    $xml = simplexml_load_file($file);
-
-                    foreach ($xml->getDocNamespaces() as $strPrefix => $strNamespace) {
-                        if (strlen((string) $strPrefix) == 0) {
-                            $strPrefix = "a"; //Assign an arbitrary namespace prefix.
-                        }
-                        $xml->registerXPathNamespace($strPrefix, $strNamespace);
-                    }
-                    $xml->registerXPathNamespace("xmlns", "http://checklists.nist.gov/xccdf/1.1");
-                    $xml->registerXPathNamespace("xccdf", "http://checklists.nist.gov/xccdf/1.2");
-                    $xml->registerXPathNamespace("dict", "http://cpe.mitre.org/dictionary/2.0");
-                    $xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/scap/source/1.2");
-
-                    $query = $xml->xpath('//xccdf:Benchmark/xccdf:title/text()');
-                    
-                    $title = (string)(count($query) > 0 ? $query[0] : "");
-                    $title = str_replace(['(STIG)', 'Security Technical Implementation Guide', ' MS ', 'Microsoft', '\/', '\\', '/'], "", $title);
-                    $title = trim($title);
-                    $title = str_replace(' ', '_', $title);
-
-                    $query = $xml->xpath('//xccdf:Benchmark/xccdf:status/@date');
-                    $date = (string)(count($query) > 0 ? $query[0] : "");
-
-                    $release = "";
-                    $version = "";
-
-                    $query = $xml->xpath("//xccdf:Benchmark/xccdf:plain-text[@id='release-info']/text()");
-                    if (count($query) > 0) {
-                        $release_results = (string)($query[0]);
-                        $matches = [];
-                        preg_match(
-                            "/Release: ([0-9\.]+) /",
-                            $release_results,
-                            $matches
-                        );
-                        $vr = explode(".", $matches[1] );
-                        $version = $vr[0];
-                        $release = $vr[1];
-                    } 
-                    if( $release == '' || $version == ''){
-                        $query = $xml->xpath("//xccdf:Benchmark/xccdf:version/text()");
-                        if(count($query) > 0){
-                            [$version, $release] = explode('.', $query[0]);
-                            $version = trim(((int)$version));
-                            $release = trim(((int)$release));
-                        }
-                    }
-
-
-
-                    if ($title != '' && $version != '' && $release != '') {
-                        if (!array_key_exists($title, $scaps)) {
-                            $scaps[$title] = [];
-                        }
-
-                        $scaps[$title][] = [
-                            "date" => $date,
-                            "filename" => basename($file),
-                            "version" => $version,
-                            "release" => $release,
-                        ];
-                    }
-                }
+            if (in_array($file->getFilename(), $existing_files, true)) {
+                continue;
             }
+            $parsed = $tocBuilder->parseScap($file->getRealPath());
+            if ($parsed === null) {
+                continue;
+            }
+            if (!array_key_exists($parsed['title'], $scaps)) {
+                $scaps[$parsed['title']] = [];
+            }
+            $scaps[$parsed['title']][] = $parsed['entry'];
+            $new++;
         }
 
-        if ($new_scap) {
-            $filesystem->dumpFile(realpath(__DIR__ . "/../../resources/data/scap_toc.json"), json_encode($scaps, JSON_PRETTY_PRINT));
+        if ($new > 0) {
+            $tocBuilder->writeToc($scaps);
         }
 
-        // Roll up to one record per title (latest version), sorted by date desc.
-        $scaps_latest = [];
-        foreach ($scaps as $title => $instances) {
-            if (empty($instances)) continue;
-            usort($instances, fn($a, $b) => strtotime((string)($b['date'] ?? '')) - strtotime((string)($a['date'] ?? '')));
-            $scaps_latest[] = ['title' => $title] + $instances[0];
-        }
-        usort($scaps_latest, fn($a, $b) => strtotime((string)($b['date'] ?? '')) - strtotime((string)($a['date'] ?? '')));
+        $scaps_latest = $tocBuilder->latestPerTitle($scaps);
 
         return $this->render('scap/index.html.twig', [
             'controller_name' => 'ScapController',
