@@ -249,9 +249,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Submit uses `.cta-primary` with arrow icon (matches the homepage colophon Contact CTA).
 - [x] Formspree action URL + CSRF token preserved.
 
-### 4.14 Report generator  *(`templates/home/report_generator.html.twig`)*
+### 4.14 Report generator  *(`templates/home/report_generator.html.twig`)*  ✓ done
 
-- [ ] Apply token typography. (Skim file first.)
+- [x] Page chrome rewritten with `.lib-page` shell, page header (eyebrow + Fraunces "Scans › *POAM & RAR*" + privacy lede), 4 `.rule-text` section dividers, `.form-stack` for contact fields, `.rg-options` 2-col grid for switches + drop area, `.data-table-wrap` for both scan tables, `.cta-primary` for Parse + Execute buttons.
+- [x] **All 18 JS hook IDs preserved** (inputCommand/Contact/Phone/Email, the 4 inputPreFill/Condense/Lower switches, drop-area, fileElem, ScansAndOptionsBody, scanFiles, parseStatus, scans2poamParse, scanSummary, scans2poamExecute, result). Column order in scanFiles + scanSummary preserved exactly (JS uses `td:nth-child(1)`/`(6)`).
+- [x] **Latent bug fixes:** added `<div id="alertWindow">` (JS appended to it in 7 places but div never existed); fixed all 4 contact-field labels pointing to wrong `for=`.
+- [x] §4.13's `.form-stack` / `.form-field` component reused; §4.6's `.data-table` reused.
 
 ---
 
