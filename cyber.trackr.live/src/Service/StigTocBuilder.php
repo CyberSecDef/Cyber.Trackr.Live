@@ -141,4 +141,49 @@ class StigTocBuilder
             json_encode($stigs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }
+
+    /**
+     * Roll up a toc array (title => [instance, ...]) to a flat list of one
+     * record per title, where the chosen instance is the latest by released
+     * date. The caller can then slice / sort / render directly. Each record
+     * carries the title alongside the entry fields (date, released, version,
+     * release, filename, sev).
+     */
+    public function latestPerTitle(array $stigs): array
+    {
+        $latest = [];
+        foreach ($stigs as $title => $instances) {
+            if (empty($instances)) {
+                continue;
+            }
+            usort($instances, fn($a, $b) => $this->sortKey($b) - $this->sortKey($a));
+            $latest[] = ['title' => $title] + $instances[0];
+        }
+        usort($latest, fn($a, $b) => $this->sortKey($b) - $this->sortKey($a));
+        return $latest;
+    }
+
+    /**
+     * Sort key for a stig instance — prefer human "released" string ("24 Jul
+     * 2024"), fall back to ISO "date", fall back to 0 so entries with neither
+     * sink rather than bubble.
+     */
+    private function sortKey(array $entry): int
+    {
+        $rel = trim((string) ($entry['released'] ?? ''));
+        if ($rel !== '') {
+            $ts = strtotime($rel);
+            if ($ts !== false) {
+                return $ts;
+            }
+        }
+        $date = (string) ($entry['date'] ?? '');
+        if ($date !== '') {
+            $ts = strtotime($date);
+            if ($ts !== false) {
+                return $ts;
+            }
+        }
+        return 0;
+    }
 }

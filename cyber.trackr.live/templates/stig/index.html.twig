@@ -1,54 +1,95 @@
 {% extends 'base.html.twig' %}
 {% import 'macros.html.twig' as ui %}
 
-{% block title %}STIGs!{% endblock %}
+{% block title %}STIGs &mdash; Cyber Trackr{% endblock %}
 
 {% block body %}
-    <h1>Security Technical Implementation Guides - STIGs</h1>
-    <table id="stigs" class="table table-hover table-striped nowrap compact p-0" style="width:100%;"> 
-        <thead>
-            <tr>
-                <th>STIG</th>
-                <th>Version</th>
-                <th>Release</th>
-                <th>Published</th>
-                <th>Released</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for stig in stigs|keys %}
-                {% set s = stigs[stig]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
-                <tr>
-                    <td class="text-nowrap">
-                        <a 
-                            href="{{ path('stig_view', {title: stig, version: s.version, release: s.release}) }}"
-                        >
-                            {{stig}}
-                        </a> 
-                    </td>
-                    <td>{{ ui.ident('V' ~ s.version) }}</td>
-                    <td>{{ ui.ident('R' ~ s.release) }}</td>
-                    <td>{{s.date}}</td>
-		    <td>{% if s.released|trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <section class="lib-page" aria-labelledby="stig-page-title">
+        <div class="rule-text">&sect; Library &middot; STIGs</div>
 
-    <script>
-        const stig_app = {
-            init(){
-                $('#stigs').DataTable( {
-                    dom: '<"top"f<\'dt_len\'li>p>rt<"bottom"<\'dt_len\'l>p><"clear">', 
-                    pageLength: 25,
-                    order: [[ 0, "asc" ]],
-                    colReorder: true,
-                } )     
-            }
-        }
+        <header class="lib-page__header">
+            <span class="eyebrow">DoD Compliance</span>
+            <h1 id="stig-page-title" class="lib-page__title-large">
+                Security Technical <em>Implementation Guides</em>
+            </h1>
+            <p class="lib-page__lede">
+                {{ stig_count|number_format }} guides covering operating systems, applications, network devices, and policies &mdash; sourced from DISA and updated as new releases land.
+            </p>
+        </header>
 
-        $(document).ready( () => {
-            stig_app.init();
-        })
-    </script>
+        <div class="lib-page__bar">
+            <div class="lib-page__filter">
+                <input id="stig-q" type="search" placeholder="Filter {{ stig_count|number_format }} STIGs by name or version&hellip;"
+                       aria-label="Filter STIGs" oninput="window.app.stigList.filter()">
+                <div class="chip-group" role="radiogroup" aria-label="Filter by age">
+                    <button type="button" class="chip active" data-age="all"   onclick="window.app.stigList.age(this)">All ages</button>
+                    <button type="button" class="chip"        data-age="fresh" onclick="window.app.stigList.age(this)">Fresh &le; 1y</button>
+                    <button type="button" class="chip"        data-age="stale" onclick="window.app.stigList.age(this)">Stale 1&ndash;3y</button>
+                    <button type="button" class="chip"        data-age="aged"  onclick="window.app.stigList.age(this)">Aged 3&ndash;5y</button>
+                    <button type="button" class="chip"        data-age="old"   onclick="window.app.stigList.age(this)">Old &gt; 5y</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lib-page__legend" aria-hidden="true">
+            <span><span class="dot fresh"></span> Fresh &middot; &le; 1 yr</span>
+            <span><span class="dot stale"></span> Stale &middot; 1&ndash;3 yr</span>
+            <span><span class="dot aged"></span>  Aged &middot; 3&ndash;5 yr</span>
+            <span><span class="dot old"></span>   Old &middot; &gt; 5 yr</span>
+        </div>
+
+        <div class="data-table-wrap">
+            <div class="data-table-scroll">
+                <table id="stig-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-sort-key="name"     data-sort-type="string">Name <span class="sort-ind"></span></th>
+                            <th data-sort-key="version"  data-sort-type="string">Version <span class="sort-ind"></span></th>
+                            <th data-sort-key="released" data-sort-type="date" class="sorted desc" aria-sort="descending">Released <span class="sort-ind">&darr;</span></th>
+                            <th>Severity Mix</th>
+                            <th data-sort-key="rules"    data-sort-type="number" class="num">Rules <span class="sort-ind"></span></th>
+                            <th>Freshness</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in stigs_latest %}
+                            {% set hi  = s.sev.h|default(0) %}
+                            {% set med = s.sev.m|default(0) %}
+                            {% set low = s.sev.l|default(0) %}
+                            {% set rules_total = hi + med + low %}
+                            {% set rel_trim = s.released|default('')|trim %}
+                            {% set tag = rel_trim is empty ? 'old' : (s.released|freshness_tag) %}
+                            {% set rel_iso = rel_trim is empty ? '' : (s.released|date('Y-m-d')) %}
+                            <tr data-name="{{ s.title|replace({'_': ' '})|lower }}"
+                                data-version="V{{ s.version }}R{{ s.release }}"
+                                data-age="{{ tag }}"
+                                data-released="{{ rel_iso }}"
+                                data-rules="{{ rules_total }}">
+                                <td><a href="{{ path('stig_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
+                                <td>{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
+                                <td>{% if rel_trim %}{{ s.released|date("d M Y") }}{% endif %}</td>
+                                <td>
+                                    <span class="sev-mix">
+                                        {{ ui.sev_bar(hi, med, low) }}
+                                        {% if hi  > 0 %}{{ ui.sev('high', hi) }}{% endif %}
+                                        {% if med > 0 %}{{ ui.sev('med',  med) }}{% endif %}
+                                        {% if low > 0 %}{{ ui.sev('low',  low) }}{% endif %}
+                                    </span>
+                                </td>
+                                <td class="num">{{ rules_total|number_format }}</td>
+                                <td>{% if rel_trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="data-table-foot">
+                <span id="stig-page-info" data-total="{{ stig_count }}">Page 1 &middot; {{ stig_count|number_format }} STIGs</span>
+                <div class="data-table-foot__pager">
+                    <button type="button" id="stig-prev" onclick="window.app.stigList.prev()" disabled>&larr; Prev</button>
+                    <button type="button" id="stig-next" onclick="window.app.stigList.next()">Next &rarr;</button>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

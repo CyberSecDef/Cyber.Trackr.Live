@@ -1163,12 +1163,43 @@ kbd, .site-search__kbd {
  *    text + age chip filters, legend row, footer with paging label.
  * ========================================================================== */
 
-.recent-stigs {
+.lib-page {
     max-width: 1280px;
     margin: 0 auto var(--space-9);
 }
 
-.recent-stigs__bar {
+/* Page-header variant — used on dedicated library pages (/stig, /scap, etc.). */
+.lib-page__header {
+    margin-bottom: var(--space-6);
+}
+
+.lib-page__title-large {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.025em;
+    font-size: clamp(40px, 6vw, 64px);
+    line-height: 1;
+    font-weight: 300;
+    margin: var(--space-2) 0 var(--space-3);
+    color: var(--text);
+}
+
+.lib-page__title-large em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    color: var(--accent);
+}
+
+.lib-page__lede {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 0 var(--space-6);
+}
+
+.lib-page__bar {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -1177,12 +1208,12 @@ kbd, .site-search__kbd {
     margin-bottom: var(--space-4);
 }
 
-.recent-stigs__head {
+.lib-page__head {
     flex: 1 1 auto;
     min-width: 240px;
 }
 
-.recent-stigs__title {
+.lib-page__title {
     font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
     font-variation-settings: "opsz" 144, "SOFT" 30;
     letter-spacing: -0.025em;
@@ -1193,13 +1224,13 @@ kbd, .site-search__kbd {
     color: var(--text);
 }
 
-.recent-stigs__title em {
+.lib-page__title em {
     font-style: italic;
     font-variation-settings: "opsz" 144, "SOFT" 100;
     color: var(--accent);
 }
 
-.recent-stigs__filter {
+.lib-page__filter {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1230,7 +1261,7 @@ kbd, .site-search__kbd {
     color: var(--text-muted);
 }
 
-.recent-stigs__legend {
+.lib-page__legend {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-4);
@@ -1242,7 +1273,7 @@ kbd, .site-search__kbd {
     color: var(--text-muted);
 }
 
-.recent-stigs__legend > span {
+.lib-page__legend > span {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1378,6 +1409,38 @@ kbd, .site-search__kbd {
 
 .data-table-foot a:hover {
     color: var(--accent-hover) !important;
+}
+
+.data-table-foot__pager {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.data-table-foot__pager button {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.data-table-foot__pager button:not(:disabled):hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.data-table-foot__pager button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 

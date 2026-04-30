@@ -35,19 +35,33 @@ window.app = {
             }
         });
 
-        // Recent STIGs table — header click sorts; toggles asc/desc on repeat click.
-        $("#recent-stigs-table thead th[data-sort-key]").on("click", function () {
+        // Generic sortable header handler — any th[data-sort-key] inside any
+        // table that has a registered handler in app.tableSortHandlers.
+        $(".data-table thead th[data-sort-key]").on("click", function () {
             const $th = $(this);
+            const $table = $th.closest("table");
+            const tableId = $table.attr("id");
+            const handler = window.app.tableSortHandlers[tableId];
+            if (!handler) return;
+
             const field = $th.data("sort-key");
             const type = $th.data("sort-type") || "string";
             const wasSorted = $th.hasClass("sorted");
             const newDir = wasSorted && $th.hasClass("desc") ? "asc" : "desc";
-            $("#recent-stigs-table thead th")
+            $table.find("thead th")
                 .removeClass("sorted asc desc")
+                .attr("aria-sort", "none")
                 .find(".sort-ind").text("");
-            $th.addClass("sorted " + newDir).find(".sort-ind").text(newDir === "asc" ? "↑" : "↓");
-            window.app.recent.sort(field, type, newDir);
+            $th.addClass("sorted " + newDir)
+               .attr("aria-sort", newDir === "asc" ? "ascending" : "descending")
+               .find(".sort-ind").text(newDir === "asc" ? "↑" : "↓");
+            handler(field, type, newDir);
         });
+
+        // Initialize stig list pagination on /stig.
+        if ($("#stig-table").length) {
+            window.app.stigList.apply();
+        }
 
         // React to system theme changes only when the user hasn't set a preference.
         if (window.matchMedia) {
@@ -80,6 +94,17 @@ window.app = {
     heroSearchFor(query) {
         if (!query) return;
         window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(query));
+    },
+
+    /**
+     * Registry of per-table sort callbacks. Keyed by the <table> element id;
+     * value is `(field, type, dir) => void`. The generic header click handler
+     * in app.init() looks up the table by id and dispatches to the right
+     * callback so multiple managed tables can share one binding.
+     */
+    tableSortHandlers: {
+        "recent-stigs-table": (f, t, d) => window.app.recent.sort(f, t, d),
+        "stig-table":         (f, t, d) => window.app.stigList.sort(f, t, d),
     },
 
     /**
@@ -141,6 +166,109 @@ window.app = {
         $el.addClass("active");
         window.app.recent.ageFilter = ($el.data("age") || "all").toString();
         window.app.recent.apply();
+    },
+
+    /**
+     * Full-library STIG list (/stig). Same filter pattern as the homepage
+     * recent table, plus client-side pagination at 50 per page since the
+     * full set is ~1,076 rows.
+     */
+    stigList: {
+        pageSize: 50,
+        currentPage: 1,
+        ageFilter: "all",
+
+        apply() {
+            const q = ($("#stig-q").val() || "").toLowerCase().trim();
+            const age = this.ageFilter;
+            const $rows = $("#stig-table tbody tr");
+            const matching = [];
+            $rows.each(function () {
+                const $row = $(this);
+                const name = ($row.data("name") || "").toString();
+                const version = ($row.data("version") || "").toString().toLowerCase();
+                const rowAge = ($row.data("age") || "old").toString();
+                const matchesQuery = !q || name.indexOf(q) >= 0 || version.indexOf(q) >= 0;
+                const matchesAge = age === "all" || rowAge === age;
+                if (matchesQuery && matchesAge) matching.push(this);
+            });
+
+            const total = matching.length;
+            const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+            if (this.currentPage > totalPages) this.currentPage = totalPages;
+            if (this.currentPage < 1) this.currentPage = 1;
+
+            const start = (this.currentPage - 1) * this.pageSize;
+            const end = start + this.pageSize;
+            const visibleSet = new Set(matching.slice(start, end));
+
+            $rows.each(function () {
+                $(this).toggleClass("is-hidden", !visibleSet.has(this));
+            });
+
+            $("#stig-page-info").text(
+                "Page " + this.currentPage + " of " + totalPages +
+                " · " + total.toLocaleString() + " STIGs"
+            );
+            $("#stig-prev").prop("disabled", this.currentPage <= 1);
+            $("#stig-next").prop("disabled", this.currentPage >= totalPages);
+        },
+
+        sort(field, type, dir) {
+            const $tbody = $("#stig-table tbody");
+            const rows = $tbody.find("tr").toArray();
+            rows.sort((a, b) => {
+                if (type === "date") {
+                    const av = new Date($(a).data("released") || 0).getTime() || 0;
+                    const bv = new Date($(b).data("released") || 0).getTime() || 0;
+                    return dir === "asc" ? av - bv : bv - av;
+                }
+                if (type === "number") {
+                    const av = +($(a).data(field) || 0);
+                    const bv = +($(b).data(field) || 0);
+                    return dir === "asc" ? av - bv : bv - av;
+                }
+                const av = ($(a).data(field) || "").toString();
+                const bv = ($(b).data(field) || "").toString();
+                return dir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+            });
+            $tbody.empty().append(rows);
+            this.currentPage = 1;
+            this.apply();
+        },
+
+        filter() {
+            this.currentPage = 1;
+            this.apply();
+        },
+
+        age(elem) {
+            const $el = $(elem);
+            $el.parent().find(".chip").removeClass("active");
+            $el.addClass("active");
+            this.ageFilter = ($el.data("age") || "all").toString();
+            this.currentPage = 1;
+            this.apply();
+        },
+
+        prev() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.apply();
+                this.scrollToTable();
+            }
+        },
+
+        next() {
+            this.currentPage++;
+            this.apply();
+            this.scrollToTable();
+        },
+
+        scrollToTable() {
+            const wrap = document.querySelector("#stig-table");
+            if (wrap) wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
     },
 
     /**

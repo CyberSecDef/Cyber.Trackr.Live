@@ -18,13 +18,13 @@ class StigController extends AbstractController
     #[Route('/stig', name: 'stig')]
     public function stig(StigTocBuilder $tocBuilder): Response
     {
-        $stigs = (array) json_decode(file_get_contents($tocBuilder->tocPath()));
+        $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
         // Index every filename already in the toc so we only parse genuinely new files.
         $existing_files = [];
         foreach ($stigs as $instances) {
             foreach ($instances as $instance) {
-                $existing_files[] = $instance->filename;
+                $existing_files[] = $instance['filename'];
             }
         }
 
@@ -49,9 +49,13 @@ class StigController extends AbstractController
             $tocBuilder->writeToc($stigs);
         }
 
+        // Roll up to one record per title (latest version), sorted by released desc.
+        $stigs_latest = $tocBuilder->latestPerTitle($stigs);
+
         return $this->render('stig/index.html.twig', [
             'controller_name' => 'StigController',
-            'stigs' => $stigs,
+            'stigs_latest' => $stigs_latest,
+            'stig_count'   => count($stigs),
         ]);
     }
 

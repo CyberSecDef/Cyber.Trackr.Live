@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\StigTocBuilder;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -12,22 +13,12 @@ class HomeController extends AbstractController
 {
 
     #[Route('/', name: 'home')]
-    public function index(): Response
+    public function index(StigTocBuilder $tocBuilder): Response
     {
-        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
-        $stigs = json_decode(file_get_contents($toc_path), true) ?: [];
+        $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
-        // Build the "recent updates" rollup: for each title, the latest
-        // version-instance, then sort across titles by released date desc,
-        // and slice the top 40 for the homepage table.
-        $latest = [];
-        foreach ($stigs as $title => $instances) {
-            if (empty($instances)) continue;
-            usort($instances, fn($a, $b) => $this->stigSortKey($b) - $this->stigSortKey($a));
-            $latest[] = ['title' => $title] + $instances[0];
-        }
-        usort($latest, fn($a, $b) => $this->stigSortKey($b) - $this->stigSortKey($a));
-        $recent_stigs = array_slice($latest, 0, 100);
+        // Top 100 most-recently-released — the homepage table is curated.
+        $recent_stigs = array_slice($tocBuilder->latestPerTitle($stigs), 0, 100);
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
@@ -36,26 +27,6 @@ class HomeController extends AbstractController
             'controls_count' => $this->countControlsV5(),
             'cci_count'      => $this->countCciItems(),
         ]);
-    }
-
-    /**
-     * Sort key for a stig instance — prefer the human "released" string
-     * ("24 Jul 2024"), fall back to ISO "date", fall back to 0 so entries
-     * with neither sink to the bottom.
-     */
-    private function stigSortKey(array $entry): int
-    {
-        $rel = trim((string) ($entry['released'] ?? ''));
-        if ($rel !== '') {
-            $ts = strtotime($rel);
-            if ($ts !== false) return $ts;
-        }
-        $date = (string) ($entry['date'] ?? '');
-        if ($date !== '') {
-            $ts = strtotime($date);
-            if ($ts !== false) return $ts;
-        }
-        return 0;
     }
 
     /**
