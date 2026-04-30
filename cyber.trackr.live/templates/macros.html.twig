@@ -63,3 +63,19 @@
 <span class="sev-bar" title="High {{ h }} · Medium {{ m }} · Low {{ l }}" role="img" aria-label="Severity proportion: {{ h }} high, {{ m }} medium, {{ l }} low"><span class="h" style="width: {{ (h * 100 / total)|round(2) }}%"></span><span class="m" style="width: {{ (m * 100 / total)|round(2) }}%"></span><span class="l" style="width: {{ (l * 100 / total)|round(2) }}%"></span></span>
 {%- endif -%}
 {% endmacro %}
+
+{#
+ # freshness — colored age dot paired with a human relative-time label.
+ #
+ # Renders nothing meaningful for empty/missing dates (a gray "old" dot
+ # with "unknown"). Otherwise pairs a .dot.{fresh|stale|aged|old} with
+ # a <time> element carrying the ISO datetime for accessibility.
+ #
+ #   {{ ui.freshness(s.released) }}
+ #}
+{% macro freshness(date) %}
+{%- set tag = date|freshness_tag -%}
+{%- set rel = date|rel_time -%}
+{%- set iso = date is empty ? '' : (date|date('c')) -%}
+<span class="freshness"><span class="dot {{ tag }}" aria-hidden="true"></span> · <time class="font-mono"{% if iso %} datetime="{{ iso }}"{% endif %}>{{ rel }}</time></span>
+{%- endmacro %}

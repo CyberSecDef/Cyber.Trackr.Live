@@ -17,7 +17,8 @@
         <div class="card shadow-lg " style="width: 36rem;">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><b>Version/Release:</b> {{ ui.ident('V' ~ version ~ 'R' ~ release) }} </li>
-                <li class="list-group-item"><b>Published: </b> {{ scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first }} </li>
+                {% set published_date = scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first %}
+                <li class="list-group-item"><b>Published:</b> {{ published_date|date("d M Y") }} {{ ui.freshness(published_date) }}</li>
 
                 <li class="list-group-item"><b>Severity:</b>
 

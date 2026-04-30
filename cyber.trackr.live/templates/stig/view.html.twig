@@ -23,8 +23,11 @@
         <div class="card shadow-lg" style="width: 36rem;">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><b>Version/Release:</b> {{ ui.ident('V' ~ version ~ 'R' ~ release) }} </li>
-                <li class="list-group-item"><b>Published: </b> {{ stig.xpath("/xmlns:Benchmark/xmlns:status/@date")|first }} </li>
-                <li class="list-group-item"><b>Released: </b> {{ stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first | split('Date:')[1] | date("Y-m-d")}} </li>
+                {% set published_date = stig.xpath("/xmlns:Benchmark/xmlns:status/@date")|first %}
+                {% set release_info = stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first %}
+                {% set released_date = release_info|split('Date:')[1]|default('')|trim %}
+                <li class="list-group-item"><b>Published:</b> {{ published_date|date("d M Y") }} {{ ui.freshness(published_date) }}</li>
+                <li class="list-group-item"><b>Released:</b> {% if released_date %}{{ released_date|date("d M Y") }} {{ ui.freshness(released_date) }}{% endif %}</li>
 
                 <li class="list-group-item">
                     <div class="row">

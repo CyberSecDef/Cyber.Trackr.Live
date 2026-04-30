@@ -27,7 +27,7 @@
                     </td>
                     <td>{{ ui.ident('V' ~ s.version) }}</td>
                     <td>{{ ui.ident('R' ~ s.release) }}</td>
-                    <td>{{s.date}}</td>
+                    <td>{% if s.date|trim %}{{ ui.freshness(s.date) }}{% endif %}</td>
                 </tr>
             {% endfor %}
         </tbody>
