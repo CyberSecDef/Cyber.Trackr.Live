@@ -4,16 +4,34 @@
 {% block title %}RMF Rev 4 Controls{% endblock %}
 
 {% block body %}
-    <div class="doc-title">
-        <h1>800-53 (Rev. 4) Risk Management Framework - RMF Security Controls</h1>
-    </div>
-    
-    <div class="doc-desc">
-        Information security controls protect the confidentiality, integrity and/or availability of information (the so-called CIA Triad). Again, some would add further categories such as non-repudiation and accountability, depending on how narrowly or broadly the CIA Triad is defined.
+    <article class="stig-detail">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{{ path('home') }}">Library</a></li>
+                <li><a href="{{ path('rmf_v5_view') }}">800-53 r5</a></li>
+                <li aria-current="page">800-53 r4</li>
+            </ol>
+        </nav>
 
-        Individual controls are often designed to act together to increase effective protection. Systems of controls can be referred to as frameworks or standards. Frameworks can enable an organization to manage security controls across different types of assets with consistency. For example, a framework can help an organization manage controls over access regardless of the type of computer operating system. This also enables an organization to assess overall risk. Risk-aware organizations may choose proactively to specify, design, implement, operate and maintain their security controls, usually by assessing the risks and implementing a comprehensive security management framework such as ISO27001:2013, the Information Security Forum's Standard of Good Practice for Information Security, or NIST SP 800-53.
+        <header class="stig-detail__header">
+            <div class="stig-detail__header-text">
+                <span class="eyebrow">NIST SP 800-53 &middot; Legacy</span>
+                <h1 class="stig-detail__title">
+                    Risk Management Framework <em>Rev. 4</em>
+                </h1>
+                <div class="stig-detail__meta">
+                    <span>{{ rmf.xpath("/controls:controls/controls:control")|length|number_format }} controls</span>
+                    <span>&middot; Previous revision &middot; legacy systems</span>
+                </div>
+            </div>
+        </header>
 
-    </div>
+        <div class="doc-desc">
+            <p>Information security controls protect the confidentiality, integrity and/or availability of information (the so-called CIA Triad). Again, some would add further categories such as non-repudiation and accountability, depending on how narrowly or broadly the CIA Triad is defined.</p>
+            <p>Individual controls are often designed to act together to increase effective protection. Systems of controls can be referred to as frameworks or standards. Frameworks can enable an organization to manage security controls across different types of assets with consistency. For example, a framework can help an organization manage controls over access regardless of the type of computer operating system. This also enables an organization to assess overall risk. Risk-aware organizations may choose proactively to specify, design, implement, operate and maintain their security controls, usually by assessing the risks and implementing a comprehensive security management framework such as ISO27001:2013, the Information Security Forum&rsquo;s Standard of Good Practice for Information Security, or NIST SP 800-53.</p>
+        </div>
+
+        <div class="rule-text">&sect; Controls</div>
 
     {% for control in rmf.xpath("/controls:controls/controls:control") %}
         <a id="rmf_{{control.number}}"></a>
@@ -130,6 +148,7 @@
 
         {% set break = true %}
     {% endfor %}
+    </article>
     <script>
         const rmf_app = {
             init(){
