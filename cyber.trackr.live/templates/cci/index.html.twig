@@ -4,9 +4,21 @@
 {% block title %}CCIs!{% endblock %}
 
 {% block body %}
-    <div class="collapse" id="cci_container" >
-        <h1>Common Control Idenfiers - CCIs</h1>
-        <table id="ccis" class="table table-hover table-striped compact p-0 text-sm border border-1 " style="width:100%;"> 
+    <section class="lib-page" aria-labelledby="cci-page-title">
+        <div class="rule-text">&sect; Library &middot; CCIs</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Control Indicators</span>
+            <h1 id="cci-page-title" class="lib-page__title-large">
+                Common Control <em>Identifiers</em>
+            </h1>
+            <p class="lib-page__lede">
+                {{ results|length|number_format }} CCIs &mdash; the atomic compliance statements behind every STIG rule, mapped to NIST 800-53 controls.
+            </p>
+        </header>
+
+        <div class="collapse" id="cci_container" >
+        <table id="ccis" class="table table-hover table-striped compact p-0 text-sm" style="width:100%;">
             <thead>
                 <tr>
                     <th>CCI</th>
@@ -36,9 +48,8 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-    <br />
-    <br />
+        </div>
+    </section>
     <script>
         const cci_app = {
             init(){
