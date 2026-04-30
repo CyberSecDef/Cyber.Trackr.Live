@@ -460,6 +460,22 @@ a:hover {
     font-family: "Linux Libertine", Georgia, Times, serif;
 }
 
+/* Override Bootstrap's hardcoded bg-light (#f8f9fa cool near-white) so it
+   matches our theme tokens instead of clashing with the warm cream page in
+   light mode and producing light-text-on-light-bg in dark mode. Used on the
+   metadata <dl> panels in stig/scap/rmf detail templates. */
+.bg-light {
+    background-color: var(--surface) !important;
+    color: var(--text);
+}
+
+/* Same idea for Bootstrap's neutral border — use our --border token so the
+   cool gray (#dee2e6) doesn't clash with the warm palette. */
+.border,
+.border-1 {
+    border-color: var(--border) !important;
+}
+
 
 /* =============================================================================
  * 1a. Layout shell — Skip link, sticky header, main
