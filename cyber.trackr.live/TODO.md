@@ -81,17 +81,15 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] **Bonus placement:** added inline beside the H/M/L filter pills on `stig/view` and `scap/view` for an immediate visual demo. Uses the same count vars set in 2.2.
 - [ ] **Pending Group 4:** primary spec uses — STIG list Severity Mix column (§10) and STIG detail stat-cards (§20). Macro and CSS are ready; just needs the redesigned templates to consume them.
 
-### 2.4 Freshness dot `.dot` + utilities (§6)  *(global)*
+### 2.4 Freshness dot `.dot` + utilities (§6)  *(global)*  ✓ done (Group 4 placements pending)
 
-- [ ] Add `.dot.fresh / .stale / .aged / .old` rules to `app.css` per spec.
-- [ ] **Decide where freshness logic lives**: Twig filter (PHP-side) vs JS. Two paths:
-  - **Twig filter** (PHP): cleaner since dates are server-rendered. Create `App\Twig\AppExtension::freshnessTag()` and `::relTime()` filters. Use as `{{ s.released | freshnessTag }}` and `{{ s.released | relTime }}`.
-  - **JS**: required if dates are sorted/filtered client-side after render (e.g., the age filter dropdown in §10).
-  - **Recommend both**: Twig filters for static rendering, JS function for the client-side filter dropdown.
-- [ ] Implement `freshnessTag(dateStr)` returning one of `fresh|stale|aged|old` based on days elapsed (≤365 / 365–1095 / 1095–1825 / >1825).
-- [ ] Implement `relTime(dateStr)` returning a human string per spec: `<14d` → `"N days ago"`, `<60d` → `"N weeks ago"`, `<365d` → `"N months ago"`, `<10yr` → `"X.X years ago"` (one decimal), else integer years.
-- [ ] Render pattern everywhere a date appears: `<span class="dot {{ tag }}"></span> · <time class="font-mono" datetime="{{ iso }}">{{ rel }}</time>`. Wrap in a Twig macro `{{ ui.freshness(date) }}` for one-line use.
-- [ ] **Apply to:** STIG list rows (`home/index.html.twig`, `stig/index.html.twig`), STIG detail header (`stig/view.html.twig` line 25–26), SCAP equivalents, search results (`home/search.html.twig`), trust strip (§7), footer status (§12).
+- [x] `.dot.fresh / .stale / .aged / .old` rules in `app.css` (section 0e). `.fresh` gets a subtle glow via box-shadow + color-mix.
+- [x] **Decision: both PHP and JS** (the recommended path). PHP filters in `App\Twig\AppExtension` (`freshness_tag`, `rel_time`) for server-rendered dates; JS twins in `app.freshnessTag()` / `app.relTime()` for client-side filtering. Behavior is identical so server- and client-rendered tags match.
+- [x] `freshnessTag(date)` boundaries match spec exactly.
+- [x] `relTime(date)` formats match spec exactly. Verified across all four magnitudes on the live STIG library.
+- [x] `{{ ui.freshness(date) }}` macro added; uses a `.freshness` wrapper + dot + `<time datetime>`.
+- [x] Applied to: `home/index` Released column, `stig/index` Released column, `scap/index` Date column, `stig/view` summary (Published + Released, with absolute date kept for legibility), `scap/view` Published.
+- [ ] **Pending Group 4 placements:** trust strip on the hero (§7), footer Status column (§12), STIG result rows in search (`home/search.html.twig`).
 
 ### 2.5 Filter chip `.chip` (§9)  *(global)*
 
