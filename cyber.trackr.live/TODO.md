@@ -293,7 +293,14 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Touch bump on `.chip` to 36px min-height below md.
 - [x] `.scroll-x` already on hero Try chips and stig/scap detail filter chips.
 
-### 5.5 Accessibility (§18)  *(global)*
+### 5.5 Accessibility (§18)  *(global)*  ✓ done
+
+- [x] WCAG AA contrast verified on every token combo (light + dark, on bg + on surface). Bumped dark `--text-muted` from `#8c7f66` to `#968870` to clear AA on `--surface` (was 4.45 → 5.04).
+- [x] Global `:focus-visible` rule in app.css with suppression on elements that already manage focus (hero-search, site-search, form-field inputs, etc.).
+- [x] Sortable headers keyboard-nav: `tabindex="0"` added via JS init; Enter/Space triggers click. `aria-sort` already managed by the click handler.
+- [x] `aria-live="polite"` on filter-count spans (`#recent-stigs-count`, `#stig-page-info`, `#scap-page-info`) so screen readers announce filter result counts as they update.
+- [x] Heading hierarchy spot-checked: one h1 per page, h2 for sections, h3 for footer cols, no skipped levels.
+- [x] Already done earlier: skip link (§3.1), theme-toggle aria (§5.1), severity-pill aria-label (§2.2), status-dot text pairing (§2.4).
 
 - [ ] Color contrast audit on every token combination (`--text` / `--bg`, `--text-muted` / `--bg`, severity tokens on backgrounds). Target WCAG AA. May need to darken `--text-muted` or `--accent` after first render.
 - [ ] Global focus style: `:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }`.
