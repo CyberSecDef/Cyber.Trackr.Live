@@ -189,4 +189,37 @@
             </div>
         </div>
     </section>
+
+    <section class="colophon" aria-labelledby="colophon-eyebrow">
+        <div class="rule-text" id="colophon-eyebrow">&sect; III &middot; Colophon</div>
+
+        <div class="colophon__inner">
+            <div class="colophon__left">
+                <span class="eyebrow">About</span>
+                <h2 class="colophon__heading">
+                    Built by one engineer,<br>
+                    <em>for the community.</em>
+                </h2>
+            </div>
+
+            <div class="colophon__right">
+                <p class="colophon__quote">
+                    Built to help everyone in the Cyber Domain with the RMF and STIG requirements &mdash; making the crosslinking between vulnerabilities, STIG rules, and CCIs easier to manage. The site mirrors authoritative sources from DISA and NIST so you can spend less time hunting and more time implementing.
+                </p>
+                <p class="colophon__body">
+                    I&rsquo;m Robert Weber, a DoD contractor working across multiple IT/IA fields &mdash; RMF, STIG implementation, SCAP compliance, vulnerability scans. This suite is built on my off-hours: no corporate backing, no funding, just updates as my free time permits. Feedback is always welcome &mdash; please send it.
+                </p>
+                <div class="colophon__ctas">
+                    <a href="{{ path('contact_us') }}" class="cta-primary">
+                        Contact &amp; feedback
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="cta-secondary" aria-disabled="true" data-coming-soon title="Public repo not yet available">
+                        <i class="bi bi-github" aria-hidden="true"></i>
+                        View on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

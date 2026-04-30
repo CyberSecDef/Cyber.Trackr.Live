@@ -1382,6 +1382,137 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 2d. Page — Homepage colophon
+ *    12-col split with eyebrow + Fraunces heading on the left (cols 1-4)
+ *    and pull-quote + body + CTA row on the right (cols 6-12, leaving
+ *    column 5 as gutter per spec).
+ * ========================================================================== */
+
+.colophon {
+    max-width: 1280px;
+    margin: 0 auto var(--space-9);
+    padding-top: var(--space-7);
+}
+
+.colophon__inner {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+}
+
+.colophon__left,
+.colophon__right {
+    grid-column: span 12;
+}
+
+@media (min-width: 992px) {
+    .colophon__left {
+        grid-column: span 4;
+    }
+    .colophon__right {
+        grid-column: 6 / span 7;
+    }
+}
+
+.colophon__heading {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.025em;
+    font-size: clamp(36px, 5vw, 52px);
+    line-height: 0.95;
+    font-weight: 300;
+    margin: var(--space-2) 0 0;
+    color: var(--text);
+}
+
+.colophon__heading em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    color: var(--accent);
+}
+
+.colophon__quote {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--text);
+    margin: 0 0 var(--space-5);
+}
+
+.colophon__body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-5);
+}
+
+.colophon__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+}
+
+
+/* =============================================================================
+ * 0i. Component layer — CTA buttons
+ *    Distinct from Bootstrap's .btn-primary/.btn-secondary so they don't
+ *    collide. Used in the colophon and any future call-to-action context.
+ * ========================================================================== */
+
+.cta-primary,
+.cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 4px 16px;
+    border-radius: var(--radius-lg);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none !important;
+    transition: opacity 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.cta-primary {
+    background: var(--text);
+    color: var(--bg) !important;
+    border: 1px solid var(--text);
+}
+
+.cta-primary:hover {
+    opacity: 0.85;
+    color: var(--bg) !important;
+}
+
+.cta-secondary {
+    background: var(--surface);
+    color: var(--text) !important;
+    border: 1px solid var(--border-strong);
+}
+
+.cta-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent) !important;
+}
+
+.cta-secondary[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.55;
+    color: var(--text-muted) !important;
+}
+
+.cta-secondary[aria-disabled="true"]:hover {
+    border-color: var(--border-strong);
+    color: var(--text-muted) !important;
+}
+
+
+/* =============================================================================
  * 2. Detail-page typography
  *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
  * ========================================================================== */
