@@ -211,9 +211,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] New `.versions-panel--single` modifier added to app.css so the View-only panel renders as 1-col instead of half-empty 2-col.
 - [x] All `scap_app` JS handlers preserved verbatim.
 
-### 4.8 SCAP list page  *(`templates/scap/index.html.twig`)*
+### 4.8 SCAP list page  *(`templates/scap/index.html.twig`)*  ✓ done
 
-- [ ] Replace the existing DataTable with the same custom managed table pattern from §4.5 (resolved decision: replace DataTables here too). Same column conventions (Name, Version `.ident`, Released with freshness dot, etc.) — though SCAP doesn't currently track severity in its toc, so the Severity Mix column may be omitted or also pre-computed in a `scap_toc.json` parallel to §4.3a.
+- [x] DataTable replaced with the same .lib-page + .data-table pattern as §4.5. ScapController rolls up to one record per title (latest by date desc), inline since the SCAP toc structure is simpler than STIG's.
+- [x] 4 columns: Name / Version / Date (default sort desc) / Freshness. Severity Mix + Rules columns omitted since SCAP toc has no sev counts.
+- [x] app.scapList JS module mirrors app.stigList; "scap-table" registered in app.tableSortHandlers; init() wires pagination on load.
+- [ ] **Future enhancement:** parallel ScapTocBuilder + console command to pre-compute sev counts so /scap can show Severity Mix too.
 
 ### 4.9 RMF v5 view  *(`templates/rmf/view_v5.html.twig`)*
 
