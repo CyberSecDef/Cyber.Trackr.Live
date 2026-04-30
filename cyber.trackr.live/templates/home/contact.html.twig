@@ -1,54 +1,46 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Cyber Trackr!{% endblock %}
+{% block title %}Contact &mdash; Cyber Trackr{% endblock %}
 
 {% block body %}
-    <div class="container-fluid">
-            <div class="card my-2" style="">
-                <div class="card-body">
-                    <h1>Contact:</h1>
-                    <p class="lead">
-                        Please feel free to get in touch with us, leave some feedback or suggestions for improvement.  We will always try to respond as quickly as possible.
-                    </p>
-                    <hr>
-                    <form method="POST" action="https://formspree.io/wwwdaze2000@gmail.com">
-                    <input type="hidden" name="_token" value="YzQtfWv4DaYceDUVik3U2HxyE8h3efySuiu9Tazm">								<div class="form-group row">
-                            <label for="inputEmail" class="col-sm-2 col-form-label">Your Email</label>
-                            <div class="col-sm-10">
-                                <input type="email" class="form-control" id="inputEmail" placeholder="Email" name="inputEmail">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="inputSubject" class="col-sm-2 col-form-label">Subject</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputSubject" placeholder="Subject" name="inputSubject">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputBody">Body</label>
-                            <textarea class="form-control" id="inputBody" rows="3" name="inputBody"></textarea>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-12">
-                            <button type="submit" class="btn btn-primary float-right">Send</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <section class="lib-page" aria-labelledby="contact-page-title">
+        <div class="rule-text">&sect; Contact</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Get in touch</span>
+            <h1 id="contact-page-title" class="lib-page__title-large">
+                Feedback &amp; <em>suggestions</em>
+            </h1>
+            <p class="lib-page__lede">
+                Spotted a bug, missing dataset, or have a feature in mind? Send a note &mdash; replies usually go out within a few days.
+            </p>
+        </header>
+
+        <form class="form-stack" method="POST" action="https://formspree.io/wwwdaze2000@gmail.com">
+            <input type="hidden" name="_token" value="YzQtfWv4DaYceDUVik3U2HxyE8h3efySuiu9Tazm">
+
+            <div class="form-field">
+                <label for="inputEmail">Your email</label>
+                <input type="email" id="inputEmail" name="inputEmail" placeholder="you@example.com" required>
+                <span class="form-field__hint">Used only to reply &mdash; never stored or shared.</span>
             </div>
-            
-        
-    </div>
 
-    <script>
-        const stig_app = {
-            init(){
-                     
-            }
-        }
+            <div class="form-field">
+                <label for="inputSubject">Subject</label>
+                <input type="text" id="inputSubject" name="inputSubject" placeholder="Brief summary" required>
+            </div>
 
-        $(document).ready( () => {
-            stig_app.init();
-        })
-    </script>
+            <div class="form-field">
+                <label for="inputBody">Message</label>
+                <textarea id="inputBody" name="inputBody" rows="6" placeholder="Details, repro steps, suggested datasets&hellip;" required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="cta-primary">
+                    Send message
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </button>
+            </div>
+        </form>
+    </section>
 {% endblock %}
