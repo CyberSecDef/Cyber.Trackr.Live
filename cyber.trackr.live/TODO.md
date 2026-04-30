@@ -130,12 +130,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] `<body class="grain">` activates site-wide.
 - [x] `.rule-text` section divider added (app.css §1c) — flex with 1px ::before/::after lines around the eyebrow.
 
-### 3.3 Footer (§12)  *(global — `base.html.twig`)*
+### 3.3 Footer (§12)  *(global — `base.html.twig`)*  ✓ done
 
-- [ ] Add `<footer>` markup at end of `base.html.twig` body (currently no footer exists at all).
-- [ ] 4-column grid with sections: Library, Tools, About, Status. Use Bootstrap `row` + `col-6 col-md-3`.
-- [ ] Status column wires to `LAST_DISA_SYNC` / `LAST_NIST_SYNC` Twig globals (§19 below).
-- [ ] Bottom strip: small seal + `Cyber Trackr · est. MMXIX` (mono uppercase) on left, italic Fraunces tagline on right.
+- [x] Footer markup added to `base.html.twig`. Uses CSS Grid (2-col → 4-col at md) instead of Bootstrap row, since the rest of the layout shell is custom-grid-based.
+- [x] 4 columns: Library, Tools, About, Status — wired to existing routes; placeholders (`aria-disabled`) for Ruby gem and GitHub per Group 8 decision.
+- [x] Status column reads from `{{ sync_status }}` Twig global (folded §5.2 in).
+- [x] Bottom strip: 28px `.seal--small` + "Cyber Trackr · est. MMXIX" mono uppercase on left, italic Fraunces "Compliance, made legible." on right.
 
 ---
 
@@ -252,23 +252,15 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] `aria-label="Toggle color theme"` set; sun/moon icon swap via `[data-theme]` attribute selectors on `[data-theme-icon="show-in-light|dark"]` children.
 - [x] `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` listener only triggers when no explicit user preference is stored.
 
-### 5.2 Trust & freshness signals (§19)  *(global — Twig + controllers)*
+### 5.2 Trust & freshness signals (§19)  *(global — Twig + controllers)*  ✓ done (footer wired; hero/detail pending Group 4)
 
-- [ ] Create `resources/data/sync_status.json` (resolved decision: explicit file, not mtime) with shape:
-  ```json
-  { "disa": "2026-04-26T00:00:00Z", "nist": "2026-04-18T00:00:00Z" }
-  ```
-- [ ] Document the file's purpose in a README comment at the top of the data dir (or the file itself can have a `// schema` field). Whatever process refreshes the source datasets is responsible for updating these timestamps — note in commit message that this is a manual update for now until automation exists.
-- [ ] Create a service `App\Service\SyncStatus` that reads the JSON once per request (lazy) and exposes `getDisa(): \DateTimeImmutable` and `getNist(): \DateTimeImmutable`.
-- [ ] Register as a Twig global in `config/packages/twig.yaml`:
-  ```yaml
-  twig:
-      globals:
-          sync_status: '@App\Service\SyncStatus'
-  ```
-  Then templates can use `{{ sync_status.disa | freshnessTag }}` and `{{ sync_status.disa | relTime }}`.
-- [ ] Use in: hero trust strip (§7), footer Status column (§12), top of every STIG/control/CCI detail page.
-- [ ] Edge case: if `sync_status.json` is missing, service returns null and templates render a fallback ("Sync status unavailable") rather than erroring.
+- [x] `resources/data/sync_status.json` created with `_comment` documenting the file's purpose and refresh responsibility.
+- [x] `src/Service/SyncStatus.php`: lazy-loaded reader, getters return `DateTimeImmutable` or null.
+- [x] Twig global registered in `config/packages/twig.yaml` as `sync_status`.
+- [x] Service auto-wires via `bind: string $projectDir: '%kernel.project_dir%'` added to `services.yaml` `_defaults` (general-purpose; reusable by future services).
+- [x] **Edge case handled:** missing/malformed file → null returns → templates `{% if sync_status.disa %}` guards.
+- [x] Used in footer Status column.
+- [ ] **Pending Group 4 placements:** hero trust strip (§7); top of every STIG/control/CCI detail page (§19 spec calls for "Per-record freshness on detail pages"). Macro and globals are ready.
 
 ### 5.3 Animations (§15)  *(global — `app.css`)*
 
