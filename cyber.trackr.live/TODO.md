@@ -313,14 +313,15 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ---
 
-## Group 6 · Performance (§21)
+## Group 6 · Performance (§21)  ✓ done (two items deferred)
 
-- [ ] Homepage table: ship only top 30–40 rows (controller change in §4.3 above).
-- [ ] Full STIG list at `path('stig')`: keep DataTables client-side pagination for now. If the loaded HTML grows unwieldy (>1MB), switch to server-side pagination (DataTables Ajax mode) — defer until measured.
-- [ ] Inline critical CSS for above-the-fold (hero, header). Either via a Symfony asset bundler or hand-extracted block in `<head>`.
-- [ ] `font-display: swap` on Fraunces.
-- [ ] Preload the variable Fraunces font file.
-- [ ] Lazy-load grain SVG noise (apply `.grain` class after `DOMContentLoaded` so first paint isn't delayed).
+- [x] Homepage table: top 100 rows (§4.3 / user request).
+- [x] Stig list 50/page client-side pagination (§4.5); scap list same (§4.8). DataTables retained on `cci/index` per Group 8 decision.
+- [x] `font-display: swap` on Fraunces (already in §1.3 Google Fonts URL).
+- [x] Soft preload of font CSS via `<link rel="preload" as="style">` so the request kicks off earlier in the loading waterfall.
+- [x] Lazy-apply `.grain` class via `requestAnimationFrame` inside `app.init()` so the inlined SVG noise doesn't push back first paint.
+- [ ] **Deferred:** Inline critical CSS for above-the-fold — non-trivial risk of FOUC. Defer until measurement shows it's needed.
+- [ ] **Deferred:** True woff2 font preload — requires either knowing the gstatic URL (brittle) or self-hosting Fraunces. Defer until perf measurement justifies.
 
 ---
 
