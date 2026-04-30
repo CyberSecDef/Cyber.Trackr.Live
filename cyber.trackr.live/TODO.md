@@ -218,11 +218,11 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] app.scapList JS module mirrors app.stigList; "scap-table" registered in app.tableSortHandlers; init() wires pagination on load.
 - [ ] **Future enhancement:** parallel ScapTocBuilder + console command to pre-compute sev counts so /scap can show Severity Mix too.
 
-### 4.9 RMF v5 view  *(`templates/rmf/view_v5.html.twig`)*
+### 4.9 RMF v5 view  *(`templates/rmf/view_v5.html.twig`)*  ✓ done
 
-- [ ] Apply tokenized styles to existing card layout.
-- [ ] Wrap control numbers (`{{control.number}}` etc.) in `.ident`.
-- [ ] Eyebrow + Fraunces title for the page header.
+- [x] Tokenized styles already applied via §4.6 (.req-header / .doc-desc / dt.inline / .sec-header etc.). Bg-light fix covers the metadata panels.
+- [x] Control numbers wrapped via §2.1.
+- [x] Page header redesigned: breadcrumbs (Library › 800-53 r5), eyebrow "NIST SP 800-53", Fraunces title "Risk Management Framework *Rev. 5*" with italic accent, meta count, icon-btn print on right. Added "§ Controls" divider before the foreach.
 
 ### 4.10 RMF v4 view  *(`templates/rmf/view_v4.html.twig`)*
 
