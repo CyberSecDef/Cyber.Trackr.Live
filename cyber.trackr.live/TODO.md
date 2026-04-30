@@ -172,11 +172,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Rules total column with right-aligned tabular numerics.
 - **Reusable .data-table component** also lives in app.css §2c — stig/index (§4.5) and scap/index (§4.8) will reuse it.
 
-### 4.4 Homepage about/colophon (§11)  *(`templates/home/index.html.twig`)*
+### 4.4 Homepage about/colophon (§11)  *(`templates/home/index.html.twig`)*  ✓ done
 
-- [ ] Replace the "About Us" prose (lines 14–26) with the 12-column split: 4-col heading + 7-col pull quote + CTAs.
-- [ ] Primary CTA → `path('contact_us')`.
-- [ ] Secondary CTA "View on GitHub" → **placeholder** (resolved decision: no public repo yet). Render as `<a href="#" aria-disabled="true" data-coming-soon>...</a>` styled with reduced opacity. Revisit when repo exists.
+- [x] 12-col split: left (cols 1-4) eyebrow + Fraunces heading "Built by one engineer, *for the community.*"; right (cols 6-12, with col 5 as gutter via `grid-column: 6 / span 7`) pull-quote + body + CTA row. Original "About Us" copy preserved in tightened form.
+- [x] Primary CTA "Contact & feedback" → `path('contact_us')`.
+- [x] Secondary CTA "View on GitHub" rendered as `aria-disabled` placeholder with reduced opacity + title tooltip; revisit when repo exists.
+- [x] New `.cta-primary` / `.cta-secondary` component added (app.css §0i) — distinct from Bootstrap's `.btn-*` to avoid collision; reusable anywhere CTAs appear.
 
 ### 4.3a Pre-compute severity counts in `stig_toc.json`  *(`StigController` — gates §4.3 and §4.5 Severity Mix columns)*  ✓ done
 
