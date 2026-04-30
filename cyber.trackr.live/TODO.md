@@ -204,9 +204,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [ ] **Deferred:** chip-row replacement for the Compare/View `<select>` controls. Current selects work; chip-row UX would need multi-select state JS for Compare. Future enhancement.
 - [ ] **Deferred:** rule-list-as-table. Spec offered "either keep card or convert to table" — chose card to preserve the rich expand/collapse + per-rule details.
 
-### 4.7 SCAP detail page  *(`templates/scap/view.html.twig`)*
+### 4.7 SCAP detail page  *(`templates/scap/view.html.twig`)*  ✓ done
 
-- [ ] Apply same patterns as STIG detail (§20 / 4.6 above).
+- [x] Mirrors §4.6 layout: breadcrumbs, header with eyebrow + Fraunces title + meta + icon-btn download, 3-up stat-cards, versions panel (single-col modifier — SCAP has no Compare action), description, rule-controls bar, rule cards.
+- [x] xccdf: namespace differences handled. `Published` shown in the freshness slot since SCAP doesn't carry a separate `released` date. No print button (didn't exist before either).
+- [x] New `.versions-panel--single` modifier added to app.css so the View-only panel renders as 1-col instead of half-empty 2-col.
+- [x] All `scap_app` JS handlers preserved verbatim.
 
 ### 4.8 SCAP list page  *(`templates/scap/index.html.twig`)*
 
