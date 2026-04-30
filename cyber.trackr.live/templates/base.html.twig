@@ -21,6 +21,8 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        {# Push the font CSS request earlier in the waterfall via preload as=style. #}
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,300..900;1,9..144,0..100,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,300..900;1,9..144,0..100,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
 
         {% block stylesheets %}
@@ -50,7 +52,7 @@
         <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
         <link rel="manifest" href="/images/site.webmanifest">
     </head>
-    <body class="grain">
+    <body>
         <a class="skip-link" href="#main">Skip to content</a>
 
         <header class="site-header">

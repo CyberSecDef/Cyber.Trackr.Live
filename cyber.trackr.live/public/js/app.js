@@ -454,4 +454,11 @@ window.app = {
 
 $(document).ready(() => {
     window.app.init();
+
+    // Lazy-apply the paper-grain overlay after first paint so the inlined
+    // SVG noise data URI doesn't push back the initial render. requestAnimationFrame
+    // schedules it for the next paint cycle — the gap is imperceptible.
+    requestAnimationFrame(() => {
+        document.body.classList.add("grain");
+    });
 });
