@@ -714,6 +714,64 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 1b. Atmospheric — Paper grain overlay
+ *    Apply class="grain" on <body>. The ::before pseudo-element covers the
+ *    viewport with a fixed SVG fractal-noise layer; pointer-events: none lets
+ *    clicks fall through to real content. z-index sits above the sticky
+ *    header (z:100) so the texture stays continuous across the chrome.
+ *
+ *    Light: multiply blend mode darkens the cream in random flecks (printed
+ *    paper feel). Dark: screen mode lightens the near-black with speckle.
+ *    Noise SVG is inlined as a data URI to avoid an extra network request.
+ * ========================================================================== */
+
+.grain::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 200;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+}
+
+[data-theme="dark"] .grain::before {
+    mix-blend-mode: screen;
+    opacity: 0.18;
+}
+
+
+/* =============================================================================
+ * 1c. Atmospheric — Section divider with eyebrow
+ *    <div class="rule-text">§ II · Recent Updates</div>
+ *    Renders a 1px line on each side of the eyebrow text. Use between
+ *    long-page sections.
+ * ========================================================================== */
+
+.rule-text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-6) 0;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+}
+
+.rule-text::before,
+.rule-text::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border-strong);
+}
+
+
+/* =============================================================================
  * 2. Detail-page typography
  *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
  * ========================================================================== */
