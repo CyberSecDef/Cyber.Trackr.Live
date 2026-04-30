@@ -4,163 +4,167 @@
 {% block title %}View SCAP - {{ scap.xpath("//xccdf:Benchmark/xccdf:title")|first }} V{{ version }}R{{ release }}{% endblock %}
 
 {% block body %}
-    <div class="doc-title">
-        <h1>
-            <button class="btn btn-primary m-2 py-1 px-2" onclick="scap_app.download();">
-                <i class="bi bi-cloud-download"></i>
+    {% set xml_title      = scap.xpath("//xccdf:Benchmark/xccdf:title")|first %}
+    {% set published_date = scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first %}
+    {% set hi_count       = scap.xpath(".//xccdf:Rule[@severity = 'high']")|length %}
+    {% set med_count      = scap.xpath(".//xccdf:Rule[@severity = 'medium']")|length %}
+    {% set low_count      = scap.xpath(".//xccdf:Rule[@severity = 'low']")|length %}
+    {% set rules_total    = hi_count + med_count + low_count %}
+
+    <article class="stig-detail">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{{ path('scap') }}">SCAP</a></li>
+                <li aria-current="page">{{ title|replace({'_': ' '}) }}</li>
+            </ol>
+        </nav>
+
+        <header class="stig-detail__header">
+            <div class="stig-detail__header-text">
+                <span class="eyebrow">DoD Compliance &middot; SCAP</span>
+                <h1 class="stig-detail__title">{{ xml_title }}</h1>
+                <div class="stig-detail__meta">
+                    {{ ui.ident('V' ~ version ~ 'R' ~ release) }}
+                    {% if published_date %}
+                        <span>&middot;</span>
+                        {{ ui.freshness(published_date) }}
+                        <span>&middot; Published {{ published_date|date("d M Y") }}</span>
+                    {% endif %}
+                    <span>&middot; {{ rules_total|number_format }} rules</span>
+                </div>
+            </div>
+            <div class="stig-detail__actions">
+                <button type="button" class="icon-btn" onclick="scap_app.download();" title="Download original XCCDF" aria-label="Download original XCCDF">
+                    <i class="bi bi-cloud-download" aria-hidden="true"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="stat-cards" role="group" aria-label="Severity filters">
+            <button type="button" class="stat-card high active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'high');" aria-label="Toggle {{ hi_count }} high-severity rules">
+                <span class="stat-card__num">{{ hi_count|number_format }}</span>
+                <span class="stat-card__label">High severity</span>
             </button>
-            {{ scap.xpath("//xccdf:Benchmark/xccdf:title")|first }}
-        </h1>
-    </div>
-    
-    <div class="doc-summary">
-        <div class="card shadow-lg " style="width: 36rem;">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><b>Version/Release:</b> {{ ui.ident('V' ~ version ~ 'R' ~ release) }} </li>
-                {% set published_date = scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first %}
-                <li class="list-group-item"><b>Published:</b> {{ published_date|date("d M Y") }} {{ ui.freshness(published_date) }}</li>
+            <button type="button" class="stat-card med active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'medium');" aria-label="Toggle {{ med_count }} medium-severity rules">
+                <span class="stat-card__num">{{ med_count|number_format }}</span>
+                <span class="stat-card__label">Medium severity</span>
+            </button>
+            <button type="button" class="stat-card low active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'low');" aria-label="Toggle {{ low_count }} low-severity rules">
+                <span class="stat-card__num">{{ low_count|number_format }}</span>
+                <span class="stat-card__label">Low severity</span>
+            </button>
+        </div>
 
-                <li class="list-group-item"><b>Severity:</b>
-
-                    {% set hi_count  = scap.xpath(".//xccdf:Rule[@severity = 'high']")|length %}
-                    {% set med_count = scap.xpath(".//xccdf:Rule[@severity = 'medium']")|length %}
-                    {% set low_count = scap.xpath(".//xccdf:Rule[@severity = 'low']")|length %}
-
-                    <button type="button" class="sev high is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'high');" aria-label="Toggle high-severity rules ({{ hi_count }})">
-                        H · {{ hi_count }}
-                    </button>
-
-                    <button type="button" class="sev med is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'medium');" aria-label="Toggle medium-severity rules ({{ med_count }})">
-                        M · {{ med_count }}
-                    </button>
-
-                    <button type="button" class="sev low is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="scap_app.toggleFilter(this, 'low');" aria-label="Toggle low-severity rules ({{ low_count }})">
-                        L · {{ low_count }}
-                    </button>
-
-                    <span class="ms-2">{{ ui.sev_bar(hi_count, med_count, low_count) }}</span>
-                </li>
-
-                <li class="list-group-item">
-                    <b>Sort:</b>
-                    <div class="chip-group" role="radiogroup" aria-label="Sort rules by">
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="control" onclick="scap_app.sort(this);">Control</button>
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="severity" onclick="scap_app.sort(this);">Severity</button>
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="vuln" onclick="scap_app.sort(this);">Vuln</button>
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="title" onclick="scap_app.sort(this);">Title</button>
-                    </div>
-                </li>
-
-            </ul>
-
-
-
-
-
-
-
-            <div class="card-body border">	
-                <h6 class="card-subtitle"><b>View</b></h6>
-                <p class="card-text">Select any old version/release of this SCAP to view the previous requirements</p>
-				<div class="input-group">
-                    <select class="form-select" id="view_scap" aria-label="Example select with button addon">
-                        <option value="" selected="selected">Choose...</option>
+        <section class="versions-panel versions-panel--single" aria-label="Versions">
+            <div class="versions-panel__col">
+                <span class="eyebrow">View</span>
+                <p class="versions-panel__hint">Open a previous version of this SCAP benchmark.</p>
+                <div class="versions-panel__controls">
+                    <select id="view_scap" aria-label="Open version">
+                        <option value="" selected>Choose&hellip;</option>
                         {% for s in scaps|sort((a, b) => a.date <=> b.date)|reverse %}
                             <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
                         {% endfor %}
                     </select>
-                    <button class="btn btn-primary" type="button" onclick="scap_app.view()">View</button>
+                    <button type="button" class="cta-primary" onclick="scap_app.view()">View</button>
                 </div>
+            </div>
+        </section>
 
+        <div class="doc-desc">
+            {{ scap.xpath("//xccdf:Benchmark/xccdf:description")|first }}
+        </div>
+
+        <div class="rule-controls">
+            <div class="rule-controls__group">
+                <span class="eyebrow">Sort by</span>
+                <div class="chip-group" role="radiogroup" aria-label="Sort rules by">
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="control"  onclick="scap_app.sort(this);">Control</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="severity" onclick="scap_app.sort(this);">Severity</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="vuln"     onclick="scap_app.sort(this);">Vuln</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="title"    onclick="scap_app.sort(this);">Title</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="doc-desc">
-        {{ scap.xpath("//xccdf:Benchmark/xccdf:description")|first }}
-    </div>
+        <div id="requirements" class="">
+        {% set groups = scap.xpath("//xccdf:Benchmark/xccdf:Group") %}
+        {% for group in groups %}
+            <div class="scap-group requirement {{group.xpath('.//xccdf:Rule/@severity')|first}}">
+                <div class="collapse severity">
+                    {% if group.xpath('.//xccdf:Rule/@severity')|first == 'high' %}
+                        c
+                    {% elseif group.xpath('.//xccdf:Rule/@severity')|first == 'medium' %}
+                        b
+                    {% else %}
+                        a
+                    {% endif %}
+                </div>
 
-    <div id="requirements" class="">
-    {% set groups = scap.xpath("//xccdf:Benchmark/xccdf:Group") %}
-    {% for group in groups %}
-        <div class="scap-group requirement {{group.xpath('.//xccdf:Rule/@severity')|first}}">
-            <div class="collapse severity"> 
-                {% if group.xpath('.//xccdf:Rule/@severity')|first == 'high' %}
-                    c
-                {% elseif group.xpath('.//xccdf:Rule/@severity')|first == 'medium' %}
-                    b
+                {% if group.xpath('.//xccdf:Rule/xccdf:ident')|filter( v => v.__toString() starts with 'CCI-')|length > 0 %}
+                    {% set CCI_NUM = group.xpath('.//xccdf:Rule/xccdf:ident')|filter( v => v.__toString() starts with 'CCI-')|first %}
                 {% else %}
-                    a
+                    {% set CCI_NUM = "" %}
                 {% endif %}
-            </div>
-            
-            {% if group.xpath('.//xccdf:Rule/xccdf:ident')|filter( v => v.__toString() starts with 'CCI-')|length > 0 %}
-                {% set CCI_NUM = group.xpath('.//xccdf:Rule/xccdf:ident')|filter( v => v.__toString() starts with 'CCI-')|first %}
-            {% else %}
-                {% set CCI_NUM = "" %}
-            {% endif %}
-            
-            <div class="req-header title">
-                {{group.xpath('.//xccdf:Rule/xccdf:title')|first}}
-            </div>
 
-            <div class="container-fluid">
-                <div class="row">
-                    <dl class="col-2 mb-0 p-0 pl-1 g-0 border border-1 bg-light">
-                        <dt class="">RMF Control</dt>
-                        <dd class="control">
-                        {% if CCI_NUM != '' %}
-                            {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
-                            {% if cci_match %}
-                                {{ ui.ident(cci_match.references.reference|first.attributes.index|split(' ')|first) }}
+                <div class="req-header title">
+                    {{group.xpath('.//xccdf:Rule/xccdf:title')|first}}
+                </div>
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <dl class="col-2 mb-0 p-0 pl-1 g-0 border border-1 bg-light">
+                            <dt class="">RMF Control</dt>
+                            <dd class="control">
+                            {% if CCI_NUM != '' %}
+                                {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
+                                {% if cci_match %}
+                                    {{ ui.ident(cci_match.references.reference|first.attributes.index|split(' ')|first) }}
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                        </dd>
+                            </dd>
 
-                        <dt class="">Severity</dt>
-                        <dd class="">
-                            {{ ui.sev(group.xpath('.//xccdf:Rule/@severity')|first) }}
-                        </dd>
+                            <dt class="">Severity</dt>
+                            <dd class="">
+                                {{ ui.sev(group.xpath('.//xccdf:Rule/@severity')|first) }}
+                            </dd>
 
-                        <dt class="">CCI</dt>
-                        <dd class="">{% if CCI_NUM != '' %}{{ ui.ident(CCI_NUM) }}{% endif %}</dd>
+                            <dt class="">CCI</dt>
+                            <dd class="">{% if CCI_NUM != '' %}{{ ui.ident(CCI_NUM) }}{% endif %}</dd>
 
-                        <dt class="">Version</dt>
-                        <dd class="">{{ ui.ident(group.xpath('.//xccdf:Rule/xccdf:version')|first) }}</dd>
+                            <dt class="">Version</dt>
+                            <dd class="">{{ ui.ident(group.xpath('.//xccdf:Rule/xccdf:version')|first) }}</dd>
 
-                        <dt class="">Vuln IDs</dt>
-                        <dd class="vuln">{{ ui.ident(group.xpath('.//@id')|first|replace({'xccdf_mil.disa.stig_group_':''})) }}</dd>
+                            <dt class="">Vuln IDs</dt>
+                            <dd class="vuln">{{ ui.ident(group.xpath('.//@id')|first|replace({'xccdf_mil.disa.stig_group_':''})) }}</dd>
 
-                        <dt class="">Rule IDs</dt>
-                        <dd class="">{{ ui.ident(group.xpath('.//xccdf:Rule/@id')|first|replace({'xccdf_mil.disa.stig_rule_':''})) }}</dd>
-                    </dl>    
-                    <div class="col-10 ">
+                            <dt class="">Rule IDs</dt>
+                            <dd class="">{{ ui.ident(group.xpath('.//xccdf:Rule/@id')|first|replace({'xccdf_mil.disa.stig_rule_':''})) }}</dd>
+                        </dl>
+                        <div class="col-10 ">
 
-                        <div class="req-desc">
-                            {{group.xpath('.//xccdf:Rule/xccdf:description')|first|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}
+                            <div class="req-desc">
+                                {{group.xpath('.//xccdf:Rule/xccdf:description')|first|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}
+                            </div>
+
+                            <h6><u><strong>Fix: </strong>{{ ui.ident(group.xpath('.//xccdf:Rule/xccdf:fix/@id')|first) }}</u></h6>
+                            <p style="white-space:pre-wrap;">{{ group.xpath('.//xccdf:Rule/xccdf:fixtext/text()')|first }}</p>
                         </div>
-
-                        <h6><u><strong>Fix: </strong>{{ ui.ident(group.xpath('.//xccdf:Rule/xccdf:fix/@id')|first) }}</u></h6>
-                        <p style="white-space:pre-wrap;">{{ group.xpath('.//xccdf:Rule/xccdf:fixtext/text()')|first }}</p>
                     </div>
                 </div>
             </div>
-
-            
-                            
-            
+        {% endfor %}
         </div>
-    {% endfor %}
-    </div>
+    </article>
     <script>
         const scap_app = {
             init(){
               $('#scaps').DataTable( {
-                dom: '<"top">rt<"bottom"<>p><"clear">', 
+                dom: '<"top">rt<"bottom"<>p><"clear">',
                 pageLength: 25,
                 order: [[ 3, "desc" ]],
                 colReorder: false,
-            } );       
+            } );
             },
             view(){
                 if($('#view_scap').val().trim() != ''){

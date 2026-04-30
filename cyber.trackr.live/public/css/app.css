@@ -1945,6 +1945,17 @@ dt.inline::after {
     padding: 0 var(--space-4);
 }
 
+/* Single-column variant — used on SCAP detail (no Compare action, only View). */
+.versions-panel--single {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .versions-panel--single {
+        grid-template-columns: 1fr;
+    }
+}
+
 .rule-controls {
     display: flex;
     flex-wrap: wrap;
