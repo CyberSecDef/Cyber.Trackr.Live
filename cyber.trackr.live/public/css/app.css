@@ -1576,74 +1576,67 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
- * 2. Detail-page typography
- *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
+ * 2. Detail-page typography (tokenized)
+ *    Shared by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search.
+ *    All hardcoded grays/blacks replaced with --border / --border-strong /
+ *    --text-muted. Detail pages dropped .doc-title / .doc-summary in §4.6.
  * ========================================================================== */
 
-.doc-title {
-    font-family: sans-serif;
-    font-size: 28.8px;
-    font-weight: 400;
-    line-height: 39.6px;
-    border-bottom: 1px solid #ccc;
-    padding-top: 20px;
-    margin-bottom: 20px;
-}
-
 .doc-desc {
-    font-family: sans-serif;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-.doc-summary {
-    float: right;
-    border: 1px solid black;
-    background: #f3f3f3;
-    margin: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: var(--space-5);
 }
 
 .sec-title {
-    font-family: sans-serif;
     font-size: 20px;
     font-weight: 400;
-    line-height: 1.2em;
-    border-bottom: 1px solid #999;
-    padding-top: 10px;
-    margin-bottom: 5px;
+    line-height: 1.25;
+    color: var(--text);
+    border-bottom: 1px solid var(--border-strong);
+    padding-top: var(--space-3);
+    margin-bottom: var(--space-2);
 }
 
 .sec-header {
-    font-family: sans-serif;
     display: block;
-    border-bottom: 1px solid black;
-    padding-left: 5px;
-    font-size: 1.2em;
-    font-weight: bold;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-1);
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-3);
 }
 
 .req-header {
-    font-family: sans-serif;
     display: block;
-    border-bottom: 1px solid #ccc;
-    font-size: 1.2em;
-    margin-top: 20px;
+    font-size: 15px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-3) 0;
+    margin-top: var(--space-5);
 }
 
 .req-desc {
-    font-family: sans-serif;
-    margin-left: 5px;
     font-size: 14px;
-    line-height: 22.4px;
-    padding-bottom: 20px;
+    line-height: 1.65;
+    color: var(--text);
+    margin-left: var(--space-1);
+    padding-bottom: var(--space-5);
 }
 
 .requirement {
-    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid var(--border);
 }
 
 .reference {
     font-size: 12px;
+    color: var(--text-muted);
 }
 
 .text-justify {
@@ -1652,7 +1645,7 @@ kbd, .site-search__kbd {
 }
 
 .text-sm {
-    font-size: 0.7em;
+    font-size: 0.75em;
 }
 
 .text-md {
@@ -1663,11 +1656,306 @@ dt.inline {
     float: left;
     clear: left;
     width: 110px;
-    font-weight: bold;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 dt.inline::after {
     content: ":";
+}
+
+
+/* =============================================================================
+ * 2e. Page — STIG (and SCAP) detail
+ *    Breadcrumbs, page header (eyebrow + title + meta + actions),
+ *    severity stat-cards (clickable filters), versions panel, rule controls.
+ *    Rule-card markup is the legacy .req-header / .requirement-details
+ *    structure styled via the rules above; new wrappers below provide the
+ *    surrounding chrome.
+ * ========================================================================== */
+
+.stig-detail {
+    max-width: 1280px;
+    margin: 0 auto var(--space-9);
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    margin-bottom: var(--space-5);
+}
+
+.breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+}
+
+.breadcrumbs li + li::before {
+    content: "›";
+    margin-right: var(--space-2);
+    color: var(--border-strong);
+}
+
+.breadcrumbs a {
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+}
+
+.breadcrumbs a:hover {
+    color: var(--accent) !important;
+}
+
+.breadcrumbs [aria-current="page"] {
+    color: var(--text);
+}
+
+/* Page header */
+.stig-detail__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.stig-detail__header-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.stig-detail__title {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.025em;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.05;
+    font-weight: 300;
+    color: var(--text);
+    margin: var(--space-2) 0 var(--space-3);
+}
+
+.stig-detail__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.stig-detail__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.icon-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.icon-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+
+/* =============================================================================
+ * 0j. Component layer — Stat card (severity stat-cards on STIG/SCAP detail)
+ * ========================================================================== */
+
+.stat-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .stat-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.stat-card {
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: left;
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.stat-card.high { border-left-color: var(--sev-high); }
+.stat-card.med  { border-left-color: var(--sev-med); }
+.stat-card.low  { border-left-color: var(--sev-low); }
+
+.stat-card:not(.active) {
+    opacity: 0.45;
+}
+
+.stat-card:hover {
+    opacity: 1;
+}
+
+.stat-card__num {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.02em;
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 400;
+    color: var(--text);
+}
+
+.stat-card.high .stat-card__num { color: var(--sev-high); }
+.stat-card.med  .stat-card__num { color: var(--sev-med); }
+.stat-card.low  .stat-card__num { color: var(--sev-low); }
+
+.stat-card__label {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+}
+
+
+/* =============================================================================
+ * 2f. Page — Versions panel and rule-controls bar
+ * ========================================================================== */
+
+.versions-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .versions-panel {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-6);
+    }
+}
+
+.versions-panel__col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.versions-panel__hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-2);
+}
+
+.versions-panel__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+.versions-panel__controls select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    height: 36px;
+    padding: 0 var(--space-3);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    cursor: pointer;
+    flex: 1 1 120px;
+    min-width: 0;
+}
+
+.versions-panel__controls select:focus {
+    outline: 0;
+    border-color: var(--accent);
+}
+
+.versions-panel__controls .cta-primary {
+    height: 36px;
+    padding: 0 var(--space-4);
+}
+
+.rule-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) 0;
+    margin-bottom: var(--space-4);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.rule-controls__group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.rule-controls__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 13px;
+    color: var(--text);
 }
 
 

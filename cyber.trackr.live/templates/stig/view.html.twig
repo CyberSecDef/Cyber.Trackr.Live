@@ -4,116 +4,118 @@
 {% block title %}View STIG - {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }} V{{ version }}R{{ release }} {% endblock %}
 
 {% block body %}
-    <div class="doc-title">
-        <h1>
-            <button class="btn btn-primary m-2 py-1 px-2" onclick="stig_app.download();">
-                <i class="bi bi-cloud-download"></i>
-            </button>
+    {% set xml_title       = stig.xpath("/xmlns:Benchmark/xmlns:title")|first %}
+    {% set published_date  = stig.xpath("/xmlns:Benchmark/xmlns:status/@date")|first %}
+    {% set release_info    = stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first %}
+    {% set released_date   = release_info|split('Date:')[1]|default('')|trim %}
+    {% set hi_count        = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'high']")|length %}
+    {% set med_count       = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'medium']")|length %}
+    {% set low_count       = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'low']")|length %}
+    {% set rules_total     = hi_count + med_count + low_count %}
 
-            <button class="btn btn-primary m-2 py-1 px-2" onclick="pdf_app.exec();">
-                <i class="bi bi-printer-fill"></i>
-            </button>
+    <article class="stig-detail">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{{ path('stig') }}">STIGs</a></li>
+                <li aria-current="page">{{ title|replace({'_': ' '}) }}</li>
+            </ol>
+        </nav>
 
-            {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }}
-            - {{ ui.ident('V' ~ version ~ 'R' ~ release) }}
-        </h1>
-    </div>
-    
-    <div class="doc-summary">
-        <div class="card shadow-lg" style="width: 36rem;">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><b>Version/Release:</b> {{ ui.ident('V' ~ version ~ 'R' ~ release) }} </li>
-                {% set published_date = stig.xpath("/xmlns:Benchmark/xmlns:status/@date")|first %}
-                {% set release_info = stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first %}
-                {% set released_date = release_info|split('Date:')[1]|default('')|trim %}
-                <li class="list-group-item"><b>Published:</b> {{ published_date|date("d M Y") }} {{ ui.freshness(published_date) }}</li>
-                <li class="list-group-item"><b>Released:</b> {% if released_date %}{{ released_date|date("d M Y") }} {{ ui.freshness(released_date) }}{% endif %}</li>
-
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3"><b>Expand All:</b></div>
-                        <div class="col-9">
-                            <div class="form-check form-switch from-switch-inline">
-                                <label class="form-check-label" for="flexSwitchCheckChecked"></label>
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="stig_app.expCol(this);">
-                            </div>    
-                        </div>
-                    </div>
-
-                </li>
-                <li class="list-group-item"><b>Severity:</b>
-
-                    {% set hi_count  = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'high']")|length %}
-                    {% set med_count = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'medium']")|length %}
-                    {% set low_count = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'low']")|length %}
-
-                    <button type="button" class="sev high is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'high');" aria-label="Toggle high-severity rules ({{ hi_count }})">
-                        H · {{ hi_count }}
-                    </button>
-
-                    <button type="button" class="sev med is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'medium');" aria-label="Toggle medium-severity rules ({{ med_count }})">
-                        M · {{ med_count }}
-                    </button>
-
-                    <button type="button" class="sev low is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'low');" aria-label="Toggle low-severity rules ({{ low_count }})">
-                        L · {{ low_count }}
-                    </button>
-
-                    <span class="ms-2">{{ ui.sev_bar(hi_count, med_count, low_count) }}</span>
-                </li>
-                <li class="list-group-item">
-                    <b>Sort:</b>
-                    <div class="chip-group" role="radiogroup" aria-label="Sort rules by">
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="control" onclick="stig_app.sort(this);">Control</button>
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="severity" onclick="stig_app.sort(this);">Severity</button>
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="vuln" onclick="stig_app.sort(this);">Vuln</button>
-                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="title" onclick="stig_app.sort(this);">Title</button>
-                    </div>
-                </li>
-            </ul>
-
-            <div class="card-body border ">	
-                <h6 class="card-subtitle"><b>Compare</b></h6>
-                <p class="card-text">Select any two versions of this STIG to compare the individual requirements</p>
-				<div class="input-group">
-
-                    <select class="form-select" id="compare_stig1">
-                        <option value="" selected="selected">Choose...</option>
-                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
-                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
-                        {% endfor %}
-                    </select>
-                    <select class="form-select" id="compare_stig2">
-                        <option value="" selected="selected">Choose...</option>
-                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
-                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
-                        {% endfor %}
-                    </select>
-                    <button class="btn btn-primary" type="button" onclick="stig_app.compare()">Compare</button>
+        <header class="stig-detail__header">
+            <div class="stig-detail__header-text">
+                <span class="eyebrow">DoD Compliance &middot; STIG</span>
+                <h1 class="stig-detail__title">{{ xml_title }}</h1>
+                <div class="stig-detail__meta">
+                    {{ ui.ident('V' ~ version ~ 'R' ~ release) }}
+                    {% if released_date %}
+                        <span>&middot;</span>
+                        {{ ui.freshness(released_date) }}
+                        <span>&middot; Released {{ released_date|date("d M Y") }}</span>
+                    {% endif %}
+                    <span>&middot; {{ rules_total|number_format }} rules</span>
                 </div>
-
             </div>
+            <div class="stig-detail__actions">
+                <button type="button" class="icon-btn" onclick="stig_app.download();" title="Download original XCCDF" aria-label="Download original XCCDF">
+                    <i class="bi bi-cloud-download" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="icon-btn" onclick="pdf_app.exec();" title="Print" aria-label="Print">
+                    <i class="bi bi-printer-fill" aria-hidden="true"></i>
+                </button>
+            </div>
+        </header>
 
-			<div class="card-body border">	
-                <h6 class="card-subtitle"><b>View</b></h6>
-                <p class="card-text">Select any old version/release of this STIG to view the previous requirements</p>
-				<div class="input-group">
-                    <select class="form-select" id="view_stig" aria-label="Example select with button addon">
-                        <option value="" selected="selected">Choose...</option>
+        <div class="stat-cards" role="group" aria-label="Severity filters">
+            <button type="button" class="stat-card high active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'high');" aria-label="Toggle {{ hi_count }} high-severity rules">
+                <span class="stat-card__num">{{ hi_count|number_format }}</span>
+                <span class="stat-card__label">High severity</span>
+            </button>
+            <button type="button" class="stat-card med active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'medium');" aria-label="Toggle {{ med_count }} medium-severity rules">
+                <span class="stat-card__num">{{ med_count|number_format }}</span>
+                <span class="stat-card__label">Medium severity</span>
+            </button>
+            <button type="button" class="stat-card low active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'low');" aria-label="Toggle {{ low_count }} low-severity rules">
+                <span class="stat-card__num">{{ low_count|number_format }}</span>
+                <span class="stat-card__label">Low severity</span>
+            </button>
+        </div>
+
+        <section class="versions-panel" aria-label="Versions">
+            <div class="versions-panel__col">
+                <span class="eyebrow">Compare</span>
+                <p class="versions-panel__hint">Pick two releases to diff their requirements.</p>
+                <div class="versions-panel__controls">
+                    <select id="compare_stig1" aria-label="Compare from version">
+                        <option value="" selected>From&hellip;</option>
                         {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
                             <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
                         {% endfor %}
                     </select>
-                    <button class="btn btn-primary" type="button" onclick="stig_app.view()">View</button>
+                    <select id="compare_stig2" aria-label="Compare to version">
+                        <option value="" selected>To&hellip;</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="cta-primary" onclick="stig_app.compare()">Compare</button>
                 </div>
+            </div>
+            <div class="versions-panel__col">
+                <span class="eyebrow">View</span>
+                <p class="versions-panel__hint">Open a previous version of this STIG.</p>
+                <div class="versions-panel__controls">
+                    <select id="view_stig" aria-label="Open version">
+                        <option value="" selected>Choose&hellip;</option>
+                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                            <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="cta-primary" onclick="stig_app.view()">View</button>
+                </div>
+            </div>
+        </section>
 
+        <div class="doc-desc">
+            {{ stig.xpath("/xmlns:Benchmark/xmlns:description")|first }}
+        </div>
+
+        <div class="rule-controls">
+            <div class="rule-controls__group">
+                <span class="eyebrow">Sort by</span>
+                <div class="chip-group" role="radiogroup" aria-label="Sort rules by">
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="control"  onclick="stig_app.sort(this);">Control</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="severity" onclick="stig_app.sort(this);">Severity</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="vuln"     onclick="stig_app.sort(this);">Vuln</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-sort="title"    onclick="stig_app.sort(this);">Title</button>
+                </div>
+            </div>
+            <div class="rule-controls__group">
+                <label class="rule-controls__toggle">
+                    <input type="checkbox" id="flexSwitchCheckChecked" checked onclick="stig_app.expCol(this);">
+                    <span class="eyebrow">Expand all</span>
+                </label>
             </div>
         </div>
-    </div>
-
-    <div class="doc-desc">
-        {{ stig.xpath("/xmlns:Benchmark/xmlns:description")|first }}
-    </div>
 
     <div id="requirements" class="collapse">
         {% for group in stig.xpath("/xmlns:Benchmark/xmlns:Group") %}
@@ -232,6 +234,7 @@
             </div>
         {% endfor %}
     </div>
+    </article>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
     <script>
         const stig_app = {
