@@ -124,11 +124,11 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] `<kbd>` global element styling added (and `.site-search__kbd` for header use).
 - [x] **Print-routine fix:** `stig/view` had two `$("div#quadrant-4 > div.doc-title > h1")` selectors that would have broken with the layout change — switched to class-based `$("div.doc-title > h1").first()`.
 
-### 3.2 Atmospheric effects (§14)  *(global — `base.html.twig` + `app.css`)*
+### 3.2 Atmospheric effects (§14)  *(global — `base.html.twig` + `app.css`)*  ✓ done
 
-- [ ] Add `.grain::before` rule to `app.css` with SVG fractal noise data URI (light: `mix-blend-mode: multiply`, dark: `mix-blend-mode: screen`).
-- [ ] Apply class `grain` to `<body>` in `base.html.twig`.
-- [ ] Add `.rule-text` divider class for "horizontal rule with eyebrow text in middle" (used between sections on long pages).
+- [x] `.grain::before` added (app.css §1b) — fixed full-viewport SVG fractal-noise layer, inlined as data URI. Light: multiply at 0.5 opacity. Dark: screen at 0.18 opacity. z-index 200 sits above the sticky header so the texture stays continuous; `pointer-events: none` keeps everything clickable.
+- [x] `<body class="grain">` activates site-wide.
+- [x] `.rule-text` section divider added (app.css §1c) — flex with 1px ::before/::after lines around the eyebrow.
 
 ### 3.3 Footer (§12)  *(global — `base.html.twig`)*
 
