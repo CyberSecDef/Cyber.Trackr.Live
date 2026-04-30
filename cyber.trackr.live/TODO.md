@@ -242,9 +242,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Section names cleaned ("RMFv4" → "800-53 r4", "APs" → "Assessment Procedures"); STIG titles in vuln results render underscores as spaces.
 - [ ] **Deferred:** freshness dots on STIG vuln results — would require `HomeController::search` to look up dates from the toc per result. Future enhancement.
 
-### 4.13 Contact page  *(`templates/home/contact.html.twig`)*
+### 4.13 Contact page  *(`templates/home/contact.html.twig`)*  ✓ done
 
-- [ ] Apply token typography and a clean, tokenized form layout. (Skim file first to see what's there — not yet read in this session.)
+- [x] Wrapped in `.lib-page` with eyebrow + Fraunces "Feedback & *suggestions*" title + lede.
+- [x] Form switched from Bootstrap row+col-form-label horizontal to stacked `.form-stack` / `.form-field` layout. New §0k component family in app.css covers labels (mono uppercase), inputs (token bg/border/focus-ring), textareas, and `.form-actions` row.
+- [x] Submit uses `.cta-primary` with arrow icon (matches the homepage colophon Contact CTA).
+- [x] Formspree action URL + CSRF token preserved.
 
 ### 4.14 Report generator  *(`templates/home/report_generator.html.twig`)*
 
