@@ -1797,28 +1797,41 @@ kbd, .site-search__kbd {
  *    every onclick) preserved unchanged.
  * ========================================================================== */
 
-.rg-options {
+.rg-setup {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-5);
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-7);
 }
 
 @media (min-width: 768px) {
-    .rg-options {
+    .rg-setup {
         grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 992px) {
+    .rg-setup {
+        grid-template-columns: 1.2fr 0.9fr 0.9fr;
         gap: var(--space-6);
     }
 }
 
-.rg-options__col {
+.rg-setup__col {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
+    min-width: 0;
 }
 
-.rg-options__col .eyebrow {
+.rg-setup__col .eyebrow {
     margin-bottom: var(--space-2);
+}
+
+/* In the 3-col layout the .form-stack inside the data-points column needs to
+   ignore its 640px max-width so it fills the column. */
+.rg-setup__col .form-stack {
+    max-width: none;
 }
 
 /* The drop area's default state sits on the page bg with a dashed border.

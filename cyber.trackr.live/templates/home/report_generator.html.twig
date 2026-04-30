@@ -18,31 +18,30 @@
             </p>
         </header>
 
-        <div class="rule-text">&sect; I &middot; Report data points</div>
+        <div class="rg-setup">
+            <div class="rg-setup__col">
+                <span class="eyebrow">Report data points</span>
+                <div class="form-stack">
+                    <div class="form-field">
+                        <label for="inputCommand">Command</label>
+                        <input type="text" id="inputCommand" placeholder="Command (NSWC DD)">
+                    </div>
+                    <div class="form-field">
+                        <label for="inputContact">Contact</label>
+                        <input type="text" id="inputContact" placeholder="John Doe">
+                    </div>
+                    <div class="form-field">
+                        <label for="inputPhone">Phone</label>
+                        <input type="text" id="inputPhone" placeholder="800-555-1212">
+                    </div>
+                    <div class="form-field">
+                        <label for="inputEmail">Email</label>
+                        <input type="text" id="inputEmail" placeholder="john.doe@acme.com">
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-stack">
-            <div class="form-field">
-                <label for="inputCommand">Command</label>
-                <input type="text" id="inputCommand" placeholder="Command (NSWC DD)">
-            </div>
-            <div class="form-field">
-                <label for="inputContact">Contact</label>
-                <input type="text" id="inputContact" placeholder="John Doe">
-            </div>
-            <div class="form-field">
-                <label for="inputPhone">Phone</label>
-                <input type="text" id="inputPhone" placeholder="800-555-1212">
-            </div>
-            <div class="form-field">
-                <label for="inputEmail">Email</label>
-                <input type="text" id="inputEmail" placeholder="john.doe@acme.com">
-            </div>
-        </div>
-
-        <div class="rule-text">&sect; II &middot; Scan files &amp; render options</div>
-
-        <div class="rg-options">
-            <div class="rg-options__col">
+            <div class="rg-setup__col">
                 <span class="eyebrow">Render options</span>
 
                 <div class="form-check form-switch">
@@ -66,13 +65,13 @@
                 </div>
             </div>
 
-            <div class="rg-options__col">
+            <div class="rg-setup__col">
                 <span class="eyebrow">Scan files</span>
 
                 <div id="ScansAndOptionsBody">
                     <div id="drop-area" class="rg-drop-area">
                         <p class="rg-drop-area__text">
-                            Drop scan files anywhere in this box, or pick them by hand.
+                            Drop scan files here, or pick them by hand.
                         </p>
                         <input type="file" id="fileElem" multiple="multiple" onchange="scansToPoam.actions.handleFiles(this.files)" style="display:none;">
                         <label class="cta-secondary" for="fileElem">
@@ -84,7 +83,7 @@
             </div>
         </div>
 
-        <div class="rule-text">&sect; III &middot; Selected scan files</div>
+        <div class="rule-text">&sect; I &middot; Selected scan files</div>
 
         <div class="data-table-wrap">
             <table id="scanFiles" class="data-table">
@@ -110,7 +109,7 @@
             </div>
         </div>
 
-        <div class="rule-text">&sect; IV &middot; Scan summary</div>
+        <div class="rule-text">&sect; II &middot; Scan summary</div>
 
         <div class="data-table-wrap">
             <table id="scanSummary" class="data-table">
