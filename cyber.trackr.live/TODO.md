@@ -187,11 +187,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] StigController::stig() refactored to use `$tocBuilder->parseStig()` for newly-dropped XML files (so future additions auto-include sev counts).
 - [x] All Twig templates that read `stigs[]` use `s.sev.h|default(0)` fallback.
 
-### 4.5 STIG list page (`templates/stig/index.html.twig`)
+### 4.5 STIG list page (`templates/stig/index.html.twig`)  ✓ done
 
-- [ ] Replace the existing DataTable with the same custom managed table built for the homepage in §4.3 (resolved decision: replace DataTables here too). This page loads ALL stigs and is the "View entire library" target from the homepage footer link, so the table needs full pagination — implement client-side virtual scrolling or paginate at 50/page.
-- [ ] Reuse the filter bar, legend row, mono headers, freshness dots in Released column, `.ident` pills in Version/Release from §4.3.
-- [ ] Page header should use `.font-display` title with eyebrow above, replacing the `<h1>` at line 9.
+- [x] Old DataTable replaced with the same .data-table component as the homepage. Pagination is 50/page (kept the spec's option) implemented in app.stigList — filter/sort reset to page 1.
+- [x] Reused .lib-page__bar / legend / .data-table everything from §4.3. CSS classes renamed from .recent-stigs__* to .lib-page__* for shared use across both pages.
+- [x] Page header: .lib-page__title-large Fraunces with italic accent + .lib-page__lede subhead + eyebrow.
+- [x] Bonus: extracted per-title rollup to `StigTocBuilder::latestPerTitle()`, reused in both HomeController and StigController. Generic sort-handler registry in app.tableSortHandlers makes the third (§4.8) and any future managed table trivial to plug in.
 
 ### 4.6 STIG detail page (§20)  *(`templates/stig/view.html.twig`)*
 
