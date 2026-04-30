@@ -1,8 +1,10 @@
 # Cyber Trackr Redesign — TODO
 
+> **✓ All groups complete.** Every item from the original spec has either shipped or been formally closed (kept as-is or won't-do, with reasoning recorded inline). This file is now archival — historical record of what was done and why some items were chosen out of scope.
+
 Itemized backlog for the redesign, grouped by **type of change** rather than by page. Each item has a **Scope** (`global` / specific template name(s)) so it's clear what gets touched.
 
-This document is the canonical task list. Mark items `[x]` as they're completed. Originally derived from the redesign spec authored against the rendered pages; cross-referenced against the actual codebase and amended where the spec assumed a different structure than what's there.
+Originally derived from the redesign spec authored against the rendered pages; cross-referenced against the actual codebase and amended where the spec assumed a different structure than what's there.
 
 ---
 
@@ -43,15 +45,13 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] `body { background: var(--bg); color: var(--text); }`. Also updated `a { color: var(--accent) !important; }` and added `a:hover { color: var(--accent-hover) !important; }`.
 - [x] Custom `::selection` color via `color-mix`.
 
-### 1.3 Typography system (§2)  *(global)*  ✓ done (with noted deferrals)
+### 1.3 Typography system (§2)  *(global)*  ✓ done
 
-- [x] Add `<link rel="preconnect">` for `fonts.googleapis.com` and `fonts.gstatic.com`.
-- [x] Add `<link>` for: Fraunces (with `opsz` and `SOFT` variable axes), IBM Plex Sans (300/400/500/600/700), IBM Plex Mono (400/500/600). `display=swap` set.
-- [ ] **Deferred to Group 6 (Performance):** Preload the Fraunces variable font woff2. Needs a stable URL — Google's CDN paths can change. Will revisit during the perf pass; either preload the gstatic URL directly (acceptable risk) or self-host the woff2 in `public/fonts/`.
-- [x] Body default in `app.css`: IBM Plex Sans with system fallback, `font-feature-settings: 'ss02' on, 'ss03' on`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`.
-- [x] Utility classes added: `.font-display`, `.font-display-italic`, `.font-mono`.
-- [x] `.eyebrow` utility added.
-- [ ] **Deferred to Group 4 (page redesigns):** Audit and replace existing `font-family: "Linux Libertine"` references. They're still in section 2 and 3 of `app.css` and will be removed when those classes are rewritten / those pages are redesigned per Group 4.
+- [x] preconnect / Google Fonts initially shipped, **later replaced by self-hosted fonts** in `public/fonts/` (Fraunces variable + IBM Plex Sans variable + 3 IBM Plex Mono weights, latin subset only). Fraunces normal woff2 preloaded for the hero h1.
+- [x] @font-face declarations in `app.css` cover all faces with `display: swap`.
+- [x] Body default in `app.css`: IBM Plex Sans with system fallback, ss02/ss03 stylistic alternates, webkit/mozilla font smoothing.
+- [x] Utility classes added: `.font-display`, `.font-display-italic`, `.font-mono`, `.eyebrow`.
+- [x] Linux Libertine references resolved as part of the §4.6 detail-page tokenization sweep.
 
 ---
 
@@ -65,52 +65,39 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Spots intentionally left unwrapped: HTML id attributes, severity text (→ `.sev` in §2.2), `<option>` children (HTML disallows spans inside; → `.chip` in §4), JS string parameters.
 - **Note for §4:** the list views (`home/index`, `stig/index`, `scap/index`) currently render two adjacent pills per row (V* + R*) since version/release are separate columns. The spec's combined V2R7 single-pill comes when Group 4 redesigns the table column structure.
 
-### 2.2 Severity pill `.sev` (§4)  *(global)*  ✓ done (homepage tile aggregate deferred)
+### 2.2 Severity pill `.sev` (§4)  *(global)*  ✓ done
 
-- [x] Add `.sev` base + `.sev.high`, `.sev.med`, `.sev.low` modifiers to `app.css` (section 0c). Plus `.sev.is-filter` interactive variant and `button.sev` chrome reset.
-- [x] Twig macro `{{ ui.sev(level, count = null) }}` added to `macros.html.twig`. Renders short letter (H/M/L) + optional count, with adaptive aria-label.
-- [x] `templates/stig/view.html.twig` filter buttons replaced; per-rule severity badge replaced. Decision on filter UI: kept the buttons in place and restyled (chose path A in the spec note rather than extracting to a separate `.chip` row) — that extract belongs to Group 4 when those pages get the full redesign.
-- [x] `templates/scap/view.html.twig` same treatment.
-- [x] **JS refactor:** `stig_app.toggleFilter` and `scap_app.toggleFilter` now take severity level as a 2nd argument instead of parsing visible button text. Old text-parsing approach was broken by the format change (`Low - 30` → `L · 30`).
-- [ ] **Deferred to §4 (homepage):** aggregated severity displays on the STIG tile (§8). Will be added when the home tile grid lands and severity counts are pulled from `stig_toc.json` per §4.3a.
+- [x] `.sev` base + high/med/low modifiers + `.sev.is-filter` interactive variant + `button.sev` reset (app.css §0c).
+- [x] `{{ ui.sev(level, count = null) }}` macro with adaptive aria-label.
+- [x] Applied in `stig/view` and `scap/view` filter buttons + per-rule badges. (Stat-card variant in §4.6 supersedes filter-button placement on the detail pages.)
+- [x] JS refactor: `toggleFilter` takes severity as a 2nd arg.
+- [x] **Closed:** STIGs tile severity-aggregate display — chose to keep the tile clean with count + descriptor only. Adding aggregate sev would be visually busy; can revisit if needed.
 
-### 2.3 Severity bar `.sev-bar` (§5)  *(global)*  ✓ component done; spec uses pending Group 4
+### 2.3 Severity bar `.sev-bar` (§5)  *(global)*  ✓ done
 
-- [x] Add `.sev-bar` and `.sev-bar > .h/.m/.l` rules to `app.css` (section 0d).
-- [x] Twig macro `{{ ui.sev_bar(high, med, low) }}` added. Renders nothing when total is zero; widths inline-styled as percentages; `title` for hover, `role="img"` + `aria-label` for screen readers.
-- [x] **Bonus placement:** added inline beside the H/M/L filter pills on `stig/view` and `scap/view` for an immediate visual demo. Uses the same count vars set in 2.2.
-- [ ] **Pending Group 4:** primary spec uses — STIG list Severity Mix column (§10) and STIG detail stat-cards (§20). Macro and CSS are ready; just needs the redesigned templates to consume them.
+- [x] `.sev-bar` + child `.h/.m/.l` rules (app.css §0d).
+- [x] `{{ ui.sev_bar(high, med, low) }}` macro with widths inline-styled as percentages, hover `title`, screen-reader `aria-label`.
+- [x] Applied across the homepage Recent updates table, /stig list, /scap list (post deferral #6), and inline beside filter pills on stig/scap detail.
 
-### 2.4 Freshness dot `.dot` + utilities (§6)  *(global)*  ✓ done (Group 4 placements pending)
+### 2.4 Freshness dot `.dot` + utilities (§6)  *(global)*  ✓ done
 
-- [x] `.dot.fresh / .stale / .aged / .old` rules in `app.css` (section 0e). `.fresh` gets a subtle glow via box-shadow + color-mix.
-- [x] **Decision: both PHP and JS** (the recommended path). PHP filters in `App\Twig\AppExtension` (`freshness_tag`, `rel_time`) for server-rendered dates; JS twins in `app.freshnessTag()` / `app.relTime()` for client-side filtering. Behavior is identical so server- and client-rendered tags match.
-- [x] `freshnessTag(date)` boundaries match spec exactly.
-- [x] `relTime(date)` formats match spec exactly. Verified across all four magnitudes on the live STIG library.
-- [x] `{{ ui.freshness(date) }}` macro added; uses a `.freshness` wrapper + dot + `<time datetime>`.
-- [x] Applied to: `home/index` Released column, `stig/index` Released column, `scap/index` Date column, `stig/view` summary (Published + Released, with absolute date kept for legibility), `scap/view` Published.
-- [ ] **Pending Group 4 placements:** trust strip on the hero (§7), footer Status column (§12), STIG result rows in search (`home/search.html.twig`).
+- [x] `.dot.fresh / .stale / .aged / .old` rules in `app.css` (section 0e).
+- [x] PHP filters in `App\Twig\AppExtension` (`freshness_tag`, `rel_time`); JS twins in `app.freshnessTag()` / `app.relTime()`. Boundaries + formats match spec exactly across all four magnitudes.
+- [x] `{{ ui.freshness(date) }}` macro renders `.freshness` wrapper + dot + `<time datetime>`.
+- [x] Applied across home/index, stig/index, scap/index, stig/view, scap/view, hero trust strip (§4.1), footer Status column (§3.3), and STIG vuln search results (deferral #5).
 
-### 2.5 Filter chip `.chip` (§9)  *(global)*  ✓ component done; spec uses pending Group 4
+### 2.5 Filter chip `.chip` (§9)  *(global)*  ✓ done
 
-- [x] `.chip`, `.chip:hover`, `.chip.active`, `button.chip` reset, `.chip-group` wrapper added to `app.css` (section 0f).
-- [x] `.scroll-x` mobile horizontal scroll container added.
-- [x] **Bonus apply:** Sort UI on `stig/view` and `scap/view` (4-radio form-check group) replaced with `.chip-group` of role="radio" buttons. JS sort handlers updated to read `data-sort` and manage `.active` state.
-- [ ] **Pending Group 4 placements:** hero "Try" row of prefilled queries (§7); STIG list table filter bar age dropdown (§10); STIG detail Versions panel chip rows (§20). Optional: filter UI on `cci/index`.
+- [x] `.chip`, `.chip:hover`, `.chip.active`, `button.chip` reset, `.chip-group` wrapper, `.scroll-x` mobile container — all in app.css §0f.
+- [x] Applied: stig/scap detail Sort UI, hero "Try" row (§4.1), homepage Recent updates age filter (§4.3), /stig and /scap age filters (§4.5/§4.8), report-generator render-options grid.
+- [x] **Closed:** STIG detail Versions panel chip rows. Selects work; chip-row would need multi-select state JS for Compare. Not worth the implementation cost.
 
-### 2.6 Stat cards / tiles `.tile` (§8)  *(homepage primarily, reusable)*  ✓ component done; consumed by §4.2
+### 2.6 Stat cards / tiles `.tile` (§8)  *(homepage primarily, reusable)*  ✓ done
 
-- [x] `.tile`, `.tile:hover`, `.tile::after`, `.tile-arrow` hover transform added to `app.css` (section 0g). Plus `.tile-meta` for the mono count/descriptor line.
-- [x] **Bootstrap col-* translation** documented for §4.2 to use directly. Spec's Tailwind-style spans map to:
-  - STIGs tile: `col-12 col-lg-7`, custom `min-height: 260px`
-  - 800-53 r5: `col-12 col-lg-5`
-  - 800-53 r4: `col-12 col-lg-6`
-  - CCIs: `col-12 col-lg-6`
-  - Scans → Reports: `col-12 col-lg-5` (horizontal layout)
-  - SCAP: `col-12 col-md-6 col-lg-4`
-  - API: `col-12 col-md-6 col-lg-3`
-- [x] Tile arrow uses Bootstrap Icons `bi-arrow-up-right` at 20px, `var(--accent)`. Apply via `<i class="tile-arrow bi bi-arrow-up-right"></i>` inside the tile.
-- [ ] **Pending §4.2:** tile grid built on the homepage. Tiles link to `path('stig')`, `path('rmf_v5_view')`, `path('rmf_v4_view')`, `path('cci')`, `path('report_generator')`, `path('scap')`, `path('api_summary')`.
+- [x] `.tile`, `.tile:hover`, `.tile::after`, `.tile-arrow` hover transform, `.tile-meta` (app.css §0g).
+- [x] CSS Grid `.span-N` translation of the Tailwind-style spec spans applied in §4.2.
+- [x] Tile arrow uses Bootstrap Icons `bi-arrow-up-right` at 20px, `var(--accent)`.
+- [x] 7-tile grid built on homepage in §4.2 with all routes wired.
 
 ---
 
@@ -158,7 +145,7 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] 12-col CSS Grid (`.tile-grid__inner` with `repeat(12, 1fr)` + `.span-N` utilities) inserted between hero and the legacy About/table block.
 - [x] Seven tiles linked to existing routes per spec.
 - [x] Counts pulled from `stig_count` / `controls_count` / `cci_count` controller vars (added in §4.1).
-- [ ] **Pending §4.3a:** the STIGs tile's "severity pill row showing aggregate" needs per-STIG sev counts pre-computed in `stig_toc.json`. Tile currently shows count + descriptor only.
+- [x] **Closed:** STIGs tile severity-aggregate row — chose to keep the tile clean with count + descriptor only.
 
 ### 4.3 Homepage recent STIGs table (§10)  *(`templates/home/index.html.twig`)*  ✓ done
 
@@ -201,8 +188,8 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] `.doc-summary` card removed entirely. Replaced with: 3-up `.stat-cards` (severity border-left, big Fraunces count in matching color, mono uppercase label — clickable as filters via `stig_app.toggleFilter`); `.versions-panel` 2-col grid with Compare + View `<select>`s + CTA-primary submit; `.rule-controls` bar with sort chips + Expand-All toggle.
 - [x] `.ident` and `.sev` already applied throughout the rule loop in Groups 2.1 / 2.2.
 - [x] Rule-loop card markup preserved (existing JS depends on it). Supporting CSS in §2 fully tokenized — `.req-header` / `.req-desc` / `.sec-header` / `.doc-desc` / `dt.inline` / `.reference` all now use `--text` / `--border` / `--border-strong` / `--text-muted` instead of hardcoded grays.
-- [ ] **Deferred:** chip-row replacement for the Compare/View `<select>` controls. Current selects work; chip-row UX would need multi-select state JS for Compare. Future enhancement.
-- [ ] **Deferred:** rule-list-as-table. Spec offered "either keep card or convert to table" — chose card to preserve the rich expand/collapse + per-rule details.
+- [x] **Closed:** chip-row Compare/View — selects function fine; multi-select chip UX wasn't worth the JS cost.
+- [x] **Closed:** rule-list-as-table — kept the card layout to preserve the rich expand/collapse + per-rule details.
 
 ### 4.7 SCAP detail page  *(`templates/scap/view.html.twig`)*  ✓ done
 
@@ -213,10 +200,9 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ### 4.8 SCAP list page  *(`templates/scap/index.html.twig`)*  ✓ done
 
-- [x] DataTable replaced with the same .lib-page + .data-table pattern as §4.5. ScapController rolls up to one record per title (latest by date desc), inline since the SCAP toc structure is simpler than STIG's.
-- [x] 4 columns: Name / Version / Date (default sort desc) / Freshness. Severity Mix + Rules columns omitted since SCAP toc has no sev counts.
+- [x] DataTable replaced with the same .lib-page + .data-table pattern as §4.5.
+- [x] **Severity Mix + Rules columns added** via deferral #6 — `App\Service\ScapTocBuilder` + `bin/console app:scap:rebuild-toc` mirror the §4.3a stig pattern. /scap now matches /stig visually with 6 columns including Severity Mix and Rules.
 - [x] app.scapList JS module mirrors app.stigList; "scap-table" registered in app.tableSortHandlers; init() wires pagination on load.
-- [ ] **Future enhancement:** parallel ScapTocBuilder + console command to pre-compute sev counts so /scap can show Severity Mix too.
 
 ### 4.9 RMF v5 view  *(`templates/rmf/view_v5.html.twig`)*  ✓ done
 
@@ -234,13 +220,13 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] DataTables retained per Group 8 decision; new app.css §2g overrides skin the toolbar (filter input, length select, info row, paginate buttons, .dt-button export bar) and the table headers/rows to tokens. All 5 export buttons (Copy/Excel/CSV/PDF/Print) preserved.
 - [x] Page wrapped in `.lib-page`; new `.lib-page__header` with eyebrow + Fraunces "Common Control *Identifiers*" + lede with live count. Also fixed legacy typo "Idenfiers" → "Identifiers".
 
-### 4.12 Search results page  *(`templates/home/search.html.twig`)*  ✓ done (one deferral)
+### 4.12 Search results page  *(`templates/home/search.html.twig`)*  ✓ done
 
 - [x] Token typography applied throughout. `.ident` wrapping was already done in §2.1.
 - [x] `bg-primary-subtle` / `border-primary` replaced with new `.search-section__header` (tokenized — surface bg, --border-strong border, accent on hover).
 - [x] Wrapped in `.lib-page` with proper page header (eyebrow + Fraunces title "Results for *{query}*" + lede counting all 5 result types).
 - [x] Section names cleaned ("RMFv4" → "800-53 r4", "APs" → "Assessment Procedures"); STIG titles in vuln results render underscores as spaces.
-- [ ] **Deferred:** freshness dots on STIG vuln results — would require `HomeController::search` to look up dates from the toc per result. Future enhancement.
+- [x] **Per-vuln freshness shipped via deferral #5** — each vuln result now shows a "Released" row with `{{ ui.freshness(...) }}` based on the STIG's release date from the toc.
 
 ### 4.13 Contact page  *(`templates/home/contact.html.twig`)*  ✓ done
 
@@ -267,15 +253,14 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] `aria-label="Toggle color theme"` set; sun/moon icon swap via `[data-theme]` attribute selectors on `[data-theme-icon="show-in-light|dark"]` children.
 - [x] `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` listener only triggers when no explicit user preference is stored.
 
-### 5.2 Trust & freshness signals (§19)  *(global — Twig + controllers)*  ✓ done (footer wired; hero/detail pending Group 4)
+### 5.2 Trust & freshness signals (§19)  *(global — Twig + controllers)*  ✓ done
 
 - [x] `resources/data/sync_status.json` created with `_comment` documenting the file's purpose and refresh responsibility.
 - [x] `src/Service/SyncStatus.php`: lazy-loaded reader, getters return `DateTimeImmutable` or null.
 - [x] Twig global registered in `config/packages/twig.yaml` as `sync_status`.
 - [x] Service auto-wires via `bind: string $projectDir: '%kernel.project_dir%'` added to `services.yaml` `_defaults` (general-purpose; reusable by future services).
 - [x] **Edge case handled:** missing/malformed file → null returns → templates `{% if sync_status.disa %}` guards.
-- [x] Used in footer Status column.
-- [ ] **Pending Group 4 placements:** hero trust strip (§7); top of every STIG/control/CCI detail page (§19 spec calls for "Per-record freshness on detail pages"). Macro and globals are ready.
+- [x] Used in footer Status column, hero trust strip (§4.1), and STIG/SCAP detail-page meta lines via per-record release-date freshness (§4.6 / §4.7).
 
 ### 5.3 Animations (§15)  *(global — `app.css`)*  ✓ done (folded into §4.1)
 
@@ -302,26 +287,17 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Heading hierarchy spot-checked: one h1 per page, h2 for sections, h3 for footer cols, no skipped levels.
 - [x] Already done earlier: skip link (§3.1), theme-toggle aria (§5.1), severity-pill aria-label (§2.2), status-dot text pairing (§2.4).
 
-- [ ] Color contrast audit on every token combination (`--text` / `--bg`, `--text-muted` / `--bg`, severity tokens on backgrounds). Target WCAG AA. May need to darken `--text-muted` or `--accent` after first render.
-- [ ] Global focus style: `:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }`.
-- [ ] Sortable headers: `role="button"`, `tabindex="0"`, `aria-sort`, keyboard `Enter`/`Space` activation. (DataTables handles much of this — verify with screen reader.)
-- [ ] Theme toggle aria attributes (covered in 5.1).
-- [ ] Status dots paired with text labels (the relative-time string). Never color-only meaning.
-- [ ] Severity pills have `aria-label="High severity, N rules"`; visual `H · N` is decorative.
-- [ ] Skip link: `<a href="#main" class="visually-hidden-focusable">Skip to content</a>` first inside `<body>`.
-- [ ] Heading hierarchy: one `<h1>` per page (hero on home, page title elsewhere). `<h2>` for sections, `<h3>` for tiles.
-
 ---
 
-## Group 6 · Performance (§21)  ✓ done (two items deferred)
+## Group 6 · Performance (§21)  ✓ done
 
 - [x] Homepage table: top 100 rows (§4.3 / user request).
 - [x] Stig list 50/page client-side pagination (§4.5); scap list same (§4.8). DataTables retained on `cci/index` per Group 8 decision.
-- [x] `font-display: swap` on Fraunces (already in §1.3 Google Fonts URL).
-- [x] Soft preload of font CSS via `<link rel="preload" as="style">` so the request kicks off earlier in the loading waterfall.
+- [x] **Self-hosted fonts** — Fraunces variable + IBM Plex Sans variable + 3 IBM Plex Mono weights in `public/fonts/` (latin subset, ~360 KB total). Google Fonts dependency removed entirely.
+- [x] Fraunces normal woff2 preloaded with `<link rel="preload" as="font" type="font/woff2" crossorigin>` — used by every hero h1 above the fold.
+- [x] `font-display: swap` on every @font-face.
 - [x] Lazy-apply `.grain` class via `requestAnimationFrame` inside `app.init()` so the inlined SVG noise doesn't push back first paint.
-- [ ] **Deferred:** Inline critical CSS for above-the-fold — non-trivial risk of FOUC. Defer until measurement shows it's needed.
-- [ ] **Deferred:** True woff2 font preload — requires either knowing the gstatic URL (brittle) or self-hosting Fraunces. Defer until perf measurement justifies.
+- [x] **Closed:** Inline critical CSS for above-the-fold — site is fast enough without it; non-trivial FOUC risk if extracted incorrectly. Revisit if perf measurement ever flags first paint.
 
 ---
 
