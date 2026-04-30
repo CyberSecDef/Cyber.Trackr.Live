@@ -27,7 +27,7 @@ class HomeController extends AbstractController
             $latest[] = ['title' => $title] + $instances[0];
         }
         usort($latest, fn($a, $b) => $this->stigSortKey($b) - $this->stigSortKey($a));
-        $recent_stigs = array_slice($latest, 0, 40);
+        $recent_stigs = array_slice($latest, 0, 100);
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
