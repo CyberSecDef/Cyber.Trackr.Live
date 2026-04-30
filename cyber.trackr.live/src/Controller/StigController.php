@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\StigTocBuilder;
 use Symfony\Component\Routing\Attribute\Route;
 use ZipArchive;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,97 +16,42 @@ class StigController extends AbstractController
 {
 
     #[Route('/stig', name: 'stig')]
-    public function stig(): Response
+    public function stig(StigTocBuilder $tocBuilder): Response
     {
-        $filesystem = new Filesystem();
-        $finder = new Finder();
+        $stigs = (array) json_decode(file_get_contents($tocBuilder->tocPath()));
 
+        // Index every filename already in the toc so we only parse genuinely new files.
         $existing_files = [];
-
-        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
-        $stigs = (array)json_decode(file_get_contents($toc_path));
-        $new_stig = false;
-
-        //get all files listed in toc
-        foreach (array_keys($stigs) as $stig) {
-            foreach ($stigs[$stig] as $instance) {
+        foreach ($stigs as $instances) {
+            foreach ($instances as $instance) {
                 $existing_files[] = $instance->filename;
             }
         }
 
-        //see if existing file is in toc, if not...add it
-        $finder->files()->in(__DIR__ . "/../../resources/data/stig/");
+        $new = 0;
+        $finder = (new Finder())->files()->in($tocBuilder->stigDir())->name('*.xml');
         foreach ($finder as $file) {
-            if (!in_array(basename($file), $existing_files)) {
-                $ext = pathinfo($file, PATHINFO_EXTENSION);
-                if ($ext == 'xml') {
-                    $new_stig = true;
-                    $xml = simplexml_load_file($file);
-
-                    foreach ($xml->getDocNamespaces() as $strPrefix => $strNamespace) {
-                        if (strlen((string) $strPrefix) == 0) {
-                            $strPrefix = "a"; //Assign an arbitrary namespace prefix.
-                        }
-                        $xml->registerXPathNamespace($strPrefix, $strNamespace);
-                    }
-                    $xml->registerXPathNamespace("xmlns", "http://checklists.nist.gov/xccdf/1.1");
-
-                    $query = $xml->xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()");
-                    if (count($query) > 0) {
-                        $release_results = (string)($query[0]);
-                        $matches = [];
-                        preg_match(
-                            "/Release: ([0-9\.]+) /",
-                            $release_results,
-                            $matches
-                        );
-                        $release = $matches[1];
-                    } else {
-                        $release = "UNK";
-                    }
-
-                    $query = $xml->xpath('/xmlns:Benchmark/xmlns:title/text()');
-                    $title = (string)(count($query) > 0 ? $query[0] : "");
-                    $title = str_replace(['(STIG)', 'Security Technical Implementation Guide', ' MS ', 'Microsoft', '\/', '\\', '/'], "", $title);
-                    $title = trim($title);
-                    $title = str_replace(' ', '_', $title);
-
-
-                    $query = $xml->xpath('/xmlns:Benchmark/xmlns:status/@date');
-                    $date = (string)(count($query) > 0 ? $query[0] : "");
-
-		    $query = $xml->xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()");
-		    $released = (string)(count($query) > 0 ? $query[0] : "");
-		    $released = explode("Date:", $released)[1] ?? "";
-
-                    $query = $xml->xpath('/xmlns:Benchmark/xmlns:version/text()');
-                    $version = (string)(count($query) > 0 ? $query[0] : "");
-
-                    if ($title != '') {
-
-                        if (!array_key_exists($title, $stigs)) {
-                            $stigs[$title] = [];
-                        }
-
-                        $stigs[$title][] = [
-                            "date" => $date,
-			    "released" => $released,
-                            "filename" => basename($file),
-                            "version" => $version,
-                            "release" => $release,
-                        ];
-                    }
-                }
+            if (in_array($file->getFilename(), $existing_files, true)) {
+                continue;
             }
+            $parsed = $tocBuilder->parseStig($file->getRealPath());
+            if ($parsed === null) {
+                continue;
+            }
+            if (!array_key_exists($parsed['title'], $stigs)) {
+                $stigs[$parsed['title']] = [];
+            }
+            $stigs[$parsed['title']][] = $parsed['entry'];
+            $new++;
         }
 
-        if ($new_stig) {
-            $filesystem->dumpFile(realpath(__DIR__ . "/../../resources/data/stig_toc.json"), json_encode($stigs, JSON_PRETTY_PRINT));
+        if ($new > 0) {
+            $tocBuilder->writeToc($stigs);
         }
 
         return $this->render('stig/index.html.twig', [
             'controller_name' => 'StigController',
-            'stigs' => $stigs
+            'stigs' => $stigs,
         ]);
     }
 
