@@ -234,11 +234,13 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] DataTables retained per Group 8 decision; new app.css §2g overrides skin the toolbar (filter input, length select, info row, paginate buttons, .dt-button export bar) and the table headers/rows to tokens. All 5 export buttons (Copy/Excel/CSV/PDF/Print) preserved.
 - [x] Page wrapped in `.lib-page`; new `.lib-page__header` with eyebrow + Fraunces "Common Control *Identifiers*" + lede with live count. Also fixed legacy typo "Idenfiers" → "Identifiers".
 
-### 4.12 Search results page  *(`templates/home/search.html.twig`)*
+### 4.12 Search results page  *(`templates/home/search.html.twig`)*  ✓ done (one deferral)
 
-- [ ] Apply token typography and `.ident` wrapping throughout the four collapsible result sections (RMFv4, RMFv5, CCI, STIG).
-- [ ] Replace `bg-primary-subtle` / `border-primary` Bootstrap classes on the section headers with tokenized custom styles.
-- [ ] Add freshness dots to STIG results.
+- [x] Token typography applied throughout. `.ident` wrapping was already done in §2.1.
+- [x] `bg-primary-subtle` / `border-primary` replaced with new `.search-section__header` (tokenized — surface bg, --border-strong border, accent on hover).
+- [x] Wrapped in `.lib-page` with proper page header (eyebrow + Fraunces title "Results for *{query}*" + lede counting all 5 result types).
+- [x] Section names cleaned ("RMFv4" → "800-53 r4", "APs" → "Assessment Procedures"); STIG titles in vuln results render underscores as spaces.
+- [ ] **Deferred:** freshness dots on STIG vuln results — would require `HomeController::search` to look up dates from the toc per result. Future enhancement.
 
 ### 4.13 Contact page  *(`templates/home/contact.html.twig`)*
 
