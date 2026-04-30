@@ -62,6 +62,10 @@ window.app = {
         if ($("#stig-table").length) {
             window.app.stigList.apply();
         }
+        // Initialize scap list pagination on /scap.
+        if ($("#scap-table").length) {
+            window.app.scapList.apply();
+        }
 
         // React to system theme changes only when the user hasn't set a preference.
         if (window.matchMedia) {
@@ -105,6 +109,7 @@ window.app = {
     tableSortHandlers: {
         "recent-stigs-table": (f, t, d) => window.app.recent.sort(f, t, d),
         "stig-table":         (f, t, d) => window.app.stigList.sort(f, t, d),
+        "scap-table":         (f, t, d) => window.app.scapList.sort(f, t, d),
     },
 
     /**
@@ -267,6 +272,104 @@ window.app = {
 
         scrollToTable() {
             const wrap = document.querySelector("#stig-table");
+            if (wrap) wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+    },
+
+    /**
+     * Full-library SCAP list (/scap). Same shape as stigList but operates
+     * over the smaller (~91-title) SCAP toc. Drops Severity Mix and Rules
+     * columns since the SCAP toc doesn't pre-compute sev counts.
+     */
+    scapList: {
+        pageSize: 50,
+        currentPage: 1,
+        ageFilter: "all",
+
+        apply() {
+            const q = ($("#scap-q").val() || "").toLowerCase().trim();
+            const age = this.ageFilter;
+            const $rows = $("#scap-table tbody tr");
+            const matching = [];
+            $rows.each(function () {
+                const $row = $(this);
+                const name = ($row.data("name") || "").toString();
+                const version = ($row.data("version") || "").toString().toLowerCase();
+                const rowAge = ($row.data("age") || "old").toString();
+                const matchesQuery = !q || name.indexOf(q) >= 0 || version.indexOf(q) >= 0;
+                const matchesAge = age === "all" || rowAge === age;
+                if (matchesQuery && matchesAge) matching.push(this);
+            });
+
+            const total = matching.length;
+            const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+            if (this.currentPage > totalPages) this.currentPage = totalPages;
+            if (this.currentPage < 1) this.currentPage = 1;
+
+            const start = (this.currentPage - 1) * this.pageSize;
+            const end = start + this.pageSize;
+            const visibleSet = new Set(matching.slice(start, end));
+
+            $rows.each(function () {
+                $(this).toggleClass("is-hidden", !visibleSet.has(this));
+            });
+
+            $("#scap-page-info").text(
+                "Page " + this.currentPage + " of " + totalPages +
+                " · " + total.toLocaleString() + " benchmarks"
+            );
+            $("#scap-prev").prop("disabled", this.currentPage <= 1);
+            $("#scap-next").prop("disabled", this.currentPage >= totalPages);
+        },
+
+        sort(field, type, dir) {
+            const $tbody = $("#scap-table tbody");
+            const rows = $tbody.find("tr").toArray();
+            rows.sort((a, b) => {
+                if (type === "date") {
+                    const av = new Date($(a).data("released") || 0).getTime() || 0;
+                    const bv = new Date($(b).data("released") || 0).getTime() || 0;
+                    return dir === "asc" ? av - bv : bv - av;
+                }
+                const av = ($(a).data(field) || "").toString();
+                const bv = ($(b).data(field) || "").toString();
+                return dir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+            });
+            $tbody.empty().append(rows);
+            this.currentPage = 1;
+            this.apply();
+        },
+
+        filter() {
+            this.currentPage = 1;
+            this.apply();
+        },
+
+        age(elem) {
+            const $el = $(elem);
+            $el.parent().find(".chip").removeClass("active");
+            $el.addClass("active");
+            this.ageFilter = ($el.data("age") || "all").toString();
+            this.currentPage = 1;
+            this.apply();
+        },
+
+        prev() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.apply();
+                this.scrollToTable();
+            }
+        },
+
+        next() {
+            this.currentPage++;
+            this.apply();
+            this.scrollToTable();
+        },
+
+        scrollToTable() {
+            const wrap = document.querySelector("#scap-table");
             if (wrap) wrap.scrollIntoView({ behavior: "smooth", block: "start" });
         },
     },

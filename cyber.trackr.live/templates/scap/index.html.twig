@@ -1,52 +1,79 @@
 {% extends 'base.html.twig' %}
 {% import 'macros.html.twig' as ui %}
 
-{% block title %}SCAPs!{% endblock %}
+{% block title %}SCAP &mdash; Cyber Trackr{% endblock %}
 
 {% block body %}
-    <h1>Security Content Automation Protocols - SCAPs</h1>
-    <table id="scaps" class="table table-hover table-striped nowrap compact p-0" style="width:100%;"> 
-        <thead>
-            <tr>
-                <th>SCAP</th>
-                <th>Version</th>
-                <th>Release</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for scap in scaps|keys %}
-                {% set s = scaps[scap]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
-                <tr>
-                    <td class="text-nowrap">
-                        <a 
-                            href="{{ path('scap_view', {title: scap, version: s.version, release: s.release}) }}"
-                        >
-                            {{scap}}
-                        </a> 
-                    </td>
-                    <td>{{ ui.ident('V' ~ s.version) }}</td>
-                    <td>{{ ui.ident('R' ~ s.release) }}</td>
-                    <td>{% if s.date|trim %}{{ ui.freshness(s.date) }}{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <section class="lib-page" aria-labelledby="scap-page-title">
+        <div class="rule-text">&sect; Library &middot; SCAP</div>
 
-    <script>
-        const scap_app = {
-            init(){
-                $('#scaps').DataTable( {
-                dom: '<"top"f<\'dt_len\'li>p>rt<"bottom"<\'dt_len\'l>p><"clear">', 
-                pageLength: 25,
-                order: [[ 3, "desc" ]],
-                colReorder: false,
-            } );     
-            }
-        }
+        <header class="lib-page__header">
+            <span class="eyebrow">Automation</span>
+            <h1 id="scap-page-title" class="lib-page__title-large">
+                Security Content <em>Automation Protocol</em>
+            </h1>
+            <p class="lib-page__lede">
+                {{ scap_count|number_format }} SCAP benchmarks &mdash; XCCDF + OVAL definitions for automated compliance scanning, kept in sync with DISA.
+            </p>
+        </header>
 
-        $(document).ready( () => {
-            scap_app.init();
-        })
-    </script>
+        <div class="lib-page__bar">
+            <div class="lib-page__filter">
+                <input id="scap-q" type="search" placeholder="Filter {{ scap_count|number_format }} benchmarks by name or version&hellip;"
+                       aria-label="Filter SCAP benchmarks" oninput="window.app.scapList.filter()">
+                <div class="chip-group" role="radiogroup" aria-label="Filter by age">
+                    <button type="button" class="chip active" data-age="all"   onclick="window.app.scapList.age(this)">All ages</button>
+                    <button type="button" class="chip"        data-age="fresh" onclick="window.app.scapList.age(this)">Fresh &le; 1y</button>
+                    <button type="button" class="chip"        data-age="stale" onclick="window.app.scapList.age(this)">Stale 1&ndash;3y</button>
+                    <button type="button" class="chip"        data-age="aged"  onclick="window.app.scapList.age(this)">Aged 3&ndash;5y</button>
+                    <button type="button" class="chip"        data-age="old"   onclick="window.app.scapList.age(this)">Old &gt; 5y</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lib-page__legend" aria-hidden="true">
+            <span><span class="dot fresh"></span> Fresh &middot; &le; 1 yr</span>
+            <span><span class="dot stale"></span> Stale &middot; 1&ndash;3 yr</span>
+            <span><span class="dot aged"></span>  Aged &middot; 3&ndash;5 yr</span>
+            <span><span class="dot old"></span>   Old &middot; &gt; 5 yr</span>
+        </div>
+
+        <div class="data-table-wrap">
+            <div class="data-table-scroll">
+                <table id="scap-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-sort-key="name"     data-sort-type="string">Name <span class="sort-ind"></span></th>
+                            <th data-sort-key="version"  data-sort-type="string">Version <span class="sort-ind"></span></th>
+                            <th data-sort-key="released" data-sort-type="date" class="sorted desc" aria-sort="descending">Date <span class="sort-ind">&darr;</span></th>
+                            <th>Freshness</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in scaps_latest %}
+                            {% set date_trim = s.date|default('')|trim %}
+                            {% set tag = date_trim is empty ? 'old' : (s.date|freshness_tag) %}
+                            {% set date_iso = date_trim is empty ? '' : (s.date|date('Y-m-d')) %}
+                            <tr data-name="{{ s.title|replace({'_': ' '})|lower }}"
+                                data-version="V{{ s.version }}R{{ s.release }}"
+                                data-age="{{ tag }}"
+                                data-released="{{ date_iso }}">
+                                <td><a href="{{ path('scap_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
+                                <td>{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
+                                <td>{% if date_trim %}{{ s.date|date("d M Y") }}{% endif %}</td>
+                                <td>{% if date_trim %}{{ ui.freshness(s.date) }}{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="data-table-foot">
+                <span id="scap-page-info" data-total="{{ scap_count }}">Page 1 &middot; {{ scap_count|number_format }} benchmarks</span>
+                <div class="data-table-foot__pager">
+                    <button type="button" id="scap-prev" onclick="window.app.scapList.prev()" disabled>&larr; Prev</button>
+                    <button type="button" id="scap-next" onclick="window.app.scapList.next()">Next &rarr;</button>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

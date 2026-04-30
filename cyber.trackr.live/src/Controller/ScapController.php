@@ -22,13 +22,13 @@ class ScapController extends AbstractController
         $existing_files = [];
 
         $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
-        $scaps = (array)json_decode(file_get_contents($toc_path));
+        $scaps = json_decode(file_get_contents($toc_path), true) ?: [];
         $new_scap = false;
 
         //get all files listed in toc
-        foreach (array_keys($scaps) as $scap) {
-            foreach ($scaps[$scap] as $instance) {
-                $existing_files[] = $instance->filename;
+        foreach ($scaps as $instances) {
+            foreach ($instances as $instance) {
+                $existing_files[] = $instance['filename'];
             }
         }
 
@@ -109,9 +109,19 @@ class ScapController extends AbstractController
             $filesystem->dumpFile(realpath(__DIR__ . "/../../resources/data/scap_toc.json"), json_encode($scaps, JSON_PRETTY_PRINT));
         }
 
+        // Roll up to one record per title (latest version), sorted by date desc.
+        $scaps_latest = [];
+        foreach ($scaps as $title => $instances) {
+            if (empty($instances)) continue;
+            usort($instances, fn($a, $b) => strtotime((string)($b['date'] ?? '')) - strtotime((string)($a['date'] ?? '')));
+            $scaps_latest[] = ['title' => $title] + $instances[0];
+        }
+        usort($scaps_latest, fn($a, $b) => strtotime((string)($b['date'] ?? '')) - strtotime((string)($a['date'] ?? '')));
+
         return $this->render('scap/index.html.twig', [
             'controller_name' => 'ScapController',
-            'scaps' => $scaps
+            'scaps_latest' => $scaps_latest,
+            'scap_count'   => count($scaps),
         ]);
     }
 
