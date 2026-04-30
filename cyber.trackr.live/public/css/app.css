@@ -1157,6 +1157,231 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 2c. Page — Homepage "Recent updates" managed table
+ *    Custom-managed (no DataTables) so the visual matches spec exactly.
+ *    Sticky mono headers, sortable columns with aria-sort, row hover,
+ *    text + age chip filters, legend row, footer with paging label.
+ * ========================================================================== */
+
+.recent-stigs {
+    max-width: 1280px;
+    margin: 0 auto var(--space-9);
+}
+
+.recent-stigs__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-4);
+}
+
+.recent-stigs__head {
+    flex: 1 1 auto;
+    min-width: 240px;
+}
+
+.recent-stigs__title {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.025em;
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 400;
+    margin: var(--space-2) 0 0;
+    color: var(--text);
+}
+
+.recent-stigs__title em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    color: var(--accent);
+}
+
+.recent-stigs__filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+#recent-stigs-q {
+    appearance: none;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    height: 36px;
+    padding: 0 var(--space-3);
+    width: 220px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#recent-stigs-q:focus {
+    outline: 0;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+#recent-stigs-q::placeholder {
+    color: var(--text-muted);
+}
+
+.recent-stigs__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+}
+
+.recent-stigs__legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* Generic data-table component (reusable for stig/index, scap/index later) */
+
+.data-table-wrap {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.data-table-scroll {
+    max-height: 620px;
+    overflow-y: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 0;
+}
+
+.data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+    text-align: left;
+    padding: 12px var(--space-4);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    border-bottom: 1.5px solid var(--border-strong);
+    white-space: nowrap;
+}
+
+.data-table thead th[data-sort-key] {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease;
+}
+
+.data-table thead th[data-sort-key]:hover {
+    color: var(--accent);
+}
+
+.data-table thead th.sorted {
+    color: var(--accent);
+}
+
+.data-table thead th .sort-ind {
+    display: inline-block;
+    margin-left: 4px;
+    width: 1ch;
+    opacity: 0.4;
+}
+
+.data-table thead th.sorted .sort-ind {
+    opacity: 1;
+}
+
+.data-table thead th.num,
+.data-table tbody td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.data-table tbody td {
+    padding: 13px var(--space-4);
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.data-table tbody tr.is-hidden {
+    display: none;
+}
+
+.data-table tbody tr:hover {
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.data-table tbody td a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.data-table tbody td a:hover {
+    color: var(--accent) !important;
+}
+
+.data-table .sev-mix {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.data-table-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.data-table-foot a {
+    color: var(--accent) !important;
+    text-decoration: none !important;
+}
+
+.data-table-foot a:hover {
+    color: var(--accent-hover) !important;
+}
+
+
+/* =============================================================================
  * 2. Detail-page typography
  *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
  * ========================================================================== */

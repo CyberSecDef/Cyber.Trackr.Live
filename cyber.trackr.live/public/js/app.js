@@ -35,6 +35,20 @@ window.app = {
             }
         });
 
+        // Recent STIGs table — header click sorts; toggles asc/desc on repeat click.
+        $("#recent-stigs-table thead th[data-sort-key]").on("click", function () {
+            const $th = $(this);
+            const field = $th.data("sort-key");
+            const type = $th.data("sort-type") || "string";
+            const wasSorted = $th.hasClass("sorted");
+            const newDir = wasSorted && $th.hasClass("desc") ? "asc" : "desc";
+            $("#recent-stigs-table thead th")
+                .removeClass("sorted asc desc")
+                .find(".sort-ind").text("");
+            $th.addClass("sorted " + newDir).find(".sort-ind").text(newDir === "asc" ? "↑" : "↓");
+            window.app.recent.sort(field, type, newDir);
+        });
+
         // React to system theme changes only when the user hasn't set a preference.
         if (window.matchMedia) {
             try {
@@ -66,6 +80,67 @@ window.app = {
     heroSearchFor(query) {
         if (!query) return;
         window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(query));
+    },
+
+    /**
+     * Recent-STIGs table — homepage. Combines text-substring filter on
+     * name+version with an age-bucket filter (.chip-group). Refreshes
+     * the "Showing N of M" footer label after every change.
+     */
+    recent: {
+        ageFilter: "all",
+        apply() {
+            const q = ($("#recent-stigs-q").val() || "").toLowerCase().trim();
+            const age = this.ageFilter;
+            const $rows = $("#recent-stigs-table tbody tr");
+            let visible = 0;
+            $rows.each(function () {
+                const $row = $(this);
+                const name = ($row.data("name") || "").toString();
+                const version = ($row.data("version") || "").toString().toLowerCase();
+                const rowAge = ($row.data("age") || "old").toString();
+                const matchesQuery = !q || name.indexOf(q) >= 0 || version.indexOf(q) >= 0;
+                const matchesAge = age === "all" || rowAge === age;
+                const show = matchesQuery && matchesAge;
+                $row.toggleClass("is-hidden", !show);
+                if (show) visible++;
+            });
+            const $count = $("#recent-stigs-count");
+            const total = $count.data("total") || $rows.length;
+            $count.text("Showing " + visible + " of " + Number(total).toLocaleString() + " STIGs");
+        },
+        sort(field, type, dir) {
+            const $tbody = $("#recent-stigs-table tbody");
+            const rows = $tbody.find("tr").toArray();
+            rows.sort((a, b) => {
+                if (type === "date") {
+                    const av = new Date($(a).data("released") || 0).getTime() || 0;
+                    const bv = new Date($(b).data("released") || 0).getTime() || 0;
+                    return dir === "asc" ? av - bv : bv - av;
+                }
+                if (type === "number") {
+                    const av = +($(a).data(field) || 0);
+                    const bv = +($(b).data(field) || 0);
+                    return dir === "asc" ? av - bv : bv - av;
+                }
+                const av = ($(a).data(field) || "").toString();
+                const bv = ($(b).data(field) || "").toString();
+                return dir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+            });
+            $tbody.empty().append(rows);
+        },
+    },
+
+    recentFilter() {
+        window.app.recent.apply();
+    },
+
+    recentAge(elem) {
+        const $el = $(elem);
+        $el.parent().find(".chip").removeClass("active");
+        $el.addClass("active");
+        window.app.recent.ageFilter = ($el.data("age") || "all").toString();
+        window.app.recent.apply();
     },
 
     /**

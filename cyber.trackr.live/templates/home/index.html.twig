@@ -111,65 +111,82 @@
         </div>
     </section>
 
-    {# About Us prose + Recent STIGs DataTable below — replaced by §4.4 (colophon) and §4.3 (custom managed table) respectively. #}
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-4 border border-1 mt-2 bg-primary bg-opacity-10">
-                <p class="bg-primary-subtle mt-2 border border-1">About Us</p>
-                <p>This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements. While this site is hosted on the public domain, it was inspired by the various complex efforts for DoD RMF Package Management. This suite was originally designed to make the crosslinking between Vulnerabilities and STIG Rules easier to manage and has grown into a full RMF Tool Suite.</p>
-                <p>My name is Robert Weber and I am a Cyber Enthusiast and work as a DoD Contractor during the day in multiple IT/IA fields. This includes virtually all aspects of Cyber Security (RMF,STIG Implementation, SCAP Compliance, Vulnerability Scans, etc.) I developed this suite on my off hours in order to allow me to grow this suite in the best way possible for my community of users. As such, there is no corporate backing or funding. I attempt to make new feature updates and releases as regularly as my free time permits.</p>
-                <p>This suite is the culmination of virtually all IT fields. It might not have an official backing, but the information provided is an aggregation of multiple Cyber Security data sets. I strive to make this the best tool available for your Cyber needs and your feedback is always welcome.</p>
-            </div>
+    <section class="recent-stigs" aria-labelledby="recent-stigs-eyebrow">
+        <div class="rule-text" id="recent-stigs-eyebrow">&sect; II &middot; Recent updates</div>
 
-            <div class="ml-4 col-8 border border-1 mt-2 bg-info bg-opacity-10 body-text">
-                <div id="hideme" class="collapse">
-                    <table id="stigs" class="table table-hover table-striped nowrap compact p-0" style="width:100%;">
-                        <thead>
-                            <tr>
-                                <th>Recent STIGs</th>
-                                <th>Version</th>
-                                <th>Release</th>
-                                <th>Published</th>
-                                <th>Released</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for stig in stigs|keys %}
-                                {% set s = stigs[stig]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
-                                <tr>
-                                    <td class="text-nowrap">
-                                        <a href="{{ path('stig_view', {title: stig, version: s.version, release: s.release}) }}">
-                                            {{stig}}
-                                        </a>
-                                    </td>
-                                    <td>{{ ui.ident('V' ~ s.version) }}</td>
-                                    <td>{{ ui.ident('R' ~ s.release) }}</td>
-                                    <td>{{s.date}}</td>
-                                    <td>{% if s.released|trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <div class="recent-stigs__bar">
+            <div class="recent-stigs__head">
+                <span class="eyebrow">Latest releases</span>
+                <h2 class="recent-stigs__title">Fresh from <em>DISA</em></h2>
+            </div>
+            <div class="recent-stigs__filter">
+                <input id="recent-stigs-q" type="search" placeholder="Filter by name or version&hellip;"
+                       aria-label="Filter recent STIGs" oninput="window.app.recentFilter()">
+                <div class="chip-group" role="radiogroup" aria-label="Filter by age">
+                    <button type="button" class="chip active" data-age="all"   onclick="window.app.recentAge(this)">All ages</button>
+                    <button type="button" class="chip"        data-age="fresh" onclick="window.app.recentAge(this)">Fresh &le; 1y</button>
+                    <button type="button" class="chip"        data-age="stale" onclick="window.app.recentAge(this)">Stale 1&ndash;3y</button>
+                    <button type="button" class="chip"        data-age="aged"  onclick="window.app.recentAge(this)">Aged 3&ndash;5y</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        const stig_app = {
-            init(){
-                $('#stigs').DataTable({
-                    dom: '<"top">rt<"bottom"<>p><"clear">',
-                    pageLength: 25,
-                    order: [[ 3, "desc" ]],
-                    colReorder: false,
-                });
-                $('#hideme').show();
-            }
-        }
+        <div class="recent-stigs__legend" aria-hidden="true">
+            <span><span class="dot fresh"></span> Fresh &middot; &le; 1 yr</span>
+            <span><span class="dot stale"></span> Stale &middot; 1&ndash;3 yr</span>
+            <span><span class="dot aged"></span>  Aged &middot; 3&ndash;5 yr</span>
+            <span><span class="dot old"></span>   Old &middot; &gt; 5 yr</span>
+        </div>
 
-        $(document).ready(() => {
-            stig_app.init();
-        });
-    </script>
+        <div class="data-table-wrap">
+            <div class="data-table-scroll">
+                <table id="recent-stigs-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-sort-key="name"     data-sort-type="string">Name <span class="sort-ind"></span></th>
+                            <th data-sort-key="version"  data-sort-type="string">Version <span class="sort-ind"></span></th>
+                            <th data-sort-key="released" data-sort-type="date" class="sorted desc" aria-sort="descending">Released <span class="sort-ind">&darr;</span></th>
+                            <th>Severity Mix</th>
+                            <th data-sort-key="rules"    data-sort-type="number" class="num">Rules <span class="sort-ind"></span></th>
+                            <th>Freshness</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in recent_stigs %}
+                            {% set hi  = s.sev.h|default(0) %}
+                            {% set med = s.sev.m|default(0) %}
+                            {% set low = s.sev.l|default(0) %}
+                            {% set rules_total = hi + med + low %}
+                            {% set rel_trim = s.released|default('')|trim %}
+                            {% set tag = rel_trim is empty ? 'old' : (s.released|freshness_tag) %}
+                            {% set rel_iso = rel_trim is empty ? '' : (s.released|date('Y-m-d')) %}
+                            <tr data-name="{{ s.title|replace({'_': ' '})|lower }}"
+                                data-version="V{{ s.version }}R{{ s.release }}"
+                                data-age="{{ tag }}"
+                                data-released="{{ rel_iso }}"
+                                data-rules="{{ rules_total }}">
+                                <td><a href="{{ path('stig_view', {title: s.title, version: s.version, release: s.release}) }}">{{ s.title|replace({'_': ' '}) }}</a></td>
+                                <td>{{ ui.ident('V' ~ s.version ~ 'R' ~ s.release) }}</td>
+                                <td>{% if s.released|default('')|trim %}{{ s.released|date("d M Y") }}{% endif %}</td>
+                                <td>
+                                    <span class="sev-mix">
+                                        {{ ui.sev_bar(hi, med, low) }}
+                                        {% if hi  > 0 %}{{ ui.sev('high', hi) }}{% endif %}
+                                        {% if med > 0 %}{{ ui.sev('med',  med) }}{% endif %}
+                                        {% if low > 0 %}{{ ui.sev('low',  low) }}{% endif %}
+                                    </span>
+                                </td>
+                                <td class="num">{{ rules_total|number_format }}</td>
+                                <td>{% if s.released|default('')|trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="data-table-foot">
+                <span id="recent-stigs-count" data-total="{{ stig_count }}">Showing {{ recent_stigs|length }} of {{ stig_count|number_format }} STIGs</span>
+                <a href="{{ path('stig') }}">View entire library &rsaquo;</a>
+            </div>
+        </div>
+    </section>
 {% endblock %}
