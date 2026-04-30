@@ -1,5 +1,7 @@
 twig:
     file_name_pattern: '*.twig'
+    globals:
+        sync_status: '@App\Service\SyncStatus'
 
 when@test:
     twig:

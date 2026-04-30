@@ -1,0 +1,5 @@
+{
+    "_comment": "Tracks when source datasets were last refreshed. Update these ISO-8601 timestamps when DISA STIG/SCAP data or NIST 800-53 data is re-synced. Read by App\\Service\\SyncStatus and exposed to Twig as the global `sync_status`.",
+    "disa": "2026-04-29T00:00:00Z",
+    "nist": "2026-04-18T00:00:00Z"
+}

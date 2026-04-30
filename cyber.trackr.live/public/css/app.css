@@ -772,6 +772,129 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 1d. Layout shell — Footer
+ *    4-column grid + bottom strip with mini-seal and italic tagline.
+ *    Status column uses .dot for the operational indicator and mono lines
+ *    for the DISA / NIST sync timestamps.
+ * ========================================================================== */
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-9);
+    padding: var(--space-7) 0 var(--space-5);
+}
+
+.site-footer__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+}
+
+.site-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-7);
+}
+
+@media (min-width: 768px) {
+    .site-footer__columns {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.site-footer__heading {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-4) 0;
+}
+
+.site-footer__links,
+.site-footer__status {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.site-footer__links li {
+    margin-bottom: 10px;
+    font-size: 13.5px;
+}
+
+.site-footer__links a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+}
+
+.site-footer__links a:hover {
+    color: var(--accent) !important;
+}
+
+.site-footer__links a[aria-disabled="true"] {
+    color: var(--text-muted) !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.site-footer__status li {
+    margin-bottom: 8px;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.site-footer__strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+}
+
+.site-footer__strip-left {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+}
+
+.site-footer__strip-right {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* Smaller seal variant for the footer strip */
+.seal--small {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+    border-width: 1px;
+}
+
+.seal--small::before {
+    inset: 2px;
+}
+
+.seal--small::after {
+    inset: 4px;
+}
+
+
+/* =============================================================================
  * 2. Detail-page typography
  *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
  * ========================================================================== */

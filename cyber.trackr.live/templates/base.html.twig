@@ -91,5 +91,68 @@
         <main id="main" class="site-main">
             {% block body %}{% endblock %}
         </main>
+
+        <footer class="site-footer">
+            <div class="site-footer__inner">
+                <div class="site-footer__columns">
+                    <div>
+                        <h3 class="site-footer__heading">Library</h3>
+                        <ul class="site-footer__links">
+                            <li><a href="{{ path('stig') }}">STIGs</a></li>
+                            <li><a href="{{ path('rmf_v5_view') }}">800-53 r5</a></li>
+                            <li><a href="{{ path('rmf_v4_view') }}">800-53 r4</a></li>
+                            <li><a href="{{ path('cci') }}">CCIs</a></li>
+                            <li><a href="{{ path('scap') }}">SCAP</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="site-footer__heading">Tools</h3>
+                        <ul class="site-footer__links">
+                            <li><a href="{{ path('report_generator') }}">Scans &rsaquo; Reports</a></li>
+                            <li><a href="{{ path('stig') }}">Diff engine</a></li>
+                            <li><a href="{{ path('api_summary') }}">REST API</a></li>
+                            <li><a href="#" aria-disabled="true" data-coming-soon>Ruby gem</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="site-footer__heading">About</h3>
+                        <ul class="site-footer__links">
+                            <li><a href="{{ path('home') }}">Mission</a></li>
+                            <li><a href="{{ path('contact_us') }}">Contact</a></li>
+                            <li><a href="#" aria-disabled="true" data-coming-soon>GitHub</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="site-footer__heading">Status</h3>
+                        <ul class="site-footer__status">
+                            <li>
+                                <span class="dot fresh" aria-hidden="true"></span>
+                                <span>All systems operational</span>
+                            </li>
+                            {% if sync_status.disa %}
+                                <li>DISA sync &middot; {{ sync_status.disa|date("d M Y") }}</li>
+                            {% endif %}
+                            {% if sync_status.nist %}
+                                <li>NIST sync &middot; {{ sync_status.nist|date("d M Y") }}</li>
+                            {% endif %}
+                            <li>v1.0.0</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="site-footer__strip">
+                    <div class="site-footer__strip-left">
+                        <span class="seal seal--small" aria-hidden="true">CT</span>
+                        <span>Cyber Trackr &middot; est. MMXIX</span>
+                    </div>
+                    <div class="site-footer__strip-right font-display-italic">
+                        &ldquo;Compliance, made legible.&rdquo;
+                    </div>
+                </div>
+            </div>
+        </footer>
     </body>
 </html>
