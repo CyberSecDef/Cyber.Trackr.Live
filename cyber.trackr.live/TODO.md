@@ -116,17 +116,13 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ## Group 3 · Layout Shell
 
-### 3.1 Navigation header (§13)  *(global — `base.html.twig`)*
+### 3.1 Navigation header (§13)  *(global — `base.html.twig`)*  ✓ done
 
-- [ ] **Decision: replace sidebar with top header (confirmed).** Header is `position: sticky` so it remains accessible on long detail pages. Delete `templates/sidebar.html.twig` and the `{% include "sidebar.html.twig" %}` at `base.html.twig:227`. Collapse the 4-quadrant grid in `base.html.twig` lines 199–233 to a simple `<header><main><footer>` shell.
-- [ ] Build the new header in `base.html.twig`:
-  - Sticky-eligible 64px height
-  - Left: `.seal` 40px circle (concentric circles + dashed inner ring + "CT" monogram in Fraunces) + two-line label
-  - Center (hidden below `lg`): horizontal nav from sidebar list — `STIGs`, `800-53 r5`, `800-53 r4`, `CCIs`, `SCAP`, `Scans → Reports`, `API`, `Contact`
-  - Right: search trigger (icon + "Search" + `<kbd>⌘K</kbd>`), theme toggle button
-- [ ] Add `.seal` component CSS (concentric circles via `::before` and `::after`).
-- [ ] Add `<kbd>` styling rule to `app.css`: `font-mono`, small padding, surface background, 3px radius.
-- [ ] When this lands: delete `templates/sidebar.html.twig` and the `{% include "sidebar.html.twig" %}` at `base.html.twig` line 227, simplify the body grid (currently 4 quadrants).
+- [x] Sidebar replaced with sticky 64px top header. `templates/sidebar.html.twig` deleted; 4-quadrant body grid collapsed to `<header><main>` (footer comes in §3.3).
+- [x] Header built per spec — three clusters (brand+seal / center nav / actions), responsive breakpoints applied.
+- [x] `.seal` concentric circles (with dashed inner ring) added.
+- [x] `<kbd>` global element styling added (and `.site-search__kbd` for header use).
+- [x] **Print-routine fix:** `stig/view` had two `$("div#quadrant-4 > div.doc-title > h1")` selectors that would have broken with the layout change — switched to class-based `$("div.doc-title > h1").first()`.
 
 ### 3.2 Atmospheric effects (§14)  *(global — `base.html.twig` + `app.css`)*
 
@@ -249,12 +245,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ## Group 5 · Cross-Cutting Behavior
 
-### 5.1 Theme toggle (§16)  *(global — `base.html.twig` + `app.js`)*
+### 5.1 Theme toggle (§16)  *(global — `base.html.twig` + `app.js`)*  ✓ done (folded into §3.1)
 
-- [ ] Preflight `<script>` in `<head>`, before any stylesheet, that reads `localStorage.getItem('theme')` (or system preference fallback) and sets `document.documentElement.dataset.theme` synchronously to prevent FOUC.
-- [ ] Toggle button in header (§13) wired to `app.theme.toggle()` — flips `dataset.theme`, persists to `localStorage`, swaps icon (sun ↔ moon).
-- [ ] `aria-label="Toggle color theme"` and `aria-pressed` on the button.
-- [ ] `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` listener for system changes when no explicit user preference is stored.
+- [x] Preflight `<script>` in `<head>` reads `localStorage.getItem('theme')` or `prefers-color-scheme` and sets `documentElement.dataset.theme` synchronously.
+- [x] Toggle button wired to `window.app.theme.toggle()`. `aria-pressed` synced on load and on every set.
+- [x] `aria-label="Toggle color theme"` set; sun/moon icon swap via `[data-theme]` attribute selectors on `[data-theme-icon="show-in-light|dark"]` children.
+- [x] `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` listener only triggers when no explicit user preference is stored.
 
 ### 5.2 Trust & freshness signals (§19)  *(global — Twig + controllers)*
 
