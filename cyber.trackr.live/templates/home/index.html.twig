@@ -4,81 +4,117 @@
 {% block title %}Cyber Trackr!{% endblock %}
 
 {% block body %}
-    <div class="container-fluid">
-        <div class="row ">
-            <div class="col-12 border border-1 mt-2 bg-light logo-text">
-                <h1 class="text-center display-6">Welcome to the Cyber Trackr</h1>
-                <p class="text-center">The Free Compliance Library</p>
+    <section class="hero" aria-labelledby="hero-headline">
+        <div class="hero__top rise delay-1">
+            <span class="stamp">&bull; Live &middot; Updated daily</span>
+            <span class="hero__issue">No. {{ "now"|date("m") }} &middot; {{ "now"|date("Y") }}</span>
+        </div>
+
+        <h1 id="hero-headline" class="hero__headline rise delay-2">
+            A complete reference<br>
+            <em>for the cyber compliant.</em>
+        </h1>
+
+        <p class="hero__subhead rise delay-3">
+            Browse and search every DoD STIG, NIST 800-53 control, CCI, and SCAP benchmark &mdash; kept in sync with DISA and NIST so you don&rsquo;t have to.
+        </p>
+
+        <form class="hero-search rise delay-4" onsubmit="return window.app.heroSubmit(event)" role="search">
+            <i class="bi bi-search hero-search__icon" aria-hidden="true"></i>
+            <input id="hero-search-input" type="search" class="hero-search__input"
+                   placeholder="Search {{ stig_count|number_format }} STIGs, {{ controls_count|number_format }} controls, {{ cci_count|number_format }} CCIs&hellip;"
+                   aria-label="Search the library" autocomplete="off">
+            <kbd>&#8984;K</kbd>
+        </form>
+
+        <div class="hero__try rise delay-4">
+            <span class="hero__try-label">Try</span>
+            <div class="chip-group scroll-x">
+                <button type="button" class="chip" onclick="window.app.heroSearchFor('Windows 11')">Windows 11</button>
+                <button type="button" class="chip" onclick="window.app.heroSearchFor('RHEL 9')">RHEL 9</button>
+                <button type="button" class="chip" onclick="window.app.heroSearchFor('Kubernetes')">Kubernetes</button>
+                <button type="button" class="chip" onclick="window.app.heroSearchFor('AC-2')">{{ ui.ident('AC-2') }}</button>
+                <button type="button" class="chip" onclick="window.app.heroSearchFor('CCI-000196')">{{ ui.ident('CCI-000196') }}</button>
+                <button type="button" class="chip" onclick="window.app.heroSearchFor('macOS Sequoia')">macOS Sequoia</button>
             </div>
         </div>
 
-        <div class="row ">
+        <div class="hero__trust rise delay-5">
+            {% if sync_status.disa %}
+                <span class="hero__trust-item">
+                    <span class="dot {{ sync_status.disa|freshness_tag }}" aria-hidden="true"></span>
+                    Synced from DISA &middot; <time datetime="{{ sync_status.disa|date('c') }}">{{ sync_status.disa|rel_time }}</time>
+                </span>
+            {% endif %}
+            <span class="hero__trust-item">
+                <span class="dot fresh" aria-hidden="true"></span>
+                API operational
+            </span>
+            <span class="hero__trust-item">
+                {{ stig_count|number_format }} STIGs &middot; {{ controls_count|number_format }} controls &middot; {{ cci_count|number_format }} CCIs
+            </span>
+        </div>
+    </section>
+
+    {# About Us prose + Recent STIGs DataTable below — replaced by §4.4 (colophon) and §4.3 (custom managed table) respectively. #}
+    <div class="container-fluid">
+        <div class="row">
             <div class="col-4 border border-1 mt-2 bg-primary bg-opacity-10">
                 <p class="bg-primary-subtle mt-2 border border-1">About Us</p>
-                <p class="">
-                    This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements.  While this site is hosted on the public domain, it was inspired by the various complex efforts for DoD RMF Package Management.  This suite was originally designed to make the crosslinking between Vulnerabilities and STIG Rules easier to manage and has grown into a full  RMF Tool Suite.
-                </p> 
-                <p class="">
-                    My name is Robert Weber and I am a Cyber Enthusiast and work as a DoD Contractor during the day in multiple IT/IA fields.  This includes virtually all aspects of Cyber Security (RMF,STIG Implementation, SCAP Compliance, Vulnerability Scans, etc.)  I developed this suite on my off hours in order to allow me to grow this suite in the best way possible for my community of users.  As such, there is no corporate backing or funding.  I attempt to make new feature updates and releases as regularly as my free time permits. 
-                </p>
-                <p class="">
-                    This suite is the culmination of virtually all IT fields.  It might not have an official backing, but the information provided is an aggregation of multiple Cyber Security data sets.  I strive to make this the best tool available for your Cyber needs and your feedback is always welcome.  
-                </p>
+                <p>This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements. While this site is hosted on the public domain, it was inspired by the various complex efforts for DoD RMF Package Management. This suite was originally designed to make the crosslinking between Vulnerabilities and STIG Rules easier to manage and has grown into a full RMF Tool Suite.</p>
+                <p>My name is Robert Weber and I am a Cyber Enthusiast and work as a DoD Contractor during the day in multiple IT/IA fields. This includes virtually all aspects of Cyber Security (RMF,STIG Implementation, SCAP Compliance, Vulnerability Scans, etc.) I developed this suite on my off hours in order to allow me to grow this suite in the best way possible for my community of users. As such, there is no corporate backing or funding. I attempt to make new feature updates and releases as regularly as my free time permits.</p>
+                <p>This suite is the culmination of virtually all IT fields. It might not have an official backing, but the information provided is an aggregation of multiple Cyber Security data sets. I strive to make this the best tool available for your Cyber needs and your feedback is always welcome.</p>
             </div>
 
             <div class="ml-4 col-8 border border-1 mt-2 bg-info bg-opacity-10 body-text">
                 <div id="hideme" class="collapse">
-
-                <table id="stigs" class="table table-hover table-striped nowrap compact p-0" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>Recent STIGs</th>
-                            <th>Version</th>
-                            <th>Release</th>
-                            <th>Published</th>
-                            <th>Released</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for stig in stigs|keys %}
-                            {% set s = stigs[stig]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
+                    <table id="stigs" class="table table-hover table-striped nowrap compact p-0" style="width:100%;">
+                        <thead>
                             <tr>
-                                <td class="text-nowrap">
-                                    <a 
-                                        href="{{ path('stig_view', {title: stig, version: s.version, release: s.release}) }}"
-                                    >
-                                        {{stig}}
-                                    </a> 
-                                </td>
-                                <td>{{ ui.ident('V' ~ s.version) }}</td>
-                                <td>{{ ui.ident('R' ~ s.release) }}</td>
-                                <td>{{s.date}}</td>
-                                <td>{% if s.released|trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
+                                <th>Recent STIGs</th>
+                                <th>Version</th>
+                                <th>Release</th>
+                                <th>Published</th>
+                                <th>Released</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
+                        </thead>
+                        <tbody>
+                            {% for stig in stigs|keys %}
+                                {% set s = stigs[stig]|sort((a, b) => a.date|date("Y-m-d") <=> b.date|date("Y-m-d"))|reverse|first %}
+                                <tr>
+                                    <td class="text-nowrap">
+                                        <a href="{{ path('stig_view', {title: stig, version: s.version, release: s.release}) }}">
+                                            {{stig}}
+                                        </a>
+                                    </td>
+                                    <td>{{ ui.ident('V' ~ s.version) }}</td>
+                                    <td>{{ ui.ident('R' ~ s.release) }}</td>
+                                    <td>{{s.date}}</td>
+                                    <td>{% if s.released|trim %}{{ ui.freshness(s.released) }}{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    const stig_app = {
-        init(){
-            $('#stigs').DataTable( {
-                dom: '<"top">rt<"bottom"<>p><"clear">', 
-                pageLength: 25,
-                order: [[ 3, "desc" ]],
-                colReorder: false,
-            } );
-            $('#hideme').show();     
-        }
-    }
 
-    $(document).ready( () => {
-        stig_app.init();
-    })
-</script>
+    <script>
+        const stig_app = {
+            init(){
+                $('#stigs').DataTable({
+                    dom: '<"top">rt<"bottom"<>p><"clear">',
+                    pageLength: 25,
+                    order: [[ 3, "desc" ]],
+                    colReorder: false,
+                });
+                $('#hideme').show();
+            }
+        }
+
+        $(document).ready(() => {
+            stig_app.init();
+        });
+    </script>
 {% endblock %}

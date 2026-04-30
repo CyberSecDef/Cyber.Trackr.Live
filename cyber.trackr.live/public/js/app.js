@@ -53,6 +53,21 @@ window.app = {
         window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(query));
     },
 
+    /** Hero search form submit (homepage). Distinct from the header search. */
+    heroSubmit(event) {
+        event.preventDefault();
+        const q = ($("#hero-search-input").val() || "").trim();
+        if (!q) return false;
+        window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(q));
+        return false;
+    },
+
+    /** Pre-filled "Try" chip → submit immediately. */
+    heroSearchFor(query) {
+        if (!query) return;
+        window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(query));
+    },
+
     /**
      * Bucket a date by age into one of: fresh / stale / aged / old.
      * Mirrors the App\Twig\AppExtension::freshnessTag PHP filter so

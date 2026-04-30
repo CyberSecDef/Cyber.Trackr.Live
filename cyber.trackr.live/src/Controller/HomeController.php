@@ -14,18 +14,37 @@ class HomeController extends AbstractController
     #[Route('/', name: 'home')]
     public function index(): Response
     {
-        $filesystem = new Filesystem();
-        $finder = new Finder();
-
-        $existing_files = [];
-
         $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
             'stigs' => $stigs,
+            'stig_count'     => count($stigs),
+            'controls_count' => $this->countControlsV5(),
+            'cci_count'      => $this->countCciItems(),
         ]);
+    }
+
+    /**
+     * Cheap proxy count for the homepage trust strip — substring match on the
+     * file is ~100x faster than parsing the full XML and accurate enough for
+     * a decorative number. Returns 0 if the file is missing.
+     */
+    private function countControlsV5(): int
+    {
+        $path = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
+        if ($path === false) return 0;
+        $raw = @file_get_contents($path);
+        return $raw === false ? 0 : substr_count($raw, '<controls:control ') + substr_count($raw, '<controls:control>');
+    }
+
+    private function countCciItems(): int
+    {
+        $path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
+        if ($path === false) return 0;
+        $raw = @file_get_contents($path);
+        return $raw === false ? 0 : substr_count($raw, '<cci_item ');
     }
 
     #[Route('/search/{query}', name: 'search')]

@@ -895,6 +895,186 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 1e. Animation — .rise entrance + delay utilities (§5.3)
+ *    Wrapped in prefers-reduced-motion: no-preference so motion-sensitive
+ *    users get an immediate, animation-free reveal.
+ * ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0);   }
+    }
+
+    .rise {
+        animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.15s; }
+    .delay-3 { animation-delay: 0.25s; }
+    .delay-4 { animation-delay: 0.35s; }
+    .delay-5 { animation-delay: 0.45s; }
+}
+
+
+/* =============================================================================
+ * 2a. Page — Homepage hero
+ *    Replaces the legacy 'Welcome to Cyber Trackr' Bootstrap card. Stamp +
+ *    issue line, massive Fraunces headline with italic accent phrase,
+ *    Fraunces subhead, hero search, "Try" chip row, trust strip with sync
+ *    dots and dataset counts.
+ * ========================================================================== */
+
+.hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-9) 0 var(--space-7);
+}
+
+.hero__top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+}
+
+.stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-md);
+}
+
+.hero__issue {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+}
+
+.hero__headline {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-weight: 300;
+    font-size: clamp(48px, 9vw, 112px);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin: 0 0 var(--space-5);
+    max-width: 14ch;
+}
+
+@media (max-width: 575.98px) {
+    .hero__headline {
+        max-width: none;
+    }
+}
+
+.hero__headline em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    color: var(--accent);
+}
+
+.hero__subhead {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 0 var(--space-6);
+}
+
+.hero-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 64px;
+    max-width: 760px;
+    margin: 0 0 var(--space-5);
+    padding: 0 var(--space-5);
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.hero-search__icon {
+    font-size: 18px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.hero-search__input {
+    flex: 1;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--text);
+    font-size: 16px;
+    height: 100%;
+    min-width: 0;
+}
+
+.hero-search__input::placeholder {
+    color: var(--text-muted);
+}
+
+.hero__try {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-7);
+    flex-wrap: wrap;
+}
+
+.hero__try-label {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.hero__trust {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+}
+
+.hero__trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* =============================================================================
  * 2. Detail-page typography
  *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
  * ========================================================================== */
