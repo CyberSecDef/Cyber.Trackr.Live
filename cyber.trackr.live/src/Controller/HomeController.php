@@ -189,9 +189,10 @@ class HomeController extends AbstractController
                         "stig_title" => $stig_title,
                         "version" => $stigs[0]->version,
                         "release" => $stigs[0]->release,
+                        "released" => $stigs[0]->released ?? '',
                         "filename" => $stigs[0]->filename,
                         "group" => "{$group->xpath('./@id')[0]}",
-                        "vuln" => $group->xpath('./@id')[0], 
+                        "vuln" => $group->xpath('./@id')[0],
                         "rule" => $group->xpath('./xmlns:Rule/@id')[0],
                         "note" => implode(",", $group->xpath('./xmlns:Rule/xmlns:title/text()')),
                         "description" => implode(",", $group->xpath('./xmlns:Rule/xmlns:description/text()'))
@@ -210,15 +211,16 @@ class HomeController extends AbstractController
                         "stig_title" => $stig_title,
                         "version" => $stigs[0]->version,
                         "release" => $stigs[0]->release,
+                        "released" => $stigs[0]->released ?? '',
                         "filename" => $stigs[0]->filename,
                         "group" => "{$group->xpath('./@id')[0]}",
-                        "vuln" => $group->xpath('./@id')[0], 
+                        "vuln" => $group->xpath('./@id')[0],
                         "rule" => $group->xpath('./xmlns:Rule/@id')[0],
                         "note" => implode(",", $group->xpath('./xmlns:Rule/xmlns:title/text()')),
                         "description" => implode(",", $group->xpath('./xmlns:Rule/xmlns:description/text()'))
                     ];
                 }
-                
+
             }
         }
         

@@ -115,6 +115,9 @@
                                         <dt class="inline">STIG</dt>
                                         <dd><a href="{{ path('stig_view', { title: c.stig_title, version: c.version, release: c.release}) }}">{{c.stig_title|replace({'_': ' '})}}</a></dd>
 
+                                        <dt class="inline">Released</dt>
+                                        <dd>{% if c.released|default('')|trim %}{{ ui.freshness(c.released) }}{% else %}<span class="text-muted">unknown</span>{% endif %}</dd>
+
                                         <dt class="inline">Rule</dt>
                                         <dd>{{c.note}}</dd>
 
