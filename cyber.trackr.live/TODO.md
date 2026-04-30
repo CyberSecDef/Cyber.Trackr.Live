@@ -91,11 +91,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Applied to: `home/index` Released column, `stig/index` Released column, `scap/index` Date column, `stig/view` summary (Published + Released, with absolute date kept for legibility), `scap/view` Published.
 - [ ] **Pending Group 4 placements:** trust strip on the hero (§7), footer Status column (§12), STIG result rows in search (`home/search.html.twig`).
 
-### 2.5 Filter chip `.chip` (§9)  *(global)*
+### 2.5 Filter chip `.chip` (§9)  *(global)*  ✓ component done; spec uses pending Group 4
 
-- [ ] Add `.chip`, `.chip:hover`, `.chip.active` to `app.css`.
-- [ ] Add `.scroll-x` mobile horizontal-scroll container with hidden scrollbar.
-- [ ] Use in: hero "Try" row (§7), §10 table filter bar age dropdown (replace `<select>` with a chip group), §20 versions panel (replace `<select>` with chip rows), §22-style filter UI in `cci/index.html.twig` if added.
+- [x] `.chip`, `.chip:hover`, `.chip.active`, `button.chip` reset, `.chip-group` wrapper added to `app.css` (section 0f).
+- [x] `.scroll-x` mobile horizontal scroll container added.
+- [x] **Bonus apply:** Sort UI on `stig/view` and `scap/view` (4-radio form-check group) replaced with `.chip-group` of role="radio" buttons. JS sort handlers updated to read `data-sort` and manage `.active` state.
+- [ ] **Pending Group 4 placements:** hero "Try" row of prefilled queries (§7); STIG list table filter bar age dropdown (§10); STIG detail Versions panel chip rows (§20). Optional: filter UI on `cci/index`.
 
 ### 2.6 Stat cards / tiles `.tile` (§8)  *(homepage primarily, reusable)*
 
