@@ -284,14 +284,14 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Tile arrow translate + tile underline already shipped in §2.6.
 - [x] All keyframe rules and the .rise/.delay utilities wrapped in `@media (prefers-reduced-motion: no-preference)`.
 
-### 5.4 Responsive (§17)  *(global)*
+### 5.4 Responsive (§17)  *(global)*  ✓ done
 
-- [ ] Verify hero clamp value works at all breakpoints.
-- [ ] Tile grid: confirm `col-12 col-lg-*` translation collapses correctly.
-- [ ] Below `lg`: replace center nav with hamburger (defer to a follow-up — out of scope for first pass).
-- [ ] Below `md`: switch table to "card view" — each row a stacked block with labeled fields. Bootstrap doesn't have this primitive; needs a CSS media query toggling display from `table-row` to `block` and adding `::before` content for labels.
-- [ ] Touch-target audit: every interactive element ≥ 44px tall.
-- [ ] `.scroll-x` on mobile chip rows.
+- [x] Hero `clamp(48px, 9vw, 112px)` already works (§4.1).
+- [x] Tile grid responsive spans already working (§4.2 .span-N utilities at md/lg).
+- [x] Hamburger menu: `.nav-toggle` button + `.site-nav.is-open` fixed panel below lg, full ARIA wiring, 44px+ touch targets on stacked links.
+- [x] Table card-view below md: thead hides, tr/td stack with `data-label` ::before labels in mono uppercase. Applied to home Recent table + stig list + scap list — sort/filter/pagination JS continues to work since only display changes.
+- [x] Touch bump on `.chip` to 36px min-height below md.
+- [x] `.scroll-x` already on hero Try chips and stig/scap detail filter chips.
 
 ### 5.5 Accessibility (§18)  *(global)*
 
