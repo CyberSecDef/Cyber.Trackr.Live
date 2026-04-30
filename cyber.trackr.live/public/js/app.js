@@ -35,6 +35,17 @@ window.app = {
             }
         });
 
+        // Make sortable headers keyboard-focusable so screen-reader users
+        // can navigate to them and Enter/Space activates the same sort handler.
+        $(".data-table thead th[data-sort-key]").attr("tabindex", "0");
+
+        $(".data-table thead th[data-sort-key]").on("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                $(this).trigger("click");
+            }
+        });
+
         // Generic sortable header handler — any th[data-sort-key] inside any
         // table that has a registered handler in app.tableSortHandlers.
         $(".data-table thead th[data-sort-key]").on("click", function () {

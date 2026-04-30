@@ -68,7 +68,7 @@
                 </table>
             </div>
             <div class="data-table-foot">
-                <span id="scap-page-info" data-total="{{ scap_count }}">Page 1 &middot; {{ scap_count|number_format }} benchmarks</span>
+                <span id="scap-page-info" data-total="{{ scap_count }}" aria-live="polite">Page 1 &middot; {{ scap_count|number_format }} benchmarks</span>
                 <div class="data-table-foot__pager">
                     <button type="button" id="scap-prev" onclick="window.app.scapList.prev()" disabled>&larr; Prev</button>
                     <button type="button" id="scap-next" onclick="window.app.scapList.next()">Next &rarr;</button>

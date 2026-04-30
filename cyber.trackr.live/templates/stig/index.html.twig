@@ -84,7 +84,7 @@
                 </table>
             </div>
             <div class="data-table-foot">
-                <span id="stig-page-info" data-total="{{ stig_count }}">Page 1 &middot; {{ stig_count|number_format }} STIGs</span>
+                <span id="stig-page-info" data-total="{{ stig_count }}" aria-live="polite">Page 1 &middot; {{ stig_count|number_format }} STIGs</span>
                 <div class="data-table-foot__pager">
                     <button type="button" id="stig-prev" onclick="window.app.stigList.prev()" disabled>&larr; Prev</button>
                     <button type="button" id="stig-next" onclick="window.app.stigList.next()">Next &rarr;</button>

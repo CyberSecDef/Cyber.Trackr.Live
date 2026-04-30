@@ -184,7 +184,7 @@
                 </table>
             </div>
             <div class="data-table-foot">
-                <span id="recent-stigs-count" data-total="{{ stig_count }}">Showing {{ recent_stigs|length }} of {{ stig_count|number_format }} STIGs</span>
+                <span id="recent-stigs-count" data-total="{{ stig_count }}" aria-live="polite">Showing {{ recent_stigs|length }} of {{ stig_count|number_format }} STIGs</span>
                 <a href="{{ path('stig') }}">View entire library &rsaquo;</a>
             </div>
         </div>

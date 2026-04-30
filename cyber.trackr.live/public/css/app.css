@@ -71,7 +71,7 @@
     --surface:        #1d1912;
     --surface-2:      #2a2418;
     --text:           #ece2c8;
-    --text-muted:     #8c7f66;
+    --text-muted:     #968870;  /* WCAG AA on both --bg and --surface */
     --border:         #2e2820;
     --border-strong:  #4a3f2c;
     --accent:         #d4a04a;   /* warm amber */
@@ -90,6 +90,27 @@
 ::selection {
     background: color-mix(in srgb, var(--accent) 30%, transparent);
     color: var(--text);
+}
+
+/* Global focus ring — :focus-visible keeps it off mouse clicks, only shows
+   on keyboard navigation. Anything that has its own focus styling above
+   (form inputs, .site-search, etc.) overrides this with their own rule. */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Element that already has a strong border + box-shadow focus state should
+   suppress the global outline so the two don't fight. */
+.hero-search:focus-within :focus-visible,
+.site-search:focus-within :focus-visible,
+.form-field input:focus-visible,
+.form-field textarea:focus-visible,
+.versions-panel__controls select:focus-visible,
+#recent-stigs-q:focus-visible,
+#stig-q:focus-visible,
+#scap-q:focus-visible {
+    outline: none;
 }
 
 
