@@ -1588,11 +1588,16 @@ kbd, .site-search__kbd {
     color: var(--accent) !important;
 }
 
+/* Severity-mix cell stays on a single line — sev-bar + pills never split.
+   Auto table layout will give the column its minimum content width and
+   wrap the longer Name column instead. (In card-view below md, each td
+   sits on its own row, so wrap-vs-nowrap is irrelevant there.) */
 .data-table .sev-mix {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .data-table-foot {
