@@ -141,17 +141,17 @@ These are the assumptions in the original spec that needed adjustment based on a
 
 ## Group 4 · Page-Specific Updates
 
-### 4.1 Homepage hero (§7)  *(`templates/home/index.html.twig`)*
+### 4.1 Homepage hero (§7)  *(`templates/home/index.html.twig`)*  ✓ done
 
-- [ ] Replace the entire current `{% block body %}` (lines 5–87) with new structure.
-- [ ] Status stamp `.stamp`: `● Live · Updated daily` styled per spec (uppercase mono 9.5px, oxblood border).
-- [ ] Issue-number sibling: `No. NN · YYYY` — generate dynamically from current month/year via Twig `now|date('m · Y')` or similar; spec uses publication-issue framing.
-- [ ] Massive headline `<h1>`: "A complete reference / *for the cyber compliant.*" with `clamp(64px, 9vw, 112px)`, italic accent color on the second line.
-- [ ] Subhead `<p>` at 17px, `max-width: 640px`, `--text-muted`.
-- [ ] Hero search bar (`.hero-search`): 64px height, max-width 760px, focus ring per spec. Wires to existing `path('search', { query })` route.
-- [ ] "Try" chip row with prefilled queries (Windows 11, RHEL 9, Kubernetes, AC-2, CCI-000196, macOS Sequoia). Each chip click sets the search input value and submits.
-- [ ] Trust strip: three items separated by spacing — DISA sync dot, API status dot, dataset counts. Counts come from controller (count `$stigs`, count from CCI loader, etc.).
-- [ ] `.rise` entrance animations with staggered `animation-delay`.
+- [x] Replaced legacy "Welcome to Cyber Trackr" card. About Us + DataTable still below — handled by §4.4 / §4.3.
+- [x] `.stamp` oxblood-bordered "● Live · Updated daily".
+- [x] Issue line `No. {{ "now"|date("m") }} · {{ "now"|date("Y") }}`.
+- [x] Massive headline with `clamp(48px, 9vw, 112px)` (started clamp at 48 instead of 64 for tighter mobile), italic oxblood accent on second line.
+- [x] Subhead in Fraunces 17px, max-width 640px.
+- [x] `.hero-search` 64px input with focus ring per spec, distinct `id="hero-search-input"` so it coexists with the header search.
+- [x] Six "Try" chips including AC-2 and CCI-000196 wrapped in `{{ ui.ident() }}`.
+- [x] Trust strip wired to `sync_status` global, dataset counts from new HomeController helpers (substring-count on raw XML for speed; uses `<controls:control` prefix since XML is namespaced).
+- [x] `.rise` + `.delay-1..5` utilities applied. (§5.3 folded in.)
 
 ### 4.2 Homepage tile grid (§8)  *(`templates/home/index.html.twig`)*
 
@@ -262,13 +262,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Used in footer Status column.
 - [ ] **Pending Group 4 placements:** hero trust strip (§7); top of every STIG/control/CCI detail page (§19 spec calls for "Per-record freshness on detail pages"). Macro and globals are ready.
 
-### 5.3 Animations (§15)  *(global — `app.css`)*
+### 5.3 Animations (§15)  *(global — `app.css`)*  ✓ done (folded into §4.1)
 
-- [ ] Define `@keyframes rise` and `.rise` class with 0.7s `cubic-bezier(0.2, 0.7, 0.2, 1)` easing and `animation-fill-mode: backwards`.
-- [ ] Add `animation-delay` utilities `.delay-1` through `.delay-5` (0.05s, 0.15s, 0.25s, 0.35s, 0.45s) for stagger.
-- [ ] Tile arrow translate transition (.tile-arrow on .tile:hover).
-- [ ] Tile underline reveal `::after` scaleX 0→1.
-- [ ] Wrap all keyframe animations and non-essential transitions in `@media (prefers-reduced-motion: no-preference)`.
+- [x] `@keyframes rise` and `.rise` class added (app.css §1e). Used `animation: ... both` shorthand which sets fill-mode forwards+backwards.
+- [x] `.delay-1..5` utilities added.
+- [x] Tile arrow translate + tile underline already shipped in §2.6.
+- [x] All keyframe rules and the .rise/.delay utilities wrapped in `@media (prefers-reduced-motion: no-preference)`.
 
 ### 5.4 Responsive (§17)  *(global)*
 
