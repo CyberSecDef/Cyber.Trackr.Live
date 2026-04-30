@@ -1075,6 +1075,88 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 2b. Page — Homepage tile grid
+ *    12-column CSS Grid with .span-N utilities. Stacks to single column
+ *    below md, transitions through md (6-cols-or-12), settles at 12-col on lg.
+ *    Tiles auto-flow rows; spans must sum to 12 per row at the lg breakpoint.
+ * ========================================================================== */
+
+.tile-grid {
+    max-width: 1280px;
+    margin: 0 auto var(--space-9);
+}
+
+.tile-grid__inner {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-4);
+}
+
+/* Below md: every tile spans the full 12 cols (single column stack). */
+@media (max-width: 767.98px) {
+    .tile-grid__inner > * {
+        grid-column: span 12;
+    }
+}
+
+/* Spans target the lg layout. Reset to 6 on md for the half-width tiles
+   so the row 2 (r4 + CCIs) and row 3 (SCAP + API) pair cleanly. */
+.span-3 { grid-column: span 12; }
+.span-4 { grid-column: span 12; }
+.span-5 { grid-column: span 12; }
+.span-6 { grid-column: span 12; }
+.span-7 { grid-column: span 12; }
+
+@media (min-width: 768px) {
+    .span-3, .span-4 { grid-column: span 6; }
+    .span-6 { grid-column: span 6; }
+}
+
+@media (min-width: 992px) {
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+}
+
+/* Tile content typography — Fraunces title with italic accent variant. */
+.tile-title {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.025em;
+    font-size: 28px;
+    line-height: 1.05;
+    font-weight: 400;
+    margin: var(--space-3) 0;
+    color: var(--text);
+}
+
+.tile-title em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    color: var(--accent);
+}
+
+/* Tall variant — STIGs hero tile. Flex column pushes meta to bottom. */
+.tile--tall {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tile--tall .tile-title {
+    font-size: clamp(40px, 5vw, 56px);
+    line-height: 1;
+    margin: var(--space-4) 0 var(--space-3);
+}
+
+.tile--tall .tile-meta {
+    margin-top: auto;
+}
+
+
+/* =============================================================================
  * 2. Detail-page typography
  *    Used by stig/view, scap/view, rmf/view_v4, rmf/view_v5, home/search
  * ========================================================================== */

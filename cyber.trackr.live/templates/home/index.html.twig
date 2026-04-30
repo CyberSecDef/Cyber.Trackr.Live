@@ -56,6 +56,61 @@
         </div>
     </section>
 
+    <section class="tile-grid" aria-labelledby="tile-grid-eyebrow">
+        <div class="rule-text" id="tile-grid-eyebrow">&sect; I &middot; Browse the library</div>
+
+        <div class="tile-grid__inner">
+            <a href="{{ path('stig') }}" class="tile tile--tall span-7">
+                <span class="eyebrow">Compliance Guides</span>
+                <h2 class="tile-title">STIGs</h2>
+                <p class="tile-meta">{{ stig_count|number_format }} guides &middot; latest from DISA</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+
+            <a href="{{ path('rmf_v5_view') }}" class="tile span-5">
+                <span class="eyebrow">NIST Controls</span>
+                <h2 class="tile-title">800-53 <em>r5</em></h2>
+                <p class="tile-meta">{{ controls_count|number_format }} controls &middot; current revision</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+
+            <a href="{{ path('rmf_v4_view') }}" class="tile span-6">
+                <span class="eyebrow">NIST Controls</span>
+                <h2 class="tile-title">800-53 <em>r4</em></h2>
+                <p class="tile-meta">Previous revision &middot; legacy systems</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+
+            <a href="{{ path('cci') }}" class="tile span-6">
+                <span class="eyebrow">Control Indicators</span>
+                <h2 class="tile-title">CCIs</h2>
+                <p class="tile-meta">{{ cci_count|number_format }} items &middot; control mappings</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+
+            <a href="{{ path('report_generator') }}" class="tile span-5">
+                <span class="eyebrow">Tools</span>
+                <h2 class="tile-title">Scans &rsaquo; Reports</h2>
+                <p class="tile-meta">Convert ACAS / SCAP / CKL scans into eMASS-compatible POAM &amp; RAR spreadsheets</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+
+            <a href="{{ path('scap') }}" class="tile span-4">
+                <span class="eyebrow">Automation</span>
+                <h2 class="tile-title">SCAP</h2>
+                <p class="tile-meta">Benchmarks &amp; OVAL definitions</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+
+            <a href="{{ path('api_summary') }}" class="tile span-3">
+                <span class="eyebrow">Developers</span>
+                <h2 class="tile-title">API</h2>
+                <p class="tile-meta">REST endpoints</p>
+                <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </section>
+
     {# About Us prose + Recent STIGs DataTable below — replaced by §4.4 (colophon) and §4.3 (custom managed table) respectively. #}
     <div class="container-fluid">
         <div class="row">
