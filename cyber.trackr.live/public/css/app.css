@@ -1792,6 +1792,99 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 2i. Page — Report generator (/report_generator)
+ *    Heavy client-side parsing UI. CSS only — JS hooks (every #id and
+ *    every onclick) preserved unchanged.
+ * ========================================================================== */
+
+.rg-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    margin-bottom: var(--space-5);
+}
+
+@media (min-width: 768px) {
+    .rg-options {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-6);
+    }
+}
+
+.rg-options__col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.rg-options__col .eyebrow {
+    margin-bottom: var(--space-2);
+}
+
+/* The drop area's default state sits on the page bg with a dashed border.
+   The JS adds/removes .bg-light on drag-over for visual feedback — paired
+   with the global .bg-light override (var(--surface)), the surface tone
+   contrasts with the page bg enough to read as "active drop target". */
+.rg-drop-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: 160px;
+    padding: var(--space-5);
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.rg-drop-area:hover {
+    border-color: var(--accent);
+}
+
+.rg-drop-area__text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.rg-alerts {
+    margin-top: var(--space-5);
+}
+
+.rg-alerts:not(:empty) {
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid var(--sev-high);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 13px;
+}
+
+.rg-alerts p {
+    margin: 0 0 4px;
+}
+
+.rg-alerts p:last-child {
+    margin-bottom: 0;
+}
+
+/* Switch labels — keep Bootstrap's form-switch widget functional, just lift
+   the label typography to our token vocabulary. */
+.rg-options__col .form-check {
+    margin-bottom: 6px;
+}
+
+.rg-options__col .form-check-label {
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+/* =============================================================================
  * 2d. Page — Homepage colophon
  *    12-col split with eyebrow + Fraunces heading on the left (cols 1-4)
  *    and pull-quote + body + CTA row on the right (cols 6-12, leaving
