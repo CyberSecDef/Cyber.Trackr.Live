@@ -224,9 +224,9 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Control numbers wrapped via §2.1.
 - [x] Page header redesigned: breadcrumbs (Library › 800-53 r5), eyebrow "NIST SP 800-53", Fraunces title "Risk Management Framework *Rev. 5*" with italic accent, meta count, icon-btn print on right. Added "§ Controls" divider before the foreach.
 
-### 4.10 RMF v4 view  *(`templates/rmf/view_v4.html.twig`)*
+### 4.10 RMF v4 view  *(`templates/rmf/view_v4.html.twig`)*  ✓ done
 
-- [ ] Same as RMF v5.
+- [x] Mirrors §4.9 RMF v5 layout. Breadcrumb includes "800-53 r5" intermediate to signal v4 is the legacy revision. "NIST SP 800-53 · Legacy" eyebrow + Fraunces "Risk Management Framework *Rev. 4*" + meta with control count.
 
 ### 4.11 CCI list page  *(`templates/cci/index.html.twig`)*
 
