@@ -98,18 +98,19 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] **Bonus apply:** Sort UI on `stig/view` and `scap/view` (4-radio form-check group) replaced with `.chip-group` of role="radio" buttons. JS sort handlers updated to read `data-sort` and manage `.active` state.
 - [ ] **Pending Group 4 placements:** hero "Try" row of prefilled queries (§7); STIG list table filter bar age dropdown (§10); STIG detail Versions panel chip rows (§20). Optional: filter UI on `cci/index`.
 
-### 2.6 Stat cards / tiles `.tile` (§8)  *(homepage primarily, reusable)*
+### 2.6 Stat cards / tiles `.tile` (§8)  *(homepage primarily, reusable)*  ✓ component done; consumed by §4.2
 
-- [ ] Add `.tile`, `.tile:hover`, `.tile::after`, `.tile-arrow`, `.tile-arrow` hover transform to `app.css`.
-- [ ] Decision: tiles are described with Tailwind-style spans (`col-span-12 lg:col-span-7`). On Bootstrap 5 these become `col-12 col-lg-7`. Translate spec §8 inventory:
-  - STIGs tile: `col-12 col-lg-7`, `min-height: 260px` (custom), large title at 56px
-  - 800-53 r5: `col-12 col-lg-5` (sits in right column above r4/CCIs split)
-  - 800-53 r4: `col-12 col-lg-6` (half of right column under r5)
-  - CCIs: `col-12 col-lg-6` (other half under r5)
-  - Scans → Reports: `col-12 col-lg-5` horizontal layout
+- [x] `.tile`, `.tile:hover`, `.tile::after`, `.tile-arrow` hover transform added to `app.css` (section 0g). Plus `.tile-meta` for the mono count/descriptor line.
+- [x] **Bootstrap col-* translation** documented for §4.2 to use directly. Spec's Tailwind-style spans map to:
+  - STIGs tile: `col-12 col-lg-7`, custom `min-height: 260px`
+  - 800-53 r5: `col-12 col-lg-5`
+  - 800-53 r4: `col-12 col-lg-6`
+  - CCIs: `col-12 col-lg-6`
+  - Scans → Reports: `col-12 col-lg-5` (horizontal layout)
   - SCAP: `col-12 col-md-6 col-lg-4`
   - API: `col-12 col-md-6 col-lg-3`
-- [ ] Tile arrow icon: use Bootstrap Icons `bi-arrow-up-right` styled to size 18–22px in `var(--accent)`.
+- [x] Tile arrow uses Bootstrap Icons `bi-arrow-up-right` at 20px, `var(--accent)`. Apply via `<i class="tile-arrow bi bi-arrow-up-right"></i>` inside the tile.
+- [ ] **Pending §4.2:** tile grid built on the homepage. Tiles link to `path('stig')`, `path('rmf_v5_view')`, `path('rmf_v4_view')`, `path('cci')`, `path('report_generator')`, `path('scap')`, `path('api_summary')`.
 
 ---
 
