@@ -160,16 +160,17 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Counts pulled from `stig_count` / `controls_count` / `cci_count` controller vars (added in §4.1).
 - [ ] **Pending §4.3a:** the STIGs tile's "severity pill row showing aggregate" needs per-STIG sev counts pre-computed in `stig_toc.json`. Tile currently shows count + descriptor only.
 
-### 4.3 Homepage recent STIGs table (§10)  *(`templates/home/index.html.twig`)*
+### 4.3 Homepage recent STIGs table (§10)  *(`templates/home/index.html.twig`)*  ✓ done
 
-- [ ] Replace the current Recent STIGs table (lines 28–66) and its DataTable init script with a **custom managed table per spec** (resolved decision: replace, not retain DataTables).
-- [ ] Build the table HTML and CSS per spec §10: bordered container, sticky mono headers, sortable columns with `aria-sort`, row hover, footer row.
-- [ ] Add filter bar above the table (text input + age `.chip` group). Wire client-side: text filter does case-insensitive substring match on Name + Version; age filter matches `freshness().tag`.
-- [ ] Add the legend row (four `.dot` legend items: Fresh ≤1yr / Stale 1–3yr / Aged 3–5yr / Old >5yr).
-- [ ] Add the footer row inside the bordered container: `Showing N of 847 STIGs` (left) + `View entire library →` link to `path('stig')` (right).
-- [ ] Limit homepage table to top 30–40 rows. **Controller change required:** `HomeController::index()` should slice/sort `$stigs` to top 40 by released date; the full `path('stig')` page handles the rest.
-- [ ] Add Severity Mix column data: high/med/low counts per stig (resolved decision: pre-compute and store in `stig_toc.json` — see Group 4.3a below).
-- [ ] Add Rules total column (sum of high+med+low).
+- [x] Legacy Bootstrap+DataTable block removed. New custom managed table per spec.
+- [x] Bordered container with sticky mono uppercase headers, sortable columns (aria-sort, click toggles asc/desc), row hover (--accent 5% mix), footer row.
+- [x] Filter bar with 220px text input + 4-chip age group. Text filter does case-insensitive substring on name+version; age matches freshness_tag.
+- [x] Legend row with the 4 dot+label freshness levels.
+- [x] Footer row "Showing N of M STIGs" + "View entire library ›" link.
+- [x] HomeController::index() slices to top 40 by released date (with date → released → 0 fallback).
+- [x] Severity Mix column composes ui.sev_bar() + ui.sev() pills.
+- [x] Rules total column with right-aligned tabular numerics.
+- **Reusable .data-table component** also lives in app.css §2c — stig/index (§4.5) and scap/index (§4.8) will reuse it.
 
 ### 4.4 Homepage about/colophon (§11)  *(`templates/home/index.html.twig`)*
 
@@ -177,16 +178,13 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [ ] Primary CTA → `path('contact_us')`.
 - [ ] Secondary CTA "View on GitHub" → **placeholder** (resolved decision: no public repo yet). Render as `<a href="#" aria-disabled="true" data-coming-soon>...</a>` styled with reduced opacity. Revisit when repo exists.
 
-### 4.3a Pre-compute severity counts in `stig_toc.json`  *(`StigController` — gates §4.3 and §4.5 Severity Mix columns)*
+### 4.3a Pre-compute severity counts in `stig_toc.json`  *(`StigController` — gates §4.3 and §4.5 Severity Mix columns)*  ✓ done
 
-- [ ] Locate the toc generator code path in `StigController::stig()` (around lines 38–95) where each STIG XML is parsed when not already in the toc.
-- [ ] Add three xpath calls per STIG: count rules at severity `high`, `medium`, `low` (e.g., `count(//xmlns:Rule[@severity='high'])`). Capture into the per-instance object alongside `version`, `release`, `date`, `released`, `filename`.
-- [ ] Update the JSON schema written to `resources/data/stig_toc.json` to include `sev: { h: N, m: N, l: N }` per entry.
-- [ ] **One-time backfill:** existing toc entries lack the new field. Two options:
-  - Force-regenerate by deleting the toc file (slow first load).
-  - Write a one-off command `bin/console app:stig:rebuild-toc` to re-parse all XML and update in place.
-  - Recommend option 2 — explicit, reproducible.
-- [ ] Verify Twig templates that consume `stigs[stig]` handle missing `sev` field gracefully during the transition (default to `{h:0, m:0, l:0}`).
+- [x] Extracted toc-build logic into `App\Service\StigTocBuilder` with `parseStig($filePath)` returning `[title, entry: {date, released, filename, version, release, sev: {h,m,l}}]` and `rebuildAll()` for full rescans.
+- [x] Schema updated: every entry now carries `sev: {h, m, l}`.
+- [x] One-time backfill via new `bin/console app:stig:rebuild-toc` command. Ran in 18.69s, 3,970 instances reparsed, 0 entries missing sev.
+- [x] StigController::stig() refactored to use `$tocBuilder->parseStig()` for newly-dropped XML files (so future additions auto-include sev counts).
+- [x] All Twig templates that read `stigs[]` use `s.sev.h|default(0)` fallback.
 
 ### 4.5 STIG list page (`templates/stig/index.html.twig`)
 
