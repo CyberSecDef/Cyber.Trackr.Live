@@ -1604,6 +1604,120 @@ kbd, .site-search__kbd {
 
 
 /* =============================================================================
+ * 2h. Page — Search results
+ *    Replaces the legacy bg-primary-subtle / border-primary Bootstrap
+ *    sections with tokenized collapsible blocks.
+ * ========================================================================== */
+
+.search-section {
+    margin-bottom: var(--space-5);
+}
+
+.search-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text);
+}
+
+.search-section__header:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.search-section__count {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.search-section__body {
+    padding: var(--space-3) var(--space-2);
+}
+
+.search-section__item {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.search-section__item:last-child {
+    border-bottom: 0;
+}
+
+.search-section__item-title {
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: var(--space-2);
+}
+
+.search-section__item-title a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+}
+
+.search-section__item-title a:hover {
+    color: var(--accent) !important;
+}
+
+.search-section__excerpt {
+    max-height: 10rem;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.search-section__excerpt strong {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.search-section__meta {
+    margin-bottom: var(--space-2);
+    font-size: 13px;
+}
+
+.search-query {
+    margin-bottom: var(--space-6);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-md);
+}
+
+.search-query__label {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.search-query__value {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    letter-spacing: -0.025em;
+    font-size: 24px;
+    line-height: 1.2;
+    color: var(--text);
+}
+
+
+/* =============================================================================
  * 2d. Page — Homepage colophon
  *    12-col split with eyebrow + Fraunces heading on the left (cols 1-4)
  *    and pull-quote + body + CTA row on the right (cols 6-12, leaving
