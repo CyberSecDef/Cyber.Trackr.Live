@@ -44,3 +44,22 @@
 {%- set aria = lbl ~ ' severity' ~ (count is not null ? ', ' ~ count ~ ' rules' : '') -%}
 <span class="sev {{ cls }}" aria-label="{{ aria }}">{{ short }}{% if count is not null %} · {{ count }}{% endif %}</span>
 {%- endmacro %}
+
+{#
+ # sev_bar — proportional severity strip (96×5px) showing high/med/low mix.
+ #
+ # Widths are calculated as percentages of the total. Renders nothing when
+ # total is zero. Inline width styles are intentional per spec §22 — they're
+ # data-driven values, not arbitrary styling.
+ #
+ #   {{ ui.sev_bar(30, 239, 12) }}
+ #}
+{% macro sev_bar(high, med, low) %}
+{%- set h = high|default(0) -%}
+{%- set m = med|default(0) -%}
+{%- set l = low|default(0) -%}
+{%- set total = h + m + l -%}
+{%- if total > 0 -%}
+<span class="sev-bar" title="High {{ h }} · Medium {{ m }} · Low {{ l }}" role="img" aria-label="Severity proportion: {{ h }} high, {{ m }} medium, {{ l }} low"><span class="h" style="width: {{ (h * 100 / total)|round(2) }}%"></span><span class="m" style="width: {{ (m * 100 / total)|round(2) }}%"></span><span class="l" style="width: {{ (l * 100 / total)|round(2) }}%"></span></span>
+{%- endif -%}
+{% endmacro %}

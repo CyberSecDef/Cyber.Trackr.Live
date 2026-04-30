@@ -213,6 +213,36 @@ button.sev {
 
 
 /* =============================================================================
+ * 0d. Component layer — Severity bar
+ *    Proportional 96×5 strip showing high/med/low rule mix at a glance.
+ *    Use via {{ ui.sev_bar(high, med, low) }} — widths set inline as %.
+ * ========================================================================== */
+
+.sev-bar {
+    display: inline-flex;
+    height: 5px;
+    width: 96px;
+    border-radius: 1px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.sev-bar > .h {
+    background: var(--sev-high);
+}
+
+.sev-bar > .m {
+    background: var(--sev-med);
+}
+
+.sev-bar > .l {
+    background: var(--sev-low);
+}
+
+
+/* =============================================================================
  * 1. Base / shell
  * ========================================================================== */
 

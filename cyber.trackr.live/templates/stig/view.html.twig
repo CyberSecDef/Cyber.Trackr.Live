@@ -55,6 +55,8 @@
                     <button type="button" class="sev low is-filter active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'low');" aria-label="Toggle low-severity rules ({{ low_count }})">
                         L · {{ low_count }}
                     </button>
+
+                    <span class="ms-2">{{ ui.sev_bar(hi_count, med_count, low_count) }}</span>
                 </li>
                 <li class="list-group-item">
                     <b>Sort:</b> 
