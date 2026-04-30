@@ -153,11 +153,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] Trust strip wired to `sync_status` global, dataset counts from new HomeController helpers (substring-count on raw XML for speed; uses `<controls:control` prefix since XML is namespaced).
 - [x] `.rise` + `.delay-1..5` utilities applied. (§5.3 folded in.)
 
-### 4.2 Homepage tile grid (§8)  *(`templates/home/index.html.twig`)*
+### 4.2 Homepage tile grid (§8)  *(`templates/home/index.html.twig`)*  ✓ done
 
-- [ ] After hero, before recent STIGs table: insert the 12-column tile grid.
-- [ ] Each tile links to its respective route (`path('stig')`, `path('rmf_v5_view')`, `path('rmf_v4_view')`, `path('cci')`, `path('report_generator')`, `path('scap')`, `path('api_summary')`).
-- [ ] Aggregate counts (847 STIGs, 1,189 controls, 5,604 CCIs) come from the controller — `HomeController::index()` needs to be updated to compute and pass them.
+- [x] 12-col CSS Grid (`.tile-grid__inner` with `repeat(12, 1fr)` + `.span-N` utilities) inserted between hero and the legacy About/table block.
+- [x] Seven tiles linked to existing routes per spec.
+- [x] Counts pulled from `stig_count` / `controls_count` / `cci_count` controller vars (added in §4.1).
+- [ ] **Pending §4.3a:** the STIGs tile's "severity pill row showing aggregate" needs per-STIG sev counts pre-computed in `stig_toc.json`. Tile currently shows count + descriptor only.
 
 ### 4.3 Homepage recent STIGs table (§10)  *(`templates/home/index.html.twig`)*
 
