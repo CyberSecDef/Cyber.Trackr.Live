@@ -74,12 +74,12 @@ These are the assumptions in the original spec that needed adjustment based on a
 - [x] **JS refactor:** `stig_app.toggleFilter` and `scap_app.toggleFilter` now take severity level as a 2nd argument instead of parsing visible button text. Old text-parsing approach was broken by the format change (`Low - 30` → `L · 30`).
 - [ ] **Deferred to §4 (homepage):** aggregated severity displays on the STIG tile (§8). Will be added when the home tile grid lands and severity counts are pulled from `stig_toc.json` per §4.3a.
 
-### 2.3 Severity bar `.sev-bar` (§5)  *(global)*
+### 2.3 Severity bar `.sev-bar` (§5)  *(global)*  ✓ component done; spec uses pending Group 4
 
-- [ ] Add `.sev-bar` and `.sev-bar > .h/.m/.l` rules to `app.css`.
-- [ ] Twig macro `{{ ui.sev_bar(highCount, medCount, lowCount) }}` that calculates widths as percentages and outputs three child `<span>` elements with width inline styles (this is one of the few legitimate inline-style cases per §22).
-- [ ] Use in §10 STIG list table (Severity Mix column).
-- [ ] Use in §20 STIG detail page (alongside the three sev stat-cards).
+- [x] Add `.sev-bar` and `.sev-bar > .h/.m/.l` rules to `app.css` (section 0d).
+- [x] Twig macro `{{ ui.sev_bar(high, med, low) }}` added. Renders nothing when total is zero; widths inline-styled as percentages; `title` for hover, `role="img"` + `aria-label` for screen readers.
+- [x] **Bonus placement:** added inline beside the H/M/L filter pills on `stig/view` and `scap/view` for an immediate visual demo. Uses the same count vars set in 2.2.
+- [ ] **Pending Group 4:** primary spec uses — STIG list Severity Mix column (§10) and STIG detail stat-cards (§20). Macro and CSS are ready; just needs the redesigned templates to consume them.
 
 ### 2.4 Freshness dot `.dot` + utilities (§6)  *(global)*
 
