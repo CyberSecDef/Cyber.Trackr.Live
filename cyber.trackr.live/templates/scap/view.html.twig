@@ -42,26 +42,13 @@
                 </li>
 
                 <li class="list-group-item">
-                    <b>Sort:</b> 
-                    
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions1" value="control" onclick="scap_app.sort(this);">
-                        <label class="form-check-label" for="sortOptions1">Control</label>
+                    <b>Sort:</b>
+                    <div class="chip-group" role="radiogroup" aria-label="Sort rules by">
+                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="control" onclick="scap_app.sort(this);">Control</button>
+                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="severity" onclick="scap_app.sort(this);">Severity</button>
+                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="vuln" onclick="scap_app.sort(this);">Vuln</button>
+                        <button type="button" class="chip" role="radio" aria-checked="false" data-sort="title" onclick="scap_app.sort(this);">Title</button>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions2" value="severity" onclick="scap_app.sort(this);">
-                        <label class="form-check-label" for="sortOptions2">Severity</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions3" value="vuln" onclick="scap_app.sort(this);">
-                        <label class="form-check-label" for="sortOptions3">Vuln</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="sortOptions" id="sortOptions4" value="title" onclick="scap_app.sort(this);">
-                        <label class="form-check-label" for="sortOptions4">Title</label>
-                    </div>
-                    
-                    
                 </li>
 
             </ul>
@@ -196,23 +183,19 @@
                 }
             },
             sort(elem){
-                var sort_field = $(elem).val();
-                var list = $('div.scap-group')
-                var itemsArr = []
-                $(list).each( (i, e) => {
-                    itemsArr.push(e)
-                })
-                
-                itemsArr.sort(function(a, b) {
-                return $(a).find('.' + sort_field).text().trim() == $(b).find('.' + sort_field).text().trim()
-                        ? 0
-                        : ($(a).find('.' + sort_field).text().trim() > $(b).find('.' + sort_field).text().trim() ? 1 : -1);
+                const sort_field = $(elem).data('sort');
+                $(elem).parent().find('.chip').removeClass('active').attr('aria-checked', 'false');
+                $(elem).addClass('active').attr('aria-checked', 'true');
+
+                const itemsArr = $('div.scap-group').toArray();
+                itemsArr.sort((a, b) => {
+                    const av = $(a).find('.' + sort_field).text().trim();
+                    const bv = $(b).find('.' + sort_field).text().trim();
+                    return av === bv ? 0 : (av > bv ? 1 : -1);
                 });
 
-                $('div#requirements').empty()
-                itemsArr.forEach( (e, i) => {
-                    $('div#requirements').append(e);
-                })
+                const $req = $('div#requirements').empty();
+                itemsArr.forEach(e => $req.append(e));
             },
         }
 

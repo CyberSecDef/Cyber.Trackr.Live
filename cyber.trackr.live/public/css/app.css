@@ -290,6 +290,66 @@ button.sev {
 
 
 /* =============================================================================
+ * 0f. Component layer — Filter chip
+ *    Used for filter tags, query suggestions, category filters, and small
+ *    radio-style multi-choice groups (sort options, age buckets).
+ *    .chip-group wraps a row with consistent spacing.
+ *    .scroll-x is a mobile-friendly horizontal scroll container that
+ *    hides its scrollbar — pair with .chip-group on narrow viewports.
+ * ========================================================================== */
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 12.5px;
+    line-height: 1.2;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.chip:hover {
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+
+.chip.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+}
+
+button.chip {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.chip-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.scroll-x {
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.scroll-x::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =============================================================================
  * 1. Base / shell
  * ========================================================================== */
 
