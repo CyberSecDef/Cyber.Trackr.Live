@@ -1740,6 +1740,55 @@ kbd, .site-search__kbd {
     border-color: var(--border) !important;
 }
 
+/* DataTables 1.13.6 with the bs5 styling build wraps pagination in
+ * Bootstrap's .pagination > .page-item > .page-link markup. The blue
+ * link color on the <a> overrides our .paginate_button rules above
+ * (which target the <li>). Override .page-link directly. */
+.dataTables_wrapper .pagination .page-link {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+    margin: 0 2px !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.dataTables_wrapper .pagination .page-link:hover,
+.dataTables_wrapper .pagination .page-link:focus {
+    background: var(--surface) !important;
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .pagination .page-item.active .page-link {
+    background: var(--text) !important;
+    color: var(--bg) !important;
+    border-color: var(--text) !important;
+}
+
+.dataTables_wrapper .pagination .page-item.disabled .page-link {
+    opacity: 0.4;
+    color: var(--text-muted) !important;
+    border-color: var(--border) !important;
+    background: var(--surface) !important;
+}
+
+/* The <ul.pagination> itself carries Bootstrap default margins +
+ * a thin grey border from the legacy reset; flatten it. */
+.dataTables_wrapper .pagination {
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    gap: 0;
+    list-style: none;
+    border: 0;
+}
+
 /* Export-button toolbar (Buttons extension) */
 .dt-buttons {
     display: inline-flex;
