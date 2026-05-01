@@ -113,8 +113,39 @@
         </div>
     </section>
 
+    <section class="workflows" aria-labelledby="workflows-eyebrow">
+        <div class="rule-text" id="workflows-eyebrow">&sect; II &middot; Common workflows</div>
+
+        <p class="workflows__lede">
+            If you came here to do one specific thing &mdash; jump straight in.
+        </p>
+
+        <div class="chip-group workflows__chips">
+            <a class="chip workflows__chip" href="{{ path('rmf_v5_view') }}">
+                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                Build an SSP
+            </a>
+            <a class="chip workflows__chip" href="{{ path('report_generator') }}">
+                <i class="bi bi-clipboard-data" aria-hidden="true"></i>
+                Validate scan findings
+            </a>
+            <a class="chip workflows__chip" href="{{ path('stig') }}">
+                <i class="bi bi-list-check" aria-hidden="true"></i>
+                Audit a system
+            </a>
+            <a class="chip workflows__chip" href="{{ path('cci') }}">
+                <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                Trace a CCI to a control
+            </a>
+            <a class="chip workflows__chip" href="{{ path('api_summary') }}">
+                <i class="bi bi-code-square" aria-hidden="true"></i>
+                Pull data via API
+            </a>
+        </div>
+    </section>
+
     <section class="tile-grid" aria-labelledby="tile-grid-eyebrow">
-        <div class="rule-text" id="tile-grid-eyebrow">&sect; II &middot; Browse the library</div>
+        <div class="rule-text" id="tile-grid-eyebrow">&sect; III &middot; Browse the library</div>
 
         <div class="tile-grid__inner">
             <a href="{{ path('stig') }}" class="tile tile--tall span-7">
@@ -169,7 +200,7 @@
     </section>
 
     <section class="lib-page" aria-labelledby="recent-stigs-eyebrow">
-        <div class="rule-text" id="recent-stigs-eyebrow">&sect; III &middot; Recent updates</div>
+        <div class="rule-text" id="recent-stigs-eyebrow">&sect; IV &middot; Recent updates</div>
 
         <div class="lib-page__bar">
             <div class="lib-page__head">
@@ -248,7 +279,7 @@
     </section>
 
     <section class="colophon" aria-labelledby="colophon-eyebrow">
-        <div class="rule-text" id="colophon-eyebrow">&sect; IV &middot; Colophon</div>
+        <div class="rule-text" id="colophon-eyebrow">&sect; V &middot; Colophon</div>
 
         <div class="colophon__inner">
             <div class="colophon__left">

@@ -3,6 +3,14 @@
 {% block title %}Compare STIGs{% endblock %}
 
 {% block body %}
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="{{ path('stig') }}">STIGs</a></li>
+            <li>{{ title|replace({'_': ' '}) }}</li>
+            <li aria-current="page">Compare V{{ v1 }}R{{ r1 }} vs V{{ v2 }}R{{ r2 }}</li>
+        </ol>
+    </nav>
+
     <div class="doc-title">
         <h1>{{ stig1.xpath("/xmlns:Benchmark/xmlns:title")[0] }} - V{{v1}}R{{r1}} vs. V{{v2}}R{{r2}}</h1>
     </div>

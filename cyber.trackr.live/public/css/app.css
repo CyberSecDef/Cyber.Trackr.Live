@@ -294,6 +294,50 @@
     --old:            #888888;
 }
 
+/* /home Common workflows — labeled deep-links into the library for the
+   most common reasons someone lands here. Lightweight chip strip, sits
+   between the value-prop and the tile grid. */
+.workflows {
+    max-width: 1400px;
+    margin: 0 auto var(--space-9);
+    padding: 0 var(--space-3);
+}
+
+.workflows__lede {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: var(--space-3) 0 var(--space-5);
+}
+
+.workflows__chips {
+    gap: var(--space-3);
+}
+
+a.workflows__chip {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--text);
+    text-decoration: none;
+}
+
+a.workflows__chip i {
+    color: var(--accent);
+    font-size: 15px;
+}
+
+a.workflows__chip:hover {
+    background: var(--surface-2);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+a.workflows__chip:hover i {
+    color: var(--accent);
+}
+
 /* /home value-prop section — appears between hero and the tile grid.
    Capped at 1400px so the editorial copy doesn't stretch on 4K, even
    though sibling sections are uncapped. */

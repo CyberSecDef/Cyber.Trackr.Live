@@ -15,7 +15,8 @@
         <nav class="breadcrumbs" aria-label="Breadcrumb">
             <ol>
                 <li><a href="{{ path('scap') }}">SCAP</a></li>
-                <li aria-current="page">{{ title|replace({'_': ' '}) }}</li>
+                <li>{{ title|replace({'_': ' '}) }}</li>
+                <li aria-current="page">V{{ version }}R{{ release }}</li>
             </ol>
         </nav>
 
