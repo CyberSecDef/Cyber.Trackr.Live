@@ -2768,11 +2768,13 @@ dt.inline::after {
     user-select: none;
 }
 
-.baseline-badge--low      { background: var(--fresh);       }
-.baseline-badge--moderate { background: var(--stale);       }
-.baseline-badge--high     { background: var(--sev-high);    }
-.baseline-badge--privacy  { background: var(--accent);      }
-.baseline-badge--li-saas  { background: var(--text-muted);  }
+.baseline-badge--low        { background: var(--fresh);       }
+.baseline-badge--moderate   { background: var(--stale);       }
+.baseline-badge--high       { background: var(--sev-high);    }
+.baseline-badge--privacy    { background: var(--accent);      }
+.baseline-badge--li-saas    { background: var(--text-muted);  }
+.baseline-badge--classified { background: var(--sev-med);     }
+.baseline-badge--space      { background: var(--old);         }
 
 [data-theme="dark"] .baseline-badge--moderate,
 [data-theme="dark"] .baseline-badge--privacy {
@@ -2790,9 +2792,11 @@ dt.inline::after {
 /* Subtle accent on the active chip so the chosen baseline color carries
  * through. The base .chip.active rule provides background/border; we only
  * tint when a baseline-specific chip is active. */
-.chip--low.active     { border-color: var(--fresh);       }
-.chip--moderate.active{ border-color: var(--stale);       }
-.chip--high.active    { border-color: var(--sev-high);    }
-.chip--privacy.active { border-color: var(--accent);      }
-.chip--li-saas.active { border-color: var(--text-muted);  }
+.chip--low.active        { border-color: var(--fresh);       }
+.chip--moderate.active   { border-color: var(--stale);       }
+.chip--high.active       { border-color: var(--sev-high);    }
+.chip--privacy.active    { border-color: var(--accent);      }
+.chip--li-saas.active    { border-color: var(--text-muted);  }
+.chip--classified.active { border-color: var(--sev-med);     }
+.chip--space.active      { border-color: var(--old);         }
 

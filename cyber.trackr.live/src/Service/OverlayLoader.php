@@ -31,7 +31,10 @@ class OverlayLoader
      * back to alphabetical.
      */
     private const SOURCE_ORDER = ['nist' => 0, 'fedramp' => 1, 'cnss' => 2];
-    private const LEVEL_ORDER  = ['low' => 0, 'moderate' => 1, 'high' => 2, 'privacy' => 3, 'li-saas' => 4];
+    private const LEVEL_ORDER  = [
+        'low' => 0, 'moderate' => 1, 'high' => 2, 'privacy' => 3,
+        'li-saas' => 4, 'classified' => 5, 'space' => 6,
+    ];
 
     /**
      * @var array<string, array{
@@ -224,7 +227,19 @@ class OverlayLoader
      */
     private static function levelFromFilename(string $filename): string
     {
-        foreach (['LI-SaaS' => 'li-saas', 'PRIVACY' => 'privacy', 'MODERATE' => 'moderate', 'HIGH' => 'high', 'LOW' => 'low'] as $needle => $level) {
+        // Ordering matters: longer / more specific substrings first to avoid
+        // accidental overlaps (e.g. "LI-SaaS" contains "LI" which would
+        // otherwise look like a partial match for "LOW").
+        $needles = [
+            'LI-SaaS'    => 'li-saas',
+            'PRIVACY'    => 'privacy',
+            'MODERATE'   => 'moderate',
+            'HIGH'       => 'high',
+            'LOW'        => 'low',
+            'CLASSIFIED' => 'classified',
+            'SPACE'      => 'space',
+        ];
+        foreach ($needles as $needle => $level) {
             if (stripos($filename, $needle) !== false) {
                 return $level;
             }
@@ -246,12 +261,14 @@ class OverlayLoader
             default   => strtoupper($source[0] ?? '?'),
         };
         $levelInitial = match ($level) {
-            'low'      => 'L',
-            'moderate' => 'M',
-            'high'     => 'H',
-            'privacy'  => 'P',
-            'li-saas'  => 'S',
-            default    => strtoupper($level[0] ?? '?'),
+            'low'        => 'L',
+            'moderate'   => 'M',
+            'high'       => 'H',
+            'privacy'    => 'P',
+            'li-saas'    => 'S',
+            'classified' => 'C',
+            'space'      => 'X',
+            default      => strtoupper($level[0] ?? '?'),
         };
         return $sourceInitial . $levelInitial;
     }
@@ -270,12 +287,14 @@ class OverlayLoader
             default   => ucfirst($source),
         };
         $lvl = match ($level) {
-            'low'      => 'Low',
-            'moderate' => 'Moderate',
-            'high'     => 'High',
-            'privacy'  => 'Privacy',
-            'li-saas'  => 'LI-SaaS',
-            default    => ucfirst($level),
+            'low'        => 'Low',
+            'moderate'   => 'Moderate',
+            'high'       => 'High',
+            'privacy'    => 'Privacy',
+            'li-saas'    => 'LI-SaaS',
+            'classified' => 'Classified',
+            'space'      => 'Space',
+            default      => ucfirst($level),
         };
         return $src . ' ' . $lvl;
     }

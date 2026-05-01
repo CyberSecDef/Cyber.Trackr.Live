@@ -1,0 +1,153 @@
+{
+  "profile": {
+    "uuid": "ea5dcca1-fae3-57a3-bde2-be2d3f9a3e8e",
+    "metadata": {
+      "title": "CNSSI 1253 Attachment 5 \u2014 Classified System Overlay (additive on top of any baseline)",
+      "version": "2022-2025",
+      "oscal-version": "1.1.2",
+      "last-modified": "2026-05-01T01:07:42+00:00",
+      "remarks": "Controls identified by the CNSSI 1253 Classified System Overlay (09/30/2022) as required to safeguard classified information stored, processed, or transmitted by NSS. Baseline-independent \u2014 applies on top of whichever NSS baseline (Low / Moderate / High / Privacy) the system uses."
+    },
+    "imports": [
+      {
+        "href": "#de3eef36-fc0c-5361-abaa-0aa9ef8c6356",
+        "include-controls": [
+          {
+            "with-ids": [
+              "ac-1",
+              "ac-11",
+              "ac-11.1",
+              "ac-16",
+              "ac-16.5",
+              "ac-16.6",
+              "ac-16.7",
+              "ac-18",
+              "ac-18.1",
+              "ac-18.3",
+              "ac-18.4",
+              "ac-18.5",
+              "ac-19",
+              "ac-19.4",
+              "ac-19.5",
+              "ac-20",
+              "ac-20.1",
+              "ac-20.2",
+              "ac-20.3",
+              "ac-20.4",
+              "ac-21",
+              "ac-23",
+              "ac-3.2",
+              "ac-3.4",
+              "ac-5",
+              "ac-6",
+              "ac-6.7",
+              "at-2",
+              "at-2.2",
+              "au-12",
+              "au-14",
+              "au-16",
+              "au-16.1",
+              "au-16.2",
+              "au-6",
+              "au-6.4",
+              "au-6.5",
+              "au-6.8",
+              "au-6.9",
+              "ca-3",
+              "cm-3.6",
+              "cm-5.5",
+              "ia-2",
+              "ia-2.1",
+              "ia-2.2",
+              "ia-5.6",
+              "ir-6",
+              "ir-9",
+              "ir-9.2",
+              "ir-9.4",
+              "ma-3.3",
+              "ma-5.1",
+              "mp-1",
+              "mp-2",
+              "mp-3",
+              "mp-4",
+              "mp-5",
+              "mp-5.3",
+              "mp-6",
+              "mp-6.1",
+              "mp-6.2",
+              "mp-6.3",
+              "mp-7",
+              "mp-8",
+              "mp-8.1",
+              "mp-8.2",
+              "mp-8.4",
+              "pe-19",
+              "pe-19.1",
+              "pe-2.3",
+              "pe-22",
+              "pe-3.2",
+              "pe-3.3",
+              "pe-4",
+              "pm-12",
+              "ps-3.1",
+              "ps-4",
+              "ps-4.1",
+              "ps-6.2",
+              "ps-6.3",
+              "ps-9",
+              "ra-10",
+              "ra-3.2",
+              "ra-5",
+              "ra-6",
+              "sa-3.2",
+              "sa-4.6",
+              "sa-9.8",
+              "sc-12",
+              "sc-12.2",
+              "sc-12.3",
+              "sc-13",
+              "sc-15.3",
+              "sc-2",
+              "sc-28",
+              "sc-28.1",
+              "sc-3",
+              "sc-41",
+              "sc-42",
+              "sc-7.26",
+              "sc-8",
+              "sc-8.1",
+              "sc-8.3",
+              "sc-8.4",
+              "si-20",
+              "si-4.14",
+              "si-4.19",
+              "si-4.21",
+              "sr-12",
+              "sr-3",
+              "sr-3.2",
+              "sr-4",
+              "sr-7"
+            ]
+          }
+        ]
+      }
+    ],
+    "merge": {
+      "as-is": true
+    },
+    "back-matter": {
+      "resources": [
+        {
+          "uuid": "de3eef36-fc0c-5361-abaa-0aa9ef8c6356",
+          "description": "NIST SP 800-53 Revision 5 catalog (the controls this profile selects from).",
+          "rlinks": [
+            {
+              "href": "https://raw.githubusercontent.com/usnistgov/oscal-content/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+              "media-type": "application/oscal.catalog+json"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
