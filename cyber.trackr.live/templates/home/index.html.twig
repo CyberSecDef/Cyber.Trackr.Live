@@ -6,7 +6,7 @@
 {% block body %}
     <section class="hero" aria-labelledby="hero-headline">
         <div class="hero__top rise delay-1">
-            <span class="stamp">&bull; Live &middot; Updated daily</span>
+            <span class="stamp">&bull; Live &middot; Updated monthly</span>
             <span class="hero__issue">No. {{ "now"|date("m") }} &middot; {{ "now"|date("Y") }}</span>
         </div>
 
@@ -56,8 +56,65 @@
         </div>
     </section>
 
+    <section class="value-prop" aria-labelledby="value-prop-eyebrow">
+        <div class="rule-text" id="value-prop-eyebrow">&sect; I &middot; Why this site</div>
+
+        <p class="value-prop__lead">
+            Every STIG, control, and CCI &mdash; <em>cross-linked, searchable,</em> and ready to drop into a POAM.
+        </p>
+
+        <div class="value-prop__outcomes">
+            <div class="value-prop__outcome">
+                <span class="eyebrow">Speed</span>
+                <h3 class="value-prop__outcome-title">Find it in under a second.</h3>
+                <p>An inverted index spanning every rule, control, CCI, and AP. Search the whole library from one box &mdash; words, &ldquo;quoted phrases&rdquo;, IDs ({{ ui.ident('CM-6') }}, {{ ui.ident('CCI-000196') }}), and even typos all match.</p>
+            </div>
+            <div class="value-prop__outcome">
+                <span class="eyebrow">Traceability</span>
+                <h3 class="value-prop__outcome-title">Walk the chain end-to-end.</h3>
+                <p>Click a STIG rule&rsquo;s CCI to land on the CCI page pre-filtered to that ID. Click its 800-53 reference to jump straight into the catalog entry. The crosslinks live on every page, not buried in a sidebar.</p>
+            </div>
+            <div class="value-prop__outcome">
+                <span class="eyebrow">Automation</span>
+                <h3 class="value-prop__outcome-title">Turn scans into deliverables.</h3>
+                <p>Drop ACAS, SCAP, or CKL scan output into the report generator and export an eMASS-ready POAM &amp; RAR &mdash; no manual reconciliation, no Excel gymnastics.</p>
+            </div>
+        </div>
+
+        <div class="value-prop__ctas">
+            <a href="{{ path('stig') }}" class="cta-primary">
+                Search STIGs
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a href="{{ path('rmf_v5_view') }}" class="cta-secondary">
+                Explore controls
+            </a>
+            <a href="{{ path('report_generator') }}" class="cta-secondary">
+                Generate reports
+            </a>
+        </div>
+
+        <div class="value-prop__vs">
+            <h3 class="value-prop__vs-heading">Why this versus the usual stack?</h3>
+            <div class="value-prop__vs-grid">
+                <div class="value-prop__vs-item">
+                    <span class="eyebrow">vs STIG Viewer</span>
+                    <p>STIG Viewer hands you one document at a time. Cross-referencing a CCI back to its 800-53 control means hopping through PDFs. Here it&rsquo;s one click in either direction.</p>
+                </div>
+                <div class="value-prop__vs-item">
+                    <span class="eyebrow">vs eMASS</span>
+                    <p>eMASS is a workflow tool, not a research one &mdash; slow, access-restricted, and built for tracking packages, not exploring requirements. Look up here, document there.</p>
+                </div>
+                <div class="value-prop__vs-item">
+                    <span class="eyebrow">vs SCAP tooling</span>
+                    <p>SCAP scanners execute benchmarks but don&rsquo;t make the catalog browsable. This site mirrors SCAP, STIG, and CCI sources together so you can read the rule and its lineage in one place.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="tile-grid" aria-labelledby="tile-grid-eyebrow">
-        <div class="rule-text" id="tile-grid-eyebrow">&sect; I &middot; Browse the library</div>
+        <div class="rule-text" id="tile-grid-eyebrow">&sect; II &middot; Browse the library</div>
 
         <div class="tile-grid__inner">
             <a href="{{ path('stig') }}" class="tile tile--tall span-7">
@@ -112,7 +169,7 @@
     </section>
 
     <section class="lib-page" aria-labelledby="recent-stigs-eyebrow">
-        <div class="rule-text" id="recent-stigs-eyebrow">&sect; II &middot; Recent updates</div>
+        <div class="rule-text" id="recent-stigs-eyebrow">&sect; III &middot; Recent updates</div>
 
         <div class="lib-page__bar">
             <div class="lib-page__head">
@@ -191,7 +248,7 @@
     </section>
 
     <section class="colophon" aria-labelledby="colophon-eyebrow">
-        <div class="rule-text" id="colophon-eyebrow">&sect; III &middot; Colophon</div>
+        <div class="rule-text" id="colophon-eyebrow">&sect; IV &middot; Colophon</div>
 
         <div class="colophon__inner">
             <div class="colophon__left">
