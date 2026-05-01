@@ -1,0 +1,12447 @@
+{
+  "ac-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ac-2": {
+    "title": "Account Management",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.2": {
+    "title": "Emergency Account",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.3": {
+    "title": "Disable Accounts",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.4": {
+    "title": "Automated Audit Actions",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.5": {
+    "title": "Inactivity Logout",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ac-2.6": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.7": {
+    "title": "Privileged User Accounts",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.8": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.9": {
+    "title": "Shared and Group",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.10": {
+    "title": "Account Credential                                                                                                          Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.11": {
+    "title": "Usage Conditions",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ac-2.12": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-2.13": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3": {
+    "title": "Access Enforcement",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.2": {
+    "title": "Dual Authorization                                                                                                                                                                   \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.3": {
+    "title": "Mandatory Access Control",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.6": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.7": {
+    "title": "Role-Based Access Control                                                                                                                                                            \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.9": {
+    "title": "Controlled Release",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.10": {
+    "title": "Access Control",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.11": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.12": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.13": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-3.14": {
+    "title": "Individual Access",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4": {
+    "title": "\u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.1": {
+    "title": "\u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.2": {
+    "title": "Processing Domains                                         \u221a4                                                                                                                           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.3": {
+    "title": "\u221a4                                                                                                                           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.4": {
+    "title": "\u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.5": {
+    "title": "Embedded Data Types                                        \u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.6": {
+    "title": "Metadata                                                   \u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.8": {
+    "title": "\u221a4                                                                                                                       \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.9": {
+    "title": "Human Reviews                                              \u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.10": {
+    "title": "Security or Privacy Policy                                 \u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.11": {
+    "title": "\u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.12": {
+    "title": "Data Type Identifiers                                                                                                                                                               \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.14": {
+    "title": "\u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.16": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.17": {
+    "title": "Domain Authentication                                                                                                                                                               \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.18": {
+    "title": "Security Attribute Binding                                                                                                Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.19": {
+    "title": "Validation of Metadata",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.20": {
+    "title": "Approved Solutions",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.21": {
+    "title": "Separation of Information                                                                                                                                                          \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.22": {
+    "title": "Access Only",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.25": {
+    "title": "Data Sanitization",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.26": {
+    "title": "Audit Filtering Actions",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.27": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.28": {
+    "title": "Linear Filter Pipelines",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.29": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-4.30": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-5": {
+    "title": "Separation of Duties",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6": {
+    "title": "Least Privilege",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.4": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.5": {
+    "title": "Privileged Accounts",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.6": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.7": {
+    "title": "Review of User Privileges",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.9": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-6.10": {
+    "title": "Users from Executing",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-7": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ac-7.1": {
+    "title": "Automatic Account Lock                                                                                                      Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-7.4": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-8": {
+    "title": "System Use Notification",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-9.1": {
+    "title": "Unsuccessful Logons",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-10": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ac-11": {
+    "title": "Device Lock",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-11.1": {
+    "title": "Pattern-Hiding Displays",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-12": {
+    "title": "Session Termination",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-12.1": {
+    "title": "User-Initiated Logouts",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-12.2": {
+    "title": "Termination Message",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-12.3": {
+    "title": "Timeout Warning Message",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-13": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-14": {
+    "title": "Without Identification or",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-14.1": {
+    "title": "Necessary Uses                                                                                                           Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-15": {
+    "title": "Automated Marking                                                                                                        Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-16": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-16.6": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-16.7": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17": {
+    "title": "Remote Access",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.1": {
+    "title": "Monitoring and Control",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.2": {
+    "title": "Confidentiality and",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.5": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.6": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.7": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.8": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-17.10": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-18": {
+    "title": "Wireless Access",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-18.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-18.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-18.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-18.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-18.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-19": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-19.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-19.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-19.3": {
+    "title": "Devices with No                                                                                                             Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-19.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-20": {
+    "title": "Use of External Systems",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-20.1": {
+    "title": "Limits on Authorized Use",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-20.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-20.3": {
+    "title": "Owned Systems \u2014",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-20.4": {
+    "title": "Storage Devices \u2014",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-21": {
+    "title": "Information Sharing",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-21.2": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-22": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-23": {
+    "title": "Data Mining Protection                                  \u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-24": {
+    "title": "Access Control Decisions",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-24.2": {
+    "title": "No User or Process Identity",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ac-25": {
+    "title": "Reference Monitor                                                                                                                                                     \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "at-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "at-2": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "at-2.1": {
+    "title": "Practical Exercises                                                                                                                                                                  \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "at-2.2": {
+    "title": "Insider Threat",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "at-2.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "at-2.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "at-2.5": {
+    "title": "Advanced Persistent Threat",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "at-2.6": {
+    "title": "Cyber Threat Environment",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "at-3": {
+    "title": "Role-Based Training",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "at-3.1": {
+    "title": "Environmental Controls",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "at-3.2": {
+    "title": "Physical Security Controls",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "at-3.3": {
+    "title": "Practical Exercises                                                                                                                                                                \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "at-3.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "at-3.5": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "at-4": {
+    "title": "Training Records",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "at-5": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "at-6": {
+    "title": "Training Feedback",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "au-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "au-2": {
+    "title": "Event Logging",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-2.1": {
+    "title": "Records from Multiple                                                                                                    Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-2.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-2.3": {
+    "title": "Reviews and Updates                                                                                                      Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-2.4": {
+    "title": "Privileged Functions                                                                                                     Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-3": {
+    "title": "Content of Audit Records                                 \u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-3.1": {
+    "title": "\u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-3.2": {
+    "title": "of Planned Audit Record                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-3.3": {
+    "title": "Identifiable Information",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "au-4.1": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "au-5": {
+    "title": "\u221a1",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "au-5.1": {
+    "title": "Storage Capacity Warning",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "au-5.2": {
+    "title": "Real-Time Alerts",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "au-5.3": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-5.4": {
+    "title": "Shutdown on Failure",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6": {
+    "title": "\u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.1": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.2": {
+    "title": "Automated Security Alerts                                                                                                  Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.3": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.4": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.5": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.6": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.7": {
+    "title": "Permitted Actions                                        \u221a2                                                                                                                    \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.8": {
+    "title": "\u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.9": {
+    "title": "Information from                                         \u221a3                                                                                                              \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-6.10": {
+    "title": "Audit Level Adjustment                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-7": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-7.1": {
+    "title": "Automatic Processing",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-7.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-8": {
+    "title": "Time Stamps",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-8.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-8.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-9": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "au-9.1": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-9.2": {
+    "title": "on Separate Physical",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "au-9.3": {
+    "title": "Cryptographic Protection",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-9.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-9.5": {
+    "title": "Dual Authorization",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-9.6": {
+    "title": "Read-Only Access",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "au-9.7": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-10": {
+    "title": "Non-Repudiation",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-10.1": {
+    "title": "Association of Identities                                 \u221a2                                                                                                                      \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-10.2": {
+    "title": "Information Producer                                   \u221a2                                                                                                                        \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-10.3": {
+    "title": "Chain of Custody                                       \u221a2                                                                                                                        \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-10.4": {
+    "title": "Information Reviewer                                   \u221a2                                                                                                                        \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-10.5": {
+    "title": "Digital Signatures                                                                                                        Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-11": {
+    "title": "Audit Record Retention",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "au-11.1": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "au-12": {
+    "title": "Audit Record Generation",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-12.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-12.2": {
+    "title": "Standardized Formats",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-12.3": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-12.4": {
+    "title": "Personally Identifiable                                  \u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-13": {
+    "title": "\u221a1                                                                                                           \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-13.1": {
+    "title": "Use of Automated Tools                                   \u221a3                                                                                                           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-13.2": {
+    "title": "Review of Monitored Sites                                \u221a3                                                                                                           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-13.3": {
+    "title": "\u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-14": {
+    "title": "Session Audit                                            \u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-14.1": {
+    "title": "System Start-Up",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-14.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-14.3": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-15": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-16": {
+    "title": "\u221a4",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-16.1": {
+    "title": "Identity Preservation                                  \u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-16.2": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "au-16.3": {
+    "title": "Disassociability                                       \u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-1": {
+    "title": "Policies and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-2": {
+    "title": "Control Assessments",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-2.1": {
+    "title": "Independent Assessors                                  \u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-2.2": {
+    "title": "Specialized Assessments                                \u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ca-2.3": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3": {
+    "title": "Information Exchange",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.1": {
+    "title": "Security System                                                                                                        Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.2": {
+    "title": "Security System                                                                                                        Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.3": {
+    "title": "Security System                                                                                                            Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.5": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.6": {
+    "title": "Transfer Authorizations",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-3.7": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-4": {
+    "title": "Security Certification                                                                                                     Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-5": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-5.1": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-6": {
+    "title": "Authorization",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-6.1": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-6.2": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-7": {
+    "title": "Continuous Monitoring",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-7.1": {
+    "title": "Independent Assessment",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "ca-7.2": {
+    "title": "Types of Assessments                                                                                                           Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-7.3": {
+    "title": "Trend Analysis",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ca-7.4": {
+    "title": "Risk Monitoring",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ca-7.5": {
+    "title": "Consistency Analysis",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ca-7.6": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ca-8": {
+    "title": "Penetration Testing",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ca-8.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ca-8.2": {
+    "title": "Red Team Exercises                                                                                                                                                                  \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-8.3": {
+    "title": "Facility Penetration Testing",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ca-9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ca-9.1": {
+    "title": "Compliance Checks                                                                                                                                                                   \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-1": {
+    "title": "Policies and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2": {
+    "title": "Baseline Configuration",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.1": {
+    "title": "Reviews and Updates                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.4": {
+    "title": "Unauthorized Software                                                                                                 Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.5": {
+    "title": "Authorized Software                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.6": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-2.7": {
+    "title": "Components for High-Risk",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.1": {
+    "title": "Notification, and",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.6": {
+    "title": "Cryptography Management",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.7": {
+    "title": "Review System Changes",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-3.8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-4": {
+    "title": "Impact Analyses",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-4.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-4.2": {
+    "title": "Verification of Controls",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.1": {
+    "title": "Enforcement and Audit",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.2": {
+    "title": "Review System Changes                                                                                                     Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.3": {
+    "title": "Signed Components                                                                                                         Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.4": {
+    "title": "Dual Authorization                                                                                                                                                                          \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.6": {
+    "title": "Limit Library Privileges",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-5.7": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-6": {
+    "title": "Configuration Settings                                 \u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-6.1": {
+    "title": "Application, and",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-6.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-6.3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-6.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7": {
+    "title": "Least Functionality",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.1": {
+    "title": "Periodic Review",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.2": {
+    "title": "Prevent Program Execution",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.3": {
+    "title": "Registration Compliance",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.4": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.6": {
+    "title": "\u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.7": {
+    "title": "\u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-7.9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.2": {
+    "title": "Automated Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.4": {
+    "title": "Accountability Information",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.5": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.6": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.7": {
+    "title": "Centralized Repository                                                                                                                                                        \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.8": {
+    "title": "\u221a2,3                                                                                                                    \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-8.9": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-10": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-10.1": {
+    "title": "Open- Source Software",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-11": {
+    "title": "User-Installed Software",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-11.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-11.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-11.3": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-12": {
+    "title": "Information Location",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cm-12.1": {
+    "title": "Support Information",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cm-13": {
+    "title": "Data Action Mapping",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cm-14": {
+    "title": "Signed Components",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-1": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-2": {
+    "title": "Contingency Plan",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-2.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-2.2": {
+    "title": "Capacity Planning",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-2.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-2.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-2.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-2.8": {
+    "title": "Identify Critical Assets",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-3": {
+    "title": "Contingency Training",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-3.1": {
+    "title": "Simulated Events",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-3.2": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-4": {
+    "title": "Contingency Plan Testing",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-4.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-4.2": {
+    "title": "Alternate Processing Site",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-4.3": {
+    "title": "Automated Testing                                                                                                                                                            \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-4.4": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-4.5": {
+    "title": "Self-Challenge                                                                                                                                                               \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-5": {
+    "title": "Contingency Plan Update                                                                                                Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-6": {
+    "title": "Alternate Storage Site",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-6.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-6.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-6.3": {
+    "title": "Accessibility",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-7": {
+    "title": "Alternate Processing Site",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-7.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-7.2": {
+    "title": "Accessibility",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-7.3": {
+    "title": "Priority of Service",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-7.4": {
+    "title": "Preparation for Use",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-7.5": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-8.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-8.2": {
+    "title": "Single Points of Failure",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-8.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-8.4": {
+    "title": "Provider Contingency Plan",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-8.5": {
+    "title": "Telecommunication",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-9": {
+    "title": "System Backup",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-9.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-9.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-9.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-9.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-9.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-9.6": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-9.7": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-9.8": {
+    "title": "Cryptographic Protection",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-10": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cp-10.1": {
+    "title": "Contingency Plan Testing                                                                                                  Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-10.2": {
+    "title": "Transaction Recovery",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "cp-10.3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-10.4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-10.5": {
+    "title": "Failover Capability                                                                                                       Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-10.6": {
+    "title": "Component Protection",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "cp-11": {
+    "title": "Communications                                                                                                                                                                           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-12": {
+    "title": "Safe Mode                                                                                                                                                                    \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "cp-13": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2": {
+    "title": "Authentication                                            \u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.2": {
+    "title": "to Non-Privileged",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.6": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.7": {
+    "title": "Privileged Accounts \u2014                                                                                                      Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.9": {
+    "title": "Privileged Accounts \u2014                                                                                                      Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.10": {
+    "title": "Single Sign-On",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.11": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.12": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-2.13": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-3": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-3.1": {
+    "title": "Bidirectional",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-3.2": {
+    "title": "Bidirectional Network                                                                                                    Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-3.4": {
+    "title": "Device Attestation",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4": {
+    "title": "Identifier Management                                   \u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.1": {
+    "title": "Identifiers as Public",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.2": {
+    "title": "Supervisor Authorization                                                                                                Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.4": {
+    "title": "Identify User Status",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.5": {
+    "title": "Dynamic Management",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.7": {
+    "title": "In-Person Registration                                                                                                  Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-4.9": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.3": {
+    "title": "External Party                                                                                                            Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.4": {
+    "title": "Password Strength                                                                                                         Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.6": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.7": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.8": {
+    "title": "Multiple System Accounts",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.11": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.13": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.14": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.16": {
+    "title": "External Party",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.17": {
+    "title": "Detection for Biometric",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-5.18": {
+    "title": "Password Managers",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-6": {
+    "title": "Authenticator Feedback",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-7": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-8": {
+    "title": "Authentication (Non-                                      \u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-8.1": {
+    "title": "Credentials from Other",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-8.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-8.3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-8.4": {
+    "title": "Use of Defined Profiles",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-8.6": {
+    "title": "Disassociability",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-9.1": {
+    "title": "Information Exchange                                                                                                        Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-9.2": {
+    "title": "Transmission of Decisions                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-10": {
+    "title": "Adaptive Authentication",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-11": {
+    "title": "Re-Authentication",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12": {
+    "title": "Identity Proofing                                          \u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12.1": {
+    "title": "Supervisor Authorization",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12.2": {
+    "title": "Identity Evidence                                          \u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12.3": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12.4": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12.5": {
+    "title": "Address Confirmation                                       \u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ia-12.6": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-2": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-2.1": {
+    "title": "Simulated Events",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-2.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-2.3": {
+    "title": "Breach",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-3": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-3.1": {
+    "title": "Automated Testing                                                                                                                                                                \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-3.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "ir-3.3": {
+    "title": "Continuous Improvement                                                                                                                                                           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-4": {
+    "title": "Incident Handling",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-4.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "ir-4.2": {
+    "title": "Dynamic Reconfiguration                                                                                                                                                             \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-4.3": {
+    "title": "Continuity of Operations",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-4.4": {
+    "title": "Information Correlation                                 \u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-4.5": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-4.6": {
+    "title": "Insider Threats",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-4.7": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-4.8": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-4.9": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-4.10": {
+    "title": "Supply Chain Coordination",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-4.11": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-4.12": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-4.13": {
+    "title": "Behavior Analysis                                         \u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-4.14": {
+    "title": "Security Operations Center",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-5": {
+    "title": "Incident Monitoring",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-5.1": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-6": {
+    "title": "Incident Reporting",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-6.1": {
+    "title": "Automated Reporting",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "ir-6.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-6.3": {
+    "title": "Supply Chain Coordination",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-7": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-7.1": {
+    "title": "Availability of Information",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "ir-7.2": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "ir-8": {
+    "title": "Incident Response Plan",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ir-8.1": {
+    "title": "Breaches",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-9.1": {
+    "title": "Responsible Personnel                                                                                                     Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-9.2": {
+    "title": "Training",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-9.3": {
+    "title": "Post-Spill Operations",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ir-9.4": {
+    "title": "\u221a3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ir-10": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-1": {
+    "title": "Policy and Procedures",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ma-2": {
+    "title": "Controlled Maintenance",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ma-2.1": {
+    "title": "Record Content                                                                                                            Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-2.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ma-3": {
+    "title": "Maintenance Tools",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-3.1": {
+    "title": "Inspect Tools",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-3.2": {
+    "title": "Inspect Media",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-3.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-3.4": {
+    "title": "Restricted Tool Use",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-3.5": {
+    "title": "Execution with Privilege",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-3.6": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4": {
+    "title": "Nonlocal Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4.1": {
+    "title": "Logging and Review",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4.2": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4.4": {
+    "title": "Separation of Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4.6": {
+    "title": "Cryptographic Protection",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-4.7": {
+    "title": "Disconnect Verification",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-5": {
+    "title": "Maintenance Personnel                                  \u221a2,3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ma-5.1": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ma-5.2": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-5.3": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-5.4": {
+    "title": "Foreign Nationals                                     \u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-5.5": {
+    "title": "Non-System Maintenance                                \u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-6": {
+    "title": "Timely Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "ma-6.1": {
+    "title": "Preventive Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ma-6.2": {
+    "title": "Predictive Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ma-7": {
+    "title": "Field Maintenance",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-2": {
+    "title": "Media Access",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-2.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-2.2": {
+    "title": "Cryptographic Protection                                                                                                  Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-3": {
+    "title": "Media Marking",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-4": {
+    "title": "Media Storage",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-4.1": {
+    "title": "Cryptographic Protection                                                                                                  Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-5": {
+    "title": "Media Transport",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-5.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-5.2": {
+    "title": "Documentation of Activities                                                                                                 Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-5.3": {
+    "title": "Custodians",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-5.4": {
+    "title": "Cryptographic Protection                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6": {
+    "title": "Media Sanitization",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.2": {
+    "title": "Equipment Testing",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.3": {
+    "title": "Nondestructive Techniques",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.4": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.5": {
+    "title": "Classified Information                                                                                                      Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.6": {
+    "title": "Media Destruction                                                                                                           Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-6.7": {
+    "title": "Dual Authorization",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-7": {
+    "title": "Media Use",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-7.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-7.2": {
+    "title": "Sanitization-Resistant",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-8": {
+    "title": "Media Downgrading",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-8.1": {
+    "title": "Documentation of Process",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-8.2": {
+    "title": "Equipment Testing",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "mp-8.4": {
+    "title": "Classified Information",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-2": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-2.2": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-2.3": {
+    "title": "Restrict Unescorted Access",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3": {
+    "title": "Physical Access Control                                     \u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-3.1": {
+    "title": "System Access",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.2": {
+    "title": "Facility and Systems",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.3": {
+    "title": "Continuous Guards",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.4": {
+    "title": "Lockable Casings",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.5": {
+    "title": "Tamper Protection                                                                                                                                                                               \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.6": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.7": {
+    "title": "Physical Barriers",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-3.8": {
+    "title": "Access Control Vestibules",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-4": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-5": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-5.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-5.2": {
+    "title": "Link to Individual Identity",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-5.3": {
+    "title": "Marking Output Devices                                                                                                   Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-6": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-6.1": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "pe-6.2": {
+    "title": "\u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-6.3": {
+    "title": "Video Surveillance                                       \u221a2,3                                                                                                                   \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-6.4": {
+    "title": "\u221a2,3",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-7": {
+    "title": "Visitor Control                                                                                                         Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-8": {
+    "title": "Visitor Access Records",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-8.1": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-8.2": {
+    "title": "Physical Access Records                                                                                                 Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-8.3": {
+    "title": "Identifiable Information",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-9": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "pe-9.1": {
+    "title": "Redundant Cabling                                                                                                                                                                        \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-10": {
+    "title": "Emergency Shutoff",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "pe-10.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-11": {
+    "title": "Emergency Power",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "pe-11.1": {
+    "title": "Minimal Operational",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-11.2": {
+    "title": "\u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-12": {
+    "title": "Emergency Lighting",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-13": {
+    "title": "Fire Protection",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-13.1": {
+    "title": "Automatic Activation and",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "pe-13.2": {
+    "title": "Automatic Activation and",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-13.3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-13.4": {
+    "title": "Inspections",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-14": {
+    "title": "Environmental Controls",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-14.1": {
+    "title": "Automatic Controls",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-15": {
+    "title": "Water Damage Protection",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-15.1": {
+    "title": "Automation Support",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-16": {
+    "title": "Delivery and Removal",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pe-17": {
+    "title": "Alternate Work Site                                  \u221a1,3",
+    "privacy": false,
+    "c": [
+      false,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      true,
+      true
+    ]
+  },
+  "pe-18": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "pe-18.1": {
+    "title": "Facility Site                                                                                                            Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-19": {
+    "title": "Information Leakage",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-20": {
+    "title": "\u221a2",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-22": {
+    "title": "Component Marking",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pe-23": {
+    "title": "Facility Location",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "pl-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pl-2": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pl-2.1": {
+    "title": "Concept of Operations                                                                                                 Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-2.2": {
+    "title": "Functional Architecture                                                                                               Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-2.3": {
+    "title": "Other Organizational                                                                                                  Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-3": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-4": {
+    "title": "Rules of Behavior",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pl-4.1": {
+    "title": "Site/Application Usage",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-5": {
+    "title": "Privacy Impact Assessment                                                                                                    Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-6": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-7": {
+    "title": "Concept of Operations                                    \u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "pl-8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pl-8.1": {
+    "title": "Defense-In-Depth",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "pl-8.2": {
+    "title": "Supplier Diversity                                       \u221a2",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      false,
+      true
+    ]
+  },
+  "pl-9": {
+    "title": "Central Management",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pl-10": {
+    "title": "Baseline Selection",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pl-11": {
+    "title": "Baseline Tailoring",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pm-1": {
+    "title": "Information Security                                                                                                      Ensure security and         b. 1st PV: at least annually",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-2": {
+    "title": "Information Security",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-3": {
+    "title": "Information Security and",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-4": {
+    "title": "Plan of Action and",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-5": {
+    "title": "System Inventory                                                                                                          Identify systems            at least annually, or when",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-5.1": {
+    "title": "Inventory of Personally                                                                     baselines.                                                continuously",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-6": {
+    "title": "Measures of Performance",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-7": {
+    "title": "Enterprise Architecture",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-7.1": {
+    "title": "Offloading                                                                                                                                                                                         \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-8": {
+    "title": "Critical Infrastructure",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-9": {
+    "title": "Risk Management                                                                                                                                c. at least annually",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-10": {
+    "title": "Authorization Process",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-11": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-12": {
+    "title": "Insider Threat Program                                     \u221a2                                                                                                                  \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-13": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-14": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-16": {
+    "title": "\u221a2                                                                                                                  \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-16.1": {
+    "title": "\u221a2,3                                                                                                                  \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-17": {
+    "title": "Unclassified Information",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-18": {
+    "title": "Privacy Program Plan",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-19": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-20": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-20.1": {
+    "title": "Websites, Applications,",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-21": {
+    "title": "Accounting of Disclosures",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-22": {
+    "title": "Information Quality",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-23": {
+    "title": "Data Governance Body",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-24": {
+    "title": "Data Integrity Board",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-25": {
+    "title": "Information Used in",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-26": {
+    "title": "Complaint Management",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-27": {
+    "title": "Privacy Reporting",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-28": {
+    "title": "Risk Framing",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-29": {
+    "title": "Program Leadership",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-30": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-30.1": {
+    "title": "\u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-31": {
+    "title": "",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pm-32": {
+    "title": "Purposing                                                                                                                                                                      \u221a           \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ps-2": {
+    "title": "Position Risk Designation                                \u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ps-3": {
+    "title": "Personnel Screening                                      \u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-3.1": {
+    "title": "Classified Information",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-3.2": {
+    "title": "Formal Indoctrination",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-3.3": {
+    "title": "Special Protective",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-3.4": {
+    "title": "Citizenship Requirements                                 \u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-4": {
+    "title": "Personnel Termination                                    \u221a1",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ps-4.1": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-4.2": {
+    "title": "Automated Actions                                     \u221a1",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      true
+    ]
+  },
+  "ps-5": {
+    "title": "Personnel Transfer",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ps-6": {
+    "title": "Access Agreements",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-6.1": {
+    "title": "Withdrawn",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-6.2": {
+    "title": "Requiring Special                                                                                                                                                            \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-6.3": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-7": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "ps-8": {
+    "title": "Personnel Sanctions",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "ps-9": {
+    "title": "Position Descriptions",
+    "privacy": true,
+    "c": [
+      true,
+      true,
+      true
+    ],
+    "i": [
+      true,
+      true,
+      true
+    ],
+    "a": [
+      true,
+      true,
+      true
+    ]
+  },
+  "pt-1": {
+    "title": "Policy and Procedures",
+    "privacy": true,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-2": {
+    "title": "Personally Identifiable",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-2.1": {
+    "title": "Data Tagging                                                                                                                                                                       \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-2.2": {
+    "title": "Automation                                                                                                                                                                         \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-3": {
+    "title": "Information Processing",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-3.1": {
+    "title": "Data Tagging                                                                                                                                                                       \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-3.2": {
+    "title": "Automation                                                                                                                                                                         \u221a",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-4": {
+    "title": "Consent",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-4.1": {
+    "title": "Tailored Consent",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-4.2": {
+    "title": "Just-In-Time Consent",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-4.3": {
+    "title": "Revocation",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-5": {
+    "title": "Privacy Notice",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-5.1": {
+    "title": "Just-In-Time Notice",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-5.2": {
+    "title": "Privacy Act Statements",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-6": {
+    "title": "System of Records Notice",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-6.1": {
+    "title": "Routine Uses",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-6.2": {
+    "title": "Exemption Rules",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-7": {
+    "title": "Personally Identifiable",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-7.1": {
+    "title": "Social Security Numbers",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-7.2": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  },
+  "pt-8": {
+    "title": "",
+    "privacy": false,
+    "c": [
+      false,
+      false,
+      false
+    ],
+    "i": [
+      false,
+      false,
+      false
+    ],
+    "a": [
+      false,
+      false,
+      false
+    ]
+  }
+}

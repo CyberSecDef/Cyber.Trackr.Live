@@ -30,7 +30,7 @@ class OverlayLoader
      * then by impact level. Anything not listed sorts to the end and falls
      * back to alphabetical.
      */
-    private const SOURCE_ORDER = ['nist' => 0, 'fedramp' => 1];
+    private const SOURCE_ORDER = ['nist' => 0, 'fedramp' => 1, 'cnss' => 2];
     private const LEVEL_ORDER  = ['low' => 0, 'moderate' => 1, 'high' => 2, 'privacy' => 3, 'li-saas' => 4];
 
     /**
@@ -214,6 +214,7 @@ class OverlayLoader
     {
         if (str_starts_with($filename, 'NIST'))    return 'nist';
         if (str_starts_with($filename, 'FedRAMP')) return 'fedramp';
+        if (str_starts_with($filename, 'CNSSI'))   return 'cnss';
         return 'custom';
     }
 
@@ -241,6 +242,7 @@ class OverlayLoader
         $sourceInitial = match ($source) {
             'nist'    => 'N',
             'fedramp' => 'F',
+            'cnss'    => 'C',
             default   => strtoupper($source[0] ?? '?'),
         };
         $levelInitial = match ($level) {
@@ -255,14 +257,16 @@ class OverlayLoader
     }
 
     /**
-     * Chip-friendly label, e.g. "NIST Low" / "FR Moderate" / "FR LI-SaaS".
-     * FedRAMP gets shortened to "FR" so the chip strip stays compact.
+     * Chip-friendly label, e.g. "NIST Low" / "FR Moderate" / "CNSS High".
+     * FedRAMP gets shortened to "FR" so the chip strip stays compact;
+     * CNSS and NIST are already short.
      */
     private static function shortTitleFor(string $source, string $level): string
     {
         $src = match ($source) {
             'nist'    => 'NIST',
             'fedramp' => 'FR',
+            'cnss'    => 'CNSS',
             default   => ucfirst($source),
         };
         $lvl = match ($level) {
