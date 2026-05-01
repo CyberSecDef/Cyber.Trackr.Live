@@ -774,7 +774,6 @@ a:hover {
     display: flex;
     align-items: center;
     gap: var(--space-5);
-    max-width: 1400px;
     height: 100%;
     margin: 0 auto;
     padding: 0 var(--space-5);
@@ -1106,7 +1105,6 @@ kbd, .site-search__kbd {
 }
 
 .site-main {
-    max-width: 1400px;
     margin: 0 auto;
     padding: var(--space-5);
 }
@@ -1190,7 +1188,6 @@ kbd, .site-search__kbd {
 }
 
 .site-footer__inner {
-    max-width: 1400px;
     margin: 0 auto;
     padding: 0 var(--space-5);
 }
@@ -1487,7 +1484,6 @@ kbd, .site-search__kbd {
  * ========================================================================== */
 
 .tile-grid {
-    max-width: 1280px;
     margin: 0 auto var(--space-9);
 }
 
@@ -1569,8 +1565,27 @@ kbd, .site-search__kbd {
  * ========================================================================== */
 
 .lib-page {
-    max-width: 1280px;
     margin: 0 auto var(--space-9);
+}
+
+/* Prose modifier — centers a page's content blocks on the viewport instead
+   of left-aligning them. Used on /mission and /contact where the body is
+   editorial copy + form, not a wide data table. */
+.lib-page--prose .lib-page__header {
+    text-align: center;
+}
+
+.lib-page--prose .lib-page__lede {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lib-page--prose .mission__grid,
+.lib-page--prose .mission__cta,
+.lib-page--prose .mission__cta-text,
+.lib-page--prose .form-stack {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Page-header variant — used on dedicated library pages (/stig, /scap, etc.). */
@@ -2514,7 +2529,6 @@ kbd, .site-search__kbd {
  * ========================================================================== */
 
 .colophon {
-    max-width: 1280px;
     margin: 0 auto var(--space-9);
     padding-top: var(--space-7);
 }
@@ -2758,7 +2772,6 @@ dt.inline::after {
  * ========================================================================== */
 
 .stig-detail {
-    max-width: 1280px;
     margin: 0 auto var(--space-9);
 }
 
