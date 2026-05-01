@@ -1112,22 +1112,27 @@ a:hover {
     }
 }
 
-/* Right cluster: search + theme toggle */
+/* Right cluster: search + theme toggle.
+   Below the desktop breakpoint, .site-actions grows so the search inside
+   can flex-fill the space between the brand and the toggle buttons.
+   At >=992px, falls back to natural width on the right. */
 .site-actions {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: var(--space-3);
-    margin-left: auto;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
 }
 
 @media (min-width: 992px) {
     .site-actions {
-        margin-left: 0;
+        flex: 0 0 auto;
     }
 }
 
 .site-search {
-    display: none;
+    display: inline-flex;
     align-items: center;
     gap: var(--space-2);
     height: 36px;
@@ -1137,6 +1142,8 @@ a:hover {
     border-radius: var(--radius-lg);
     color: var(--text-muted);
     transition: border-color 0.15s ease;
+    flex: 1 1 0%;
+    min-width: 0;
 }
 
 .site-search:focus-within {
@@ -1150,16 +1157,29 @@ a:hover {
     outline: 0;
     color: var(--text);
     font-size: 13px;
-    width: 180px;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
 }
 
 .site-search__input::placeholder {
     color: var(--text-muted);
 }
 
-@media (min-width: 768px) {
+/* Cmd+K hint only matters on devices with a hardware keyboard. */
+@media (max-width: 767.98px) {
+    .site-search__kbd {
+        display: none;
+    }
+}
+
+@media (min-width: 992px) {
     .site-search {
-        display: inline-flex;
+        flex: 0 0 auto;
+    }
+    .site-search__input {
+        flex: 0 0 auto;
+        width: 180px;
     }
 }
 
