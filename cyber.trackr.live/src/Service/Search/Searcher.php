@@ -30,6 +30,16 @@ class Searcher
      */
     public function search(string $query): array
     {
+        // The whole index is currently loaded into memory per search:
+        // docs.json alone parses to ~400 MB PHP-array, which trips PHP's
+        // default 128M / 256M caps on shared hosting. Raise the limit so
+        // the search succeeds; hosts that disable ini_set silently no-op
+        // and fall back to whatever is already configured.
+        // TODO: shard docs.json by index range so we only load the slices
+        // that contain matched docs. Would bring per-search resident down
+        // to ~30-50 MB and remove the need for this bump entirely.
+        @ini_set('memory_limit', '1G');
+
         $empty = ['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []];
         $parsed = $this->parser->parse($query);
 
