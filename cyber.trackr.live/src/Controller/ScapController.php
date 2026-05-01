@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\SyncStatus;
 use Symfony\Component\Routing\Attribute\Route;
 use ZipArchive;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -156,7 +157,7 @@ class ScapController extends AbstractController
 
 
     #[Route('/scap/disa_download', name: 'scap_disa_download')]
-    public function scap_disa_download()
+    public function scap_disa_download(SyncStatus $syncStatus)
     {
         $destination_dir = realpath(__DIR__ . "/../../resources/data/scap/");
 
@@ -266,7 +267,9 @@ class ScapController extends AbstractController
             }
         }
         curl_close($session);
-        
+
+        $syncStatus->markDisaSyncedNow();
+
         return new Response(
             "Done.",
             Response::HTTP_OK,
@@ -274,4 +277,5 @@ class ScapController extends AbstractController
         );
 
     }
-}  
+}
+

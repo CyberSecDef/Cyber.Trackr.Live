@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\StigTocBuilder;
+use App\Service\SyncStatus;
 use Symfony\Component\Routing\Attribute\Route;
 use ZipArchive;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -218,7 +219,7 @@ class StigController extends AbstractController
     }
 
     #[Route('/stig/disa_download', name: 'stig_disa_download')]
-    public function stig_disa_download()
+    public function stig_disa_download(SyncStatus $syncStatus)
     {
         $destination_dir = realpath(__DIR__ . "/../../resources/data/stig/");
 
@@ -328,7 +329,9 @@ class StigController extends AbstractController
             }
         }
         curl_close($session);
-        
+
+        $syncStatus->markDisaSyncedNow();
+
         return new Response(
             "Done.",
             Response::HTTP_OK,

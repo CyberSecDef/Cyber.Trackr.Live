@@ -21,8 +21,22 @@ window.app = {
             }
         });
 
-        // Sync theme-toggle aria-pressed with the active theme on load.
-        $(".theme-toggle").attr("aria-pressed", window.app.theme.get() === "dark" ? "true" : "false");
+        // Mark the active theme menu item on load.
+        window.app.theme.syncMenuChecks();
+
+        // Click outside the theme menu closes it.
+        $(document).on("click.themeMenu", function (e) {
+            if (!$(e.target).closest(".theme-menu").length) {
+                window.app.theme.menuClose();
+            }
+        });
+
+        // Escape closes the theme menu.
+        $(document).on("keydown.themeMenu", function (e) {
+            if (e.key === "Escape") {
+                window.app.theme.menuClose();
+            }
+        });
 
         // Cmd/Ctrl + K — focus the header search input from anywhere on the page.
         $(document).on("keydown", function (e) {
@@ -87,7 +101,7 @@ window.app = {
             try {
                 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
                     if (!localStorage.getItem("theme")) {
-                        window.app.theme.set(e.matches ? "dark" : "light", { persist: false });
+                        window.app.theme.set(e.matches ? "ink" : "paper", { persist: false });
                     }
                 });
             } catch (err) { /* older browsers without addEventListener on MQL */ }
@@ -472,21 +486,46 @@ window.app = {
     /**
      * Theme management. The preflight script in base.html.twig sets
      * document.documentElement.dataset.theme synchronously to prevent FOUC,
-     * so .get() always returns the active theme on load.
+     * so .get() always returns the active theme on load. Available themes
+     * must mirror the THEMES array in base.html.twig and the [data-theme="*"]
+     * blocks in app.css.
      */
     theme: {
+        THEMES: ["paper", "ink", "mono", "solarized-light", "solarized-dark", "nord", "dracula", "high-contrast"],
+
         get() {
-            return document.documentElement.dataset.theme || "light";
+            return document.documentElement.dataset.theme || "paper";
         },
         set(theme, opts = { persist: true }) {
+            if (this.THEMES.indexOf(theme) === -1) return;
             document.documentElement.dataset.theme = theme;
             if (opts.persist) {
                 try { localStorage.setItem("theme", theme); } catch (e) { /* ignore */ }
             }
-            $(".theme-toggle").attr("aria-pressed", theme === "dark" ? "true" : "false");
+            this.syncMenuChecks();
+            this.menuClose();
         },
-        toggle() {
-            this.set(this.get() === "dark" ? "light" : "dark");
+        syncMenuChecks() {
+            const active = this.get();
+            $(".theme-menu__item").each(function () {
+                const name = $(this).data("theme-name");
+                $(this).attr("aria-checked", name === active ? "true" : "false");
+            });
+        },
+        menuToggle(btn) {
+            const $btn = $(btn);
+            const $panel = $btn.siblings(".theme-menu__panel");
+            const isOpen = !$panel.prop("hidden");
+            if (isOpen) {
+                this.menuClose();
+            } else {
+                $panel.prop("hidden", false);
+                $btn.attr("aria-expanded", "true");
+            }
+        },
+        menuClose() {
+            $(".theme-menu__panel").prop("hidden", true);
+            $(".theme-menu .theme-toggle").attr("aria-expanded", "false");
         },
     },
 };

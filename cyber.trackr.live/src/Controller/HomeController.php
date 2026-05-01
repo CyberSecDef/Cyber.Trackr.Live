@@ -253,4 +253,12 @@ class HomeController extends AbstractController
             'controller_name' => 'HomeController'
         ]);
     }
+
+    #[Route('/mission', name: 'mission')]
+    public function mission(): Response
+    {
+        return $this->render('home/mission.html.twig', [
+            'controller_name' => 'HomeController'
+        ]);
+    }
 }

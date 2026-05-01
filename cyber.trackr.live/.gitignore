@@ -24,3 +24,8 @@
 # 100+ MB and exceed GitHub's per-file limit. The individual STIG zips in
 # resources/data/zips/ stay tracked; only Compilation bundles are excluded.
 *Compilation*.zip
+
+# Baked version string written by `php bin/console app:version:freeze` at
+# deploy time. Generated, not authored — let dev compute live and let prod
+# read the file produced by CI.
+/VERSION

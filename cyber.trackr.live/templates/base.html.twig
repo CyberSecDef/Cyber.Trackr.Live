@@ -8,12 +8,23 @@
 
         <title>{% block title %}Welcome!{% endblock %}</title>
 
-        {# Preflight: apply stored / system theme synchronously to prevent FOUC. #}
+        {# Preflight: apply stored / system theme synchronously to prevent FOUC.
+           Also migrates legacy values (light → paper, dark → ink) and rejects
+           any unknown stored value, falling back to system preference. #}
         <script>
             (function () {
+                var THEMES = ['paper','ink','mono','solarized-light','solarized-dark','nord','dracula','high-contrast'];
+                var LEGACY = { light: 'paper', dark: 'ink' };
                 try {
                     var stored = localStorage.getItem('theme');
-                    var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                    if (stored && LEGACY[stored]) {
+                        stored = LEGACY[stored];
+                        localStorage.setItem('theme', stored);
+                    }
+                    if (stored && THEMES.indexOf(stored) === -1) {
+                        stored = null;
+                    }
+                    var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'ink' : 'paper');
                     document.documentElement.dataset.theme = theme;
                 } catch (e) { /* localStorage unavailable — fall back to default */ }
             })();
@@ -80,10 +91,34 @@
                         <input type="search" id="search_terms" class="site-search__input" placeholder="Search the library&hellip;" aria-label="Search the library" autocomplete="off">
                         <kbd class="site-search__kbd" title="Press Cmd/Ctrl + K to focus search">&#8984;K</kbd>
                     </div>
-                    <button type="button" class="theme-toggle" onclick="window.app.theme.toggle()" aria-label="Toggle color theme" aria-pressed="false">
-                        <i class="bi bi-moon-stars" data-theme-icon="show-in-light" aria-hidden="true"></i>
-                        <i class="bi bi-sun" data-theme-icon="show-in-dark" aria-hidden="true"></i>
-                    </button>
+                    <div class="theme-menu">
+                        <button type="button" class="theme-toggle" onclick="window.app.theme.menuToggle(this)"
+                                aria-label="Choose color theme" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-palette" aria-hidden="true"></i>
+                        </button>
+                        <div class="theme-menu__panel" role="menu" hidden>
+                            {% set theme_options = [
+                                { name: 'paper',           label: 'Paper',           bg: '#f4efe2', fg: '#1a1612', accent: '#7a1e1e' },
+                                { name: 'ink',             label: 'Ink',             bg: '#15120c', fg: '#ece2c8', accent: '#d4a04a' },
+                                { name: 'mono',            label: 'Mono (print)',    bg: '#ffffff', fg: '#000000', accent: '#000000' },
+                                { name: 'solarized-light', label: 'Solarized Light', bg: '#fdf6e3', fg: '#073642', accent: '#268bd2' },
+                                { name: 'solarized-dark',  label: 'Solarized Dark',  bg: '#002b36', fg: '#eee8d5', accent: '#268bd2' },
+                                { name: 'nord',            label: 'Nord',            bg: '#2e3440', fg: '#eceff4', accent: '#88c0d0' },
+                                { name: 'dracula',         label: 'Dracula',         bg: '#282a36', fg: '#f8f8f2', accent: '#bd93f9' },
+                                { name: 'high-contrast',   label: 'High Contrast',   bg: '#000000', fg: '#ffffff', accent: '#ffff00' }
+                            ] %}
+                            {% for t in theme_options %}
+                                <button type="button" class="theme-menu__item" role="menuitemradio"
+                                        data-theme-name="{{ t.name }}" aria-checked="false"
+                                        onclick="window.app.theme.set('{{ t.name }}')">
+                                    <span class="theme-menu__swatch" aria-hidden="true"
+                                          style="--swatch-bg: {{ t.bg }}; --swatch-fg: {{ t.fg }}; --swatch-accent: {{ t.accent }}"></span>
+                                    <span class="theme-menu__label">{{ t.label }}</span>
+                                    <i class="bi bi-check theme-menu__check" aria-hidden="true"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
                     <button type="button" class="nav-toggle icon-btn" onclick="window.app.navToggle(this)" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-nav">
                         <i class="bi bi-list" aria-hidden="true"></i>
                     </button>
@@ -113,16 +148,14 @@
                         <h3 class="site-footer__heading">Tools</h3>
                         <ul class="site-footer__links">
                             <li><a href="{{ path('report_generator') }}">Scans &rsaquo; Reports</a></li>
-                            <li><a href="{{ path('stig') }}">Diff engine</a></li>
                             <li><a href="{{ path('api_summary') }}">REST API</a></li>
-                            <li><a href="#" aria-disabled="true" data-coming-soon>Ruby gem</a></li>
                         </ul>
                     </div>
 
                     <div>
                         <h3 class="site-footer__heading">About</h3>
                         <ul class="site-footer__links">
-                            <li><a href="{{ path('home') }}">Mission</a></li>
+                            <li><a href="{{ path('mission') }}">Mission</a></li>
                             <li><a href="{{ path('contact_us') }}">Contact</a></li>
                             <li><a href="https://github.com/CyberSecDef" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                         </ul>
@@ -141,7 +174,7 @@
                             {% if sync_status.nist %}
                                 <li>NIST sync &middot; {{ sync_status.nist|date("d M Y") }}</li>
                             {% endif %}
-                            <li>v1.0.0</li>
+                            <li>v{{ app_version }}</li>
                         </ul>
                     </div>
                 </div>

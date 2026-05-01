@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mission &mdash; Cyber Trackr{% endblock %}
+
+{% block body %}
+    <section class="lib-page mission" aria-labelledby="mission-page-title">
+        <div class="rule-text">&sect; Mission</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Why this site exists</span>
+            <h1 id="mission-page-title" class="lib-page__title-large">
+                A reference I needed,<br>
+                <em>kept open for everyone else.</em>
+            </h1>
+            <p class="lib-page__lede">
+                Cyber Trackr started as a personal tool to make day-to-day RMF work less painful, and grew into a public reference for the wider cyber community.
+            </p>
+        </header>
+
+        <div class="mission__grid">
+            <article class="mission__section">
+                <span class="rule-text">&sect; I &middot; Origin</span>
+                <h2 class="mission__heading">A side project that <em>stuck</em>.</h2>
+                <p class="mission__prose">
+                    I built this to help with a full-time cyber security job. Public.cyber.mil left a lot to be desired, and I wanted a single place that was fast, easy to browse, and had everything I needed for RMF work in one spot &mdash; including the parts that turn into POAMs.
+                </p>
+                <p class="mission__prose">
+                    What started as a tool just for me grew into a reference others use too. It&rsquo;s been running for nearly a decade at this point. I keep it going because the work still helps me, and because solving the puzzle is its own reward.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; II &middot; What this is, and isn&rsquo;t</span>
+                <h2 class="mission__heading">An independent project &mdash; <em>not</em> an authoritative source.</h2>
+                <p class="mission__prose">
+                    Cyber Trackr is not affiliated with, endorsed by, or sponsored by the Department of Defense, DISA, NIST, or any other government agency. There is no official funding behind it, and there&rsquo;s no organization to escalate to. It&rsquo;s just me.
+                </p>
+                <p class="mission__prose">
+                    For authoritative copies of any document published here, always go back to the source &mdash; <a href="https://public.cyber.mil/stigs/" target="_blank" rel="noopener noreferrer">public.cyber.mil</a> for STIGs and SCAP, <a href="https://csrc.nist.gov/publications/sp800" target="_blank" rel="noopener noreferrer">csrc.nist.gov</a> for NIST publications. This site is a convenience layer over those, kept in sync but not a replacement.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; III &middot; Principles</span>
+                <h2 class="mission__heading">What I optimize for.</h2>
+                <ul class="mission__principles">
+                    <li>
+                        <strong>Free and ad-free.</strong>
+                        No paywalls, no banners, no upsells. Everything visible to anyone with a browser.
+                    </li>
+                    <li>
+                        <strong>No signup, no tracking.</strong>
+                        No accounts, no analytics chasing you around the web. Open the page, get what you need, leave.
+                    </li>
+                    <li>
+                        <strong>Read-only by design.</strong>
+                        The site doesn&rsquo;t accept user data or store anything personal &mdash; it can&rsquo;t leak what it never collects, and there&rsquo;s no surface for malicious input.
+                    </li>
+                    <li>
+                        <strong>Fast and easy to browse.</strong>
+                        Pages are static-feeling and keyboard-friendly. Search hits across STIGs, controls, CCIs, and rules from one box.
+                    </li>
+                    <li>
+                        <strong>Constantly updated.</strong>
+                        DISA and NIST sources are pulled and indexed on a schedule. The footer shows the freshness of each feed.
+                    </li>
+                    <li>
+                        <strong>Open data via REST.</strong>
+                        A documented <a href="{{ path('api_summary') }}">REST API</a> mirrors the same dataset so other tools can pull from it without scraping.
+                    </li>
+                </ul>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; IV &middot; Who it&rsquo;s for</span>
+                <h2 class="mission__heading">Anyone doing the work.</h2>
+                <p class="mission__prose">
+                    The audience cuts across the whole RMF lifecycle. Assessors use it for research and to cross-reference controls. Sysadmins use it to look up the actual implementation steps when applying a STIG. Auditors lean on it for package support and traceability. Engineers, ISSMs, and policy folks use it to navigate between CCIs, controls, and SRGs without bouncing through five tabs.
+                </p>
+                <p class="mission__prose">
+                    If your day touches DoD or federal compliance in any form, there&rsquo;s probably something here for you.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; V &middot; How it&rsquo;s run</span>
+                <h2 class="mission__heading">Self-funded, slowly improved, <em>not going anywhere</em>.</h2>
+                <p class="mission__prose">
+                    Hosting, sync infrastructure, and development time all come out of pocket. That&rsquo;s a blessing and a curse: there&rsquo;s no roadmap dictated from above, but there&rsquo;s also no team &mdash; features land when I have time and motivation to land them.
+                </p>
+                <p class="mission__prose">
+                    The upside for you: the site has been online for almost ten years and it&rsquo;s not going away anytime soon. As long as I find the puzzle interesting, the lights stay on.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; VI &middot; What&rsquo;s next</span>
+                <h2 class="mission__heading">More datasets, as I find them.</h2>
+                <p class="mission__prose">
+                    The roadmap is &ldquo;whatever feels useful next.&rdquo; Things on my list to evaluate include ACAS plugin data, CVE / NVD coverage, IAVMs, and selected DoD policy documents. If a dataset would clearly help RMF or assessment work, I&rsquo;ll look at integrating it.
+                </p>
+                <p class="mission__prose">
+                    Have a dataset you wish were here? Tell me &mdash; the best feature requests so far have all come from people doing the work.
+                </p>
+            </article>
+        </div>
+
+        <aside class="mission__cta">
+            <h2 class="mission__cta-title">Spotted something?</h2>
+            <p class="mission__cta-text">
+                Bug, missing dataset, broken link, or an idea I haven&rsquo;t thought of &mdash; I&rsquo;d rather hear about it than not.
+            </p>
+            <a href="{{ path('contact_us') }}" class="cta-primary">
+                Get in touch
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </aside>
+    </section>
+{% endblock %}
