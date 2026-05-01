@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\Search\IndexBuilder;
 use App\Service\StigTocBuilder;
 use App\Service\SyncStatus;
 use Symfony\Component\Routing\Attribute\Route;
@@ -219,7 +220,7 @@ class StigController extends AbstractController
     }
 
     #[Route('/stig/disa_download', name: 'stig_disa_download')]
-    public function stig_disa_download(SyncStatus $syncStatus)
+    public function stig_disa_download(SyncStatus $syncStatus, IndexBuilder $indexBuilder)
     {
         $destination_dir = realpath(__DIR__ . "/../../resources/data/stig/");
 
@@ -331,6 +332,7 @@ class StigController extends AbstractController
         curl_close($session);
 
         $syncStatus->markDisaSyncedNow();
+        $indexBuilder->syncDeltas();
 
         return new Response(
             "Done.",

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\Search\IndexBuilder;
 use App\Service\SyncStatus;
 use Symfony\Component\Routing\Attribute\Route;
 use ZipArchive;
@@ -157,7 +158,7 @@ class ScapController extends AbstractController
 
 
     #[Route('/scap/disa_download', name: 'scap_disa_download')]
-    public function scap_disa_download(SyncStatus $syncStatus)
+    public function scap_disa_download(SyncStatus $syncStatus, IndexBuilder $indexBuilder)
     {
         $destination_dir = realpath(__DIR__ . "/../../resources/data/scap/");
 
@@ -269,6 +270,7 @@ class ScapController extends AbstractController
         curl_close($session);
 
         $syncStatus->markDisaSyncedNow();
+        $indexBuilder->syncDeltas();
 
         return new Response(
             "Done.",
