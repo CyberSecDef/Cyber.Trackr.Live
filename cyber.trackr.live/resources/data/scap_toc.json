@@ -5119,5 +5119,18 @@
                 "l": 8
             }
         }
+    ],
+    "Amazon_Linux_2023_STIG_SCAP_Benchmark": [
+        {
+            "date": "2026-03-23",
+            "filename": "U_Amazon_Linux_2023_V1R0.1_STIG_SCAP_1-3_DraftBenchmark.xml",
+            "version": "1",
+            "release": "0",
+            "sev": {
+                "h": 11,
+                "m": 138,
+                "l": 2
+            }
+        }
     ]
 }
