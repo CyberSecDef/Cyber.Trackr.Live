@@ -13,23 +13,40 @@ use Symfony\Component\Finder\Finder;
  * additive: drop another `*_profile.json` into the overlays directory and
  * it shows up on the next request.
  *
+ * Overlay IDs are source-prefixed ("nist-low", "fedramp-moderate") so
+ * profiles from different authorities don't collide. Each overlay also
+ * carries a `level` (low/moderate/high/privacy/li-saas) used for color
+ * coding, and an `abbr` (NL/NM/NH/NP/FL/FM/FH/FS) for compact badge text.
+ *
  * The XML at resources/data/rmf/800-53v5-controls.xml carries its own
  * <baseline> tags but they're stale (XML pub_date is 2017-08-01); OSCAL
- * 5.2.0 is current and authoritative, so this loader supersedes them.
+ * 5.2.0 + FedRAMP rev5 are current and authoritative, so this loader
+ * supersedes them.
  */
 class OverlayLoader
 {
     /**
-     * @var array<string, array{id:string, title:string, short_title:string, count:int, controls: array<int,string>}>
-     *      Keyed by overlay id (e.g. "low"). `controls` is the list of OSCAL
-     *      control IDs (lowercase + dot, e.g. "ac-2.1").
+     * Display order for the chip strip. Sources first (NIST is canonical),
+     * then by impact level. Anything not listed sorts to the end and falls
+     * back to alphabetical.
+     */
+    private const SOURCE_ORDER = ['nist' => 0, 'fedramp' => 1];
+    private const LEVEL_ORDER  = ['low' => 0, 'moderate' => 1, 'high' => 2, 'privacy' => 3, 'li-saas' => 4];
+
+    /**
+     * @var array<string, array{
+     *      id:string, source:string, level:string, abbr:string,
+     *      title:string, short_title:string, count:int,
+     *      controls: array<int,string>
+     *   }>
+     *   Keyed by overlay id (e.g. "nist-low", "fedramp-moderate").
+     *   `controls` is the list of OSCAL control IDs (lowercase + dot).
      */
     private array $overlays = [];
 
     /**
      * @var array<string, array<int,string>>
      *      OSCAL control id → list of overlay ids the control appears in.
-     *      Built lazily from $overlays on first lookup.
      */
     private array $controlMap = [];
 
@@ -39,34 +56,43 @@ class OverlayLoader
     {
     }
 
-    /**
-     * Path to the overlays directory.
-     */
     public function dir(): string
     {
         return $this->projectDir . '/resources/data/overlays';
     }
 
     /**
-     * Returns metadata for every overlay, sorted with the standard NIST
-     * baselines first (low → moderate → high → privacy), then alphabetical
-     * for any custom overlays added later.
+     * Returns metadata for every overlay, keyed by id, in display order
+     * (NIST L → M → H → P, then FedRAMP L → M → H → LI-SaaS, then
+     * anything custom alphabetically). Templates iterate values for the
+     * chip strip and use it as a lookup when rendering per-control badges.
      *
-     * @return array<int, array{id:string, title:string, short_title:string, count:int}>
+     * @return array<string, array{id:string, source:string, level:string, abbr:string, title:string, short_title:string, count:int}>
      */
     public function getOverlays(): array
     {
         $this->ensureLoaded();
-        $list = array_map(
-            fn(array $o) => ['id' => $o['id'], 'title' => $o['title'], 'short_title' => $o['short_title'], 'count' => $o['count']],
-            $this->overlays
-        );
 
-        $order = ['low' => 0, 'moderate' => 1, 'high' => 2, 'privacy' => 3];
-        usort($list, function ($a, $b) use ($order) {
-            $oa = $order[$a['id']] ?? 99;
-            $ob = $order[$b['id']] ?? 99;
-            if ($oa !== $ob) return $oa <=> $ob;
+        $list = [];
+        foreach ($this->overlays as $id => $o) {
+            $list[$id] = [
+                'id'          => $o['id'],
+                'source'      => $o['source'],
+                'level'       => $o['level'],
+                'abbr'        => $o['abbr'],
+                'title'       => $o['title'],
+                'short_title' => $o['short_title'],
+                'count'       => $o['count'],
+            ];
+        }
+
+        uasort($list, function (array $a, array $b): int {
+            $sa = self::SOURCE_ORDER[$a['source']] ?? 99;
+            $sb = self::SOURCE_ORDER[$b['source']] ?? 99;
+            if ($sa !== $sb) return $sa <=> $sb;
+            $la = self::LEVEL_ORDER[$a['level']] ?? 99;
+            $lb = self::LEVEL_ORDER[$b['level']] ?? 99;
+            if ($la !== $lb) return $la <=> $lb;
             return strcmp($a['short_title'], $b['short_title']);
         });
         return $list;
@@ -77,7 +103,7 @@ class OverlayLoader
      * the XML's native form ("AC-2", "AC-2(1)", "AC-1a.") and handles the
      * normalization. Statement-letter forms always return [].
      *
-     * @return array<int, string> overlay ids, e.g. ['low', 'moderate', 'high']
+     * @return array<int, string> overlay ids, e.g. ['nist-low', 'fedramp-moderate']
      */
     public function getControlOverlays(string $xmlControlNumber): array
     {
@@ -110,10 +136,6 @@ class OverlayLoader
         return null;
     }
 
-    /**
-     * Walk the overlays directory once, parse each *_profile.json, and
-     * populate $overlays + $controlMap.
-     */
     private function ensureLoaded(): void
     {
         if ($this->loaded) {
@@ -156,7 +178,7 @@ class OverlayLoader
      * Extract the bits we care about from one OSCAL Profile JSON document.
      *
      * @param array<string,mixed> $profile
-     * @return array{id:string, title:string, short_title:string, count:int, controls: array<int,string>}|null
+     * @return array{id:string, source:string, level:string, abbr:string, title:string, short_title:string, count:int, controls: array<int,string>}|null
      */
     private function parseProfile(string $filename, array $profile): ?array
     {
@@ -172,45 +194,85 @@ class OverlayLoader
             return null;
         }
 
-        $title = (string) ($profile['metadata']['title'] ?? $filename);
+        $title  = (string) ($profile['metadata']['title'] ?? $filename);
+        $source = self::sourceFromFilename($filename);
+        $level  = self::levelFromFilename($filename);
 
         return [
-            'id'          => self::idFromFilename($filename),
+            'id'          => $source . '-' . $level,
+            'source'      => $source,
+            'level'       => $level,
+            'abbr'        => self::abbrFor($source, $level),
             'title'       => $title,
-            'short_title' => self::shortTitle($title, $filename),
+            'short_title' => self::shortTitleFor($source, $level),
             'count'       => count($controls),
             'controls'    => $controls,
         ];
     }
 
-    /**
-     * Derive a short, lowercase, hyphenated overlay id from the filename.
-     * "NIST_SP-800-53_rev5_MODERATE-baseline_profile.json" → "moderate".
-     * Anything that doesn't match the NIST naming pattern falls back to
-     * the filename base.
-     */
-    private static function idFromFilename(string $filename): string
+    private static function sourceFromFilename(string $filename): string
     {
-        if (preg_match('/_(LOW|MODERATE|HIGH|PRIVACY)-baseline/i', $filename, $m)) {
-            return strtolower($m[1]);
-        }
-        return strtolower(preg_replace('/[^a-z0-9]+/i', '-', pathinfo($filename, PATHINFO_FILENAME)));
+        if (str_starts_with($filename, 'NIST'))    return 'nist';
+        if (str_starts_with($filename, 'FedRAMP')) return 'fedramp';
+        return 'custom';
     }
 
     /**
-     * Pick a chip-friendly label from the profile's metadata title. NIST's
-     * canonical titles are wordy ("Electronic (OSCAL) Version of NIST Special
-     * Publication 800-53 Revision 5.2.0 MODERATE IMPACT BASELINE"); we just
-     * want "Moderate" for the chip.
+     * Order matters — "LI-SaaS" must be checked before "LOW" because both
+     * contain L+I and would collide on a permissive regex.
      */
-    private static function shortTitle(string $title, string $filename): string
+    private static function levelFromFilename(string $filename): string
     {
-        if (preg_match('/(LOW|MODERATE|HIGH|PRIVACY)\s+IMPACT\s+BASELINE/i', $title, $m)) {
-            return ucfirst(strtolower($m[1]));
+        foreach (['LI-SaaS' => 'li-saas', 'PRIVACY' => 'privacy', 'MODERATE' => 'moderate', 'HIGH' => 'high', 'LOW' => 'low'] as $needle => $level) {
+            if (stripos($filename, $needle) !== false) {
+                return $level;
+            }
         }
-        if (preg_match('/(LOW|MODERATE|HIGH|PRIVACY)/i', $filename, $m)) {
-            return ucfirst(strtolower($m[1]));
-        }
-        return $title;
+        return 'unknown';
+    }
+
+    /**
+     * Two-character abbreviation for the per-control badge. First letter is
+     * the source initial (N/F), second is the level initial (L/M/H/P/S).
+     * "S" stands in for LI-SaaS since L collides with Low.
+     */
+    private static function abbrFor(string $source, string $level): string
+    {
+        $sourceInitial = match ($source) {
+            'nist'    => 'N',
+            'fedramp' => 'F',
+            default   => strtoupper($source[0] ?? '?'),
+        };
+        $levelInitial = match ($level) {
+            'low'      => 'L',
+            'moderate' => 'M',
+            'high'     => 'H',
+            'privacy'  => 'P',
+            'li-saas'  => 'S',
+            default    => strtoupper($level[0] ?? '?'),
+        };
+        return $sourceInitial . $levelInitial;
+    }
+
+    /**
+     * Chip-friendly label, e.g. "NIST Low" / "FR Moderate" / "FR LI-SaaS".
+     * FedRAMP gets shortened to "FR" so the chip strip stays compact.
+     */
+    private static function shortTitleFor(string $source, string $level): string
+    {
+        $src = match ($source) {
+            'nist'    => 'NIST',
+            'fedramp' => 'FR',
+            default   => ucfirst($source),
+        };
+        $lvl = match ($level) {
+            'low'      => 'Low',
+            'moderate' => 'Moderate',
+            'high'     => 'High',
+            'privacy'  => 'Privacy',
+            'li-saas'  => 'LI-SaaS',
+            default    => ucfirst($level),
+        };
+        return $src . ' ' . $lvl;
     }
 }

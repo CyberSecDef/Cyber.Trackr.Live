@@ -45,7 +45,7 @@
                         All <span class="chip-count">{{ total_controls|number_format }}</span>
                     </button>
                     {% for o in overlays %}
-                        <button type="button" class="chip chip--{{ o.id }}" data-overlay="{{ o.id }}"
+                        <button type="button" class="chip chip--{{ o.level }}" data-overlay="{{ o.id }}"
                                 onclick="window.app.rmfList.filter(this)"
                                 title="{{ o.title }}">
                             {{ o.short_title }} <span class="chip-count">{{ o.count|number_format }}</span>
@@ -88,13 +88,14 @@
                     <dt class="">Baselines</dt>
                     <dd class="baseline-badges">
                         {% if ctrl_overlays|length %}
-                            {% for o in ctrl_overlays %}
-                                <span class="baseline-badge baseline-badge--{{ o }}"
-                                      title="{{ o|capitalize }} baseline (NIST 5.2.0)">{{ o|first|upper }}</span>
+                            {% for oid in ctrl_overlays %}
+                                {% set o = overlays[oid] %}
+                                <span class="baseline-badge baseline-badge--{{ o.level }}"
+                                      title="{{ o.title }}">{{ o.abbr }}</span>
                             {% endfor %}
                         {% else %}
                             <span class="baseline-badge baseline-badge--none"
-                                  title="Not in any current NIST baseline">&mdash;</span>
+                                  title="Not in any current NIST or FedRAMP baseline">&mdash;</span>
                         {% endif %}
                     </dd>
 

@@ -7,6 +7,8 @@ serves as the data backing the **overlay filter** on `/rmf/5`.
 
 ## What's here
 
+### NIST 800-53 r5 baselines
+
 | File | Source | Controls | Notes |
 | --- | --- | --- | --- |
 | `NIST_SP-800-53_rev5_LOW-baseline_profile.json` | NIST | 149 | Minimum controls for low-impact systems |
@@ -19,6 +21,32 @@ All sourced from
 [`usnistgov/oscal-content`](https://github.com/usnistgov/oscal-content/tree/main/nist.gov/SP800-53/rev5/json),
 metadata version **5.2.0**, last modified **2025-08-26**. Public domain
 (work of the U.S. Government).
+
+### FedRAMP Rev 5 baselines
+
+| File | Controls | Set-parameters | Notes |
+| --- | --- | --- | --- |
+| `FedRAMP_rev5_LOW-baseline_profile.json` | 156 | 156 | FedRAMP Low — broader than NIST Low (adds 7 FedRAMP-specific controls) |
+| `FedRAMP_rev5_MODERATE-baseline_profile.json` | 323 | 236 | The dominant cloud SaaS baseline |
+| `FedRAMP_rev5_HIGH-baseline_profile.json` | 410 | 276 | High-impact cloud systems |
+| `FedRAMP_rev5_LI-SaaS-baseline_profile.json` | 156 | 156 | Tailored Low Impact SaaS — for low-risk cloud services |
+
+Originally published at `GSA/fedramp-automation/dist/content/rev5/baselines/json/`.
+**That repository was removed from GitHub in 2025** when FedRAMP transitioned to
+their "Rev 5 + 20x" rules format. These profiles were recovered from the most
+recent healthy Wayback Machine snapshots:
+
+- LOW: snapshot `20250126171204`
+- MODERATE: snapshot `20250618020019`
+- HIGH: snapshot `20250320182412`
+- LI-SaaS: snapshot `20250708083632`
+
+License: U.S. federal government work — no copyright claim, public domain.
+Unlike NIST baselines, FedRAMP profiles **do** bind organization-defined
+parameter values via `modify.set-parameters` (e.g., AC-2(2) "disable
+inactive accounts within 30 days"). Our `OverlayLoader` doesn't currently
+surface those — it reads `with-ids` only — but the data is preserved in
+the files for future use.
 
 ## Why OSCAL and not the XML's `<baseline>` tags
 
@@ -82,19 +110,24 @@ as belonging to the parent control's overlay set.
 ## Adding new overlays later
 
 Drop another OSCAL Profile JSON into this directory. The loader picks it up
-on the next request — no service registration needed. The metadata title is
-used for the chip label (truncated at the first em-dash) and the file name
-becomes the overlay ID after some lowercasing.
+on the next request — no service registration needed. The overlay ID is
+derived from the filename:
+
+- Source prefix: filenames starting with `NIST` → `nist-`, `FedRAMP` → `fedramp-`,
+  anything else → `custom-`.
+- Level suffix: substring match on `LI-SaaS`, `PRIVACY`, `MODERATE`, `HIGH`,
+  `LOW` (in that order — `LI-SaaS` is checked first because it contains "LI"
+  which would otherwise match "LOW").
 
 Candidates worth chasing:
 
 - **CNSSI 1253** baselines (the 27 CIA-leg combinations). Currently published
   as PDFs and Excel; CNSS has an OSCAL working group but no canonical release.
-- **FedRAMP Rev 5** baselines (Low / Moderate / High / LI-SaaS). Originally
-  at `GSA/fedramp-automation` but that repo is gone — they've moved to a
-  different rules format at `FedRAMP/rules`. Recoverable from a Wayback
-  snapshot or transcribable from the FedRAMP PDF.
-- **DoD overlays** (Privacy, Cross-Domain, Space Platform). Same situation
-  as CNSS — PDF only.
+- **DoD overlays** (Cross-Domain, Space Platform, Intel-specific). PDF only.
+- **CMMC Level 1/2/3** profiles. Some community OSCAL conversions exist;
+  quality varies and needs verification before adoption (the
+  `grcwarlock/oscal-catalog-library` repo, for example, is LLM-generated
+  placeholders — `include-all: {}` rather than real `with-ids` lists —
+  and should *not* be used).
 
 [oscal-profile]: https://pages.nist.gov/OSCAL/concepts/layer/control/profile/
