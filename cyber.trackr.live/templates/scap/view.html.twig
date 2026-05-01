@@ -119,7 +119,7 @@
                             {% if CCI_NUM != '' %}
                                 {% set cci_match = cci.xpath("//xmlns:cci_item[@id='" ~ CCI_NUM ~ "']")|first %}
                                 {% if cci_match %}
-                                    {{ ui.ident(cci_match.references.reference|first.attributes.index|split(' ')|first) }}
+                                    {{ ui.rmf_link(cci_match.references.reference|first.attributes.index|split(' ')|first) }}
                                 {% endif %}
                             {% endif %}
                             </dd>
@@ -130,7 +130,7 @@
                             </dd>
 
                             <dt class="">CCI</dt>
-                            <dd class="">{% if CCI_NUM != '' %}{{ ui.ident(CCI_NUM) }}{% endif %}</dd>
+                            <dd class="">{% if CCI_NUM != '' %}{{ ui.cci_link(CCI_NUM) }}{% endif %}</dd>
 
                             <dt class="">Version</dt>
                             <dd class="">{{ ui.ident(group.xpath('.//xccdf:Rule/xccdf:version')|first) }}</dd>

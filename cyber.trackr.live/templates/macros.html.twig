@@ -23,6 +23,38 @@
 {% macro ident(value) %}<span class="ident">{{ value|trim }}</span>{% endmacro %}
 
 {#
+ # rmf_link — control number rendered as a clickable .ident pill that
+ # deep-links to the 800-53 Rev 5 page anchored at #rmf_<num>. The
+ # anchor format matches the <a id="rmf_{{control.number}}"> emitted
+ # by templates/rmf/view_v5.html.twig.
+ #
+ # Use on STIG/SCAP detail pages where a control is named so users get
+ # a one-click jump to the full control text. Renders nothing when
+ # value is empty/whitespace.
+ #}
+{% macro rmf_link(value) %}
+{%- set v = value|trim -%}
+{%- if v != '' -%}
+<a class="ident ident--link" href="{{ path('rmf_v5_view') }}#rmf_{{ v }}" title="View {{ v }} on the 800-53 Rev 5 page">{{ v }}</a>
+{%- endif -%}
+{% endmacro %}
+
+{#
+ # cci_link — CCI id rendered as a clickable .ident pill. The CCI page
+ # uses a DataTable, so we pass the id via URL fragment (#CCI-000366);
+ # cci_app.init() reads location.hash on load + on hashchange and
+ # applies it as the table's search filter.
+ #
+ # Renders nothing for empty/whitespace values.
+ #}
+{% macro cci_link(value) %}
+{%- set v = value|trim -%}
+{%- if v != '' -%}
+<a class="ident ident--link" href="{{ path('cci') }}#{{ v }}" title="View {{ v }} on the CCI page">{{ v }}</a>
+{%- endif -%}
+{% endmacro %}
+
+{#
  # sev — severity pill.
  #
  # Accepts level as 'high' | 'medium' | 'med' | 'low'. Optional count appends

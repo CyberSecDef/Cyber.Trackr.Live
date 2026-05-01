@@ -55,7 +55,7 @@
             init(){
                 // Single toolbar at top: filter, length, info, pagination, export buttons.
                 // No bottom controls — they only duplicate what's already at top.
-                $('#ccis').DataTable({
+                const dt = $('#ccis').DataTable({
                     // Top toolbar: filter | length + export buttons.
                     // Bottom: row count info + pagination (where the eye lands after scrolling).
                     dom: '<"cci-toolbar"<"cci-toolbar__left"f><"cci-toolbar__right"lB>>rt<"cci-foot"<"cci-foot__info"i>p>',
@@ -71,6 +71,17 @@
                         { extend: 'print',      text: '<i class="bi bi-printer"></i>',       titleAttr: 'Print' },
                     ],
                 });
+
+                // Deep-link support: /cci#CCI-000366 pre-filters the table to that
+                // CCI. Used by ui.cci_link from STIG/SCAP detail pages.
+                cci_app.applyHashFilter(dt);
+                $(window).on('hashchange', () => cci_app.applyHashFilter(dt));
+            },
+            applyHashFilter(dt) {
+                const hash = (window.location.hash || '').replace(/^#/, '').trim();
+                if (/^CCI-\d{6}$/i.test(hash)) {
+                    dt.search(hash).draw();
+                }
             }
         };
 
