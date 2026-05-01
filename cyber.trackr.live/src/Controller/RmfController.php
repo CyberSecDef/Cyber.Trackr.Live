@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\Service\OverlayLoader;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -11,7 +12,7 @@ class RmfController extends AbstractController
 {
 
     #[Route('/rmf/5', name: 'rmf_v5_view')]
-    public function rmf_v5_view(): Response
+    public function rmf_v5_view(OverlayLoader $overlays): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -49,11 +50,23 @@ class RmfController extends AbstractController
         }
         $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
 
+        // Pre-compute control → overlays once per request so the template doesn't
+        // call OverlayLoader on every <controls:control> iteration.
+        $overlay_map = [];
+        foreach ($rmf_v5_xml->xpath("/controls:controls/controls:control") as $c) {
+            $num = trim((string) $c->number);
+            if ($num !== '') {
+                $overlay_map[$num] = $overlays->getControlOverlays($num);
+            }
+        }
+
         return $this->render('rmf/view_v5.html.twig', [
             'controller_name' => 'RmfController',
             'cci' => $cci_xml,
             'rmf' => $rmf_v5_xml,
             'rmfs_json' => $rmfs_json,
+            'overlays' => $overlays->getOverlays(),
+            'overlay_map' => $overlay_map,
         ]);
     }
 

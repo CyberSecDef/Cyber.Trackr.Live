@@ -77,6 +77,10 @@ window.app = {
         if ($("#scap-table").length) {
             window.app.scapList.apply();
         }
+        // Initialize RMF v5 baseline filter when present.
+        if ($("#rmf-page-info").length) {
+            window.app.rmfList.apply();
+        }
 
         // React to system theme changes only when the user hasn't set a preference.
         if (window.matchMedia) {
@@ -390,6 +394,41 @@ window.app = {
         scrollToTable() {
             const wrap = document.querySelector("#scap-table");
             if (wrap) wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+    },
+
+    /**
+     * RMF v5 controls list — baseline filter (/rmf/5).
+     *
+     * Each <section.control-card> carries `data-overlays="low moderate high"`
+     * (server-rendered from App\Service\OverlayLoader). Clicking a chip
+     * toggles `is-hidden` on cards whose data-overlays don't include the
+     * selected baseline. "All" shows everything including controls in zero
+     * baselines (deprecated / privacy-only / not-yet-baselined).
+     */
+    rmfList: {
+        overlayFilter: "all",
+        apply() {
+            const f = this.overlayFilter;
+            const $cards = $(".control-card");
+            let visible = 0;
+            $cards.each(function () {
+                const $c = $(this);
+                const overlays = ($c.attr("data-overlays") || "").trim().split(/\s+/).filter(Boolean);
+                const show = f === "all" || overlays.indexOf(f) >= 0;
+                $c.toggleClass("is-hidden", !show);
+                if (show) visible++;
+            });
+            const $info = $("#rmf-page-info");
+            const total = +($info.data("total") || $cards.length);
+            $info.text("Showing " + visible.toLocaleString() + " of " + total.toLocaleString() + " controls");
+        },
+        filter(elem) {
+            const $el = $(elem);
+            $el.parent().find(".chip").removeClass("active");
+            $el.addClass("active");
+            this.overlayFilter = ($el.data("overlay") || "all").toString();
+            this.apply();
         },
     },
 

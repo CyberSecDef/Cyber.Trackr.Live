@@ -35,9 +35,38 @@
             <p>Individual controls are often designed to act together to increase effective protection. Systems of controls can be referred to as frameworks or standards. Frameworks can enable an organization to manage security controls across different types of assets with consistency. For example, a framework can help an organization manage controls over access regardless of the type of computer operating system. This also enables an organization to assess overall risk. Risk-aware organizations may choose proactively to specify, design, implement, operate and maintain their security controls, usually by assessing the risks and implementing a comprehensive security management framework such as ISO27001:2013, the Information Security Forum&rsquo;s Standard of Good Practice for Information Security, or NIST SP 800-53.</p>
         </div>
 
+        {% set total_controls = rmf.xpath("/controls:controls/controls:control")|length %}
+        <div class="lib-page__bar rmf-filter-bar">
+            <div class="lib-page__filter">
+                <span class="lib-page__filter-label eyebrow">Baseline</span>
+                <div class="chip-group" role="radiogroup" aria-label="Filter controls by baseline">
+                    <button type="button" class="chip active" data-overlay="all"
+                            onclick="window.app.rmfList.filter(this)">
+                        All <span class="chip-count">{{ total_controls|number_format }}</span>
+                    </button>
+                    {% for o in overlays %}
+                        <button type="button" class="chip chip--{{ o.id }}" data-overlay="{{ o.id }}"
+                                onclick="window.app.rmfList.filter(this)"
+                                title="{{ o.title }}">
+                            {{ o.short_title }} <span class="chip-count">{{ o.count|number_format }}</span>
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="rmf-page-info" class="rmf-filter-bar__info"
+                 data-total="{{ total_controls }}" aria-live="polite">
+                Showing {{ total_controls|number_format }} controls
+            </div>
+        </div>
+
         <div class="rule-text">&sect; Controls</div>
 
     {% for control in rmf.xpath("/controls:controls/controls:control") %}
+        {% set ctrl_num = control.number|trim %}
+        {% set ctrl_overlays = overlay_map[ctrl_num]|default([]) %}
+        <section class="control-card"
+                 data-control="{{ ctrl_num }}"
+                 data-overlays="{{ ctrl_overlays|join(' ') }}">
         <a id="rmf_{{control.number}}"></a>
         {% set res = control.registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0") %}
         {% set res = control.registerXPathNamespace("controls", "http://scap.nist.gov/schema/sp800-53/feed/2.0") %}
@@ -55,11 +84,21 @@
 
                     <dt class="">Subject Area</dt>
                     <dd class="">{{control.family}}</dd>
-                        
-                    <dt class="">Baseline Areas</dt>
-                    <dd class="">{{ control.xpath('./aaa:baseline')|join(', ') }}</dd>
-                    
-                </dl>    
+
+                    <dt class="">Baselines</dt>
+                    <dd class="baseline-badges">
+                        {% if ctrl_overlays|length %}
+                            {% for o in ctrl_overlays %}
+                                <span class="baseline-badge baseline-badge--{{ o }}"
+                                      title="{{ o|capitalize }} baseline (NIST 5.2.0)">{{ o|first|upper }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="baseline-badge baseline-badge--none"
+                                  title="Not in any current NIST baseline">&mdash;</span>
+                        {% endif %}
+                    </dd>
+
+                </dl>
                 <div class="col-7 pt-0 mt-0">
 <div class="sec-header">Description</div>
 <div class="req-desc pre-wrap">{% for i in control.xpath('./aaa:discussion/aaa:description/aaa:p') %}{{ i.asXml()|striptags|trans}}
@@ -140,6 +179,7 @@
 
             </div>
         </div>
+        </section>
 
         {% set break = true %}
     {% endfor %}

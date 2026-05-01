@@ -2676,3 +2676,120 @@ dt.inline::after {
         display: none !important;
     }
 }
+
+/* =====================================================================
+ * §10 RMF v5 baseline overlay filter
+ *
+ * Adds the chip-group filter bar above the controls list and a small
+ * colored badge (L/M/H/P) on each control. Backed by App\Service\OverlayLoader
+ * which reads the OSCAL profile JSONs in resources/data/overlays/.
+ *
+ * Filter behavior is single-select (radiogroup) — clicking a chip hides
+ * every .control-card whose data-overlays attribute doesn't include it.
+ * "All" is the default and shows everything including controls in zero
+ * baselines (deprecated / not-yet-baselined).
+ * ===================================================================== */
+
+.rmf-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-5);
+}
+
+.rmf-filter-bar__info {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.lib-page__filter-label {
+    margin-right: var(--space-3);
+}
+
+/* Subtle pill inside each chip showing the count for that baseline. */
+.chip-count {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    min-width: 24px;
+    text-align: center;
+}
+
+.chip.active .chip-count {
+    background: rgba(255, 255, 255, 0.18);
+    color: inherit;
+}
+
+/* Each control on /rmf/5 is wrapped in a .control-card so the JS filter
+ * can hide the whole block by toggling .is-hidden. The wrapper is layout-
+ * neutral — it imposes no padding or borders so the existing Bootstrap
+ * grid inside continues to render unchanged. */
+.control-card {
+    display: block;
+}
+
+.control-card.is-hidden {
+    display: none !important;
+}
+
+/* Baselines column — the small letter chips next to each control's
+ * "Baselines" row. One letter per baseline (L/M/H/P), color-coded so the
+ * pattern is scannable when skimming a long page of controls. */
+.baseline-badges {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+}
+
+.baseline-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    color: #fff;
+    background: var(--text-muted);
+    user-select: none;
+}
+
+.baseline-badge--low      { background: var(--fresh);    }
+.baseline-badge--moderate { background: var(--stale);    }
+.baseline-badge--high     { background: var(--sev-high); }
+.baseline-badge--privacy  { background: var(--accent);   }
+
+[data-theme="dark"] .baseline-badge--moderate,
+[data-theme="dark"] .baseline-badge--privacy {
+    /* The dark-theme variants of --stale and --accent are bright amber;
+     * pair with dark text for contrast. */
+    color: #1a1612;
+}
+
+.baseline-badge--none {
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    color: var(--text-muted);
+}
+
+/* Subtle accent on the active chip so the chosen baseline color carries
+ * through. The base .chip.active rule provides background/border; we only
+ * tint when a baseline-specific chip is active. */
+.chip--low.active     { border-color: var(--fresh);    }
+.chip--moderate.active{ border-color: var(--stale);    }
+.chip--high.active    { border-color: var(--sev-high); }
+.chip--privacy.active { border-color: var(--accent);   }
+
