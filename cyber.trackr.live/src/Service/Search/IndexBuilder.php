@@ -39,6 +39,14 @@ class IndexBuilder
      */
     private function run(array $existingSources, bool $isFull): array
     {
+        // Walking ~1.2 GB of STIG XML + holding the postings in memory peaks
+        // well above PHP's default 128M. Raise the cap unconditionally so
+        // neither the CLI command nor the post-DISA-pull auto-rebuild trips
+        // on memory in environments that haven't tuned php.ini. Hosts that
+        // disable ini_set will see the call no-op and fall back to whatever
+        // memory_limit is already configured.
+        @ini_set('memory_limit', '2G');
+
         $stats = ['unchanged' => 0, 'changed' => 0, 'new' => 0, 'removed' => 0];
 
         if ($isFull) {
