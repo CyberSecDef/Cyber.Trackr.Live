@@ -62,6 +62,17 @@
                     pageLength: 10,
                     order: [[ 0, "asc" ]],
                     colReorder: true,
+                    // Mobile: collapse low-priority columns into a per-row expand chevron.
+                    // CCI id (col 0) always stays visible; the Definition (col 1) and
+                    // Control (col 5) drop in next as width allows; everything else
+                    // hides first into the child row.
+                    responsive: true,
+                    columnDefs: [
+                        { responsivePriority: 1,     targets: 0 },
+                        { responsivePriority: 2,     targets: 1 },
+                        { responsivePriority: 3,     targets: 5 },
+                        { responsivePriority: 10001, targets: '_all' },
+                    ],
                     buttons: [
                         { extend: 'copyHtml5',  text: '<i class="bi bi-copy"></i>',          titleAttr: 'Copy'  },
                         { extend: 'excelHtml5', text: '<i class="bi bi-file-excel"></i>',    titleAttr: 'Excel' },
