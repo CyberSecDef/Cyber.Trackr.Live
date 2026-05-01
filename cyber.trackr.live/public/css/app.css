@@ -1794,10 +1794,117 @@ kbd, .site-search__kbd {
     background: color-mix(in srgb, var(--accent) 5%, transparent) !important;
 }
 
-/* Drop the alternating-stripe pattern — the row hover provides enough cue. */
+/* Drop the alternating-stripe pattern — the row hover provides enough cue.
+ * Two selectors are needed: DataTables 1.x adds .odd/.even classes, but
+ * Bootstrap 5's .table-striped uses :nth-of-type. We strip both even
+ * though we no longer apply .table-striped to the CCI table, in case
+ * some other future use re-introduces it. */
 #ccis tbody tr.odd,
-#ccis tbody tr.even {
+#ccis tbody tr.even,
+#ccis tbody tr,
+#ccis tbody tr > * {
     background-color: transparent !important;
+    --bs-table-accent-bg: transparent !important;
+    --bs-table-bg: transparent !important;
+}
+
+/* Defensive neutralizer for Bootstrap .table* classes if they ever land
+ * back on the CCI table (e.g. via DataTables auto-class injection). */
+#ccis,
+#ccis > :not(caption) > * > * {
+    background-color: transparent;
+    color: var(--text);
+    box-shadow: none;
+}
+
+/* CCI toolbar layout — replaces DataTables' default block-level controls
+ * with a tidy two-column row at top and a clean info + paging row at
+ * bottom. The dom string in cci/index.html.twig populates the named divs. */
+.cci-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+}
+
+.cci-toolbar__left,
+.cci-toolbar__right {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.cci-toolbar__right {
+    margin-left: auto;
+}
+
+/* The default DataTables labels (`Search:` and `Show ___ entries`)
+ * are inline-block paragraphs with stray vertical margins that break
+ * the toolbar's visual rhythm. Flatten them. */
+.cci-toolbar .dataTables_filter,
+.cci-toolbar .dataTables_length {
+    margin: 0;
+    padding: 0;
+}
+
+.cci-toolbar .dataTables_filter label,
+.cci-toolbar .dataTables_length label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Export-button toolbar already has gap from §2g .dt-buttons rule;
+ * just ensure it sits flush in the right cluster. */
+.cci-toolbar .dt-buttons {
+    margin-left: 0;
+}
+
+/* Override any hardcoded Bootstrap btn-* classes the buttons array
+ * may apply (e.g. the Excel button used to ship with className:
+ * 'btn-primary'). Force the warm-paper styling regardless. */
+.dt-button.btn,
+.dt-button.btn-primary,
+.dt-button.btn-secondary,
+.dt-button.btn-success,
+.dt-button.btn-info {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border-strong) !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+.dt-button.btn:hover,
+.dt-button.btn-primary:hover {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+/* Bottom row: info on left, pagination on right. */
+.cci-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.cci-foot__info {
+    flex: 1 1 auto;
+}
+
+/* DataTables likes to add inline padding to the info <div>; reset it
+ * so it sits on the toolbar baseline. */
+.cci-foot .dataTables_info,
+.cci-toolbar .dataTables_info {
+    padding-top: 0;
 }
 
 
