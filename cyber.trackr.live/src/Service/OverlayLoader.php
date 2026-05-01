@@ -169,12 +169,62 @@ class OverlayLoader
             }
             $this->overlays[$entry['id']] = $entry;
             foreach ($entry['controls'] as $cid) {
-                $this->controlMap[$cid] ??= [];
-                if (!in_array($entry['id'], $this->controlMap[$cid], true)) {
-                    $this->controlMap[$cid][] = $entry['id'];
+                $this->tag($cid, $entry['id']);
+                // If this is an enhancement (e.g. ac-2.1), also tag its
+                // parent base control (ac-2). The /rmf/5 page renders
+                // enhancements *inside* their parent's row, so a row
+                // must stay visible whenever any of its enhancements
+                // appears in the active overlay — otherwise the
+                // enhancement disappears with the parent.
+                if (preg_match('/^(.+)\.\d+$/', $cid, $m)) {
+                    $this->tag($m[1], $entry['id']);
                 }
             }
         }
+    }
+
+    private function tag(string $controlId, string $overlayId): void
+    {
+        $this->controlMap[$controlId] ??= [];
+        if (!in_array($overlayId, $this->controlMap[$controlId], true)) {
+            $this->controlMap[$controlId][] = $overlayId;
+        }
+    }
+
+    /**
+     * Given the set of XML base control numbers actually rendered as rows
+     * on /rmf/5, return [overlayId => visibleRowCount]. The chip strip uses
+     * this so the displayed count matches what the user sees after clicking.
+     *
+     * "Visible" means: the base control is in the overlay, OR any of its
+     * enhancements is. The same logic the visibility filter uses.
+     *
+     * @param array<int,string> $xmlBaseNumbers e.g. ["AC-1", "AC-2", ...]
+     * @return array<string,int>                 e.g. ["nist-low" => 131, ...]
+     */
+    public function getRowCounts(array $xmlBaseNumbers): array
+    {
+        $this->ensureLoaded();
+        // Normalize XML numbers ("AC-2") to OSCAL ids ("ac-2"), once.
+        $base_set = [];
+        foreach ($xmlBaseNumbers as $n) {
+            $oscal = self::normalize($n);
+            if ($oscal !== null) {
+                $base_set[$oscal] = true;
+            }
+        }
+        $counts = array_fill_keys(array_keys($this->overlays), 0);
+        foreach ($this->overlays as $oid => $o) {
+            $rows = [];
+            foreach ($o['controls'] as $cid) {
+                $base = preg_match('/^(.+)\.\d+$/', $cid, $m) ? $m[1] : $cid;
+                if (isset($base_set[$base])) {
+                    $rows[$base] = true;
+                }
+            }
+            $counts[$oid] = count($rows);
+        }
+        return $counts;
     }
 
     /**

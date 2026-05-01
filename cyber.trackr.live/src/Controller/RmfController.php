@@ -53,19 +53,32 @@ class RmfController extends AbstractController
         // Pre-compute control → overlays once per request so the template doesn't
         // call OverlayLoader on every <controls:control> iteration.
         $overlay_map = [];
+        $xml_base_nums = [];
         foreach ($rmf_v5_xml->xpath("/controls:controls/controls:control") as $c) {
             $num = trim((string) $c->number);
             if ($num !== '') {
                 $overlay_map[$num] = $overlays->getControlOverlays($num);
+                $xml_base_nums[]   = $num;
             }
         }
+
+        // Augment overlay metadata with the *visible row count* for the
+        // chips. Without this, a chip says "NIST High: 370" but only ~188
+        // rows show after filtering (the other 182 are enhancements
+        // rendered inside parent rows, not as separate top-level rows).
+        $overlay_meta  = $overlays->getOverlays();
+        $row_counts    = $overlays->getRowCounts($xml_base_nums);
+        foreach ($overlay_meta as &$o) {
+            $o['row_count'] = $row_counts[$o['id']] ?? 0;
+        }
+        unset($o);
 
         return $this->render('rmf/view_v5.html.twig', [
             'controller_name' => 'RmfController',
             'cci' => $cci_xml,
             'rmf' => $rmf_v5_xml,
             'rmfs_json' => $rmfs_json,
-            'overlays' => $overlays->getOverlays(),
+            'overlays' => $overlay_meta,
             'overlay_map' => $overlay_map,
         ]);
     }

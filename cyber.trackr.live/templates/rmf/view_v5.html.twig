@@ -45,10 +45,11 @@
                         All <span class="chip-count">{{ total_controls|number_format }}</span>
                     </button>
                     {% for o in overlays %}
+                        {% set enh = o.count - o.row_count %}
                         <button type="button" class="chip chip--{{ o.level }}" data-overlay="{{ o.id }}"
                                 onclick="window.app.rmfList.filter(this)"
-                                title="{{ o.title }}">
-                            {{ o.short_title }} <span class="chip-count">{{ o.count|number_format }}</span>
+                                title="{{ o.title }} — {{ o.row_count|number_format }} rows visible{% if enh > 0 %} ({{ o.count|number_format }} controls total incl. {{ enh|number_format }} enhancement{{ enh == 1 ? '' : 's' }} nested in parent rows){% endif %}">
+                            {{ o.short_title }} <span class="chip-count">{{ o.row_count|number_format }}</span>
                         </button>
                     {% endfor %}
                 </div>
