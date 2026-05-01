@@ -30,15 +30,11 @@ class Searcher
      */
     public function search(string $query): array
     {
-        // The whole index is currently loaded into memory per search:
-        // docs.json alone parses to ~400 MB PHP-array, which trips PHP's
-        // default 128M / 256M caps on shared hosting. Raise the limit so
-        // the search succeeds; hosts that disable ini_set silently no-op
-        // and fall back to whatever is already configured.
-        // TODO: shard docs.json by index range so we only load the slices
-        // that contain matched docs. Would bring per-search resident down
-        // to ~30-50 MB and remove the need for this bump entirely.
-        @ini_set('memory_limit', '1G');
+        // Defensive bump: a typical search now touches only the shard slices
+        // containing matched docs (~30-50 MB resident), but a query that
+        // matches across many shards could still spike. 512M leaves plenty
+        // of headroom on shared hosts. Hosts that disable ini_set no-op.
+        @ini_set('memory_limit', '512M');
 
         $empty = ['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []];
         $parsed = $this->parser->parse($query);
@@ -48,7 +44,6 @@ class Searcher
         }
 
         $postings = $this->store->postings();
-        $docs = $this->store->docs();
 
         // Token-level AND set.
         $matchedDocSet = $this->andDocs($parsed['tokens'], $postings);
@@ -65,10 +60,17 @@ class Searcher
             }
         }
 
+        if (empty($matchedDocSet)) {
+            return $empty;
+        }
+
+        // Now pull only the matched docs from their respective shards.
+        $matchedDocs = $this->store->getDocs($matchedDocSet);
+
         // Phrase verification on docs.text.
         if (!empty($parsed['phrases'])) {
-            $matchedDocSet = array_filter($matchedDocSet, function ($idx) use ($docs, $parsed) {
-                $doc = $docs[$idx] ?? null;
+            $matchedDocSet = array_filter($matchedDocSet, function ($idx) use ($matchedDocs, $parsed) {
+                $doc = $matchedDocs[$idx] ?? null;
                 if (!$doc) return false;
                 $hay = strtolower((string) ($doc['text'] ?? ''));
                 foreach ($parsed['phrases'] as $p) {
@@ -81,7 +83,7 @@ class Searcher
         // Bucket results.
         $out = $empty;
         foreach ($matchedDocSet as $idx) {
-            $doc = $docs[$idx] ?? null;
+            $doc = $matchedDocs[$idx] ?? null;
             if (!$doc) continue;
             $type = $doc['type'] ?? null;
             if (!isset($out[$type])) continue;

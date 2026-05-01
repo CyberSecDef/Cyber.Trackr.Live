@@ -51,6 +51,7 @@ class SearchRebuildCommand extends Command
             ['Docs' => number_format($stats['docs'])],
             ['Tokens' => number_format($stats['tokens'])],
             ['Trigrams' => number_format($stats['trigrams'])],
+            ['Shards written' => $stats['shards_written'] ?? '—'],
             ['Sources unchanged' => $stats['unchanged']],
             ['Sources changed' => $stats['changed']],
             ['Sources added' => $stats['new']],

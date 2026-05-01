@@ -49,22 +49,31 @@ class IndexBuilder
 
         $stats = ['unchanged' => 0, 'changed' => 0, 'new' => 0, 'removed' => 0];
 
+        // Build still pulls all docs into a single array - the build is the
+        // memory-hungry path (we already raised memory_limit above) and the
+        // dedup/sort logic is simpler with one flat array. Per-shard write
+        // happens at the end so we don't pay the IO cost of rewriting every
+        // shard on a delta.
         if ($isFull) {
             $docs = [];
             $postings = [];
             $sources = [];
         } else {
-            $docs = $this->store->docs();
+            $docs = $this->store->loadAllShards();
             $postings = $this->store->postings();
             $sources = $existingSources;
         }
+
+        // Track which shards have been touched (had a doc dropped, mutated,
+        // or appended) so a delta only writes those shards back to disk.
+        $dirtyShards = [];
 
         $expected = $this->collectExpectedSources();
 
         // 1. Drop docs from sources that are gone (e.g. older STIG superseded).
         foreach ($sources as $path => $meta) {
             if (!isset($expected[$path])) {
-                $this->dropDocs($meta['doc_indexes'] ?? [], $docs, $postings);
+                $this->dropDocs($meta['doc_indexes'] ?? [], $docs, $postings, $dirtyShards);
                 unset($sources[$path]);
                 $stats['removed']++;
             }
@@ -80,7 +89,7 @@ class IndexBuilder
 
             if (isset($sources[$path])) {
                 // Changed: drop existing docs first.
-                $this->dropDocs($sources[$path]['doc_indexes'], $docs, $postings);
+                $this->dropDocs($sources[$path]['doc_indexes'], $docs, $postings, $dirtyShards);
                 $stats['changed']++;
             } else {
                 $stats['new']++;
@@ -92,6 +101,7 @@ class IndexBuilder
                 $idx = count($docs);
                 $docs[] = $doc;
                 $newIndexes[] = $idx;
+                $dirtyShards[intdiv($idx, IndexStore::SHARD_SIZE)] = true;
                 foreach ($this->tokenizer->tokenize($doc['text']) as $tok) {
                     $postings[$tok][] = $idx;
                 }
@@ -126,7 +136,16 @@ class IndexBuilder
         }
 
         // 5. Persist.
-        $this->store->save(IndexStore::FILE_DOCS, $docs);
+        if ($isFull) {
+            $this->store->saveAllShards($docs);
+        } else {
+            // Delta: only re-write shards we actually mutated.
+            foreach (array_keys($dirtyShards) as $shardId) {
+                $start = $shardId * IndexStore::SHARD_SIZE;
+                $shard = array_slice($docs, $start, IndexStore::SHARD_SIZE);
+                $this->store->saveShard($shardId, $shard);
+            }
+        }
         $this->store->save(IndexStore::FILE_POSTINGS, $postings);
         $this->store->save(IndexStore::FILE_TRIGRAMS, $trigrams);
         $this->store->save(IndexStore::FILE_SOURCES, $sources);
@@ -135,21 +154,27 @@ class IndexBuilder
             'docs' => count($docs),
             'tokens' => count($postings),
             'trigrams' => count($trigrams),
+            'shards_written' => $isFull
+                ? (int) ceil(count($docs) / IndexStore::SHARD_SIZE)
+                : count($dirtyShards),
             ...$stats,
         ];
     }
 
     /**
      * Marks the given doc indexes as null in $docs and removes them from
-     * every posting list. Walking all postings is O(vocabulary) but the
-     * vocabulary is small relative to total doc count, so this is cheaper
-     * than re-tokenizing the dropped docs to find their token edges.
+     * every posting list. Each touched index also flags its containing
+     * shard as dirty so a delta knows which shard files to rewrite.
+     * Walking all postings is O(vocabulary) but the vocabulary is small
+     * relative to total doc count, so this is cheaper than re-tokenizing
+     * the dropped docs to find their token edges.
      */
-    private function dropDocs(array $indexes, array &$docs, array &$postings): void
+    private function dropDocs(array $indexes, array &$docs, array &$postings, array &$dirtyShards): void
     {
         $deadSet = array_flip($indexes);
         foreach ($indexes as $i) {
             $docs[$i] = null;
+            $dirtyShards[intdiv($i, IndexStore::SHARD_SIZE)] = true;
         }
         foreach ($postings as $tok => $idxs) {
             $kept = [];
