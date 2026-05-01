@@ -2417,6 +2417,12 @@ dt.inline::after {
     margin: var(--space-2) 0 var(--space-3);
 }
 
+.stig-detail__title em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    color: var(--accent);
+}
+
 .stig-detail__meta {
     display: flex;
     flex-wrap: wrap;
