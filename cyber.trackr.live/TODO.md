@@ -746,7 +746,7 @@ per-control guidance, glossary, acronyms, references. Order suggested
 by RMF priority, but reorderable based on demand.
 
 - [x] AC — Access Control Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls with 22 extra fields, 25 glossary entries, 39 acronyms, 7 references)
-- [ ] AU — Audit and Accountability Plan
+- [x] AU — Audit and Accountability Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls — AU-2/3/5/6/8/9/11/12 — with 18 extra fields, 20 glossary entries, 41 acronyms, 6 references)
 - [ ] AT — Awareness and Training Plan
 - [ ] CP — Contingency Plan (intersection with COOP/DR)
 - [ ] IA — Identification and Authentication Plan

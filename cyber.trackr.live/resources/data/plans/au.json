@@ -1,0 +1,531 @@
+{
+    "_comment": "Audit and Accountability Plan generator. Authored at the Phase 2 assessability floor; mirrors cm.json / ac.json structure with AU-domain content. Pairs naturally with AC since most authentication and authorization events flow into the audit pipeline.",
+
+    "family": "AU",
+    "family_name": "Audit and Accountability",
+    "title": "Audit and Accountability Plan",
+    "description": "Documents how the system generates, protects, retains, and reviews audit records to support accountability, anomaly detection, and forensic investigation. Covers the controls of the AU family in NIST SP 800-53 r5 and aligns with NIST SP 800-92 (Guide to Computer Security Log Management).",
+
+    "intro_template": "This Audit and Accountability Plan documents the audit-logging approach for {system_name}. It establishes the events the system records, the format and retention of audit records, the protection of audit data from tampering, and the review process that converts logs into actionable findings.\n\nThe scope covers event selection, log generation and ingestion, time synchronization, retention and storage, log protection, review and analysis, and the response when audit-logging itself fails. The plan is consistent with NIST SP 800-53 r5 (Audit and Accountability family) and NIST SP 800-92 (Guide to Computer Security Log Management).",
+
+    "approach_section_title": "Audit and Accountability Approach",
+    "approach_template": "{system_name} sends audit records to {siem_tool} as the system of record for log aggregation, retention, and analysis. The event categories selected for audit are documented in §4.2 below. Audit records are retained for {retention_period_total} (online + cold archive) and reviewed per the cadence in §6.1. Audit records are protected from unauthorized modification through {log_protection_summary}.\n\nAdditional details on event selection, log protection, review cadence, audit-failure response, log format / standards, privacy redaction, and time synchronization are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Audit-record collection for {system_name} is monitored continuously: ingestion lag, dropped-event counts, and storage-capacity headroom feed automated alerts. Log review combines automated SIEM correlation rules with periodic manual review. Time synchronization across audit sources is verified daily against the authoritative time source. Retention compliance is checked monthly. Continuous-monitoring metrics related to AU controls are documented in the sub-sections below.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Audit and Accountability Plan does not stand alone. Audit records described herein are referenced from the System Security Plan (SSP); audit-related findings flow into the Plan of Action and Milestones (POA&M); audit records consume authentication and authorization events from the AC family, support SI-4 (System Monitoring) detection, and feed CA-7 (Continuous Monitoring) reporting. The following cross-references identify the specific artifacts and locations where AU-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "AU-1",  "from": "Organizational audit-and-accountability policy" },
+        { "number": "AU-6",  "from": "Enterprise Security Operations Center (SOC) review processes" },
+        { "number": "AU-8",  "from": "Enterprise time-synchronization service (authoritative NTP)" },
+        { "number": "AU-9",  "from": "Enterprise SIEM access-control + tamper-protection" },
+        { "number": "AU-11", "from": "Enterprise log-retention infrastructure (cold storage)" },
+        { "number": "AU-16", "from": "Cross-organizational logging agreements (when applicable)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "SIEM tooling, ingestion pipeline, and where audit records ultimately land.",
+            "questions": [
+                {
+                    "id": "siem_tool",
+                    "label": "SIEM / log aggregation system of record",
+                    "type": "text",
+                    "required": true,
+                    "help": "Authoritative platform for audit records (e.g., Splunk Enterprise Security, Microsoft Sentinel, Elastic Security, Sumo Logic, Chronicle, Graylog, AWS CloudWatch + Athena)."
+                },
+                {
+                    "id": "log_destinations",
+                    "label": "Log destinations / forwarding architecture",
+                    "type": "textarea",
+                    "rows": 3,
+                    "help": "How audit records get from generators to the SIEM. Mention agents (Splunk Universal Forwarder, Fluent Bit, Vector), kinesis / kafka pipelines, syslog relays, and any intermediate parsing."
+                },
+                {
+                    "id": "log_format_standard",
+                    "label": "Log format / standard",
+                    "type": "select",
+                    "options": ["JSON (structured)", "CEF (Common Event Format)", "LEEF (Log Event Extended Format)", "OCSF (Open Cybersecurity Schema Framework)", "Syslog (RFC 5424)", "Mixed (specify in narrative)"],
+                    "help": "Primary log encoding the SIEM ingests. JSON or OCSF is increasingly common for structured analytics."
+                },
+                {
+                    "id": "log_protection_summary",
+                    "label": "Log protection one-liner",
+                    "type": "text",
+                    "help": "Brief phrase describing protection (e.g., 'WORM-tier S3 + KMS encryption + RBAC restricting log access to the SOC group'). Detailed approach goes in the dedicated sub-section."
+                }
+            ]
+        },
+
+        {
+            "id": "event_inventory",
+            "type": "group",
+            "section": "approach",
+            "label": "Event Inventory",
+            "description": "What categories of events are logged, and what data each record carries.",
+            "questions": [
+                { "id": "event_categories", "label": "Event categories logged", "type": "multi_select",
+                  "options": [
+                      "Authentication (success + failure)",
+                      "Authorization decisions (deny + privileged grant)",
+                      "Account management (create / modify / disable / delete)",
+                      "Privileged command execution",
+                      "Configuration changes",
+                      "Data access (read / write to sensitive data)",
+                      "Network connections (inbound + outbound)",
+                      "Cryptographic operations",
+                      "Audit-system events (start / stop / config change)",
+                      "Object access (file / database / object-store)",
+                      "Process creation / termination",
+                      "Vulnerability scans",
+                      "Antivirus / EDR detections"
+                  ] },
+                { "id": "audit_record_fields", "label": "Required fields in each audit record", "type": "multi_select",
+                  "options": [
+                      "Timestamp (UTC, ISO-8601 with millisecond precision)",
+                      "Event type / event ID",
+                      "Source identifier (host, container, function)",
+                      "User identifier (subject)",
+                      "Outcome (success / failure / deny)",
+                      "Object affected (target)",
+                      "Source IP / port",
+                      "Process / parent process",
+                      "Session / correlation ID",
+                      "Severity"
+                  ] },
+                { "id": "auditable_event_review_cadence", "label": "Cadence for reviewing the auditable-event list itself", "type": "select",
+                  "options": ["Quarterly", "Semi-annually", "Annually", "On material system change"],
+                  "help": "AU-2 requires periodic review of which events are logged. Most plans review annually + on material change." }
+            ]
+        },
+
+        {
+            "id": "log_protection",
+            "type": "group",
+            "section": "approach",
+            "label": "Log Protection",
+            "description": "Tamper protection, access controls, and encryption for audit records.",
+            "questions": [
+                { "id": "log_tamper_protection",  "label": "Tamper-protection mechanism", "type": "textarea", "rows": 3,
+                  "help": "How audit records are protected from unauthorized modification (WORM storage, hash chains, signed batches, immutable object lock)." },
+                { "id": "log_access_controls",    "label": "Who can read / search / export audit records",   "type": "textarea", "rows": 3,
+                  "help": "Roles with each level of access. Reference AC-5 separation-of-duties — audit reviewers should not have administrative authority over the audit system itself." },
+                { "id": "log_encryption_at_rest", "label": "Encryption at rest",                              "type": "text",
+                  "help": "Mechanism + key custody (e.g., 'AWS KMS customer-managed key in the SOC account; key admin separated from log readers')." },
+                { "id": "log_encryption_in_transit","label": "Encryption in transit",                        "type": "text",
+                  "help": "Transport security between log sources, forwarders, and SIEM (TLS 1.2+ with mutual authentication preferred)." }
+            ]
+        },
+
+        {
+            "id": "log_review",
+            "type": "group",
+            "section": "approach",
+            "label": "Log Review and Analysis",
+            "description": "Automated correlation, manual review, and SOC integration.",
+            "questions": [
+                { "id": "review_automated",       "label": "Automated review (SIEM correlation rules / UEBA)", "type": "textarea", "rows": 3,
+                  "help": "Categories of automated rules (failed-auth threshold, privilege escalation, data exfiltration patterns) and where they're authored / tuned." },
+                { "id": "review_manual_cadence",  "label": "Manual review cadence",  "type": "select",
+                  "options": ["Continuous (24/7 SOC)", "Daily", "Weekly", "Monthly", "Triggered by alert"] },
+                { "id": "review_responsible_role","label": "Responsible role for review", "type": "text",
+                  "help": "Role accountable for ensuring review happens (often 'Tier 2 SOC analyst' or 'ISSO + SOC partnership')." },
+                { "id": "review_escalation",      "label": "Escalation path",         "type": "textarea", "rows": 3,
+                  "help": "What happens when review surfaces a probable incident — who's paged, what's logged in the IR tracker, who can authorize containment." }
+            ]
+        },
+
+        {
+            "id": "audit_failure_response",
+            "type": "group",
+            "section": "approach",
+            "label": "Audit Failure Response",
+            "description": "What the system does when audit-logging itself fails (AU-5).",
+            "questions": [
+                { "id": "audit_failure_action",  "label": "Action on audit-logging failure", "type": "select",
+                  "options": [
+                      "Block (system fails closed; no further activity until logging restored)",
+                      "Alert + continue (system logs to backup channel; on-call paged)",
+                      "Alert + degrade (some functions disabled until logging restored)",
+                      "Best effort (note in record once restored — generally not acceptable for ATO)"
+                  ] },
+                { "id": "audit_failure_alert_target", "label": "Alert target",          "type": "text",
+                  "help": "Who is paged on audit failure (PagerDuty rotation, security email distribution)." },
+                { "id": "audit_failure_storage_threshold", "label": "Storage-capacity warning threshold", "type": "text",
+                  "help": "Free space remaining that triggers a warning (e.g., '20% free' or '7 days of headroom at current ingest rate')." }
+            ]
+        },
+
+        {
+            "id": "privacy_redaction",
+            "type": "group",
+            "section": "approach",
+            "label": "Privacy and Redaction",
+            "description": "What the system masks or redacts in audit records to balance investigative value with privacy.",
+            "questions": [
+                { "id": "redacted_fields",        "label": "Fields masked / redacted before storage", "type": "multi_select",
+                  "options": ["PII (SSN, DOB, full name)", "PHI (health information)", "Payment data (PAN, CVV)", "Passwords / authenticators (always redacted)", "Session tokens", "Customer email addresses (where applicable)", "Internal IP addresses", "Cryptographic key material"] },
+                { "id": "redaction_mechanism",    "label": "Redaction mechanism",                     "type": "textarea", "rows": 3,
+                  "help": "Where redaction occurs (forwarder vs SIEM ingestion pipeline). Hash vs replace-with-token vs remove." },
+                { "id": "privacy_reference",      "label": "Privacy framework reference",             "type": "text",
+                  "help": "Pointer to the privacy assessment (PIA / SORN reference) governing audit-record handling." }
+            ]
+        },
+
+        {
+            "id": "log_volume_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Audit Volume and Scope",
+            "description": "Order-of-magnitude scope of the audit pipeline.",
+            "questions": [
+                { "id": "vol_log_sources_count",  "label": "Approximate log source count",        "type": "text",
+                  "help": "How many distinct sources feed the SIEM (hosts, containers, applications, network appliances)." },
+                { "id": "vol_daily_event_volume", "label": "Approximate daily event volume",      "type": "text",
+                  "help": "Order of magnitude (e.g., '~10M events/day', '~50 GB ingest/day')." },
+                { "id": "vol_peak_burst_factor",  "label": "Peak burst factor",                   "type": "text",
+                  "help": "Multiple of baseline volume seen at peak (e.g., '3x normal during patch Tuesday')." }
+            ]
+        },
+
+        {
+            "id": "retention_storage",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Retention and Storage Strategy",
+            "description": "Online vs cold-archive split, retention period, and storage tiers.",
+            "questions": [
+                { "id": "retention_online_period",   "label": "Online (hot) retention period",   "type": "text",
+                  "help": "How long records remain queryable in the SIEM without restore (e.g., '90 days')." },
+                { "id": "retention_archive_period",  "label": "Cold archive retention period",   "type": "text",
+                  "help": "How long records remain in cold storage before destruction (e.g., '7 years per NARA GRS 4.2')." },
+                { "id": "retention_period_total",    "label": "Total retention period (one-line for §4 narrative)", "type": "text",
+                  "help": "Combined online + archive period in narrative form (e.g., '90 days online + 7 years cold archive')." },
+                { "id": "retention_storage_tier",    "label": "Storage tier(s) used",            "type": "textarea", "rows": 2,
+                  "help": "Storage classes: hot (S3 Standard / Splunk indexer), warm (S3 IA), cold (S3 Glacier Deep Archive / Azure Archive)." },
+                { "id": "retention_destruction_process", "label": "Records destruction process","type": "textarea", "rows": 3,
+                  "help": "How records are destroyed at end of retention. Verification / certificate of destruction. References NARA schedule if federal." }
+            ]
+        },
+
+        {
+            "id": "time_sync",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Time Synchronization",
+            "description": "Authoritative time source and accuracy verification (AU-8).",
+            "questions": [
+                { "id": "time_source",          "label": "Authoritative time source",  "type": "text",
+                  "help": "Stratum-1/2 NTP server or vendor service (e.g., 'Internal Stratum-2 NTP servers synced to USNO Master Clock', 'AWS Time Sync Service')." },
+                { "id": "time_drift_threshold", "label": "Maximum allowed drift",       "type": "text",
+                  "help": "Threshold beyond which a host is flagged (e.g., '100 ms')." },
+                { "id": "time_drift_monitoring","label": "Drift monitoring approach",  "type": "textarea", "rows": 2,
+                  "help": "How drift is detected and remediated (SIEM rule, daily script, NTP-monitor integration)." }
+            ]
+        },
+
+        {
+            "id": "audit_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Audit Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate AU control effectiveness over time.",
+            "questions": [
+                { "id": "au_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Ingestion lag (median + P95)",
+                      "Dropped-event count (target: 0)",
+                      "% sources reporting in last hour",
+                      "Storage headroom (days remaining)",
+                      "Time-drift violations per quarter",
+                      "Mean time to detect (MTTD)",
+                      "Mean time to acknowledge alerts",
+                      "% alerts triaged within SLA",
+                      "Audit-system uptime"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the AU control implementations are summarized (e.g., 'SSP §13.3')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for AU findings", "type": "text",
+                  "help": "Convention for AU-related POA&M items (e.g., 'POAM-AU-')." },
+                { "id": "ac_event_source",              "label": "AC family event sourcing",        "type": "textarea", "rows": 2,
+                  "help": "How authentication / authorization events from the AC family land in the audit pipeline. Pointer to the AC plan if separate." },
+                { "id": "si_alerting",                  "label": "SI-4 alerting integration",       "type": "textarea", "rows": 2,
+                  "help": "How audit detections feed System Monitoring (SI-4). Reference SOAR playbook locations." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying AU continuous-monitoring activities to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "AU-2": {
+            "prompts": [
+                "Reference the event categories selected in §4.2 for the auditable-event list.",
+                "Identify the rationale for each category (regulatory requirement, threat model, compliance scope).",
+                "Document the coordination with other entities — see AU-2(a) ODV.",
+                "Address the periodic review of the auditable-event list — see §4.2 cadence.",
+                "State which roles can change the auditable-event list."
+            ],
+            "evidence_suggestions": [
+                "Auditable events list / event-source matrix",
+                "SIEM data-input configuration export",
+                "Annual event-list review records",
+                "Regulatory mapping (FISMA / FedRAMP / DoD 8500.01)",
+                "Sample audit record demonstrating each category"
+            ],
+            "extra_fields": [
+                { "id": "au2_event_list_owner",   "label": "Event-list owner role",      "type": "text",
+                  "help": "Role accountable for maintaining the auditable-events list." },
+                { "id": "au2_change_authorization","label": "Authorization to change the list", "type": "textarea", "rows": 3,
+                  "help": "Workflow for adding / removing event types. Typically requires ISSO concurrence or CCB review." },
+                { "id": "au2_coordination_entities","label": "Coordinating entities",      "type": "textarea", "rows": 2,
+                  "help": "Other organizational entities consulted on event selection (Privacy, Legal, Internal Audit)." }
+            ]
+        },
+
+        "AU-3": {
+            "prompts": [
+                "Reference the required-fields list in §4.2.",
+                "Address how additional content is captured for high-severity events (AU-3(1)).",
+                "Document how multiple system sources are correlated by shared session / correlation IDs.",
+                "Describe field validation at ingestion (events missing required fields are flagged or rejected)."
+            ],
+            "evidence_suggestions": [
+                "Sample audit record for each event category showing all required fields",
+                "Ingestion-pipeline schema / parser configuration",
+                "Schema validation report (events failing validation)"
+            ],
+            "extra_fields": [
+                { "id": "au3_correlation_id_strategy", "label": "Correlation ID strategy", "type": "textarea", "rows": 3,
+                  "help": "How a single user action that triggers events on multiple systems is correlated (request ID propagation, session token, distributed-trace ID)." },
+                { "id": "au3_extra_content_for_severe","label": "Additional content for high-severity events", "type": "textarea", "rows": 3,
+                  "help": "What fields are captured beyond the standard set when severity warrants. References AU-3(1)." }
+            ]
+        },
+
+        "AU-5": {
+            "prompts": [
+                "Reference the failure-action choice in §4.5.",
+                "Describe the alert path on logging failure (PagerDuty rotation, email, ticket).",
+                "Address the storage-capacity threshold and what happens when crossed.",
+                "Document the fallback logging channel (if any) for when the primary fails.",
+                "State the maximum-acceptable-data-loss window."
+            ],
+            "evidence_suggestions": [
+                "Sample audit-failure alert + response",
+                "Capacity-threshold alert configuration",
+                "Documented post-incident review of an audit failure (if any)"
+            ],
+            "extra_fields": [
+                { "id": "au5_fallback_channel", "label": "Fallback logging channel", "type": "textarea", "rows": 3,
+                  "help": "Where audit records go if primary fails (local disk buffer, secondary SIEM, syslog file). Document the bridge-back procedure." },
+                { "id": "au5_max_data_loss",    "label": "Maximum acceptable data-loss window", "type": "text",
+                  "help": "Tolerance for missed events during an outage (e.g., '5 minutes', 'zero — system halts')." }
+            ]
+        },
+
+        "AU-6": {
+            "prompts": [
+                "Reference the manual review cadence in §4.4.",
+                "Describe the automated correlation that filters noise before manual review.",
+                "Document the responsible role and escalation path — see §4.4.",
+                "Address review of audit records for security violations vs operational issues vs both.",
+                "Reference AU-6(1) automated tools, AU-6(3) correlation across repositories, AU-6(4) central review."
+            ],
+            "evidence_suggestions": [
+                "SIEM correlation rule export",
+                "Sample weekly / monthly audit-review report",
+                "SOC runbook for audit-record review",
+                "Sample escalation ticket arising from review"
+            ],
+            "extra_fields": [
+                { "id": "au6_automated_rules_count", "label": "Automated correlation rules in production (approximate count)", "type": "text",
+                  "help": "Order of magnitude — '~50 rules' is fine. Indicates analytic maturity." },
+                { "id": "au6_review_artifact",       "label": "Review artifact / output",       "type": "textarea", "rows": 3,
+                  "help": "What does a review produce? (Weekly report, dashboard screenshot, ticket queue review, etc.)" }
+            ]
+        },
+
+        "AU-8": {
+            "prompts": [
+                "Identify the authoritative time source — see §6.2.",
+                "State the maximum-allowed clock drift across audit sources.",
+                "Describe how drift is detected and remediated.",
+                "Address timestamps in records — UTC vs local, granularity, and ISO-8601 format compliance."
+            ],
+            "evidence_suggestions": [
+                "NTP configuration export (chronyd / w32time configuration)",
+                "Drift-monitoring SIEM rule",
+                "Sample audit record showing UTC ISO-8601 timestamp",
+                "Stratum hierarchy diagram"
+            ],
+            "extra_fields": [
+                { "id": "au8_timestamp_granularity","label": "Timestamp granularity",   "type": "select",
+                  "options": ["Second", "Millisecond", "Microsecond", "Nanosecond"] },
+                { "id": "au8_timezone_policy",      "label": "Timezone policy",          "type": "select",
+                  "options": ["All audit records in UTC", "Local time with timezone offset", "Mixed (specify in narrative)"] },
+                { "id": "au8_stratum",              "label": "NTP stratum used",        "type": "text",
+                  "help": "Stratum hierarchy (e.g., 'Stratum-2 internal servers synced to Stratum-1 GPS / atomic clock')." }
+            ]
+        },
+
+        "AU-9": {
+            "prompts": [
+                "Reference the tamper-protection mechanism in §4.3.",
+                "Describe access controls on audit records — see §4.3.",
+                "Document separation of duties between system administrators and audit reviewers.",
+                "Address backup of audit records and integrity verification of backups.",
+                "Reference AU-9(2) backup on separate physical/logical system, AU-9(3) cryptographic protection, AU-9(4) access by privileged users."
+            ],
+            "evidence_suggestions": [
+                "Storage policy (object lock / WORM configuration)",
+                "Audit-system IAM policy export (who can read / modify / delete)",
+                "Hash-chain verification log",
+                "Audit-record backup test report"
+            ],
+            "extra_fields": [
+                { "id": "au9_separation_of_duties","label": "Separation of duties",     "type": "textarea", "rows": 3,
+                  "help": "Roles able to administer the audit system vs roles able to review records vs roles able to modify retention. Ideally three distinct sets." },
+                { "id": "au9_backup_strategy",     "label": "Audit-record backup",      "type": "textarea", "rows": 3,
+                  "help": "Where audit records are backed up (separate region / account); how backups are integrity-verified; restoration test cadence." }
+            ]
+        },
+
+        "AU-11": {
+            "prompts": [
+                "Reference the retention period in §6.1.",
+                "Describe the online vs cold-archive split.",
+                "Document the records-destruction process at end of retention.",
+                "Address retention extensions for legal hold or active investigation.",
+                "Reference NARA records schedule (if federal) or organizational retention policy."
+            ],
+            "evidence_suggestions": [
+                "Retention policy document",
+                "S3 / Glacier lifecycle policy export",
+                "Sample certificate of destruction",
+                "Legal-hold procedure"
+            ],
+            "extra_fields": [
+                { "id": "au11_legal_hold_process","label": "Legal-hold process", "type": "textarea", "rows": 3,
+                  "help": "How a legal-hold request suspends retention destruction. Who initiates, who authorizes, how it's lifted." },
+                { "id": "au11_nara_schedule",     "label": "NARA / organizational schedule reference", "type": "text",
+                  "help": "Specific NARA GRS schedule item (e.g., 'GRS 3.2 item 030') or the organizational retention policy reference." }
+            ]
+        },
+
+        "AU-12": {
+            "prompts": [
+                "Identify the systems / applications that generate audit records.",
+                "Describe how non-logging components (legacy apps, embedded devices) are bridged into the audit pipeline.",
+                "Address selectability — who can change which events are emitted by which sources.",
+                "Document signing or hashing of records at generation (integrity from source, AU-12(1) supports this).",
+                "Reference AU-12(1) system-wide / time-correlated audit trail, AU-12(3) changes by authorized individuals."
+            ],
+            "evidence_suggestions": [
+                "Audit-source inventory (all hosts / apps / services emitting records)",
+                "Bridge-agent configuration for legacy systems",
+                "Sample signed / hashed audit record",
+                "Generation-config change audit (records of changes to logging config itself)"
+            ],
+            "extra_fields": [
+                { "id": "au12_source_inventory",     "label": "Audit-source inventory location", "type": "text",
+                  "help": "Where the master inventory of audit sources lives (CMDB attribute, dedicated wiki page, IaC config)." },
+                { "id": "au12_legacy_bridging",      "label": "Legacy system bridging",          "type": "textarea", "rows": 3,
+                  "help": "How systems that don't natively emit structured logs are brought into the pipeline (file-tail forwarder, syslog wrapper, sidecar)." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Audit Log",                  "definition": "A chronological record of system activities providing documentary evidence of the sequence of events that have affected a specific operation, procedure, or event." },
+        { "term": "Audit Record",              "definition": "An individual entry in an audit log — a single event captured with timestamp, source, subject, action, and outcome." },
+        { "term": "Audit Reduction",           "definition": "Process of filtering out duplicate, low-value, or out-of-scope records prior to long-term retention or review, while preserving forensic integrity." },
+        { "term": "Audit Trail",               "definition": "A complete, ordered sequence of audit records sufficient to reconstruct the activity of a user, process, or transaction." },
+        { "term": "Cold Archive",              "definition": "Storage tier for long-retention records that is rarely accessed and optimized for cost. Restoration takes hours, not seconds." },
+        { "term": "Common Event Format (CEF)", "definition": "An ArcSight-originated text-based log format with key-value extensions, widely supported by SIEMs." },
+        { "term": "Correlation Rule",          "definition": "A SIEM detection that combines events from multiple sources or over time to identify a higher-order pattern of interest." },
+        { "term": "Forwarder",                 "definition": "Lightweight agent that ships logs from a source host to a central aggregation point. Examples: Splunk Universal Forwarder, Fluent Bit, Vector, NXLog." },
+        { "term": "Hash Chain",                "definition": "An integrity construction where each log batch's hash is included in the next batch's record, making tampering detectable." },
+        { "term": "Ingestion Lag",             "definition": "The interval between an event occurring at its source and the event being queryable in the SIEM. Important SLI." },
+        { "term": "Log Aggregation",           "definition": "Collection of log records from disparate sources into a central system for storage and analysis." },
+        { "term": "Non-repudiation",           "definition": "Assurance that the originator of an action cannot later deny performing it. Often achieved with digital signatures or hash-chained logs." },
+        { "term": "OCSF",                      "definition": "Open Cybersecurity Schema Framework — a vendor-neutral schema for security telemetry that normalizes events across sources." },
+        { "term": "SIEM",                      "definition": "Security Information and Event Management — a platform that aggregates, correlates, and analyzes audit records for security purposes." },
+        { "term": "SOC",                       "definition": "Security Operations Center — the team (and tooling) responsible for monitoring audit records and responding to alerts." },
+        { "term": "Stratum (NTP)",             "definition": "Hierarchical level of an NTP server. Stratum-0 are reference clocks (atomic, GPS); stratum-1 are directly attached; each subsequent level is one hop away." },
+        { "term": "Tamper-Evident Logging",    "definition": "Logging architecture in which any modification to recorded events leaves a detectable signal — typically via hash chains or WORM storage." },
+        { "term": "Time-Drift",                "definition": "Divergence between a host's clock and the authoritative time source. Drift beyond threshold makes audit-record correlation unreliable." },
+        { "term": "UEBA",                      "definition": "User and Entity Behavior Analytics — a class of audit-record analytics that establishes baselines and flags deviations." },
+        { "term": "WORM Storage",              "definition": "Write-Once-Read-Many storage; records cannot be modified or deleted once written, until retention expires." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AO",    "expansion": "Authorizing Official" },
+        { "abbr": "ATO",   "expansion": "Authority to Operate" },
+        { "abbr": "AU",    "expansion": "Audit and Accountability (NIST 800-53 family)" },
+        { "abbr": "CEF",   "expansion": "Common Event Format" },
+        { "abbr": "EDR",   "expansion": "Endpoint Detection and Response" },
+        { "abbr": "FIM",   "expansion": "File Integrity Monitoring" },
+        { "abbr": "IDS",   "expansion": "Intrusion Detection System" },
+        { "abbr": "IPS",   "expansion": "Intrusion Prevention System" },
+        { "abbr": "ISA",   "expansion": "Interconnection Security Agreement" },
+        { "abbr": "ISSM",  "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",  "expansion": "Information System Security Officer" },
+        { "abbr": "LEEF",  "expansion": "Log Event Extended Format" },
+        { "abbr": "MTTA",  "expansion": "Mean Time To Acknowledge" },
+        { "abbr": "MTTD",  "expansion": "Mean Time To Detect" },
+        { "abbr": "MTTR",  "expansion": "Mean Time To Respond" },
+        { "abbr": "NARA",  "expansion": "National Archives and Records Administration" },
+        { "abbr": "NDR",   "expansion": "Network Detection and Response" },
+        { "abbr": "NIST",  "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "NOC",   "expansion": "Network Operations Center" },
+        { "abbr": "NTP",   "expansion": "Network Time Protocol" },
+        { "abbr": "OCSF",  "expansion": "Open Cybersecurity Schema Framework" },
+        { "abbr": "ODV",   "expansion": "Organization-Defined Value" },
+        { "abbr": "P95",   "expansion": "95th percentile (latency / time metric)" },
+        { "abbr": "PAN",   "expansion": "Primary Account Number (payment data)" },
+        { "abbr": "PHI",   "expansion": "Protected Health Information" },
+        { "abbr": "PII",   "expansion": "Personally Identifiable Information" },
+        { "abbr": "POAM",  "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PTP",   "expansion": "Precision Time Protocol" },
+        { "abbr": "RBAC",  "expansion": "Role-Based Access Control" },
+        { "abbr": "RMF",   "expansion": "Risk Management Framework" },
+        { "abbr": "SIEM",  "expansion": "Security Information and Event Management" },
+        { "abbr": "SLA",   "expansion": "Service-Level Agreement / Objective" },
+        { "abbr": "SLI",   "expansion": "Service-Level Indicator" },
+        { "abbr": "SOAR",  "expansion": "Security Orchestration, Automation, and Response" },
+        { "abbr": "SOC",   "expansion": "Security Operations Center" },
+        { "abbr": "SP",    "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",   "expansion": "System Security Plan" },
+        { "abbr": "UEBA",  "expansion": "User and Entity Behavior Analytics" },
+        { "abbr": "UTC",   "expansion": "Coordinated Universal Time" },
+        { "abbr": "WORM",  "expansion": "Write Once Read Many (storage)" },
+        { "abbr": "XDR",   "expansion": "Extended Detection and Response" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",   "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-92 — Guide to Computer Security Log Management","url": "https://csrc.nist.gov/pubs/sp/800/92/final" },
+        { "label": "NIST SP 800-137 — Information Security Continuous Monitoring", "url": "https://csrc.nist.gov/pubs/sp/800/137/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",        "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NARA General Records Schedule 3.2 (Information Systems Security Records)", "url": "https://www.archives.gov/records-mgmt/grs" },
+        { "label": "OCSF — Open Cybersecurity Schema Framework",           "url": "https://schema.ocsf.io/" }
+    ]
+}
