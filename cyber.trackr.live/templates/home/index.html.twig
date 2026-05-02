@@ -24,8 +24,20 @@
             <input id="hero-search-input" type="search" class="hero-search__input"
                    placeholder="Search {{ stig_count|number_format }} STIGs, {{ controls_count|number_format }} controls, {{ cci_count|number_format }} CCIs&hellip;"
                    aria-label="Search the library" autocomplete="off">
+            <button type="button"
+                    id="hero-bookmark-trigger"
+                    class="hero-search__bookmark saved-search-trigger"
+                    data-saved-search-trigger
+                    aria-label="Saved searches"
+                    aria-expanded="false"
+                    aria-controls="hero-bookmark-panel"
+                    title="Saved searches">
+                <i class="bi bi-bookmarks" aria-hidden="true"></i>
+                <span class="saved-search-trigger__count" data-saved-count hidden></span>
+            </button>
             <kbd>&#8984;K</kbd>
         </form>
+        <div id="hero-bookmark-panel" class="saved-search-panel" hidden role="region" aria-label="Saved searches"></div>
 
         <div class="hero__try rise delay-4">
             <span class="hero__try-label">Try</span>

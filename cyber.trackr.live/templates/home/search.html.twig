@@ -11,7 +11,27 @@
             <span class="eyebrow">Library Search</span>
             <h1 id="search-page-title" class="lib-page__title-large">
                 Results for <em>{{ query }}</em>
+                <button type="button"
+                        class="save-search-toggle"
+                        data-save-query="{{ query }}"
+                        aria-pressed="false"
+                        title="Save this search">
+                    <i class="bi bi-bookmark" aria-hidden="true"></i>
+                    <span data-save-label>Save</span>
+                </button>
+                <button type="button"
+                        id="search-bookmark-trigger"
+                        class="saved-search-trigger save-search-trigger--inline"
+                        data-saved-search-trigger
+                        aria-label="Saved searches"
+                        aria-expanded="false"
+                        aria-controls="search-bookmark-panel"
+                        title="Saved searches">
+                    <i class="bi bi-bookmarks" aria-hidden="true"></i>
+                    <span class="saved-search-trigger__count" data-saved-count hidden></span>
+                </button>
             </h1>
+            <div id="search-bookmark-panel" class="saved-search-panel saved-search-panel--inline" hidden role="region" aria-label="Saved searches"></div>
             <p class="lib-page__lede">
                 {{ results.rmfv4|length|number_format }} 800-53 r4 controls &middot;
                 {{ results.rmfv5|length|number_format }} 800-53 r5 controls &middot;

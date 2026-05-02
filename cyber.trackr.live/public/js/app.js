@@ -38,6 +38,28 @@ window.app = {
             }
         });
 
+        // Saved-searches dropdown — wires the bookmark trigger + panel
+        // wherever they appear on the current page (home hero + /search
+        // page header). Both pages put the panel right after the trigger
+        // so this single hook handles both.
+        if (window.savedSearches) {
+            const triggers = document.querySelectorAll("[data-saved-search-trigger]");
+            triggers.forEach(function (trigger) {
+                const panelId = trigger.getAttribute("aria-controls");
+                const panel = panelId ? document.getElementById(panelId) : null;
+                if (panel) {
+                    window.savedSearches.wireDropdown(trigger, panel, {
+                        searchBaseUrl: (window.routes && window.routes.search ? window.routes.search.replace("REPLACE_THIS", "") : "/search/"),
+                    });
+                }
+            });
+
+            // Wire any save-toggle buttons by reading their data-save-query.
+            document.querySelectorAll("[data-save-query]").forEach(function (btn) {
+                window.savedSearches.wireSaveToggle(btn, btn.dataset.saveQuery);
+            });
+        }
+
         // Click outside the 800-53 nav dropdown closes it. Uses the native
         // <details> 'open' attribute so no extra state to reconcile.
         $(document).on("click.siteNavMenu", function (e) {
