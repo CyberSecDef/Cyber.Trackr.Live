@@ -28,7 +28,13 @@ class Changelog
     }
 
     /**
-     * Walk the repo's git log newest → oldest.
+     * Return changelog entries newest → oldest. Resolution order:
+     *
+     *   1. resources/data/changelog.json — frozen by `app:changelog:freeze`,
+     *      written on dev before rsync to prod (which loses the .git dir).
+     *   2. Live `git log` — works on dev shells where the repo is intact.
+     *   3. Empty array — the template renders a "check GitHub instead"
+     *      empty state.
      *
      * @return array<int, array{
      *      hash:string, short_hash:string, subject:string, summary:string,
@@ -37,9 +43,56 @@ class Changelog
      */
     public function getEntries(): array
     {
+        $frozen = $this->loadFrozen();
+        if ($frozen !== null) return $frozen;
+
+        $live = $this->fetchFromGit();
+        return $live ?? [];
+    }
+
+    /**
+     * Path to the frozen JSON, regardless of whether it currently exists.
+     */
+    public function frozenPath(): string
+    {
+        return $this->projectDir . '/resources/data/changelog.json';
+    }
+
+    /**
+     * Read a previously-frozen JSON file. Returns null if the file is
+     * missing, unreadable, malformed, or has the wrong shape so the caller
+     * can fall back cleanly.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function loadFrozen(): ?array
+    {
+        $path = $this->frozenPath();
+        if (!is_file($path)) return null;
+
+        $raw = @file_get_contents($path);
+        if (!is_string($raw)) return null;
+
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) return null;
+        if (!isset($decoded['entries']) || !is_array($decoded['entries'])) return null;
+
+        return $decoded['entries'];
+    }
+
+    /**
+     * Live `git log` walk, newest → oldest. Returns null on environments
+     * without git or .git so callers can choose how to handle it (the
+     * freeze command surfaces an error; getEntries() falls through to
+     * empty).
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    public function fetchFromGit(): ?array
+    {
         $repoDir = $this->resolveRepoDir();
-        if ($repoDir === null) return [];
-        if (!function_exists('proc_open')) return [];
+        if ($repoDir === null) return null;
+        if (!function_exists('proc_open')) return null;
 
         // Unique record + field separators that won't appear in commit text.
         $rs = "\x1e";  // ASCII record separator
@@ -48,7 +101,7 @@ class Changelog
 
         $cmd = ['git', '-C', $repoDir, 'log', '--no-merges', '--pretty=format:' . $format];
         $raw = $this->runCommand($cmd);
-        if ($raw === null) return [];
+        if ($raw === null) return null;
 
         $entries = [];
         foreach (explode($rs, $raw) as $chunk) {
