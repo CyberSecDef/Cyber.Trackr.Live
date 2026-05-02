@@ -1,0 +1,535 @@
+{
+    "_comment": "Contingency Plan generator. Authored at the Phase 2 assessability floor; pairs naturally with the CM plan's backup_strategy group and the IR plan's recovery phase. Note the meta-quirk: CP-2 (Contingency Plan) is satisfied BY this very document.",
+
+    "family": "CP",
+    "family_name": "Contingency Planning",
+    "title": "Contingency Plan",
+    "description": "Documents how the system continues to operate during a disruption and how it recovers afterwards. Covers the controls of the CP family in NIST SP 800-53 r5 and aligns with NIST SP 800-34 r1 (Contingency Planning Guide for Federal Information Systems).",
+
+    "intro_template": "This Contingency Plan documents the contingency-planning approach for {system_name}. It establishes the recovery objectives, alternate sites, backup strategy, telecommunications continuity, training, exercises, and safe-mode operations needed to maintain or restore mission-critical functions during a disruption.\n\nThe scope covers the Business Impact Analysis (BIA) underpinning the recovery objectives, the alternate storage and processing strategy, system backup and recovery procedures, telecommunications continuity, training and exercises, and degraded-operation modes within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Contingency Planning family) and NIST SP 800-34 r1 (Contingency Planning Guide for Federal Information Systems).\n\nThis document satisfies the CP-2 control requirement for the system to maintain a documented contingency plan.",
+
+    "approach_section_title": "Contingency Planning Approach",
+    "approach_template": "Contingency planning for {system_name} is owned by {cp_program_lead}. The Business Impact Analysis (§4.2) establishes a Recovery Time Objective of {rto_target} and a Recovery Point Objective of {rpo_target}. Alternate storage and processing arrangements are described in §4.3. System backups are taken per the strategy in §4.4 and recovery executes per the runbooks in §4.5. Telecommunications continuity, training and exercise programs, and safe-mode operations are documented in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Contingency-planning effectiveness for {system_name} is tracked through the metrics in §6.1 (RTO / RPO performance during exercises and real events, exercise findings closed within target, backup-success rate, restoration-test outcomes). The plan itself is reviewed at the cadence in §6.2; lessons learned from exercises and real disruptions trigger interim revisions.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Contingency Plan does not stand alone. The IR family coordinates recovery actions during cybersecurity incidents; the CM family supplies the baseline configurations from which systems are restored; the SI family provides system-monitoring infrastructure that detects degraded operation. The following cross-references identify the specific artifacts and locations where CP-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "CP-1",  "from": "Organizational contingency-planning policy" },
+        { "number": "CP-3",  "from": "Enterprise contingency-training program" },
+        { "number": "CP-7",  "from": "Enterprise alternate processing site (when shared)" },
+        { "number": "CP-8",  "from": "Enterprise telecommunications continuity service" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Program ownership and the recovery objectives that drive everything else.",
+            "questions": [
+                {
+                    "id": "cp_program_lead",
+                    "label": "Contingency-planning program lead",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role accountable for keeping the plan current and the program operating (e.g., 'Director of IT Operations', 'Business Continuity Manager')."
+                },
+                {
+                    "id": "rto_target",
+                    "label": "Recovery Time Objective (RTO)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Target time from disruption to restored operation (e.g., '4 hours', '1 business day'). Drives the alternate-site and backup strategies."
+                },
+                {
+                    "id": "rpo_target",
+                    "label": "Recovery Point Objective (RPO)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Maximum acceptable data loss measured in time (e.g., '1 hour', '24 hours'). Drives the backup frequency."
+                },
+                {
+                    "id": "mtpd",
+                    "label": "Maximum Tolerable Period of Disruption (MTPD / MTD)",
+                    "type": "text",
+                    "help": "Hard upper bound on how long the system can be down before consequences become unacceptable. Drives the alternate-processing strategy."
+                },
+                {
+                    "id": "criticality_tier",
+                    "label": "Mission criticality tier",
+                    "type": "select",
+                    "options": ["Mission Essential Function (MEF)", "Primary Mission Essential Function (PMEF)", "Mission Critical (Tier 1)", "Mission Important (Tier 2)", "Routine (Tier 3)"],
+                    "help": "How critical the system is to the mission. Federal MEF/PMEF terminology per FCD 1; lower tiers are organizational classifications."
+                }
+            ]
+        },
+
+        {
+            "id": "bia",
+            "type": "group",
+            "section": "approach",
+            "label": "Business Impact Analysis (BIA)",
+            "description": "What functions the system supports, what depends on it, and the tolerance for disruption.",
+            "questions": [
+                { "id": "bia_critical_functions",  "label": "Critical functions supported",       "type": "textarea", "rows": 4,
+                  "help": "Mission / business functions the system supports. State which are time-critical and why." },
+                { "id": "bia_dependencies",         "label": "Upstream dependencies",              "type": "textarea", "rows": 4,
+                  "help": "Other systems / services this system depends on (auth, network, storage, payments, etc.). Recovery cannot complete without these. Reference SA-9 if external." },
+                { "id": "bia_dependents",           "label": "Downstream dependents",              "type": "textarea", "rows": 3,
+                  "help": "Systems / services that depend on THIS system. They will also be affected by a disruption." },
+                { "id": "bia_impact_categories",    "label": "Impact categories evaluated",        "type": "multi_select",
+                  "options": ["Operational disruption", "Financial loss", "Regulatory / compliance violation", "Reputational damage", "Loss of life / safety", "Mission failure", "Data loss / corruption"] },
+                { "id": "bia_responsible_role",     "label": "BIA owner role",                     "type": "text",
+                  "help": "Role responsible for keeping the BIA current. Often the System Owner or Business Continuity Manager." },
+                { "id": "bia_review_cadence",       "label": "BIA review cadence",                 "type": "select",
+                  "options": ["Annually", "Semi-annually", "On material system change", "Annually + on material change"] }
+            ]
+        },
+
+        {
+            "id": "alternate_sites",
+            "type": "group",
+            "section": "approach",
+            "label": "Alternate Storage and Processing",
+            "description": "Off-site storage and failover processing capabilities (CP-6, CP-7).",
+            "questions": [
+                { "id": "alt_storage_site",       "label": "Alternate storage site",             "type": "textarea", "rows": 3,
+                  "help": "Where backups and configuration baselines live in off-site / cross-region storage. Distance from primary, access controls." },
+                { "id": "alt_processing_site",    "label": "Alternate processing site",          "type": "textarea", "rows": 4,
+                  "help": "Where the system can run when the primary is unavailable. Cloud cross-region, hot/warm/cold site, mutual-aid agreement." },
+                { "id": "alt_site_type",          "label": "Alternate-site readiness",            "type": "select",
+                  "options": ["Hot site (continuous standby; near-zero RTO)", "Warm site (provisioned but not running; minutes-to-hours RTO)", "Cold site (capability only; days RTO)", "Mutual aid agreement", "Cloud cross-region (active-active)", "Cloud cross-region (active-passive)", "None (single-site; document risk acceptance)"] },
+                { "id": "alt_site_distance",      "label": "Geographic separation",               "type": "text",
+                  "help": "Distance from primary site in miles / km, or cloud-region pair (e.g., 'us-gov-west-1 → us-gov-east-1, ~2400 mi')." },
+                { "id": "alt_site_access",        "label": "Site activation / access procedure", "type": "textarea", "rows": 3,
+                  "help": "How the alternate site is activated. Who authorizes? What credentials / access are pre-positioned?" }
+            ]
+        },
+
+        {
+            "id": "backup_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "System Backup Strategy",
+            "description": "Backup types, frequency, retention, and integrity verification (CP-9). Overlaps with the CM plan's backup_strategy group; the CP plan focuses on disaster-recovery use, the CM plan focuses on configuration restoration.",
+            "questions": [
+                { "id": "backup_types",          "label": "Backup types performed",             "type": "multi_select",
+                  "options": ["Full system image", "File-level full backup", "File-level incremental", "File-level differential", "Database transaction log backups", "Database snapshot", "Configuration export (CMDB / IaC)", "User data backup"] },
+                { "id": "backup_frequency",      "label": "Backup frequency",                   "type": "textarea", "rows": 3,
+                  "help": "How often each backup type runs. Tied to RPO target." },
+                { "id": "backup_retention",      "label": "Backup retention",                   "type": "textarea", "rows": 3,
+                  "help": "How long each backup type is retained. Often shorter for incremental, longer for full." },
+                { "id": "backup_offsite",        "label": "Offsite copy",                       "type": "textarea", "rows": 3,
+                  "help": "Where the offsite copy lives. Same as alternate storage site or distinct? Encryption in transit and at rest." },
+                { "id": "backup_integrity_test", "label": "Integrity verification cadence",     "type": "text",
+                  "help": "How often backup integrity is verified (hash check + restore test). Separate from full restoration test." },
+                { "id": "backup_restoration_test","label": "Restoration test cadence",           "type": "text",
+                  "help": "How often a real restore is exercised end-to-end (e.g., 'Quarterly restore-from-cold to scratch environment')." }
+            ]
+        },
+
+        {
+            "id": "recovery_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Recovery Strategy",
+            "description": "How the system is restored from backup or alternate site (CP-10).",
+            "questions": [
+                { "id": "recovery_phases",       "label": "Recovery phases",                    "type": "textarea", "rows": 5,
+                  "help": "Phases per NIST SP 800-34: Activation/Notification → Recovery → Reconstitution → Plan Deactivation. Document who does what at each phase." },
+                { "id": "recovery_runbook_link", "label": "Recovery runbook location",          "type": "text",
+                  "help": "Where the technical step-by-step runbook lives. Should be accessible during a primary-site outage." },
+                { "id": "recovery_decision_authority","label": "Recovery decision authority",   "type": "text",
+                  "help": "Role authorized to declare a contingency event and trigger recovery (e.g., 'CP Program Lead in coordination with System Owner')." },
+                { "id": "recovery_priority_order","label": "Component recovery priority order",  "type": "textarea", "rows": 4,
+                  "help": "Order in which components / services are restored. Database first? Auth first? Document the dependency chain." },
+                { "id": "reconstitution_validation","label": "Reconstitution validation",         "type": "textarea", "rows": 3,
+                  "help": "How the recovered system is validated before returning to production (smoke tests, security scans, data-integrity checks)." }
+            ]
+        },
+
+        {
+            "id": "telecommunications",
+            "type": "group",
+            "section": "approach",
+            "label": "Telecommunications Continuity (CP-8)",
+            "description": "Primary and alternate communication paths.",
+            "questions": [
+                { "id": "telecomm_primary",      "label": "Primary telecommunications service", "type": "text",
+                  "help": "Main connectivity for the system (carrier + technology, e.g., 'AT&T MPLS + fiber')." },
+                { "id": "telecomm_alternate",    "label": "Alternate telecommunications service", "type": "textarea", "rows": 3,
+                  "help": "Diverse-path backup connectivity. Different carrier? Different technology? Different physical entry to the building?" },
+                { "id": "telecomm_priority_service","label": "Telecommunications Service Priority (TSP) enrollment", "type": "select",
+                  "options": ["Yes — TSP enrolled (federal priority restoration)", "No — not enrolled", "Not applicable (cloud-based system)"] },
+                { "id": "telecomm_diversity_check","label": "Diversity verification cadence",   "type": "text",
+                  "help": "How often path diversity is verified — carriers can converge to common physical paths over time without notice." }
+            ]
+        },
+
+        {
+            "id": "training_exercises",
+            "type": "group",
+            "section": "approach",
+            "label": "Training and Exercises (CP-3, CP-4)",
+            "description": "Contingency-specific training and the exercise program.",
+            "questions": [
+                { "id": "cp_training_audience",   "label": "CP training audiences",              "type": "multi_select",
+                  "options": ["CP team / responders", "System administrators (recovery operators)", "On-call engineers", "System Owner + leadership", "All system users (general awareness of safe-mode)"] },
+                { "id": "cp_training_cadence",    "label": "CP training cadence",                "type": "select",
+                  "options": ["Annually", "Annually + on role change", "Quarterly tabletop bites + annual full training"] },
+                { "id": "cp_exercise_types",      "label": "Exercise types performed",           "type": "multi_select",
+                  "options": ["Tabletop (discussion-based)", "Walkthrough (procedural)", "Functional (technical drill on test systems)", "Full-scale (failover to alternate site, real systems)", "Restore-from-backup test", "Joint exercise with IR team"] },
+                { "id": "cp_exercise_cadence",    "label": "Exercise cadence",                   "type": "select",
+                  "options": ["Annually (one full-scale)", "Semi-annually (mix)", "Quarterly tabletop + annual full-scale", "Continuous (chaos engineering / planned failover drills)"] },
+                { "id": "cp_aar_process",         "label": "After-action / lessons-learned process","type": "textarea", "rows": 3,
+                  "help": "How exercise findings are tracked to closure (POA&M, internal tracker), and the cadence for revalidating closure." }
+            ]
+        },
+
+        {
+            "id": "safe_mode",
+            "type": "group",
+            "section": "approach",
+            "label": "Safe Mode and Degraded Operations (CP-12)",
+            "description": "How the system continues operating in a degraded state during a disruption.",
+            "questions": [
+                { "id": "safe_mode_definition",   "label": "Safe-mode definition",               "type": "textarea", "rows": 4,
+                  "help": "What functions remain available in safe mode? What's disabled? Read-only access only? Reduced user populations?" },
+                { "id": "safe_mode_triggers",     "label": "Safe-mode entry triggers",           "type": "textarea", "rows": 3,
+                  "help": "What conditions cause the system to enter safe mode (automated or manual). Detection thresholds." },
+                { "id": "safe_mode_communication","label": "User communication during degradation","type": "textarea", "rows": 3,
+                  "help": "How users are informed of degraded operation and remaining capabilities (status page, banner, email)." },
+                { "id": "safe_mode_exit_criteria","label": "Safe-mode exit criteria",            "type": "textarea", "rows": 3,
+                  "help": "Conditions for returning to full operation. Validation steps before exit." }
+            ]
+        },
+
+        {
+            "id": "system_criticality_overview",
+            "type": "group",
+            "section": "system_overview",
+            "label": "System Criticality Overview",
+            "description": "High-level summary of how critical the system is to the mission.",
+            "questions": [
+                { "id": "criticality_users_impacted","label": "Approximate users affected by disruption", "type": "text",
+                  "help": "Order-of-magnitude count of users / dependent systems who would be impacted." },
+                { "id": "criticality_revenue_impact","label": "Revenue / mission impact per hour of disruption", "type": "text",
+                  "help": "If quantifiable. Otherwise qualitative — 'mission-essential', 'core operations halted', etc." },
+                { "id": "criticality_compliance_impact","label": "Compliance impact of disruption",        "type": "textarea", "rows": 3,
+                  "help": "Regulatory / contractual obligations that disruption would violate (uptime SLA, public-facing service requirement, etc.)." }
+            ]
+        },
+
+        {
+            "id": "cp_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Contingency Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate CP control effectiveness over time.",
+            "questions": [
+                { "id": "cp_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "RTO actual vs target (median + worst case)",
+                      "RPO actual vs target (median + worst case)",
+                      "Backup-success rate (target: 99%+)",
+                      "Restoration-test success rate (target: 100%)",
+                      "Exercise findings closed within target",
+                      "Mean time to declare contingency event",
+                      "Time-since-last-restoration test (days)",
+                      "Alternate-site failover-test outcomes",
+                      "% recovery runbooks current within review cadence"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "plan_review",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Plan Review Cadence",
+            "description": "When and why the plan is revised.",
+            "questions": [
+                { "id": "plan_review_cadence",    "label": "Scheduled plan review cadence",      "type": "select",
+                  "options": ["Annually", "Semi-annually", "Annually + after every exercise"] },
+                { "id": "plan_review_triggers",   "label": "Triggers beyond scheduled review",   "type": "textarea", "rows": 3,
+                  "help": "Events that force a plan revision outside the annual schedule (real disruption, organizational restructure, major architecture change)." },
+                { "id": "plan_distribution",      "label": "Plan distribution / access control", "type": "textarea", "rows": 3,
+                  "help": "Who receives the plan, and how access is controlled (the plan often contains procedural detail useful to attackers — control distribution accordingly)." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the CP control implementations are summarized (e.g., 'SSP §13.7')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for CP findings", "type": "text",
+                  "help": "Convention for CP-related POA&M items (e.g., 'POAM-CP-')." },
+                { "id": "ir_plan_reference",            "label": "IR plan cross-reference",       "type": "textarea", "rows": 2,
+                  "help": "How recovery from cybersecurity incidents coordinates with the IR plan's recovery phase." },
+                { "id": "cm_backup_reference",          "label": "CM plan backup_strategy cross-reference", "type": "textarea", "rows": 2,
+                  "help": "How CP backup activities coordinate with the CM plan's baseline-storage and integrity-protection approach." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying CP continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "CP-2": {
+            "prompts": [
+                "**This document satisfies CP-2.** State that explicitly in the implementation narrative.",
+                "Reference the document version / approval signatures.",
+                "Identify the BIA — see §4.2.",
+                "Address coordination with related plans (IR — recovery; OEP — Occupant Emergency; COOP — Continuity of Operations).",
+                "Document the review cadence — see §6.2.",
+                "Reference CP-2(1) coordination with related plans, CP-2(3) resume essential mission/business functions, CP-2(8) identify critical assets."
+            ],
+            "evidence_suggestions": [
+                "This document (the Contingency Plan itself)",
+                "Plan-approval record (System Owner / ISSO / AO signatures)",
+                "BIA document",
+                "Coordination matrix with related plans",
+                "Annual review record"
+            ],
+            "extra_fields": [
+                { "id": "cp2_plan_owner",          "label": "Plan owner role",            "type": "text",
+                  "help": "Role responsible for keeping the plan current (typically CP Program Lead, often the BCM)." },
+                { "id": "cp2_related_plans",       "label": "Related plans coordinated with", "type": "multi_select",
+                  "options": ["IR Plan (cybersecurity incident response)", "Occupant Emergency Plan (life safety)", "Continuity of Operations Plan (COOP)", "Disaster Recovery Plan (technology recovery)", "Crisis Communications Plan", "Pandemic Influenza Plan", "Cyber Incident Response Plan (sector-level)"] },
+                { "id": "cp2_critical_assets",     "label": "Critical assets identified",   "type": "textarea", "rows": 3,
+                  "help": "Summary of the critical assets identified per CP-2(8). Detail typically lives in the BIA." }
+            ]
+        },
+
+        "CP-3": {
+            "prompts": [
+                "Reference §4.7 — training audiences and cadence.",
+                "Document the role-based training content.",
+                "Address training records and how completion is tracked.",
+                "Reference CP-3(1) simulated events for incorporating training in operational realism."
+            ],
+            "evidence_suggestions": [
+                "CP training curriculum / syllabus",
+                "Annual training completion report",
+                "Sample role-based CP training module",
+                "Training-records LMS export"
+            ],
+            "extra_fields": [
+                { "id": "cp3_training_records_system","label": "Training-records system of record", "type": "text",
+                  "help": "LMS or other system tracking individual completion." },
+                { "id": "cp3_simulated_events",       "label": "Use of simulated events in training", "type": "select",
+                  "options": ["Yes — every CP training cycle includes simulated event exercise", "Yes — quarterly drills supplement classroom training", "Yes — annual exercise serves as simulated event", "No — training is classroom only"] }
+            ]
+        },
+
+        "CP-4": {
+            "prompts": [
+                "Reference §4.7 — exercise types and cadence.",
+                "Document specific scenarios exercised (regional outage, ransomware, primary-site loss, etc.).",
+                "Address coordination with related-plan exercises (IR + CP joint exercise).",
+                "Document how findings are tracked to closure.",
+                "Reference CP-4(1) coordinated with related plans, CP-4(2) alternate processing site, CP-4(4) full recovery and reconstitution."
+            ],
+            "evidence_suggestions": [
+                "Annual exercise schedule",
+                "After-action reports from last 12 months",
+                "Exercise scenario library",
+                "Findings-closure tracker",
+                "Joint IR/CP exercise records"
+            ],
+            "extra_fields": [
+                { "id": "cp4_full_reconstitution_tested","label": "Full recovery & reconstitution tested?", "type": "select",
+                  "options": ["Yes — last full reconstitution test within review cadence", "Partial — components tested separately, not end-to-end", "No — table-top / functional only"],
+                  "help": "CP-4(4) requires full recovery + reconstitution exercise. Document where you stand." },
+                { "id": "cp4_joint_ir_exercise",       "label": "Joint IR/CP exercise cadence",          "type": "text",
+                  "help": "How often IR and CP teams exercise together on a scenario that crosses both domains." }
+            ]
+        },
+
+        "CP-6": {
+            "prompts": [
+                "Identify the alternate storage site — see §4.3.",
+                "Document the geographic separation and distance from primary.",
+                "Address access controls and physical / logical security at the alternate site.",
+                "Reference CP-6(1) separation from primary site, CP-6(2) recovery time / point objectives, CP-6(3) accessibility."
+            ],
+            "evidence_suggestions": [
+                "Alternate-storage-site contract / MOU / lease",
+                "Site-distance verification document",
+                "Access-control configuration at alternate site",
+                "Disaster scenario analysis showing alternate site is unaffected by same disruption"
+            ],
+            "extra_fields": [
+                { "id": "cp6_storage_provider",   "label": "Alternate storage provider",         "type": "text",
+                  "help": "Cloud region pair, third-party vault service, or in-house remote facility." },
+                { "id": "cp6_access_during_emergency","label": "Access during emergency",        "type": "textarea", "rows": 3,
+                  "help": "How storage is accessed when the primary site is down. Pre-positioned credentials, network-path independence." }
+            ]
+        },
+
+        "CP-7": {
+            "prompts": [
+                "Identify the alternate processing site — see §4.3.",
+                "State the readiness tier (hot / warm / cold / mutual aid).",
+                "Document the failover process and decision authority.",
+                "Address the time required to bring up operations at the alternate site (relate to RTO).",
+                "Reference CP-7(1) separation from primary, CP-7(2) accessibility, CP-7(3) priority of service, CP-7(4) preparation for use."
+            ],
+            "evidence_suggestions": [
+                "Alternate-processing-site contract / lease / cloud-region SLA",
+                "Failover runbook",
+                "Last failover-test report",
+                "Pre-positioned access roster"
+            ],
+            "extra_fields": [
+                { "id": "cp7_readiness_tier",      "label": "Readiness tier",         "type": "select",
+                  "options": ["Hot — continuous standby", "Warm — provisioned, not running", "Cold — capability only", "Mutual aid", "Active-active multi-region"] },
+                { "id": "cp7_priority_of_service", "label": "Priority of service guarantee", "type": "textarea", "rows": 3,
+                  "help": "Per CP-7(3) — contractual priority for restoration when the alternate site is shared with other tenants." }
+            ]
+        },
+
+        "CP-8": {
+            "prompts": [
+                "Reference §4.6 — primary and alternate telecommunications services.",
+                "State the carriers used and the diversity model (different carrier, different technology, different physical entry).",
+                "Document TSP enrollment for federal-priority restoration if applicable.",
+                "Reference CP-8(1) priority of service provisions, CP-8(2) single points of failure, CP-8(3) separation of providers, CP-8(4) provider contingency plans."
+            ],
+            "evidence_suggestions": [
+                "Carrier contracts (executive summary)",
+                "Path-diversity verification report",
+                "TSP enrollment record (if applicable)",
+                "Provider contingency-plan attestations"
+            ],
+            "extra_fields": [
+                { "id": "cp8_separation_verified", "label": "Last carrier-diversity verification", "type": "text",
+                  "help": "Date of last verification that primary and alternate paths are physically and operationally distinct." },
+                { "id": "cp8_provider_attestations","label": "Provider contingency-plan attestations", "type": "textarea", "rows": 3,
+                  "help": "Summary of CP-8(4) — what each carrier has attested to about their own contingency posture." }
+            ]
+        },
+
+        "CP-9": {
+            "prompts": [
+                "Reference §4.4 — backup types, frequency, retention.",
+                "Document integrity verification + restoration testing — see §4.4.",
+                "Address backup encryption (at rest + in transit).",
+                "Reference CP-9(1) testing of backup information, CP-9(2) test restoration using sampling, CP-9(3) separate storage for critical information, CP-9(5) transfer to alternate storage site, CP-9(8) cryptographic protection."
+            ],
+            "evidence_suggestions": [
+                "Backup configuration export",
+                "Backup-integrity verification log",
+                "Restoration-test report (last cycle)",
+                "Backup-encryption configuration",
+                "Critical-information storage-separation verification"
+            ],
+            "extra_fields": [
+                { "id": "cp9_critical_separately_stored","label": "Critical information stored separately?", "type": "select",
+                  "options": ["Yes — separate logical storage and access boundary", "Yes — separate physical infrastructure", "No — same infrastructure as full backups"],
+                  "help": "CP-9(3) requires critical info (e.g., critical control parameters) to be backed up separately from general system backups." },
+                { "id": "cp9_cryptographic_protection",   "label": "Cryptographic protection of backups", "type": "textarea", "rows": 3,
+                  "help": "Encryption at rest + in transit. Key management. Reference SC-13 / SC-28 alignment." }
+            ]
+        },
+
+        "CP-10": {
+            "prompts": [
+                "Reference §4.5 — recovery phases and runbooks.",
+                "State the RTO target and document actual recovery times from exercises.",
+                "Address protection of the recovery process itself (recovery operators with elevated access; tamper protection of recovery media).",
+                "Reference CP-10(2) transaction recovery, CP-10(4) restore within time period, CP-10(6) component protection during recovery."
+            ],
+            "evidence_suggestions": [
+                "Recovery runbook (with version)",
+                "Last recovery exercise after-action report",
+                "Recovery-time data over last several exercises",
+                "Recovery-operator role definition"
+            ],
+            "extra_fields": [
+                { "id": "cp10_transaction_recovery", "label": "Transaction recovery approach (CP-10(2))", "type": "textarea", "rows": 3,
+                  "help": "For transactional systems — how in-flight transactions are handled across recovery. Roll-forward from logs, two-phase commit recovery, etc." },
+                { "id": "cp10_recovery_protection",  "label": "Protection of recovery process",          "type": "textarea", "rows": 3,
+                  "help": "How the recovery process itself is protected (recovery accounts with elevated privileges; tamper-evidence on recovery media; verification of recovered system before reconnection)." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Active-Active",            "definition": "Architecture where multiple instances simultaneously serve traffic across geographic regions. Failure of one region triggers automatic re-routing without manual recovery." },
+        { "term": "Active-Passive",           "definition": "Architecture where a primary instance serves traffic and a standby instance takes over on failure. Failover is faster than warm-site activation but requires explicit switchover." },
+        { "term": "After-Action Report (AAR)","definition": "Document produced after an exercise or real disruption summarizing what happened, what worked, what didn't, and corrective actions." },
+        { "term": "Alternate Processing Site","definition": "Facility (physical or cloud) prepared to take over operation when the primary site is unavailable. Tier (hot / warm / cold) drives RTO." },
+        { "term": "Alternate Storage Site",   "definition": "Off-site location holding copies of backup data and configuration baselines, geographically separated from the primary site." },
+        { "term": "Business Continuity Plan (BCP)", "definition": "An organization-wide plan covering continuity of business functions during a disruption. Encompasses but is broader than the Contingency Plan / DRP." },
+        { "term": "Business Impact Analysis (BIA)", "definition": "Analysis identifying mission-critical functions, their dependencies, and the impact of disruption. Drives RTO / RPO targets." },
+        { "term": "Cold Site",                "definition": "An alternate site providing only the basic capability (space, power, telecom). Equipment and data must be brought in. Days-level RTO." },
+        { "term": "Continuity of Operations (COOP)", "definition": "Federal continuity-planning concept covering an organization's ability to continue Mission Essential Functions during a disruption. Per FCD 1." },
+        { "term": "Disaster Recovery Plan (DRP)", "definition": "A focused plan covering technology recovery — restoring IT systems and data after a disruption. The CP is closely related but broader." },
+        { "term": "Failover",                 "definition": "The process of switching operations from a failed component or site to a backup. Can be automatic or manual." },
+        { "term": "Hot Site",                 "definition": "An alternate site with continuously running, fully provisioned infrastructure that mirrors the primary site. Near-zero RTO." },
+        { "term": "Maximum Tolerable Period of Disruption (MTPD / MTD)", "definition": "Hard upper bound on system downtime before consequences become unacceptable. RTO must be less than MTPD." },
+        { "term": "Mission Essential Function (MEF)", "definition": "Per FCD 1, a function an organization must perform to support its statutory mission. Cannot be deferred during a continuity event." },
+        { "term": "Mutual Aid Agreement",      "definition": "Reciprocal arrangement between organizations to provide assistance to each other during a contingency event. Typically formalized in an MOU." },
+        { "term": "Primary Mission Essential Function (PMEF)", "definition": "An MEF that supports the performance of a federal department's National Essential Function (NEF). Highest-tier criticality." },
+        { "term": "Recovery Point Objective (RPO)", "definition": "The maximum acceptable amount of data loss measured in time. Drives backup frequency. Example: RPO of 1 hour requires backups at least hourly." },
+        { "term": "Recovery Time Objective (RTO)", "definition": "The target time to restore a system after disruption. Drives the alternate-site readiness tier and recovery procedures." },
+        { "term": "Reconstitution",           "definition": "The phase after recovery in which the system is fully restored to operational state, validated, and reconnected to dependent services." },
+        { "term": "Safe Mode",                "definition": "A degraded operational mode that maintains a subset of system functions during a disruption. Typically excludes high-risk operations." },
+        { "term": "Single Point of Failure (SPOF)", "definition": "A component whose failure would cause loss of system availability. CP design seeks to eliminate or minimize SPOFs." },
+        { "term": "Telecommunications Service Priority (TSP)", "definition": "A federal program that authorizes priority installation and restoration of National Security and Emergency Preparedness telecommunications services." },
+        { "term": "Warm Site",                "definition": "An alternate site with provisioned infrastructure that is not actively running. Activation takes minutes to hours; RTO is typically several hours." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AAR",   "expansion": "After-Action Report" },
+        { "abbr": "AO",    "expansion": "Authorizing Official" },
+        { "abbr": "ATO",   "expansion": "Authority to Operate" },
+        { "abbr": "BCM",   "expansion": "Business Continuity Manager" },
+        { "abbr": "BCP",   "expansion": "Business Continuity Plan" },
+        { "abbr": "BIA",   "expansion": "Business Impact Analysis" },
+        { "abbr": "COOP",  "expansion": "Continuity of Operations Plan" },
+        { "abbr": "CP",    "expansion": "Contingency Planning (NIST 800-53 family)" },
+        { "abbr": "DR",    "expansion": "Disaster Recovery" },
+        { "abbr": "DRP",   "expansion": "Disaster Recovery Plan" },
+        { "abbr": "FCD",   "expansion": "Federal Continuity Directive" },
+        { "abbr": "ISSM",  "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",  "expansion": "Information System Security Officer" },
+        { "abbr": "MEF",   "expansion": "Mission Essential Function" },
+        { "abbr": "MTD",   "expansion": "Maximum Tolerable Downtime" },
+        { "abbr": "MTPD",  "expansion": "Maximum Tolerable Period of Disruption" },
+        { "abbr": "NEF",   "expansion": "National Essential Function" },
+        { "abbr": "NIST",  "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",   "expansion": "Organization-Defined Value" },
+        { "abbr": "OEP",   "expansion": "Occupant Emergency Plan" },
+        { "abbr": "PMEF",  "expansion": "Primary Mission Essential Function" },
+        { "abbr": "POAM",  "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RMF",   "expansion": "Risk Management Framework" },
+        { "abbr": "RPO",   "expansion": "Recovery Point Objective" },
+        { "abbr": "RTO",   "expansion": "Recovery Time Objective" },
+        { "abbr": "SLA",   "expansion": "Service-Level Agreement" },
+        { "abbr": "SP",    "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SPOF",  "expansion": "Single Point of Failure" },
+        { "abbr": "SSP",   "expansion": "System Security Plan" },
+        { "abbr": "TSP",   "expansion": "Telecommunications Service Priority" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",                   "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-34 r1 — Contingency Planning Guide for Federal Information Systems", "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" },
+        { "label": "NIST SP 800-84 — Guide to Test, Training, and Exercise Programs for IT Plans and Capabilities", "url": "https://csrc.nist.gov/pubs/sp/800/84/final" },
+        { "label": "NIST SP 800-184 — Guide for Cybersecurity Event Recovery",            "url": "https://csrc.nist.gov/pubs/sp/800/184/final" },
+        { "label": "Federal Continuity Directive 1 (FCD 1)",                               "url": "https://www.fema.gov/sites/default/files/2020-07/Federal_Continuity_Directive-1_January-17-2017.pdf" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                        "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" }
+    ]
+}
