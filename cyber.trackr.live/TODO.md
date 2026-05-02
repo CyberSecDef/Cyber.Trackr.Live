@@ -769,7 +769,7 @@ Tiered by impact + natural pairings to plans already authored.
 
 - [x] PE — Physical and Environmental Protection Plan (authored at Phase 2 floor; 14 family-question groups, 8 guided controls — PE-2 / PE-3 / PE-4 / PE-6 / PE-8 / PE-13 / PE-16 / PE-17 — with 14 extra fields, 23 glossary entries, 57 acronyms, 10 references; renders 50 cards at nist-moderate — 16 bases + 34 enhancements — with 67 ODV inputs and 34 disposition pickers; explicit inheritance-posture extras handle the common FedRAMP / colo case)
 - [x] PS — Personnel Security Plan (authored at Phase 2 floor; 13 family-question groups, 7 guided controls — PS-2 / PS-3 / PS-4 / PS-5 / PS-6 / PS-7 / PS-8 — with 10 extra fields, 23 glossary entries, 56 acronyms, 9 references; renders 18 cards at nist-moderate — 9 bases + 9 enhancements; CV / Trusted Workforce 2.0, FIS Tier 1-5, EO 12968 in scope)
-- [ ] MA — Maintenance Plan *(scheduled maintenance, vendor maintenance, remote maintenance, sanitization before service)*
+- [x] MA — Maintenance Plan (authored at Phase 2 floor; 10 family-question groups, 5 guided controls — MA-2 / MA-3 / MA-4 / MA-5 / MA-6 — with 10 extra fields, 17 glossary entries, 46 acronyms, 7 references; renders 29 cards at nist-moderate — 6 bases + 23 enhancements; explicit inheritance-posture extras for cloud-hosted MA-2 / MA-3)
 - [ ] MP — Media Protection Plan *(media handling, storage, transport, sanitization, marking)*
 - [ ] AT — Awareness and Training Plan *(role-based training, security awareness, phishing exercises)*
 

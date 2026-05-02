@@ -1,0 +1,441 @@
+{
+    "_comment": "Maintenance Plan generator. Authored at the Phase 2 assessability floor; pairs with PE (MA-5 maintenance personnel use the PE-3 escort policy), PS (MA-5 maintenance personnel are subject to PS-3 / PS-7 screening), MP (MA-3(2) media inspection echoes MP-5 transport handling; MA-2 sanitization before maintenance overlaps MP-6), and CM (MA-2 maintenance records feed CM-3 change control). Compact family — 6 base controls at moderate; the rigor is in vendor escort + remote-maintenance protections.",
+
+    "family": "MA",
+    "family_name": "Maintenance",
+    "title": "Maintenance Plan",
+    "description": "Documents how the system's maintenance activities are governed across scheduling, tool control, nonlocal (remote) maintenance, maintenance personnel, and timely component replacement. Covers the controls of the MA family in NIST SP 800-53 r5 and aligns with NIST SP 800-88 r1 (Sanitization), NIST SP 800-46 r2 (Remote Access), CNSSP-300 (Hardware Maintenance for National Security Systems), and FAR / DFARS clauses governing vendor maintenance personnel.",
+
+    "intro_template": "This Maintenance Plan documents the maintenance approach for {system_name}. It establishes the practices, tooling, cadences, and roles used to schedule and record maintenance, control maintenance tools and the media they introduce or remove, secure nonlocal (remote) maintenance sessions, manage maintenance personnel including vendor staff, and ensure timely replacement of system components requiring maintenance.\n\nThe scope covers controlled maintenance per MA-2, maintenance tools per MA-3, nonlocal maintenance per MA-4, maintenance personnel per MA-5, and timely maintenance per MA-6 within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Maintenance family), NIST SP 800-88 r1 (Sanitization Guidelines for sanitization before vendor maintenance), and CNSSP-300 (Hardware Maintenance) for classified systems where applicable.",
+
+    "approach_section_title": "Maintenance Approach",
+    "approach_template": "{system_name} schedules and records maintenance through {maintenance_scheduling_system}. Maintenance vendors are managed via {vendor_management_role} with escort policy coordinated with §4 of the PE plan. Nonlocal (remote) maintenance is performed over {nonlocal_channel} with the safeguards in §4.4. Spare-parts inventory for timely maintenance is maintained at {spares_inventory_location} with the SLAs in §4.6.\n\nAdditional details on controlled maintenance, maintenance tools, nonlocal maintenance, maintenance personnel, and timely maintenance are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Maintenance performance for {system_name} is tracked through the metrics in §6.1 (maintenance-window adherence rate, mean time between failures, mean time to repair, vendor-escort completion rate, sanitization-before-vendor-maintenance compliance, nonlocal-maintenance session anomalies). Maintenance records are reviewed on the cadence in §6.2; vendor-personnel rosters are reconciled with the PS-7 external-personnel register and with the PE-2 access list to surface drift.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Maintenance Plan does not stand alone. The PE family supplies the PE-3 escort policy and PE-2 access authorization for maintenance personnel; the PS family supplies the PS-3 / PS-7 screening that underwrites maintenance-personnel access; the MP family handles the media that MA-3(2) inspects and MA-2 sanitization-before-maintenance protects; the CM family receives MA-2 maintenance records as inputs to CM-3 change-control where maintenance produces configuration changes; the IR family escalates anomalies detected during maintenance (tampered tools, unauthorized media, suspicious nonlocal sessions). The following cross-references identify the specific artifacts and locations where MA-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "MA-1", "from": "Organizational maintenance policy" },
+        { "number": "MA-2", "from": "Hosting provider (when system runs on cloud / colocation — provider performs hardware maintenance)" },
+        { "number": "MA-3", "from": "Hosting provider (cloud / colo — provider tools, not system-managed)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Tooling and roles that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "maintenance_scheduling_system",
+                    "label": "Maintenance scheduling system (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where maintenance is scheduled and recorded (e.g., 'ServiceNow CMDB + Change module', 'Maximo CMMS', 'Inherited from cloud provider — no system-managed hardware')."
+                },
+                {
+                    "id": "vendor_management_role",
+                    "label": "Maintenance-vendor management role",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role accountable for vendor maintenance personnel (e.g., 'Facilities Operations Manager + Contracting Officer', 'ISSO with PSO support')."
+                },
+                {
+                    "id": "nonlocal_channel",
+                    "label": "Nonlocal-maintenance channel",
+                    "type": "text",
+                    "help": "How remote maintenance reaches system components (e.g., 'GFE-laptop + agency VPN with MFA + session recording', 'Vendor-side privileged-access workstation through bastion'). Reference the SC plan for transmission protections."
+                },
+                {
+                    "id": "spares_inventory_location",
+                    "label": "Spare-parts inventory location",
+                    "type": "text",
+                    "help": "Where spare components are inventoried (e.g., 'Onsite cage + cloud-provider auto-replacement; CMDB tracks individual spares by serial')."
+                },
+                {
+                    "id": "hosting_inheritance_summary",
+                    "label": "Hosting-inheritance summary",
+                    "type": "text",
+                    "help": "One-line summary of which MA controls are inherited from the hosting provider (e.g., 'MA-2 / MA-3 inherited from AWS; system-managed for endpoint workstations only')."
+                }
+            ]
+        },
+
+        {
+            "id": "controlled_maintenance",
+            "type": "group",
+            "section": "approach",
+            "label": "Controlled Maintenance (MA-2)",
+            "description": "Scheduling, approval, recording, and post-maintenance security.",
+            "questions": [
+                { "id": "ma2_approval_workflow",    "label": "Maintenance approval workflow",      "type": "textarea", "rows": 3,
+                  "help": "How maintenance is approved before execution (e.g., 'CCB approves planned maintenance windows; emergency maintenance requires retroactive approval within 24h'). Reference CM-3 for change-control overlap." },
+                { "id": "ma2_record_fields",        "label": "Maintenance-record required fields", "type": "multi_select",
+                  "options": ["Date and time", "Component identifier", "Maintenance reason", "Personnel performing maintenance", "Escort name (if vendor)", "Maintenance tools used", "Media introduced / removed", "Sanitization performed before / after", "Approval record cite", "Verification of restoration", "Linked CM-3 change record"] },
+                { "id": "ma2_pre_maintenance_sanitization","label": "Pre-vendor-maintenance sanitization", "type": "textarea", "rows": 3,
+                  "help": "How information is sanitized from a component before vendor maintenance (especially when component leaves the facility). Reference NIST SP 800-88 r1 categories (Clear / Purge / Destroy)." },
+                { "id": "ma2_post_maintenance_check","label": "Post-maintenance security check",  "type": "textarea", "rows": 3,
+                  "help": "Verification that security controls remain intact after maintenance (FIM check, configuration-baseline verification, integrity scan). Reference SI-7 for integrity verification." },
+                { "id": "ma2_record_retention",     "label": "Maintenance-record retention",       "type": "text",
+                  "help": "How long maintenance records are retained. Reference NARA records-retention schedule." }
+            ]
+        },
+
+        {
+            "id": "maintenance_tools",
+            "type": "group",
+            "section": "approach",
+            "label": "Maintenance Tools (MA-3)",
+            "description": "Tool inventory, inspection, and media handling.",
+            "questions": [
+                { "id": "ma3_tool_categories",      "label": "Maintenance-tool categories in scope", "type": "multi_select",
+                  "options": ["Diagnostic / test tools (multimeters, cable testers)", "Software diagnostic packages (vendor utilities)", "Bootable diagnostic media (USB / CD)", "Network protocol analyzers (Wireshark, etc.)", "Hardware test equipment (logic analyzers, JTAG)", "Vendor-provided remote-diagnostic appliances", "Replacement components (spares)", "Field-service kits"] },
+                { "id": "ma3_inspection_for_modification","label": "Tool-modification inspection (MA-3(1))", "type": "textarea", "rows": 3,
+                  "help": "How maintenance tools are inspected for improper modifications before use. Tamper-evident packaging, vendor-supplied integrity hashes." },
+                { "id": "ma3_media_inspection",     "label": "Media-inspection for malicious code (MA-3(2))", "type": "textarea", "rows": 3,
+                  "help": "How media brought in for diagnostics (USB, CDs, etc.) is scanned for malware before use. Dedicated scan-station, write-blocked-read." },
+                { "id": "ma3_unauthorized_removal", "label": "Unauthorized-removal prevention (MA-3(3))", "type": "textarea", "rows": 3,
+                  "help": "How equipment is checked at removal (per MA-3(3)) — verify the component or media is sanitized or authorized for removal. Coordinated with PE-16." },
+                { "id": "ma3_tool_storage",         "label": "Tool storage location",              "type": "text",
+                  "help": "Where maintenance tools are stored when not in use (locked cabinet, controlled checkout system)." }
+            ]
+        },
+
+        {
+            "id": "nonlocal_maintenance",
+            "type": "group",
+            "section": "approach",
+            "label": "Nonlocal Maintenance (MA-4)",
+            "description": "Remote / vendor maintenance over network channels.",
+            "questions": [
+                { "id": "ma4_session_initiation",   "label": "Session-initiation workflow",        "type": "textarea", "rows": 3,
+                  "help": "How a nonlocal maintenance session is initiated (e.g., 'Vendor requests via Service Now → ISSO approval → just-in-time bastion access opened for the window → revoked at session end')." },
+                { "id": "ma4_protections_in_place", "label": "Session protections in place",       "type": "multi_select",
+                  "options": ["MFA required", "Session recording (full keyboard / screen capture)", "Just-in-time access provisioned for window", "Bastion / jump-server enforced (no direct vendor → host)", "Endpoint posture check on vendor device", "Time-limited session", "Approver-monitored session", "FIPS-validated TLS / SSH end-to-end", "VPN gateway with logging"] },
+                { "id": "ma4_disconnect_verification","label": "Session-disconnect verification",  "type": "textarea", "rows": 3,
+                  "help": "How session termination is verified (no lingering processes, no re-auth credentials cached)." },
+                { "id": "ma4_recording_retention",  "label": "Session-recording retention",        "type": "text",
+                  "help": "How long nonlocal-maintenance session recordings are retained. Useful for after-action review when anomalies are reported. Reference AU plan." },
+                { "id": "ma4_classified_handling",  "label": "Classified-system nonlocal-maintenance handling", "type": "textarea", "rows": 3,
+                  "help": "If applicable: special handling per CNSSP-300. Often non-local maintenance is prohibited on classified systems." }
+            ]
+        },
+
+        {
+            "id": "maintenance_personnel",
+            "type": "group",
+            "section": "approach",
+            "label": "Maintenance Personnel (MA-5)",
+            "description": "Vendor staff governance, escort, and access.",
+            "questions": [
+                { "id": "ma5_screening_requirement","label": "Personnel screening requirement",    "type": "textarea", "rows": 3,
+                  "help": "Required background-investigation level for maintenance personnel. Reference PS-3 / PS-7 standards. Cleared vs uncleared personnel handling." },
+                { "id": "ma5_escort_policy",        "label": "Escort policy",                      "type": "select",
+                  "options": ["All vendor staff escorted at all times (default)", "Cleared vendor staff unescorted in approved areas; uncleared escorted", "Escort required only in sensitive zones; perimeter areas free", "No escort required (vendor fully cleared + indoctrinated)"] },
+                { "id": "ma5_vendor_authorization", "label": "Vendor-authorization process",       "type": "textarea", "rows": 3,
+                  "help": "How specific vendor employees are authorized for access (vendor-supplied roster, PIV-I cards, agency-issued temporary badges). Reference PS-7." },
+                { "id": "ma5_temporary_access_sla", "label": "Temporary-access provisioning SLA",  "type": "text",
+                  "help": "Time from vendor-personnel-change notification to access record updated. Common: 'Within 1 business day'." },
+                { "id": "ma5_post_visit_review",    "label": "Post-visit review",                  "type": "textarea", "rows": 3,
+                  "help": "How vendor visits are reviewed after the fact (escort log review, surveillance review for anomalies, badge-event reconciliation)." }
+            ]
+        },
+
+        {
+            "id": "timely_maintenance",
+            "type": "group",
+            "section": "approach",
+            "label": "Timely Maintenance (MA-6)",
+            "description": "Spare-parts inventory and component-replacement SLAs.",
+            "questions": [
+                { "id": "ma6_critical_components",  "label": "Critical-component register (MA-6 ODV)", "type": "textarea", "rows": 4,
+                  "help": "Components for which timely-maintenance SLAs apply. MA-6 ODV — system components requiring obtainable spare parts within an organization-defined time period." },
+                { "id": "ma6_replacement_sla",      "label": "Replacement SLA by component class","type": "textarea", "rows": 4,
+                  "help": "Time within which each component class must be replaceable. Example: 'HSM: 24h; production database server: 4h via cloud-provider auto-replacement; network appliance: 72h with vendor next-business-day support contract'." },
+                { "id": "ma6_spare_inventory_strategy","label": "Spare-inventory strategy",        "type": "select",
+                  "options": ["Onsite cold spares for critical components", "Vendor-managed inventory with N4H delivery contract", "Cloud-provider auto-replacement (effectively infinite spares)", "Mixed (onsite for critical; vendor-managed for non-critical)", "Best-effort (no formal SLA)"] },
+                { "id": "ma6_test_cadence",         "label": "Spare-test cadence",                 "type": "text",
+                  "help": "How often spares are tested to ensure they are functional when needed (rotation schedule, periodic boot test)." }
+            ]
+        },
+
+        {
+            "id": "ma_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Maintenance Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_maintained_components","label": "System components requiring maintenance", "type": "text",
+                  "help": "Approximate count of components that need MA-2 controlled-maintenance handling." },
+                { "id": "scope_vendor_personnel",    "label": "Maintenance vendors / personnel count","type": "text",
+                  "help": "Approximate count of vendor maintenance personnel with system access (PS-7)." },
+                { "id": "scope_nonlocal_sessions",   "label": "Nonlocal-maintenance session volume","type": "text",
+                  "help": "Approximate sessions per quarter (anchors session-recording storage planning)." },
+                { "id": "scope_critical_spares",     "label": "Critical components with spares",    "type": "text",
+                  "help": "Count of components covered by spare-parts inventory (MA-6)." }
+            ]
+        },
+
+        {
+            "id": "ma_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Maintenance Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate MA control effectiveness.",
+            "questions": [
+                { "id": "ma_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Maintenance-window adherence rate (% scheduled vs ad-hoc)",
+                      "Mean time between failures (MTBF)",
+                      "Mean time to repair (MTTR)",
+                      "Vendor-escort completion rate (% sessions with escort logged)",
+                      "Sanitization-before-vendor-maintenance compliance rate",
+                      "Nonlocal-maintenance session-recording completeness rate",
+                      "Vendor-personnel-roster reconciliation gap count",
+                      "Critical-component spare-availability rate",
+                      "Spare-test completion rate",
+                      "Open POA&M items linked to MA controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "anomaly_detection",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Maintenance Anomaly Detection",
+            "description": "How anomalies in maintenance activity are detected and escalated.",
+            "questions": [
+                { "id": "anomaly_detection_signals",  "label": "Detection signals",                "type": "multi_select",
+                  "options": ["Maintenance performed without record", "Maintenance performed outside approved window", "Vendor session lacking escort log", "Tool / media not in inventory", "Session-recording gap", "Configuration drift detected post-maintenance", "Unauthorized removal of equipment"] },
+                { "id": "anomaly_escalation_path",    "label": "Escalation path",                  "type": "textarea", "rows": 3,
+                  "help": "How detected anomalies escalate (typically to the IR plan workflow). Severity classification." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the MA control implementations are summarized (e.g., 'SSP §13.7')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for MA findings", "type": "text",
+                  "help": "Convention for MA-related POA&M items (e.g., 'POAM-MA-' for general)." },
+                { "id": "pe_handoff",                   "label": "PE handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MA-5 maintenance personnel use the PE-3 escort policy and PE-2 access list. Vendor-visit coordination." },
+                { "id": "ps_handoff",                   "label": "PS handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MA-5 maintenance personnel are screened per PS-3 / PS-7. Trigger when vendor personnel change." },
+                { "id": "mp_handoff",                   "label": "MP handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MA-3(2) media inspection coordinates with MP-5 transport handling and MA-2 pre-maintenance sanitization with MP-6 sanitization." },
+                { "id": "cm_handoff",                   "label": "CM handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MA-2 maintenance records feed CM-3 change control where maintenance produces configuration changes." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How maintenance anomalies (tampered tools, unauthorized media, anomalous nonlocal sessions) escalate into the IR plan." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying MA continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "MA-2": {
+            "prompts": [
+                "Reference §4.2 — approval workflow, record fields, sanitization, post-maintenance check.",
+                "Document the maintenance-record retention period.",
+                "Address handling for components leaving the facility for off-site repair.",
+                "Reference NIST SP 800-88 r1 sanitization categories applied before vendor maintenance.",
+                "Reference MA-2(1) record content (withdrawn — incorporated into MA-2), MA-2(2) automated maintenance activities."
+            ],
+            "evidence_suggestions": [
+                "Maintenance-approval workflow document",
+                "Sample maintenance record",
+                "Pre-vendor-maintenance sanitization certificate",
+                "Post-maintenance integrity-check log",
+                "Maintenance-record retention policy"
+            ],
+            "extra_fields": [
+                { "id": "ma2_inherited",            "label": "Inherited posture",                "type": "select",
+                  "options": ["Fully inherited from hosting provider (cloud / colo)", "Hybrid — system-managed endpoints + provider-managed infrastructure", "Fully implemented by the system (own facility)", "Not applicable"] },
+                { "id": "ma2_offsite_handling",     "label": "Off-site repair handling",         "type": "textarea", "rows": 3,
+                  "help": "How components are handled when leaving the facility for off-site repair. Sanitization, chain-of-custody, return-validation." }
+            ]
+        },
+
+        "MA-3": {
+            "prompts": [
+                "Reference §4.3 — tool categories, modification inspection, media inspection, unauthorized-removal prevention.",
+                "Document tool-storage location and checkout process.",
+                "Address vendor-supplied diagnostic packages (often unique attack surface).",
+                "Reference MA-3(1) inspect maintenance tools, MA-3(2) inspect media for malicious code, MA-3(3) prevent unauthorized removal, MA-3(4) restricted tool use, MA-3(5) execution with privileged status, MA-3(6) software updates and patches."
+            ],
+            "evidence_suggestions": [
+                "Maintenance-tool inventory",
+                "Tool-modification inspection log",
+                "Media-scanning log (MA-3(2))",
+                "Tool-checkout records",
+                "Vendor-supplied tool integrity-hash verification log"
+            ],
+            "extra_fields": [
+                { "id": "ma3_inherited",             "label": "Inherited posture",                "type": "select",
+                  "options": ["Fully inherited from hosting provider", "Hybrid", "Fully implemented by the system", "Not applicable"] },
+                { "id": "ma3_dedicated_scan_station","label": "Dedicated media-scan station location", "type": "text",
+                  "help": "Where the dedicated media-scanning station is located if applicable. Air-gapped, write-blocked, AV-current." }
+            ]
+        },
+
+        "MA-4": {
+            "prompts": [
+                "Reference §4.4 — initiation workflow, session protections, disconnect verification, recording retention.",
+                "Document classified-system handling per CNSSP-300 if applicable.",
+                "Address authentication strength on the vendor side (must match agency identity-assurance).",
+                "Reference MA-4(1) auditing and review of nonlocal maintenance, MA-4(2) document nonlocal maintenance, MA-4(3) comparable security / sanitization, MA-4(4) authentication / separation of maintenance sessions, MA-4(5) approvals and notifications, MA-4(6) cryptographic protection, MA-4(7) disconnect verification."
+            ],
+            "evidence_suggestions": [
+                "Nonlocal-maintenance approval workflow document",
+                "Session-recording sample (vendor accepted)",
+                "Bastion / JIT-access configuration export",
+                "Sample session-disconnect verification record",
+                "Cryptographic-protection of session evidence (TLS / SSH config)"
+            ],
+            "extra_fields": [
+                { "id": "ma4_session_recording_tool","label": "Session-recording tool",          "type": "text",
+                  "help": "Tool used to record nonlocal-maintenance sessions (e.g., 'CyberArk PSM', 'Teleport', 'Apache Guacamole')." },
+                { "id": "ma4_jit_provisioning_tool", "label": "Just-in-time access provisioning tool","type": "text",
+                  "help": "Tool used for JIT credential / access provisioning (e.g., 'CyberArk', 'AWS Systems Manager Just-in-Time Access')." }
+            ]
+        },
+
+        "MA-5": {
+            "prompts": [
+                "Reference §4.5 — screening requirement, escort policy, vendor authorization, temporary-access SLA, post-visit review.",
+                "Document the linkage to PS-3 / PS-7 screening and PE-2 access list.",
+                "Address handling of unscheduled / emergency maintenance personnel.",
+                "Reference MA-5(1) individuals without appropriate access, MA-5(2) security clearances for classified systems, MA-5(3) citizenship requirements for classified systems, MA-5(4) foreign nationals, MA-5(5) nonsystem maintenance."
+            ],
+            "evidence_suggestions": [
+                "Maintenance-vendor roster",
+                "Sample escort log",
+                "Vendor PS-7 attestation evidence",
+                "Sample access-grant ticket showing PE-2 update + PS-7 attestation linkage",
+                "Vendor PIV-I issuance records (if applicable)"
+            ],
+            "extra_fields": [
+                { "id": "ma5_pivi_use",            "label": "PIV-I use for vendor staff",      "type": "select",
+                  "options": ["Yes — vendor staff use agency-issued PIV / PIV-I cards", "Vendor-issued credentials accepted (federation)", "Temporary badges issued per visit", "Mixed by vendor / contract", "Not applicable"] },
+                { "id": "ma5_emergency_access_protocol","label": "Emergency-access protocol",  "type": "textarea", "rows": 3,
+                  "help": "Procedure for unscheduled / emergency maintenance personnel needing immediate access. Retroactive approval, supervisor escort, post-visit review." }
+            ]
+        },
+
+        "MA-6": {
+            "prompts": [
+                "Reference §4.6 — critical-component register, replacement SLA by class, spare-inventory strategy, test cadence.",
+                "Document MTBF / MTTR data informing the SLA.",
+                "Address vendor-support-contract obligations (next-business-day, 4-hour response).",
+                "Reference MA-6(1) preventive maintenance, MA-6(2) predictive maintenance, MA-6(3) automated maintenance activities."
+            ],
+            "evidence_suggestions": [
+                "Critical-component register",
+                "Replacement SLA matrix",
+                "Spare-parts inventory export",
+                "Vendor-support-contract terms",
+                "Spare-test log",
+                "MTBF / MTTR trend report"
+            ],
+            "extra_fields": [
+                { "id": "ma6_predictive_maintenance","label": "Predictive-maintenance tooling",  "type": "textarea", "rows": 3,
+                  "help": "If applicable: tooling that predicts component failure (drive SMART trends, fan / temperature trending, vendor predictive analytics). Reference MA-6(2)." },
+                { "id": "ma6_vendor_contract_terms",  "label": "Vendor-support-contract terms",   "type": "text",
+                  "help": "Brief reference to vendor-support contract response terms (e.g., '4-hour onsite response 24x7 for critical')." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Bastion / Jump Host",     "definition": "An intermediate access-controlled host through which maintenance sessions to internal components are routed. Common MA-4 protection." },
+        { "term": "Chain of Custody",         "definition": "Documented sequence of transfers of an asset from one custodian to another. Critical when components leave the facility for maintenance." },
+        { "term": "CMDB / CMMS",             "definition": "Configuration Management Database / Computerized Maintenance Management System — systems tracking components, their state, and maintenance history." },
+        { "term": "CNSSP-300",                "definition": "Committee on National Security Systems Policy 300 — Hardware Maintenance for National Security Systems. Applies special handling for classified systems." },
+        { "term": "Cold Spare",               "definition": "A replacement component kept in storage, ready for installation when the primary fails. Contrast with hot spare (already powered and standby) and warm spare (powered but not active)." },
+        { "term": "Just-in-Time (JIT) Access","definition": "Access credentials provisioned only for the duration of a maintenance window, automatically revoked at session end. Common MA-4 protection." },
+        { "term": "MTBF",                    "definition": "Mean Time Between Failures — average time between failures of a component or system. Drives MA-6 spare-inventory planning." },
+        { "term": "MTTR",                    "definition": "Mean Time to Repair — average time required to restore a component to operation after a failure. Tracked as an MA-6 metric." },
+        { "term": "Nonlocal Maintenance",    "definition": "Per MA-4, maintenance performed over a network connection from a location not within the system's physical boundary. Subject to specific protections including session recording and JIT access." },
+        { "term": "PIV-I",                    "definition": "Personal Identity Verification - Interoperable — credential standard allowing non-federal organizations to issue PIV-equivalent credentials trusted by federal systems. Common for vendor staff requiring repeat access." },
+        { "term": "Preventive Maintenance",   "definition": "Per MA-6(1), scheduled maintenance performed to prevent failures (firmware updates, fan replacement, battery replacement) rather than to fix existing problems." },
+        { "term": "Predictive Maintenance",   "definition": "Per MA-6(2), maintenance triggered by analytics predicting an impending failure (SMART drive analytics, thermal trends, vendor-supplied predictive models)." },
+        { "term": "Sanitization",            "definition": "Process of removing data from media to prevent recovery. Per NIST SP 800-88 r1: Clear (logical), Purge (cryptographic erase / degauss), Destroy (physical destruction). Required by MA-2 before vendor-maintained components leave the facility." },
+        { "term": "Session Recording",        "definition": "Capture of activity (keyboard, screen, network traffic) during a maintenance session, enabling after-action review. Common MA-4 protection." },
+        { "term": "Spare-Parts SLA",          "definition": "Per MA-6, the time within which a replacement component must be obtainable for a given system component class. Tied to organizational MTTR objectives." },
+        { "term": "Tamper-Evident Packaging", "definition": "Packaging that displays visible evidence if opened. Common method for verifying maintenance-tool integrity per MA-3(1)." },
+        { "term": "Warm Maintenance Window",  "definition": "Scheduled maintenance window during which the system remains in production but at reduced capacity. Distinct from cold (powered down) and hot (no impact) windows." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "AV",      "expansion": "Anti-Virus" },
+        { "abbr": "CCB",     "expansion": "Configuration Control Board" },
+        { "abbr": "CM",      "expansion": "Configuration Management (NIST 800-53 family)" },
+        { "abbr": "CMDB",    "expansion": "Configuration Management Database" },
+        { "abbr": "CMMS",    "expansion": "Computerized Maintenance Management System" },
+        { "abbr": "CNSSP",   "expansion": "Committee on National Security Systems Policy" },
+        { "abbr": "DCSA",    "expansion": "Defense Counterintelligence and Security Agency" },
+        { "abbr": "DFARS",   "expansion": "Defense Federal Acquisition Regulation Supplement" },
+        { "abbr": "FAR",     "expansion": "Federal Acquisition Regulation" },
+        { "abbr": "FIM",     "expansion": "File Integrity Monitoring" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "GFE",     "expansion": "Government-Furnished Equipment" },
+        { "abbr": "HSM",     "expansion": "Hardware Security Module" },
+        { "abbr": "IR",      "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "JIT",     "expansion": "Just-in-Time (access provisioning)" },
+        { "abbr": "MA",      "expansion": "Maintenance (NIST 800-53 family)" },
+        { "abbr": "MFA",     "expansion": "Multi-Factor Authentication" },
+        { "abbr": "MP",      "expansion": "Media Protection (NIST 800-53 family)" },
+        { "abbr": "MTBF",    "expansion": "Mean Time Between Failures" },
+        { "abbr": "MTTR",    "expansion": "Mean Time to Repair / Respond" },
+        { "abbr": "N4H",     "expansion": "Next-Four-Hour (vendor support tier)" },
+        { "abbr": "NARA",    "expansion": "National Archives and Records Administration" },
+        { "abbr": "NBD",     "expansion": "Next-Business-Day (vendor support tier)" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification" },
+        { "abbr": "PIV-I",   "expansion": "Personal Identity Verification - Interoperable" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "PSM",     "expansion": "Privileged Session Manager" },
+        { "abbr": "PSO",     "expansion": "Personnel Security Officer" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SC",      "expansion": "System and Communications Protection (NIST 800-53 family)" },
+        { "abbr": "SI",      "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SLA",     "expansion": "Service-Level Agreement" },
+        { "abbr": "SMART",   "expansion": "Self-Monitoring, Analysis and Reporting Technology (drives)" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSH",     "expansion": "Secure Shell" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TLS",     "expansion": "Transport Layer Security" },
+        { "abbr": "VPN",     "expansion": "Virtual Private Network" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-88 r1 — Guidelines for Media Sanitization",         "url": "https://csrc.nist.gov/pubs/sp/800/88/r1/final" },
+        { "label": "NIST SP 800-46 r2 — Telework, Remote Access, and BYOD Security", "url": "https://csrc.nist.gov/pubs/sp/800/46/r2/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "CNSSP-300 — Hardware Maintenance for National Security Systems", "url": "https://www.cnss.gov/CNSS/issuances/Policies.cfm" },
+        { "label": "NIST IR 7621 r1 — Small Business Information Security: The Fundamentals (maintenance discussion)", "url": "https://csrc.nist.gov/pubs/ir/7621/r1/final" },
+        { "label": "FedRAMP Continuous Monitoring Strategy Guide",                  "url": "https://www.fedramp.gov/documents/" }
+    ]
+}
