@@ -1,6 +1,24 @@
 {
-    "frozen_at": "2026-05-02T19:18:49+00:00",
+    "frozen_at": "2026-05-02T20:04:24+00:00",
     "entries": [
+        {
+            "hash": "96881af7b8f1ea3a3c90bb86bc6344faf6f764ce",
+            "short_hash": "96881af",
+            "subject": "fix(seo): per-page meta descriptions, content-driven where possible",
+            "summary": "Bing flagged duplicate-template descriptions across pages.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T15:36:36-04:00",
+            "date_human": "May 02, 2026 · 15:36"
+        },
+        {
+            "hash": "d20de0f2501614403293f5fc674479c17310b9f9",
+            "short_hash": "d20de0f",
+            "subject": "refresh changelog snapshot",
+            "summary": "",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T15:19:21-04:00",
+            "date_human": "May 02, 2026 · 15:19"
+        },
         {
             "hash": "5e0d91f4d5dcbf2265f5162a3f4e6e00e7252588",
             "short_hash": "5e0d91f",
