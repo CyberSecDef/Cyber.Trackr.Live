@@ -1,0 +1,92 @@
+{
+    "_comment": "Configuration Management Plan generator. Adding a new family is essentially copying this file, changing 'family' + 'title' + intro/approach prose, and authoring 5-ish family_questions appropriate to that domain.",
+
+    "family": "CM",
+    "family_name": "Configuration Management",
+    "title": "Configuration Management Plan",
+    "description": "Documents how the organization establishes, maintains, and monitors baseline configurations for the system. Covers the controls of the CM family in NIST SP 800-53 r5 and aligns with NIST SP 800-128.",
+
+    "intro_template": "This Configuration Management Plan documents the configuration management approach for {system_name}. It establishes the practices, roles, and procedures used to manage the integrity of system components throughout the system's lifecycle.\n\nThe scope of this plan covers all hardware, software, firmware, and supporting documentation comprising the {system_name} authorization boundary. The plan is consistent with NIST SP 800-128 (Guide for Security-Focused Configuration Management of Information Systems) and the controls of the CM family in NIST SP 800-53 r5.",
+
+    "approach_section_title": "Configuration Management Approach",
+    "approach_template": "{system_name} uses {cm_tool} as the system of record for configuration items and baselines. Proposed changes are reviewed by a Configuration Control Board (CCB) chaired by {ccb_chair}, which meets on a {ccb_cadence} cadence. Baselines are documented and stored as follows: {baseline_storage}. The end-to-end change-request workflow is: {change_workflow}.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Configuration baselines for {system_name} are reviewed against the active configuration on a defined cadence and any drift is reconciled through the change-management workflow described above. The CCB is the authoritative body for evaluating drift findings, scheduling remediation, and approving exceptions. Findings, drift remediation actions, and CCB decisions are recorded in {cm_tool} and reviewed during periodic CM audits. Continuous monitoring of CM controls supports the broader ongoing-authorization strategy for the system.",
+
+    "family_questions": [
+        {
+            "id": "cm_tool",
+            "label": "Configuration management tool / repository of record",
+            "type": "text",
+            "required": true,
+            "help": "What tool, repo, or system holds your authoritative configuration baselines? Examples: Git, Ansible Tower, Puppet Enterprise, SCCM, Chef, Salt."
+        },
+        {
+            "id": "ccb_chair",
+            "label": "Configuration Control Board chair",
+            "type": "text",
+            "help": "Role or named individual that chairs your CCB."
+        },
+        {
+            "id": "ccb_cadence",
+            "label": "CCB meeting cadence",
+            "type": "select",
+            "options": ["Weekly", "Bi-weekly", "Monthly", "Quarterly", "Ad hoc / on demand"]
+        },
+        {
+            "id": "baseline_storage",
+            "label": "How are baselines documented and stored?",
+            "type": "textarea",
+            "rows": 3,
+            "help": "Briefly describe where baseline configurations live and how they're versioned. Example: 'In a Git repository under config/baselines/, tagged at each release. Hardware inventory tracked in ServiceNow CMDB.'"
+        },
+        {
+            "id": "change_workflow",
+            "label": "Change-request workflow",
+            "type": "textarea",
+            "rows": 4,
+            "help": "Describe the workflow from change request through review, approval, implementation, and verification. Mention any tooling (Jira, ServiceNow, etc.) and approval thresholds."
+        }
+    ],
+
+    "glossary": [
+        { "term": "Authorization Boundary",     "definition": "All components of an information system to be authorized for operation; excludes separately authorized systems to which the system is connected." },
+        { "term": "Baseline Configuration",     "definition": "A documented, formally reviewed and agreed-upon set of specifications for a system at a given point in time. Serves as the reference against which subsequent changes are evaluated." },
+        { "term": "Change Request",             "definition": "A formal proposal to modify a configuration item, submitted for review and approval through the configuration-management workflow." },
+        { "term": "Configuration Audit",        "definition": "An independent verification that a configuration item conforms to its specified configuration. Includes both functional and physical configuration audits." },
+        { "term": "Configuration Control",      "definition": "The systematic evaluation, approval/disapproval, and implementation of changes to configuration items, performed after formal establishment of their baselines." },
+        { "term": "Configuration Control Board (CCB)", "definition": "An organizational body responsible for evaluating proposed changes to configuration baselines and approving or disapproving their implementation." },
+        { "term": "Configuration Identification","definition": "The process of selecting items for configuration management, naming them, and identifying the relationships between them." },
+        { "term": "Configuration Item (CI)",    "definition": "An aggregation of hardware, software, firmware, or any combination thereof, that is designated for configuration management." },
+        { "term": "Configuration Management Database (CMDB)", "definition": "A repository for storing configuration items and the relationships between them; supports configuration status accounting." },
+        { "term": "Configuration Status Accounting", "definition": "The recording and reporting of information needed to manage configuration items effectively, including the status of proposed changes and the implementation status of approved changes." },
+        { "term": "Drift",                      "definition": "Unintended divergence between an active configuration and its documented baseline. Detected through periodic comparison and reconciled via the change-management workflow." },
+        { "term": "Functional Baseline",        "definition": "Initial approved technical documentation describing the functional, interoperability, and interface characteristics of a configuration item." },
+        { "term": "Production Baseline",        "definition": "Approved configuration documentation describing the configuration of a configuration item as it is to be produced or fielded." },
+        { "term": "Security-Impact Analysis",   "definition": "Analysis conducted by qualified personnel to determine the extent to which proposed changes could affect the security posture of a system." }
+    ],
+
+    "acronyms": [
+        { "abbr": "ATO",  "expansion": "Authority to Operate" },
+        { "abbr": "CCB",  "expansion": "Configuration Control Board" },
+        { "abbr": "CI",   "expansion": "Configuration Item" },
+        { "abbr": "CM",   "expansion": "Configuration Management" },
+        { "abbr": "CMDB", "expansion": "Configuration Management Database" },
+        { "abbr": "ISSM", "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO", "expansion": "Information System Security Officer" },
+        { "abbr": "NIST", "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "POAM", "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RMF",  "expansion": "Risk Management Framework" },
+        { "abbr": "SP",   "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",  "expansion": "System Security Plan" },
+        { "abbr": "STIG", "expansion": "Security Technical Implementation Guide" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",       "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-128 — Security-Focused Configuration Management","url": "https://csrc.nist.gov/pubs/sp/800/128/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",            "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-160 v1 — Systems Security Engineering",        "url": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final" }
+    ]
+}

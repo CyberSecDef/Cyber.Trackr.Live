@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ schema.title }} &mdash; Wizard{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="plan-wizard-title">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{{ path('plans') }}">Plans</a></li>
+                <li aria-current="page">{{ schema.family_name }}</li>
+            </ol>
+        </nav>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">{{ schema.family }} &middot; Plan wizard</span>
+            <h1 id="plan-wizard-title" class="lib-page__title-large">
+                {{ schema.title }}
+            </h1>
+            <p class="lib-page__lede">{{ schema.description }}</p>
+        </header>
+
+        <div class="plan-wizard__actions">
+            <button type="button" class="cta-secondary" onclick="planWizard.saveDraft()">
+                <i class="bi bi-download" aria-hidden="true"></i>
+                Save progress
+            </button>
+            <label class="cta-secondary plan-wizard__upload-label">
+                <i class="bi bi-upload" aria-hidden="true"></i>
+                Load draft
+                <input type="file" accept="application/json" onchange="planWizard.loadDraft(event)" hidden>
+            </label>
+            <button type="button" class="cta-secondary" onclick="planWizard.preview()">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+                Preview
+            </button>
+            <button type="button" class="cta-primary" onclick="planWizard.download()">
+                <i class="bi bi-file-earmark-word" aria-hidden="true"></i>
+                Download Word
+            </button>
+        </div>
+
+        <form id="plan-wizard-form" class="plan-wizard" onsubmit="event.preventDefault(); planWizard.preview();">
+
+            <details class="plan-wizard__section" open>
+                <summary>
+                    <span class="plan-wizard__section-num">1</span>
+                    <span class="plan-wizard__section-label">System metadata</span>
+                </summary>
+                <div class="plan-wizard__section-body" data-question-group="system">
+                    {% for q in shared.system_questions %}
+                        {{ _self.field(q, 'system') }}
+                    {% endfor %}
+                </div>
+            </details>
+
+            <details class="plan-wizard__section" open>
+                <summary>
+                    <span class="plan-wizard__section-num">2</span>
+                    <span class="plan-wizard__section-label">Baseline</span>
+                </summary>
+                <div class="plan-wizard__section-body">
+                    <div class="form-field">
+                        <label for="baseline">Pick the baseline that controls system applicability</label>
+                        <select name="baseline" id="baseline" data-answer-key="baseline">
+                            <option value="">— Choose a baseline —</option>
+                            {% for id, o in overlays %}
+                                <option value="{{ id }}">{{ o.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="form-field__hint">Determines which controls in this family appear in your plan.</span>
+                    </div>
+                </div>
+            </details>
+
+            <details class="plan-wizard__section" open>
+                <summary>
+                    <span class="plan-wizard__section-num">3</span>
+                    <span class="plan-wizard__section-label">{{ schema.family_name }} approach</span>
+                </summary>
+                <div class="plan-wizard__section-body" data-question-group="family_answers">
+                    {% for q in schema.family_questions %}
+                        {{ _self.field(q, 'family_answers') }}
+                    {% endfor %}
+                </div>
+            </details>
+
+            <details class="plan-wizard__section">
+                <summary>
+                    <span class="plan-wizard__section-num">4</span>
+                    <span class="plan-wizard__section-label">Per-control implementation</span>
+                </summary>
+                <div class="plan-wizard__section-body" id="plan-controls-target">
+                    <p class="plan-wizard__placeholder">
+                        Pick a baseline in section 2 and the applicable controls will appear here. Each control gets a card with the official text, related controls, linked CCIs, and fields for your implementation status, narrative, responsible role, and evidence.
+                    </p>
+                </div>
+            </details>
+
+            <details class="plan-wizard__section">
+                <summary>
+                    <span class="plan-wizard__section-num">5</span>
+                    <span class="plan-wizard__section-label">Document metadata</span>
+                </summary>
+                <div class="plan-wizard__section-body" data-question-group="document">
+                    {% for q in shared.document_questions %}
+                        {{ _self.field(q, 'document') }}
+                    {% endfor %}
+                </div>
+            </details>
+
+        </form>
+
+        <div class="plan-wizard__footer">
+            <p class="plan-wizard__autosave-hint">
+                Your answers autosave to this browser. Click <strong>Save progress</strong> to download a JSON file you can re-upload later or share.
+            </p>
+        </div>
+    </section>
+
+    <script>
+        window.planConfig = {
+            family: {{ family|json_encode|raw }},
+            previewUrl:  {{ path('plans_preview',  {family: family})|json_encode|raw }},
+            downloadUrl: {{ path('plans_download', {family: family})|json_encode|raw }},
+            schemaUrl:   {{ path('plans_schema',   {family: family})|json_encode|raw }},
+            // 'baseline-placeholder' replaced client-side with the selected baseline id.
+            // Lowercase + hyphen so it satisfies the route's [a-z0-9\-]+ requirement at URL generation.
+            controlsUrlTemplate: {{ path('plans_controls', {family: family, baseline: 'baseline-placeholder'})|json_encode|raw }},
+        };
+    </script>
+    <script src="/js/plans.js"></script>
+{% endblock %}
+
+{# ----- field rendering macro -----
+   Renders a single question field. Group = 'system' | 'family_answers' | 'document'.
+   The data-answer-key attribute lets plans.js collect answers into the right
+   bucket without needing per-section duplicated code. show_when conditions
+   are evaluated client-side. #}
+{% macro field(q, group) %}
+    {% set fid = group ~ '_' ~ q.id %}
+    <div class="form-field"
+         {% if q.show_when is defined %}data-show-when="{{ q.show_when }}"{% endif %}>
+        <label for="{{ fid }}">
+            {{ q.label }}{% if q.required|default(false) %} <span class="form-field__req" aria-hidden="true">*</span>{% endif %}
+        </label>
+        {% if q.type == 'textarea' %}
+            <textarea id="{{ fid }}" name="{{ fid }}" rows="{{ q.rows|default(4) }}"
+                      data-answer-group="{{ group }}" data-answer-key="{{ q.id }}"></textarea>
+        {% elseif q.type == 'select' %}
+            <select id="{{ fid }}" name="{{ fid }}"
+                    data-answer-group="{{ group }}" data-answer-key="{{ q.id }}">
+                <option value="">— Select —</option>
+                {% for opt in q.options %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                {% endfor %}
+            </select>
+        {% elseif q.type == 'date' %}
+            <input type="date" id="{{ fid }}" name="{{ fid }}"
+                   data-answer-group="{{ group }}" data-answer-key="{{ q.id }}">
+        {% elseif q.type == 'list' %}
+            <div class="form-field__list" data-answer-group="{{ group }}" data-answer-key="{{ q.id }}">
+                <ul class="form-field__list-items"></ul>
+                <button type="button" class="cta-secondary form-field__list-add" onclick="planWizard.listAdd(this)">
+                    <i class="bi bi-plus" aria-hidden="true"></i> Add item
+                </button>
+            </div>
+        {% else %}
+            <input type="text" id="{{ fid }}" name="{{ fid }}"
+                   value="{{ q.default|default('') }}"
+                   data-answer-group="{{ group }}" data-answer-key="{{ q.id }}">
+        {% endif %}
+        {% if q.help is defined %}
+            <span class="form-field__hint">{{ q.help }}</span>
+        {% endif %}
+    </div>
+{% endmacro %}

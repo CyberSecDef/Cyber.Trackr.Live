@@ -1,0 +1,224 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}{{ plan.meta.title }} &mdash; Preview{% endblock %}
+
+{% block body %}
+    <article class="plan-preview">
+
+        {# ---------- Front matter ---------- #}
+        <section class="plan-preview__cover">
+            <span class="plan-preview__classification">{{ plan.front_matter.cover.classification|upper }}</span>
+            <h1 class="plan-preview__cover-title">{{ plan.front_matter.cover.title }}</h1>
+            <p class="plan-preview__cover-system">{{ plan.front_matter.cover.system_name }}</p>
+            <dl class="plan-preview__cover-meta">
+                <dt>Version</dt><dd>{{ plan.front_matter.cover.version }}</dd>
+                {% if plan.front_matter.cover.publication_date %}
+                    <dt>Date</dt><dd>{{ plan.front_matter.cover.publication_date }}</dd>
+                {% endif %}
+                {% if plan.meta.baseline %}
+                    <dt>Baseline</dt><dd>{{ plan.meta.baseline }}</dd>
+                {% endif %}
+            </dl>
+        </section>
+
+        <section class="plan-preview__doc-control">
+            <h2>Document control</h2>
+            <table class="plan-preview__table">
+                <thead>
+                    <tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th></tr>
+                </thead>
+                <tbody>
+                    {% for row in plan.front_matter.doc_control %}
+                        <tr>
+                            <td>{{ row.version }}</td>
+                            <td>{{ row.date }}</td>
+                            <td>{{ row.author }}</td>
+                            <td>{{ row.changes }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="plan-preview__exec-summary">
+            <h2>Executive summary</h2>
+            <p>{{ plan.front_matter.executive_summary }}</p>
+        </section>
+
+        {# ---------- Body ---------- #}
+        <section class="plan-preview__section">
+            <h2>1. Introduction</h2>
+
+            <h3>1.1 Purpose</h3>
+            <p class="pre-wrap">{{ plan.body.introduction.purpose }}</p>
+
+            <h3>1.2 Scope</h3>
+            <p>{{ plan.body.introduction.scope }}</p>
+
+            <h3>1.3 Audience</h3>
+            <p>{{ plan.body.introduction.audience }}</p>
+
+            <h3>1.4 References</h3>
+            <ul>
+                {% for r in plan.body.introduction.references %}
+                    <li><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.label }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="plan-preview__section">
+            <h2>2. System Overview</h2>
+            <h3>2.1 Description</h3>
+            <p class="pre-wrap">{{ plan.body.system_overview.description }}</p>
+
+            {% if plan.body.system_overview.environment or plan.body.system_overview.classification %}
+                <h3>2.2 Environment &amp; classification</h3>
+                <p>
+                    {% if plan.body.system_overview.environment %}Environment: <strong>{{ plan.body.system_overview.environment }}</strong>.{% endif %}
+                    {% if plan.body.system_overview.classification %} Classification: <strong>{{ plan.body.system_overview.classification }}</strong>.{% endif %}
+                </p>
+            {% endif %}
+        </section>
+
+        <section class="plan-preview__section">
+            <h2>3. Roles and Responsibilities</h2>
+            <table class="plan-preview__table">
+                <thead><tr><th>Role</th><th>Assignee</th></tr></thead>
+                <tbody>
+                    {% for r in plan.body.roles %}
+                        <tr><td>{{ r.role }}</td><td>{{ r.name }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="plan-preview__section">
+            <h2>4. {{ plan.body.family_approach.title }}</h2>
+            <p class="pre-wrap">{{ plan.body.family_approach.narrative }}</p>
+        </section>
+
+        <section class="plan-preview__section">
+            <h2>5. Control Implementation</h2>
+            {% if plan.body.controls is empty %}
+                <p class="plan-preview__placeholder">
+                    {{ plan.meta.baseline ? 'No controls match the selected baseline.' : 'Pick a baseline in the wizard and the controls in this family will appear here.' }}
+                </p>
+            {% else %}
+                <p class="plan-preview__count">
+                    {{ plan.body.controls|length }} controls and enhancements applicable to this baseline.
+                </p>
+
+                {% for c in plan.body.controls %}
+                    <article class="plan-preview__control" id="control-{{ c.number }}">
+                        <header class="plan-preview__control-header">
+                            <h3>5.{{ loop.index }} {{ ui.rmf_link(c.number) }} &middot; {{ c.title|editorial_title }}{% if c.is_enhancement %} <em>(enhancement of {{ c.parent }})</em>{% endif %}</h3>
+                            <span class="plan-preview__control-status plan-preview__control-status--{{ (c.answers.status ?: 'pending')|lower|replace({' ': '-'}) }}">
+                                {{ c.answers.status ?: 'TO BE COMPLETED' }}
+                            </span>
+                        </header>
+
+                        {% if c.statement %}
+                            <h4>Control statement</h4>
+                            <pre class="plan-preview__statement">{{ c.statement }}</pre>
+                        {% endif %}
+
+                        <h4>Implementation</h4>
+                        {% set status = c.answers.status %}
+                        {% if status == 'Inherited' %}
+                            <p>
+                                <strong>Inherited from:</strong> {{ c.answers.inheritance_provider ?: '[TO BE COMPLETED]' }}
+                            </p>
+                            {% if c.answers.inheritance_details %}
+                                <p class="pre-wrap">{{ c.answers.inheritance_details }}</p>
+                            {% endif %}
+                        {% elseif status == 'Not Applicable' %}
+                            <p>
+                                <strong>Not applicable.</strong>
+                                {{ c.answers.na_rationale ?: '[TO BE COMPLETED: rationale]' }}
+                            </p>
+                        {% elseif status in ['Implemented', 'Partially Implemented'] %}
+                            <p class="pre-wrap">{{ c.answers.narrative ?: '[TO BE COMPLETED]' }}</p>
+                        {% else %}
+                            <p class="plan-preview__todo">[TO BE COMPLETED]</p>
+                        {% endif %}
+
+                        <dl class="plan-preview__control-meta">
+                            <dt>Responsible role</dt>
+                            <dd>{{ c.answers.responsible_role ?: '[TO BE COMPLETED]' }}</dd>
+
+                            <dt>Evidence / artifacts</dt>
+                            <dd>
+                                {% if c.answers.evidence %}
+                                    <ul>
+                                        {% for e in c.answers.evidence %}<li>{{ e }}</li>{% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="plan-preview__todo">[TO BE COMPLETED]</span>
+                                {% endif %}
+                            </dd>
+
+                            {% if c.related %}
+                                <dt>Related controls</dt>
+                                <dd>
+                                    {% for r in c.related %}{{ ui.rmf_link(r) }}{% if not loop.last %} {% endif %}{% endfor %}
+                                </dd>
+                            {% endif %}
+
+                            {% if c.ccis %}
+                                <dt>Linked CCIs ({{ c.ccis|length }})</dt>
+                                <dd>
+                                    {% for cci in c.ccis %}{{ ui.cci_link(cci.id) }}{% if not loop.last %} {% endif %}{% endfor %}
+                                </dd>
+                            {% endif %}
+                        </dl>
+                    </article>
+                {% endfor %}
+            {% endif %}
+        </section>
+
+        {% if plan.body.continuous_monitoring.narrative %}
+            <section class="plan-preview__section">
+                <h2>6. {{ plan.body.continuous_monitoring.title }}</h2>
+                <p class="pre-wrap">{{ plan.body.continuous_monitoring.narrative }}</p>
+            </section>
+        {% endif %}
+
+        {# ---------- Back matter ---------- #}
+        {% if plan.back_matter.glossary %}
+            <section class="plan-preview__section">
+                <h2>Appendix A &mdash; Glossary</h2>
+                <dl class="plan-preview__glossary">
+                    {% for g in plan.back_matter.glossary %}
+                        <dt>{{ g.term }}</dt>
+                        <dd>{{ g.definition }}</dd>
+                    {% endfor %}
+                </dl>
+            </section>
+        {% endif %}
+
+        {% if plan.back_matter.acronyms %}
+            <section class="plan-preview__section">
+                <h2>Appendix B &mdash; Acronyms</h2>
+                <dl class="plan-preview__acronyms">
+                    {% for a in plan.back_matter.acronyms %}
+                        <dt>{{ a.abbr }}</dt>
+                        <dd>{{ a.expansion }}</dd>
+                    {% endfor %}
+                </dl>
+            </section>
+        {% endif %}
+
+        {% if plan.back_matter.references %}
+            <section class="plan-preview__section">
+                <h2>Appendix C &mdash; References</h2>
+                <ul>
+                    {% for r in plan.back_matter.references %}
+                        <li><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.label }}</a></li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+    </article>
+{% endblock %}

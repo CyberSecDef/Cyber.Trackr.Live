@@ -294,6 +294,702 @@
     --old:            #888888;
 }
 
+/* /plans — family plan picker + wizard + preview.
+   Schema-driven wizard with autosave + BYOJSON. Phase 1A scope. */
+
+/* Family picker grid on /plans */
+.plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-7);
+}
+
+.plan-grid__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-muted);
+    padding: var(--space-7);
+}
+
+.plan-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    color: var(--text);
+    text-decoration: none !important;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.plan-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.plan-card__title {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 400;
+    margin: 4px 0;
+    color: var(--text);
+}
+
+.plan-card__description {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0;
+    flex: 1;
+}
+
+.plan-card__cta {
+    margin-top: var(--space-3);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Wizard */
+.plan-wizard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 880px;
+    margin: var(--space-5) 0;
+}
+
+.plan-wizard__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-3) 0 var(--space-5);
+}
+
+.plan-wizard__upload-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.plan-wizard__section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.plan-wizard__section > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-4) var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    color: var(--text);
+    transition: background-color 0.1s ease;
+}
+
+.plan-wizard__section > summary::-webkit-details-marker {
+    display: none;
+}
+
+.plan-wizard__section > summary::after {
+    content: '+';
+    margin-left: auto;
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
+.plan-wizard__section[open] > summary::after {
+    content: '−';
+}
+
+.plan-wizard__section > summary:hover {
+    background: var(--surface-2);
+}
+
+.plan-wizard__section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.plan-wizard__section-label {
+    flex: 1;
+}
+
+.plan-wizard__section-body {
+    padding: var(--space-3) var(--space-5) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    border-top: 1px solid var(--border);
+}
+
+.plan-wizard__placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+    padding: var(--space-3);
+    border-left: 2px solid var(--border-strong);
+    background: var(--surface-2);
+    border-radius: var(--radius-md);
+}
+
+.plan-wizard__footer {
+    margin-top: var(--space-5);
+    color: var(--text-muted);
+    font-size: 13px;
+    max-width: 720px;
+}
+
+/* ----- per-control wizard cards (section 4) ----- */
+
+.plan-control-list__intro {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: var(--space-4);
+}
+
+.plan-control-list__intro code {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: var(--radius-md);
+}
+
+.plan-control-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.plan-control {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.plan-control > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 14px;
+    color: var(--text);
+    transition: background-color 0.1s ease;
+}
+
+.plan-control > summary::-webkit-details-marker {
+    display: none;
+}
+
+.plan-control > summary:hover {
+    background: var(--surface-2);
+}
+
+.plan-control__num {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.plan-control__title {
+    flex: 1;
+    color: var(--text);
+}
+
+.plan-control__enh {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.plan-control__status-badge {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.plan-control__status-badge--implemented {
+    background: color-mix(in srgb, var(--fresh) 18%, var(--surface));
+    color: var(--fresh);
+    border-color: color-mix(in srgb, var(--fresh) 40%, var(--border));
+}
+
+.plan-control__status-badge--partially-implemented {
+    background: color-mix(in srgb, var(--stale) 18%, var(--surface));
+    color: var(--stale);
+    border-color: color-mix(in srgb, var(--stale) 40%, var(--border));
+}
+
+.plan-control__status-badge--not-implemented {
+    background: color-mix(in srgb, var(--sev-high) 18%, var(--surface));
+    color: var(--sev-high);
+    border-color: color-mix(in srgb, var(--sev-high) 40%, var(--border));
+}
+
+.plan-control__status-badge--inherited {
+    background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+.plan-control__body {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+@media (max-width: 991.98px) {
+    .plan-control__body {
+        grid-template-columns: 1fr;
+    }
+}
+
+.plan-control__sidebar {
+    background: var(--surface-2);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-muted);
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.plan-control__sidebar h4 {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin: var(--space-3) 0 4px;
+}
+
+.plan-control__sidebar h4:first-child {
+    margin-top: 0;
+}
+
+.plan-control__statement {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    color: var(--text);
+    margin: 0;
+}
+
+.plan-control__discussion {
+    line-height: 1.55;
+    margin: 0;
+}
+
+.plan-control__related {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.plan-control__ccis {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.plan-control__ccis li {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.plan-control__cci-def {
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+.plan-control__more {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.plan-control__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+/* Conditional fields toggled by status class on .plan-control */
+.plan-control__when-implemented,
+.plan-control__when-inherited,
+.plan-control__when-na {
+    display: none;
+}
+
+.plan-control.is-implemented   .plan-control__when-implemented { display: flex; }
+.plan-control.is-inherited     .plan-control__when-inherited   { display: flex; }
+.plan-control.is-na            .plan-control__when-na          { display: flex; }
+
+.form-field__req {
+    color: var(--accent);
+}
+
+.form-field__list-items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field__list-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.form-field__list-input {
+    flex: 1;
+}
+
+.form-field__list-remove {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-field__list-remove:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.form-field__list-add {
+    align-self: flex-start;
+    font-size: 13px;
+    padding: 4px 10px;
+}
+
+/* Plan preview (HTML rendering) */
+.plan-preview {
+    max-width: 880px;
+    margin: 0 auto var(--space-9);
+    padding: 0 var(--space-3);
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    line-height: 1.55;
+}
+
+.plan-preview h2 {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: 28px;
+    margin: var(--space-7) 0 var(--space-3);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-2);
+}
+
+.plan-preview h3 {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 19px;
+    margin: var(--space-5) 0 var(--space-2);
+    color: var(--text);
+}
+
+.plan-preview__cover {
+    text-align: center;
+    padding: var(--space-9) var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-6);
+}
+
+.plan-preview__classification {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+}
+
+.plan-preview__cover-title {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1;
+    font-weight: 300;
+    margin: 0 0 var(--space-3);
+    color: var(--text);
+}
+
+.plan-preview__cover-system {
+    font-size: 22px;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-6);
+    font-style: italic;
+}
+
+.plan-preview__cover-meta {
+    display: inline-grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px var(--space-4);
+    text-align: left;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.plan-preview__cover-meta dt {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    align-self: center;
+}
+
+.plan-preview__cover-meta dd {
+    margin: 0;
+    color: var(--text);
+    align-self: center;
+}
+
+.plan-preview__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-3) 0;
+}
+
+.plan-preview__table th,
+.plan-preview__table td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.plan-preview__table th {
+    background: var(--surface-2);
+    font-weight: 500;
+}
+
+.plan-preview__placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: var(--space-3);
+    border-left: 2px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+}
+
+.plan-preview__count {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: var(--space-3);
+}
+
+.plan-preview__control-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.plan-preview__control-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+}
+
+.plan-preview__control {
+    margin: var(--space-5) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+}
+
+.plan-preview__control-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-3);
+}
+
+.plan-preview__control-header h3 {
+    margin: 0;
+    flex: 1;
+    font-size: 18px;
+}
+
+.plan-preview__control-status {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 9px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.plan-preview__control-status--implemented {
+    background: color-mix(in srgb, var(--fresh) 18%, var(--surface));
+    color: var(--fresh);
+}
+
+.plan-preview__control-status--partially-implemented {
+    background: color-mix(in srgb, var(--stale) 18%, var(--surface));
+    color: var(--stale);
+}
+
+.plan-preview__control-status--not-implemented {
+    background: color-mix(in srgb, var(--sev-high) 18%, var(--surface));
+    color: var(--sev-high);
+}
+
+.plan-preview__control-status--inherited {
+    background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+    color: var(--accent);
+}
+
+.plan-preview__control h4 {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: var(--space-3) 0 6px;
+}
+
+.plan-preview__statement {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    background: var(--surface-2);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    margin: 0 0 var(--space-3);
+    color: var(--text);
+}
+
+.plan-preview__control-meta {
+    display: grid;
+    grid-template-columns: minmax(140px, 180px) 1fr;
+    gap: 6px var(--space-3);
+    margin-top: var(--space-3);
+    font-size: 14px;
+}
+
+.plan-preview__control-meta dt {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    align-self: start;
+    padding-top: 2px;
+}
+
+.plan-preview__control-meta dd {
+    margin: 0;
+    color: var(--text);
+}
+
+.plan-preview__control-meta dd ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.plan-preview__todo {
+    color: var(--accent);
+    font-style: italic;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
+.plan-preview__glossary,
+.plan-preview__acronyms {
+    display: grid;
+    grid-template-columns: minmax(160px, 220px) 1fr;
+    gap: 6px var(--space-4);
+}
+
+.plan-preview__glossary dt,
+.plan-preview__acronyms dt {
+    font-weight: 500;
+    color: var(--text);
+}
+
+.plan-preview__glossary dd,
+.plan-preview__acronyms dd {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.plan-preview__acronyms dt {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+}
+
 /* /home Common workflows — labeled deep-links into the library for the
    most common reasons someone lands here. Lightweight chip strip, sits
    between the value-prop and the tile grid. */

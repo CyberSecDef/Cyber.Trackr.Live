@@ -1,0 +1,110 @@
+{# Per-control card fragment loaded by plans.js when the baseline changes.
+   No layout extension - this is injected into section 4 of wizard.html.twig.
+   Each card has its own form scope; conditional fields are toggled by CSS
+   classes set on the .plan-control container, not by global show_when. #}
+{% import 'macros.html.twig' as ui %}
+
+{% if controls is empty %}
+    <p class="plan-wizard__placeholder">
+        No controls in the {{ family|upper }} family match this baseline. Pick a different baseline or check your overlay configuration.
+    </p>
+{% else %}
+    <p class="plan-control-list__intro">
+        {{ controls|length }} controls and enhancements applicable to this baseline. Skip a card and the plan will render <code>[TO BE COMPLETED]</code> for that control rather than blocking generation.
+    </p>
+
+    <div class="plan-control-list">
+    {% for c in controls %}
+        <details class="plan-control" data-control-num="{{ c.number }}">
+            <summary>
+                <span class="plan-control__num">{{ c.number }}</span>
+                <span class="plan-control__title">{{ c.title|editorial_title }}</span>
+                {% if c.is_enhancement %}<span class="plan-control__enh">enhancement of {{ c.parent }}</span>{% endif %}
+                <span class="plan-control__status-badge" data-control-status-badge>—</span>
+            </summary>
+
+            <div class="plan-control__body">
+
+                {# Sidebar: read-only context from the catalog #}
+                <aside class="plan-control__sidebar">
+                    {% if c.statement %}
+                        <h4>Control statement</h4>
+                        <pre class="plan-control__statement">{{ c.statement }}</pre>
+                    {% endif %}
+                    {% if c.discussion %}
+                        <h4>Discussion</h4>
+                        <p class="plan-control__discussion">{{ c.discussion }}</p>
+                    {% endif %}
+                    {% if c.related %}
+                        <h4>Related controls</h4>
+                        <p class="plan-control__related">
+                            {% for r in c.related %}{{ ui.rmf_link(r) }}{% if not loop.last %} {% endif %}{% endfor %}
+                        </p>
+                    {% endif %}
+                    {% if c.ccis %}
+                        <h4>Linked CCIs ({{ c.ccis|length }})</h4>
+                        <ul class="plan-control__ccis">
+                            {% for cci in c.ccis|slice(0, 8) %}
+                                <li>{{ ui.cci_link(cci.id) }} <span class="plan-control__cci-def">{{ cci.definition|slice(0, 140) }}{% if cci.definition|length > 140 %}…{% endif %}</span></li>
+                            {% endfor %}
+                            {% if c.ccis|length > 8 %}
+                                <li class="plan-control__more">+{{ c.ccis|length - 8 }} more</li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </aside>
+
+                {# Form: per-control answers #}
+                <div class="plan-control__form">
+                    <div class="form-field">
+                        <label>Implementation status</label>
+                        <select data-control-num="{{ c.number }}" data-control-key="status" data-control-status>
+                            <option value="">— Select —</option>
+                            <option value="Implemented">Implemented</option>
+                            <option value="Partially Implemented">Partially Implemented</option>
+                            <option value="Not Implemented">Not Implemented</option>
+                            <option value="Not Applicable">Not Applicable</option>
+                            <option value="Inherited">Inherited</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field plan-control__when-implemented">
+                        <label>Implementation narrative</label>
+                        <textarea rows="5" data-control-num="{{ c.number }}" data-control-key="narrative" placeholder="How is this control satisfied? Tools, processes, frequencies, responsible parties."></textarea>
+                    </div>
+
+                    <div class="form-field plan-control__when-inherited">
+                        <label>Inheritance provider</label>
+                        <input type="text" data-control-num="{{ c.number }}" data-control-key="inheritance_provider" placeholder="e.g., Enterprise IAM Service">
+                    </div>
+                    <div class="form-field plan-control__when-inherited">
+                        <label>Inheritance details</label>
+                        <textarea rows="3" data-control-num="{{ c.number }}" data-control-key="inheritance_details" placeholder="Reference the provider's authorization, MOU, or boundary documentation."></textarea>
+                    </div>
+
+                    <div class="form-field plan-control__when-na">
+                        <label>Not Applicable rationale</label>
+                        <textarea rows="3" data-control-num="{{ c.number }}" data-control-key="na_rationale" placeholder="Justify why this control does not apply."></textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Responsible role</label>
+                        <input type="text" data-control-num="{{ c.number }}" data-control-key="responsible_role" placeholder="Role accountable for this control">
+                    </div>
+
+                    <div class="form-field">
+                        <label>Evidence / artifacts</label>
+                        <div class="form-field__list" data-control-num="{{ c.number }}" data-control-key="evidence">
+                            <ul class="form-field__list-items"></ul>
+                            <button type="button" class="cta-secondary form-field__list-add" onclick="planWizard.listAdd(this)">
+                                <i class="bi bi-plus" aria-hidden="true"></i> Add evidence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </details>
+    {% endfor %}
+    </div>
+{% endif %}

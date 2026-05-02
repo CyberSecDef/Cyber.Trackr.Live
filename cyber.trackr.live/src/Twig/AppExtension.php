@@ -18,6 +18,25 @@ class AppExtension
     }
 
     /**
+     * Editorial title case: capitalize each word but lowercase short
+     * conjunctions / articles / prepositions (and, or, of, for, etc.).
+     * Used by the plan generator since 800-53 r5 stores control titles
+     * in ALL CAPS ("POLICY AND PROCEDURES") and the default `|title`
+     * filter would render that as "Policy And Procedures."
+     */
+    #[AsTwigFilter(name: 'editorial_title')]
+    public function editorialTitle(string $value): string
+    {
+        $s = ucwords(strtolower($value));
+        $small = ['And','Or','Of','For','To','In','On','At','By','The','A','An','As','With','From'];
+        return preg_replace_callback(
+            '/\b(' . implode('|', $small) . ')\b/',
+            fn($m) => strtolower($m[1]),
+            $s
+        );
+    }
+
+    /**
      * Bucket a date by age into one of four freshness tags, matching the
      * .dot CSS modifiers in app.css. Boundaries: ≤1y fresh, ≤3y stale,
      * ≤5y aged, else old. Empty/invalid dates collapse to 'old'.

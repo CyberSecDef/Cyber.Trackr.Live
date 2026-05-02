@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Plans &mdash; Cyber Trackr{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="plans-page-title">
+        <div class="rule-text">&sect; Plans</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Plan generators</span>
+            <h1 id="plans-page-title" class="lib-page__title-large">
+                Family compliance plans, <em>generated.</em>
+            </h1>
+            <p class="lib-page__lede">
+                Answer a structured set of questions and download a Word document &mdash; cover page, control-by-control implementation narrative, linked CCIs, and back matter included. Saves and reloads as JSON so a half-finished draft travels with you.
+            </p>
+        </header>
+
+        <div class="plan-grid">
+            {% for code, p in plans %}
+                <a href="{{ path('plans_wizard', {family: code}) }}" class="plan-card">
+                    <span class="eyebrow">{{ p.family_name }}</span>
+                    <h2 class="plan-card__title">{{ p.title }}</h2>
+                    <p class="plan-card__description">{{ p.description }}</p>
+                    <span class="plan-card__cta">
+                        Start <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </span>
+                </a>
+            {% else %}
+                <p class="plan-grid__empty">No plan generators are available yet.</p>
+            {% endfor %}
+        </div>
+
+    </section>
+{% endblock %}

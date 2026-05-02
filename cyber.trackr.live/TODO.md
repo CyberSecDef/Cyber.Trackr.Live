@@ -1,339 +1,685 @@
-# Cyber Trackr Redesign — TODO
+# Cyber Trackr — TODO
 
-> **✓ All groups complete.** Every item from the original spec has either shipped or been formally closed (kept as-is or won't-do, with reasoning recorded inline). This file is now archival — historical record of what was done and why some items were chosen out of scope.
+## Auto Plan Generation (CM-first, schema-driven)
 
-Itemized backlog for the redesign, grouped by **type of change** rather than by page. Each item has a **Scope** (`global` / specific template name(s)) so it's clear what gets touched.
-
-Originally derived from the redesign spec authored against the rendered pages; cross-referenced against the actual codebase and amended where the spec assumed a different structure than what's there.
-
----
-
-## Cross-reference notes (read first)
-
-These are the assumptions in the original spec that needed adjustment based on actual source. Items below have been updated accordingly:
-
-- **Stack:** Bootstrap **5.3.2** + Bootstrap Icons 1.11.1 + jQuery 3.7.1 + DataTables. No Tailwind. The spec uses Tailwind-style class names like `col-span-12 lg:col-span-7`, `gap-7`, `space-y-2.5`, `min-h-[260px]`, `lg:col-start-6`. These have been translated to Bootstrap 5 grid (`col-12 col-lg-7`, `g-3`) or noted as new custom utility classes that need to be added.
-- **Navigation:** Currently a **left sidebar** (`templates/sidebar.html.twig` included from `base.html.twig` line 227). **Resolved:** replace with sticky top header per §13. The 4-quadrant body grid in `base.html.twig` lines 199–233 collapses to a simple `<header><main><footer>` shell.
-- **Custom CSS:** Lives inline in `<style>` blocks in `templates/base.html.twig` (~150 lines covering `.doc-title`, `.doc-desc`, `.doc-summary`, `.sec-title`, `.sec-header`, `.req-header`, `.req-desc`, `.requirement`, `.reference`, `.sidemenu`, `.text-sm`, `.text-md`, `.body-container`, `.logo-text`, `.text-justify`) plus per-template `<style>` blocks (each list view repeats `#tableid td { padding:0px ... font-family: 'Linux Libertine', Georgia, Times, serif }`). All of this needs to migrate to a real stylesheet at `public/css/app.css` (new file) before tokenization can happen.
-- **No theme system today:** All colors are hardcoded (Bootstrap defaults + a few inline `color: #339`, `#f6f6f6`, etc.). Theme tokens (§1) require introducing the stylesheet first.
-- **Tables are DataTables, not static dumps:** The spec calls the homepage table a "250-row HTML table dump" — it actually IS a `<table>` populated by Twig with all stigs, but a `$('#stigs').DataTable({pageLength: 25})` call paginates client-side. So initial HTML payload is large but the visible UI is paginated. **Resolved:** replace DataTables on `home/index`, `stig/index`, `scap/index` with the custom managed table the spec describes (exact design match); retain + theme DataTables on `cci/index` (export buttons heavily used).
-- **Google Fonts not loaded:** Need to add `<link>` tags for Fraunces + IBM Plex Sans + IBM Plex Mono in `base.html.twig` `<head>`.
-- **No JS framework:** Plain jQuery + per-template `const stig_app = { init() {...} }` pattern. Theme toggle, freshness utility, etc. need to be added as a shared `public/js/app.js` (new file) loaded before the per-page scripts.
-- **Server-side data for §19:** "Stored as a server-side variable (`window.LAST_DISA_SYNC`, etc.)" — implementation in Symfony will be either (a) a Twig global registered in `config/packages/twig.yaml` via `globals:` pointing at a service, or (b) injected by each controller. Recommend a Twig global for site-wide availability.
-- **"Sitemap" mentioned in §6:** No `/sitemap` route exists today. There's a `public/sitemap.xml`. Treating "sitemap" as forward-compatible (the freshness component should work wherever, not requiring a new route).
-- **Per-record freshness on detail pages (§19):** `stig/view.html.twig` already shows the published date (line 25) and a derived "Released" date (line 26 — currently uses `split('Date:')[1]`). The freshness dot should pair with the existing date display, not replace the whole header.
+A wizard-based generator that produces NIST RMF family plans (Configuration
+Management Plan, Access Control Plan, etc.) from a structured questionnaire.
+Template-based, no LLM. Schema-driven so adding new families is a JSON file,
+not a code change. Output is HTML preview + downloadable `.docx`.
 
 ---
 
-## Group 1 · Foundations
+### → Pick up here next session
 
-### 1.1 Stylesheet & file structure  *(global, prerequisite for everything below)*  ✓ done
+**Current state**: Phase 1 is COMPLETE for the CM family but is now
+considered the **structural floor** for the engine — it produces a
+syntactically correct plan but not yet an assessable one. Phase 2 is
+the assessability pass: it makes the plan *measurable, parameterized,
+and evidence-backed* per RMF best practice. The Phase 2 engine work
+becomes the **shared baseline** all future family schemas rely on.
 
-- [x] Create `public/css/app.css` as the new home for all custom styles. Load it in `base.html.twig` *after* `bootstrap.min.css`, `bootstrap-icons.css`, `datatables.min.css` so it can override.
-- [x] Move the inline `<style>` block from `base.html.twig` (lines 39–171) into `public/css/app.css`. Preserved every selector. Also moved the `@media print` rules from `stig/compare.html.twig` into a new section 4 of `app.css`.
-- [x] Remove the per-template `<style>` blocks duplicated across `home/index.html.twig`, `stig/index.html.twig`, `scap/index.html.twig`; consolidated into a single rule (`#stigs td, #scaps td, #ccis td`) in `app.css`.
-- [x] Create `public/js/app.js` with `window.app = { init, search }`. Theme toggle, freshness, relTime utilities will be added here in §5.1 / §2.4. Search route URL passed via `window.routes` set in `base.html.twig` (since static JS can't use Twig's `path()` helper).
+Code from Phase 1 is local and uncommitted (we agreed to commit once
+after 1D).
+End-to-end verified: `/plans` index → `/plans/cm` wizard → baseline picker
+loads per-control cards → preview HTML opens in new tab → download
+generates a clean `.docx` that opens in Word.
 
-### 1.2 Design tokens (§1)  *(global)*  ✓ done
+**Where to start when resuming**:
 
-- [x] Add `:root` block in `app.css` with all light-theme tokens.
-- [x] Add `[data-theme="dark"]` block with dark-theme overrides. Theme toggle JS wiring still pending (§5.1).
-- [x] Spacing scale: `--space-1` through `--space-10` (4, 8, 12, 16, 24, 32, 48, 64, 80, 112).
-- [x] Border-radius scale: `--radius-sm` (2px) / `--radius-md` (3px) / `--radius-lg` (4px) / `--radius-xl` (6px).
-- [x] Severity tokens per theme.
-- [x] Freshness tokens per theme.
-- [x] `body { background: var(--bg); color: var(--text); }`. Also updated `a { color: var(--accent) !important; }` and added `a:hover { color: var(--accent-hover) !important; }`.
-- [x] Custom `::selection` color via `color-mix`.
+1. **Commit the whole Phase 1 series** as one feature commit (we held all
+   diffs from 1A through 1D plus the docx-corruption fix specifically so
+   we could land them as one coherent feature). Files involved:
+   - `composer.json` / `composer.lock` (added phpoffice/phpword)
+   - `resources/data/plans/_shared.json` + `cm.json` (new)
+   - `src/Service/Plans/{PlanRegistry,ControlResolver,PlanBuilder}.php` (new)
+   - `src/Service/Plans/Renderer/{HtmlRenderer,DocxRenderer}.php` (new)
+   - `src/Controller/PlansController.php` (new)
+   - `src/Twig/AppExtension.php` (added `editorial_title` filter)
+   - `templates/plans/{index,wizard,preview,_control_cards}.html.twig` (new)
+   - `templates/base.html.twig` (added Plans nav link)
+   - `public/js/plans.js` (new)
+   - `public/css/app.css` (~400 lines of plan-related styling)
+   - `TODO.md` (this file, the planning doc)
 
-### 1.3 Typography system (§2)  *(global)*  ✓ done
+2. **Begin Phase 2 — Assessability** (see full spec below). Driven by
+   real RMF practitioner feedback on the Phase 1 CM Plan: the plan was
+   structurally sound but lacked enforceable, measurable,
+   organization-defined values; control-enhancement traceability;
+   per-control technical enforcement detail; and several CM-specific
+   structured sections (CCB definition, CI methodology, audit strategy,
+   exception management, drift automation, metrics, etc.). Phase 2
+   addresses the engine + schema gaps so the resulting plans are
+   *assessable*, not just structurally compliant.
 
-- [x] preconnect / Google Fonts initially shipped, **later replaced by self-hosted fonts** in `public/fonts/` (Fraunces variable + IBM Plex Sans variable + 3 IBM Plex Mono weights, latin subset only). Fraunces normal woff2 preloaded for the hero h1.
-- [x] @font-face declarations in `app.css` cover all faces with `display: swap`.
-- [x] Body default in `app.css`: IBM Plex Sans with system fallback, ss02/ss03 stylistic alternates, webkit/mozilla font smoothing.
-- [x] Utility classes added: `.font-display`, `.font-display-italic`, `.font-mono`, `.eyebrow`.
-- [x] Linux Libertine references resolved as part of the §4.6 detail-page tokenization sweep.
+3. **Future families come AFTER Phase 2.** Phase 2 sets the new floor
+   for what every family schema should provide. Adding AC, AU, IR, etc.
+   on top of the Phase 2 engine is still schema-only work (no engine
+   changes), but the schema templates are richer.
 
----
+### Lesson learned during 1D — PHPWord TOC bug
 
-## Group 2 · Reusable Components
-
-### 2.1 Identifier pill `.ident` (§3)  *(global, highest-impact)*  ✓ done
-
-- [x] Add `.ident` class to `app.css` per spec.
-- [x] Created `templates/macros.html.twig` with `{{ ui.ident(value) }}` macro (trims input to handle xpath whitespace).
-- [x] Sweep across 8 templates: `home/index`, `stig/index`, `scap/index` (version/release columns); `stig/view`, `scap/view` (titles, summary, rule loop CCI/vuln/rule IDs and references); `cci/index` (CCI + RMF columns); `rmf/view_v5`, `rmf/view_v4` (control numbers, APs, related controls, enhancement numbers); `home/search` (all result row IDs + vuln details).
-- [x] Spots intentionally left unwrapped: HTML id attributes, severity text (→ `.sev` in §2.2), `<option>` children (HTML disallows spans inside; → `.chip` in §4), JS string parameters.
-- **Note for §4:** the list views (`home/index`, `stig/index`, `scap/index`) currently render two adjacent pills per row (V* + R*) since version/release are separate columns. The spec's combined V2R7 single-pill comes when Group 4 redesigns the table column structure.
-
-### 2.2 Severity pill `.sev` (§4)  *(global)*  ✓ done
-
-- [x] `.sev` base + high/med/low modifiers + `.sev.is-filter` interactive variant + `button.sev` reset (app.css §0c).
-- [x] `{{ ui.sev(level, count = null) }}` macro with adaptive aria-label.
-- [x] Applied in `stig/view` and `scap/view` filter buttons + per-rule badges. (Stat-card variant in §4.6 supersedes filter-button placement on the detail pages.)
-- [x] JS refactor: `toggleFilter` takes severity as a 2nd arg.
-- [x] **Closed:** STIGs tile severity-aggregate display — chose to keep the tile clean with count + descriptor only. Adding aggregate sev would be visually busy; can revisit if needed.
-
-### 2.3 Severity bar `.sev-bar` (§5)  *(global)*  ✓ done
-
-- [x] `.sev-bar` + child `.h/.m/.l` rules (app.css §0d).
-- [x] `{{ ui.sev_bar(high, med, low) }}` macro with widths inline-styled as percentages, hover `title`, screen-reader `aria-label`.
-- [x] Applied across the homepage Recent updates table, /stig list, /scap list (post deferral #6), and inline beside filter pills on stig/scap detail.
-
-### 2.4 Freshness dot `.dot` + utilities (§6)  *(global)*  ✓ done
-
-- [x] `.dot.fresh / .stale / .aged / .old` rules in `app.css` (section 0e).
-- [x] PHP filters in `App\Twig\AppExtension` (`freshness_tag`, `rel_time`); JS twins in `app.freshnessTag()` / `app.relTime()`. Boundaries + formats match spec exactly across all four magnitudes.
-- [x] `{{ ui.freshness(date) }}` macro renders `.freshness` wrapper + dot + `<time datetime>`.
-- [x] Applied across home/index, stig/index, scap/index, stig/view, scap/view, hero trust strip (§4.1), footer Status column (§3.3), and STIG vuln search results (deferral #5).
-
-### 2.5 Filter chip `.chip` (§9)  *(global)*  ✓ done
-
-- [x] `.chip`, `.chip:hover`, `.chip.active`, `button.chip` reset, `.chip-group` wrapper, `.scroll-x` mobile container — all in app.css §0f.
-- [x] Applied: stig/scap detail Sort UI, hero "Try" row (§4.1), homepage Recent updates age filter (§4.3), /stig and /scap age filters (§4.5/§4.8), report-generator render-options grid.
-- [x] **Closed:** STIG detail Versions panel chip rows. Selects work; chip-row would need multi-select state JS for Compare. Not worth the implementation cost.
-
-### 2.6 Stat cards / tiles `.tile` (§8)  *(homepage primarily, reusable)*  ✓ done
-
-- [x] `.tile`, `.tile:hover`, `.tile::after`, `.tile-arrow` hover transform, `.tile-meta` (app.css §0g).
-- [x] CSS Grid `.span-N` translation of the Tailwind-style spec spans applied in §4.2.
-- [x] Tile arrow uses Bootstrap Icons `bi-arrow-up-right` at 20px, `var(--accent)`.
-- [x] 7-tile grid built on homepage in §4.2 with all routes wired.
+PHPWord 1.4's TOC field rendering copies heading text into
+`<w:hyperlink><w:t>…</w:t></w:hyperlink>` **without** XML-escaping, so a
+literal `&` in any heading produces a `document.xml` that `unzip`
+accepts but Word refuses to open. The fix is `DocxRenderer::safeHeading()`,
+which strips/replaces `& < >` from anything passed to `addTitle()`. All
+dynamic heading paths route through it (4. {family approach title},
+5.X CM-N — {control title}, 6. {continuous monitoring title}). When
+authoring future family schemas, **keep `&`, `<`, `>` out of any field
+that lands in a heading** (intro_template body text is fine — only
+title strings are at risk).
 
 ---
 
-## Group 3 · Layout Shell
+### Decisions locked
 
-### 3.1 Navigation header (§13)  *(global — `base.html.twig`)*  ✓ done
+- **CM family-specific questions** (5): CM tool / repo of record, CCB chair,
+  CCB cadence, baseline storage approach, change-request workflow.
+- **DOCX styling**: single neutral template for v1 (no configurable cover
+  color / logo upload — that's a future enhancement).
+- **Nav placement**: new top-level "Plans" slot in the primary nav, between
+  "Scans to Reports" and "API."
+- **DOCX library**: PHPWord (acceptable to add the ~5 MB to `vendor/`).
+- **No LLM**: pure templating + user-authored prose.
+- **No DB**: persistence via BYOJSON (download / upload draft files,
+  autosave to `localStorage` during a session).
+- **Status taxonomy**: Implemented / Partially Implemented / Not Implemented
+  / Not Applicable / Inherited (with provider + details fields).
+- **Skipping is allowed**: missing controls render as `[TO BE COMPLETED]`
+  rather than blocking the generate action.
+- **Wizard layout**: single-page accordion, not a stepper. RMF folks answer
+  non-linearly.
+- **Cross-references**: each control's "See also" pulls from `<related>` in
+  the 800-53 r5 catalog, rendered with the existing `ui.rmf_link` macro.
 
-- [x] Sidebar replaced with sticky 64px top header. `templates/sidebar.html.twig` deleted; 4-quadrant body grid collapsed to `<header><main>` (footer comes in §3.3).
-- [x] Header built per spec — three clusters (brand+seal / center nav / actions), responsive breakpoints applied.
-- [x] `.seal` concentric circles (with dashed inner ring) added.
-- [x] `<kbd>` global element styling added (and `.site-search__kbd` for header use).
-- [x] **Print-routine fix:** `stig/view` had two `$("div#quadrant-4 > div.doc-title > h1")` selectors that would have broken with the layout change — switched to class-based `$("div.doc-title > h1").first()`.
+### Architecture summary
 
-### 3.2 Atmospheric effects (§14)  *(global — `base.html.twig` + `app.css`)*  ✓ done
+- **Schemas**: `resources/data/plans/_shared.json` (system metadata + per-
+  control questions, used by every family) + `resources/data/plans/<fam>.json`
+  per family (intro prose template, family-specific questions).
+- **Services** under `App\Service\Plans\`:
+  - `PlanRegistry` — discovers schema files, exposes `availablePlans()`.
+  - `ControlResolver` — given `family + baseline`, returns applicable
+    controls from the 800-53 r5 catalog filtered by OSCAL profile.
+  - `PlanBuilder` — schema + answers → `Plan` value object.
+  - `Renderer\HtmlRenderer` — `Plan` → HTML.
+  - `Renderer\DocxRenderer` — `Plan` → `.docx` via PHPWord.
+- **Controller**: `App\Controller\PlansController` with five routes
+  (`/plans` index, `/plans/{family}` wizard, `/plans/{family}/preview`,
+  `/plans/{family}/download`, `/plans/{family}/schema.json`).
+- **Templates**: `templates/plans/{index,wizard,preview}.html.twig`.
+- **CSS**: new `.plan-wizard` and `.plan-preview` blocks in `app.css`.
 
-- [x] `.grain::before` added (app.css §1b) — fixed full-viewport SVG fractal-noise layer, inlined as data URI. Light: multiply at 0.5 opacity. Dark: screen at 0.18 opacity. z-index 200 sits above the sticky header so the texture stays continuous; `pointer-events: none` keeps everything clickable.
-- [x] `<body class="grain">` activates site-wide.
-- [x] `.rule-text` section divider added (app.css §1c) — flex with 1px ::before/::after lines around the eyebrow.
+### Document structure (every plan, family-specific where noted)
 
-### 3.3 Footer (§12)  *(global — `base.html.twig`)*  ✓ done
+**Front matter**
+- Cover page (title, system name, version, date, classification stamp)
+- Document control / revision history table
+- Table of contents
+- Executive summary (auto-generated from system metadata)
 
-- [x] Footer markup added to `base.html.twig`. Uses CSS Grid (2-col → 4-col at md) instead of Bootstrap row, since the rest of the layout shell is custom-grid-based.
-- [x] 4 columns: Library, Tools, About, Status — wired to existing routes; placeholders (`aria-disabled`) for Ruby gem and GitHub per Group 8 decision.
-- [x] Status column reads from `{{ sync_status }}` Twig global (folded §5.2 in).
-- [x] Bottom strip: 28px `.seal--small` + "Cyber Trackr · est. MMXIX" mono uppercase on left, italic Fraunces "Compliance, made legible." on right.
+**Body**
+1. Introduction (purpose, scope, audience, references) — family boilerplate
+2. System Overview — from system metadata
+3. Roles and Responsibilities — table from owner/ISSO/ISSM
+4. **{Family} Approach** — narrative built from family-specific answers
+5. Control Implementation — one subsection per applicable control:
+   - Control text from 800-53 r5
+   - Implementation status
+   - Implementation narrative (or inheritance/N-A details)
+   - Responsible role
+   - Evidence / artifacts list
+   - Linked CCIs (deep-linked to /cci#CCI-…)
+   - Related controls (deep-linked to /rmf/5#rmf_…)
+6. Continuous Monitoring — family boilerplate
 
----
+**Back matter**
+- Appendix A: Glossary (auto, terms from this family's controls)
+- Appendix B: Acronyms (auto)
+- Appendix C: References (NIST 800-53 r5, family SP, CNSSI 1253 if applicable)
 
-## Group 4 · Page-Specific Updates
+### BYOJSON shape
 
-### 4.1 Homepage hero (§7)  *(`templates/home/index.html.twig`)*  ✓ done
+```json
+{
+  "schema_version": 1,
+  "family": "CM",
+  "saved_at": "2026-05-01T19:42:00Z",
+  "system": { "name": "...", "owner": "...", ... },
+  "baseline": "fedramp-moderate",
+  "family_answers": { "ccb_chair": "...", "ccb_cadence": "...", ... },
+  "controls": {
+    "CM-1": { "status": "Implemented", "narrative": "...", "evidence": ["..."], ... },
+    "CM-2": { "status": "Inherited", "provider": "...", "details": "...", ... }
+  },
+  "document": { "version": "1.0", "author": "...", "publication_date": "..." }
+}
+```
 
-- [x] Replaced legacy "Welcome to Cyber Trackr" card. About Us + DataTable still below — handled by §4.4 / §4.3.
-- [x] `.stamp` oxblood-bordered "● Live · Updated daily".
-- [x] Issue line `No. {{ "now"|date("m") }} · {{ "now"|date("Y") }}`.
-- [x] Massive headline with `clamp(48px, 9vw, 112px)` (started clamp at 48 instead of 64 for tighter mobile), italic oxblood accent on second line.
-- [x] Subhead in Fraunces 17px, max-width 640px.
-- [x] `.hero-search` 64px input with focus ring per spec, distinct `id="hero-search-input"` so it coexists with the header search.
-- [x] Six "Try" chips including AC-2 and CCI-000196 wrapped in `{{ ui.ident() }}`.
-- [x] Trust strip wired to `sync_status` global, dataset counts from new HomeController helpers (substring-count on raw XML for speed; uses `<controls:control` prefix since XML is namespaced).
-- [x] `.rise` + `.delay-1..5` utilities applied. (§5.3 folded in.)
-
-### 4.2 Homepage tile grid (§8)  *(`templates/home/index.html.twig`)*  ✓ done
-
-- [x] 12-col CSS Grid (`.tile-grid__inner` with `repeat(12, 1fr)` + `.span-N` utilities) inserted between hero and the legacy About/table block.
-- [x] Seven tiles linked to existing routes per spec.
-- [x] Counts pulled from `stig_count` / `controls_count` / `cci_count` controller vars (added in §4.1).
-- [x] **Closed:** STIGs tile severity-aggregate row — chose to keep the tile clean with count + descriptor only.
-
-### 4.3 Homepage recent STIGs table (§10)  *(`templates/home/index.html.twig`)*  ✓ done
-
-- [x] Legacy Bootstrap+DataTable block removed. New custom managed table per spec.
-- [x] Bordered container with sticky mono uppercase headers, sortable columns (aria-sort, click toggles asc/desc), row hover (--accent 5% mix), footer row.
-- [x] Filter bar with 220px text input + 4-chip age group. Text filter does case-insensitive substring on name+version; age matches freshness_tag.
-- [x] Legend row with the 4 dot+label freshness levels.
-- [x] Footer row "Showing N of M STIGs" + "View entire library ›" link.
-- [x] HomeController::index() slices to top 40 by released date (with date → released → 0 fallback).
-- [x] Severity Mix column composes ui.sev_bar() + ui.sev() pills.
-- [x] Rules total column with right-aligned tabular numerics.
-- **Reusable .data-table component** also lives in app.css §2c — stig/index (§4.5) and scap/index (§4.8) will reuse it.
-
-### 4.4 Homepage about/colophon (§11)  *(`templates/home/index.html.twig`)*  ✓ done
-
-- [x] 12-col split: left (cols 1-4) eyebrow + Fraunces heading "Built by one engineer, *for the community.*"; right (cols 6-12, with col 5 as gutter via `grid-column: 6 / span 7`) pull-quote + body + CTA row. Original "About Us" copy preserved in tightened form.
-- [x] Primary CTA "Contact & feedback" → `path('contact_us')`.
-- [x] Secondary CTA "View on GitHub" rendered as `aria-disabled` placeholder with reduced opacity + title tooltip; revisit when repo exists.
-- [x] New `.cta-primary` / `.cta-secondary` component added (app.css §0i) — distinct from Bootstrap's `.btn-*` to avoid collision; reusable anywhere CTAs appear.
-
-### 4.3a Pre-compute severity counts in `stig_toc.json`  *(`StigController` — gates §4.3 and §4.5 Severity Mix columns)*  ✓ done
-
-- [x] Extracted toc-build logic into `App\Service\StigTocBuilder` with `parseStig($filePath)` returning `[title, entry: {date, released, filename, version, release, sev: {h,m,l}}]` and `rebuildAll()` for full rescans.
-- [x] Schema updated: every entry now carries `sev: {h, m, l}`.
-- [x] One-time backfill via new `bin/console app:stig:rebuild-toc` command. Ran in 18.69s, 3,970 instances reparsed, 0 entries missing sev.
-- [x] StigController::stig() refactored to use `$tocBuilder->parseStig()` for newly-dropped XML files (so future additions auto-include sev counts).
-- [x] All Twig templates that read `stigs[]` use `s.sev.h|default(0)` fallback.
-
-### 4.5 STIG list page (`templates/stig/index.html.twig`)  ✓ done
-
-- [x] Old DataTable replaced with the same .data-table component as the homepage. Pagination is 50/page (kept the spec's option) implemented in app.stigList — filter/sort reset to page 1.
-- [x] Reused .lib-page__bar / legend / .data-table everything from §4.3. CSS classes renamed from .recent-stigs__* to .lib-page__* for shared use across both pages.
-- [x] Page header: .lib-page__title-large Fraunces with italic accent + .lib-page__lede subhead + eyebrow.
-- [x] Bonus: extracted per-title rollup to `StigTocBuilder::latestPerTitle()`, reused in both HomeController and StigController. Generic sort-handler registry in app.tableSortHandlers makes the third (§4.8) and any future managed table trivial to plug in.
-
-### 4.6 STIG detail page (§20)  *(`templates/stig/view.html.twig`)*  ✓ done
-
-- [x] Breadcrumbs: simple "STIGs › {title}". Vendor heuristic deferred (would need a controller-side helper).
-- [x] Header rewrite: eyebrow + Fraunces title from XCCDF Benchmark/title + meta row with `.ident` pill / freshness / released date / rule count, plus 40px `.icon-btn` download/print on the right.
-- [x] `.doc-summary` card removed entirely. Replaced with: 3-up `.stat-cards` (severity border-left, big Fraunces count in matching color, mono uppercase label — clickable as filters via `stig_app.toggleFilter`); `.versions-panel` 2-col grid with Compare + View `<select>`s + CTA-primary submit; `.rule-controls` bar with sort chips + Expand-All toggle.
-- [x] `.ident` and `.sev` already applied throughout the rule loop in Groups 2.1 / 2.2.
-- [x] Rule-loop card markup preserved (existing JS depends on it). Supporting CSS in §2 fully tokenized — `.req-header` / `.req-desc` / `.sec-header` / `.doc-desc` / `dt.inline` / `.reference` all now use `--text` / `--border` / `--border-strong` / `--text-muted` instead of hardcoded grays.
-- [x] **Closed:** chip-row Compare/View — selects function fine; multi-select chip UX wasn't worth the JS cost.
-- [x] **Closed:** rule-list-as-table — kept the card layout to preserve the rich expand/collapse + per-rule details.
-
-### 4.7 SCAP detail page  *(`templates/scap/view.html.twig`)*  ✓ done
-
-- [x] Mirrors §4.6 layout: breadcrumbs, header with eyebrow + Fraunces title + meta + icon-btn download, 3-up stat-cards, versions panel (single-col modifier — SCAP has no Compare action), description, rule-controls bar, rule cards.
-- [x] xccdf: namespace differences handled. `Published` shown in the freshness slot since SCAP doesn't carry a separate `released` date. No print button (didn't exist before either).
-- [x] New `.versions-panel--single` modifier added to app.css so the View-only panel renders as 1-col instead of half-empty 2-col.
-- [x] All `scap_app` JS handlers preserved verbatim.
-
-### 4.8 SCAP list page  *(`templates/scap/index.html.twig`)*  ✓ done
-
-- [x] DataTable replaced with the same .lib-page + .data-table pattern as §4.5.
-- [x] **Severity Mix + Rules columns added** via deferral #6 — `App\Service\ScapTocBuilder` + `bin/console app:scap:rebuild-toc` mirror the §4.3a stig pattern. /scap now matches /stig visually with 6 columns including Severity Mix and Rules.
-- [x] app.scapList JS module mirrors app.stigList; "scap-table" registered in app.tableSortHandlers; init() wires pagination on load.
-
-### 4.9 RMF v5 view  *(`templates/rmf/view_v5.html.twig`)*  ✓ done
-
-- [x] Tokenized styles already applied via §4.6 (.req-header / .doc-desc / dt.inline / .sec-header etc.). Bg-light fix covers the metadata panels.
-- [x] Control numbers wrapped via §2.1.
-- [x] Page header redesigned: breadcrumbs (Library › 800-53 r5), eyebrow "NIST SP 800-53", Fraunces title "Risk Management Framework *Rev. 5*" with italic accent, meta count, icon-btn print on right. Added "§ Controls" divider before the foreach.
-
-### 4.10 RMF v4 view  *(`templates/rmf/view_v4.html.twig`)*  ✓ done
-
-- [x] Mirrors §4.9 RMF v5 layout. Breadcrumb includes "800-53 r5" intermediate to signal v4 is the legacy revision. "NIST SP 800-53 · Legacy" eyebrow + Fraunces "Risk Management Framework *Rev. 4*" + meta with control count.
-
-### 4.11 CCI list page  *(`templates/cci/index.html.twig`)*  ✓ done
-
-- [x] CCI numbers and RMF control refs wrapped in `.ident` (done in §2.1 sweep).
-- [x] DataTables retained per Group 8 decision; new app.css §2g overrides skin the toolbar (filter input, length select, info row, paginate buttons, .dt-button export bar) and the table headers/rows to tokens. All 5 export buttons (Copy/Excel/CSV/PDF/Print) preserved.
-- [x] Page wrapped in `.lib-page`; new `.lib-page__header` with eyebrow + Fraunces "Common Control *Identifiers*" + lede with live count. Also fixed legacy typo "Idenfiers" → "Identifiers".
-
-### 4.12 Search results page  *(`templates/home/search.html.twig`)*  ✓ done
-
-- [x] Token typography applied throughout. `.ident` wrapping was already done in §2.1.
-- [x] `bg-primary-subtle` / `border-primary` replaced with new `.search-section__header` (tokenized — surface bg, --border-strong border, accent on hover).
-- [x] Wrapped in `.lib-page` with proper page header (eyebrow + Fraunces title "Results for *{query}*" + lede counting all 5 result types).
-- [x] Section names cleaned ("RMFv4" → "800-53 r4", "APs" → "Assessment Procedures"); STIG titles in vuln results render underscores as spaces.
-- [x] **Per-vuln freshness shipped via deferral #5** — each vuln result now shows a "Released" row with `{{ ui.freshness(...) }}` based on the STIG's release date from the toc.
-
-### 4.13 Contact page  *(`templates/home/contact.html.twig`)*  ✓ done
-
-- [x] Wrapped in `.lib-page` with eyebrow + Fraunces "Feedback & *suggestions*" title + lede.
-- [x] Form switched from Bootstrap row+col-form-label horizontal to stacked `.form-stack` / `.form-field` layout. New §0k component family in app.css covers labels (mono uppercase), inputs (token bg/border/focus-ring), textareas, and `.form-actions` row.
-- [x] Submit uses `.cta-primary` with arrow icon (matches the homepage colophon Contact CTA).
-- [x] Formspree action URL + CSRF token preserved.
-
-### 4.14 Report generator  *(`templates/home/report_generator.html.twig`)*  ✓ done
-
-- [x] Page chrome rewritten with `.lib-page` shell, page header (eyebrow + Fraunces "Scans › *POAM & RAR*" + privacy lede), 4 `.rule-text` section dividers, `.form-stack` for contact fields, `.rg-options` 2-col grid for switches + drop area, `.data-table-wrap` for both scan tables, `.cta-primary` for Parse + Execute buttons.
-- [x] **All 18 JS hook IDs preserved** (inputCommand/Contact/Phone/Email, the 4 inputPreFill/Condense/Lower switches, drop-area, fileElem, ScansAndOptionsBody, scanFiles, parseStatus, scans2poamParse, scanSummary, scans2poamExecute, result). Column order in scanFiles + scanSummary preserved exactly (JS uses `td:nth-child(1)`/`(6)`).
-- [x] **Latent bug fixes:** added `<div id="alertWindow">` (JS appended to it in 7 places but div never existed); fixed all 4 contact-field labels pointing to wrong `for=`.
-- [x] §4.13's `.form-stack` / `.form-field` component reused; §4.6's `.data-table` reused.
+`schema_version` allows future migration of old drafts when the shape evolves.
 
 ---
 
-## Group 5 · Cross-Cutting Behavior
+### Phase 1A — Foundation (~8–12 h) — COMPLETE
 
-### 5.1 Theme toggle (§16)  *(global — `base.html.twig` + `app.js`)*  ✓ done (folded into §3.1)
+- [x] Add `App\Service\Plans\PlanRegistry` (lists schema files, exposes
+      family code → schema metadata)
+- [x] Add `App\Service\Plans\ControlResolver` (family + baseline →
+      ordered list of applicable controls from 800-53 r5 + OSCAL profiles)
+- [x] Author `resources/data/plans/_shared.json` (system metadata
+      questions, per-control questions including inheritance fields)
+- [x] Author `resources/data/plans/cm.json` (CM intro prose template +
+      five family questions: CM tool/repo, CCB chair, CCB cadence,
+      baseline storage, change-request workflow)
+- [x] Add `App\Controller\PlansController` with `/plans` index route
+      that lists plans from `PlanRegistry`
+- [x] Add `/plans/{family}` wizard route — renders the wizard for
+      system metadata + baseline + family questions only (no per-control
+      yet)
+- [x] Add `/plans/{family}/schema.json` route exposing the schema to
+      wizard JS for show_when logic and BYOJSON validation
+- [x] Add `templates/plans/index.html.twig` — family picker, matches
+      site editorial style
+- [x] Add `templates/plans/wizard.html.twig` (5 accordion sections;
+      sections 1/2/3/5 fully wired, section 4 placeholder for 1B)
+- [x] Add basic `.plan-wizard` CSS (accordion, form fields, save/load
+      buttons, conditional show_when)
+- [x] Add `public/js/plans.js` — autosave to localStorage, BYOJSON
+      save/load, show_when conditional rendering, evidence list field,
+      preview POST
+- [x] Add "Plans" nav link to `templates/base.html.twig` between
+      "Scans to Reports" and "API"
+- [x] Add `/plans/cm/preview` POST route that renders cover/intro/
+      system-overview/family-approach (proof the schema + builder +
+      renderer pipeline works end-to-end before adding per-control)
+- [x] Add `App\Service\Plans\PlanBuilder` (skeleton — handles
+      front-matter + intro + system-overview + family approach +
+      lists applicable controls; per-control implementation is 1B)
+- [x] Add `App\Service\Plans\Renderer\HtmlRenderer` and the
+      `templates/plans/preview.html.twig` shell
 
-- [x] Preflight `<script>` in `<head>` reads `localStorage.getItem('theme')` or `prefers-color-scheme` and sets `documentElement.dataset.theme` synchronously.
-- [x] Toggle button wired to `window.app.theme.toggle()`. `aria-pressed` synced on load and on every set.
-- [x] `aria-label="Toggle color theme"` set; sun/moon icon swap via `[data-theme]` attribute selectors on `[data-theme-icon="show-in-light|dark"]` children.
-- [x] `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` listener only triggers when no explicit user preference is stored.
+End-to-end smoke test passed: `/plans` index lists CM, `/plans/cm`
+wizard renders with all sections and overlays populated, POST to
+`/plans/cm/preview` with sample answers returns a rendered HTML
+preview with cover, intro, family approach narrative, and the list
+of 12 applicable controls for the nist-moderate baseline.
 
-### 5.2 Trust & freshness signals (§19)  *(global — Twig + controllers)*  ✓ done
+### Phase 1B — Per-control implementation (~12–15 h) — COMPLETE
 
-- [x] `resources/data/sync_status.json` created with `_comment` documenting the file's purpose and refresh responsibility.
-- [x] `src/Service/SyncStatus.php`: lazy-loaded reader, getters return `DateTimeImmutable` or null.
-- [x] Twig global registered in `config/packages/twig.yaml` as `sync_status`.
-- [x] Service auto-wires via `bind: string $projectDir: '%kernel.project_dir%'` added to `services.yaml` `_defaults` (general-purpose; reusable by future services).
-- [x] **Edge case handled:** missing/malformed file → null returns → templates `{% if sync_status.disa %}` guards.
-- [x] Used in footer Status column, hero trust strip (§4.1), and STIG/SCAP detail-page meta lines via per-record release-date freshness (§4.6 / §4.7).
+- [x] Add `/plans/{family}/controls/{baseline}` route returning an
+      HTML fragment of per-control cards (lazy-loaded by JS when the
+      baseline changes, so initial wizard load stays light)
+- [x] `templates/plans/_control_cards.html.twig` fragment: per-card
+      accordion, sidebar with control statement / discussion /
+      related / linked CCIs (read-only), form fields with status
+      dropdown, conditional narrative/provider/details/rationale,
+      role, evidence list
+- [x] Class-based conditional rendering: `.plan-control` parent gets
+      `is-implemented` / `is-partial` / `is-not-implemented` /
+      `is-na` / `is-inherited` based on status; conditional fields
+      visible only when the parent has the right class. Scoped per
+      card so multiple status dropdowns don't fight each other
+- [x] Status badge in summary header reflects current status with
+      color-coded variant (green/yellow/red/accent)
+- [x] Evidence/artifacts list field works in per-control cards via
+      shared `planWizard.listAdd` (added in Phase 1A)
+- [x] Extend `PlanBuilder` to merge user-supplied per-control answers
+      onto resolved catalog entries, with `normalizeControlAnswers`
+      producing a predictable shape so the renderer always sees the
+      same fields
+- [x] Update `templates/plans/preview.html.twig` section 5 to render
+      per-control implementation: control statement, status badge,
+      implementation narrative (or inheritance / N-A details),
+      responsible role, evidence list, related controls, linked CCIs
+      with deep-links via `ui.rmf_link` and `ui.cci_link`
+- [x] Skip handling: empty answers render `[TO BE COMPLETED]` in
+      colored italic monospace, not blocking generation
+- [x] Inherited rendering: "Inherited from {provider}. {details}"
+      block replaces the implementation narrative
+- [x] `plans.js` extended with: lazy fetch of per-control fragment
+      on baseline change, hydration of per-control fields from
+      `state.controls` into newly rendered cards, status-class
+      toggling, badge refresh, autosave continuing to capture
+      per-control answers via `data-control-num` attributes
 
-### 5.3 Animations (§15)  *(global — `app.css`)*  ✓ done (folded into §4.1)
+### Phase 1C — DOCX output + BYOJSON persistence (~8–12 h) — COMPLETE
 
-- [x] `@keyframes rise` and `.rise` class added (app.css §1e). Used `animation: ... both` shorthand which sets fill-mode forwards+backwards.
-- [x] `.delay-1..5` utilities added.
-- [x] Tile arrow translate + tile underline already shipped in §2.6.
-- [x] All keyframe rules and the .rise/.delay utilities wrapped in `@media (prefers-reduced-motion: no-preference)`.
+- [x] `composer require phpoffice/phpword` (1.4.0; ~3.1 MB in vendor/)
+- [x] Add `App\Service\Plans\Renderer\DocxRenderer` consuming the same
+      `Plan` array shape as the HTML renderer
+- [x] Single neutral DOCX style: Calibri 11 body, bold headings at
+      18/14/12pt, Consolas for code/statement blocks, tables with
+      light gray header rows, accent-colored hyperlinks, italic
+      "[TO BE COMPLETED]" placeholders for missing answers
+- [x] Cover page section with classification stamp banner, big serif
+      title, system name in italic, version + date + baseline meta
+- [x] Document control / revision history table from document
+      metadata (single row for v1, schema supports multiple)
+- [x] Executive summary auto-generated from system metadata
+- [x] Body sections: Introduction (purpose / scope / audience /
+      references with hyperlinks), System Overview, Roles table,
+      Family Approach narrative
+- [x] Per-control implementation: heading, status, control
+      statement (preformatted code block), implementation block
+      (narrative / inheritance / N-A based on status), meta table
+      with role, evidence list, related controls, linked CCIs
+- [x] Back matter: glossary (one paragraph per term, term in bold),
+      references with hyperlinks
+- [x] Add `/plans/{family}/download` POST route returning the docx
+      bytes with proper `application/vnd.openxmlformats-...` MIME and
+      a sensible filename derived from system_acronym (or system_name)
+- [x] Wizard "Download Word" button alongside Preview, with full
+      JS support: collects current state, POSTs JSON, reads
+      Content-Disposition for filename, triggers browser download
+- [x] BYOJSON Save progress / Load draft / autosave already wired
+      in Phase 1A; verified to round-trip through the new download
 
-### 5.4 Responsive (§17)  *(global)*  ✓ done
+Smoke test: a CM Plan with 3 controls of mixed status (Implemented /
+Inherited / N-A) generates a 14 KB `.docx` recognized by `file` as
+"Microsoft Word 2007+", containing all expected content (system
+name, family-approach narrative, status badges, inheritance details,
+N-A rationale, control statements).
 
-- [x] Hero `clamp(48px, 9vw, 112px)` already works (§4.1).
-- [x] Tile grid responsive spans already working (§4.2 .span-N utilities at md/lg).
-- [x] Hamburger menu: `.nav-toggle` button + `.site-nav.is-open` fixed panel below lg, full ARIA wiring, 44px+ touch targets on stacked links.
-- [x] Table card-view below md: thead hides, tr/td stack with `data-label` ::before labels in mono uppercase. Applied to home Recent table + stig list + scap list — sort/filter/pagination JS continues to work since only display changes.
-- [x] Touch bump on `.chip` to 36px min-height below md.
-- [x] `.scroll-x` already on hero Try chips and stig/scap detail filter chips.
+Deferred items (out of scope for v1):
+- Auto-generated TOC. `addTOC()` works but requires Word to
+  refresh fields manually on open. Cleaner to skip for now.
+- Acronyms appendix. Schema doesn't carry acronyms yet; derive
+  in 1D once we author them per family.
 
-### 5.5 Accessibility (§18)  *(global)*  ✓ done
+### Phase 1D — Validation + polish — COMPLETE (self-review pass)
 
-- [x] WCAG AA contrast verified on every token combo (light + dark, on bg + on surface). Bumped dark `--text-muted` from `#8c7f66` to `#968870` to clear AA on `--surface` (was 4.45 → 5.04).
-- [x] Global `:focus-visible` rule in app.css with suppression on elements that already manage focus (hero-search, site-search, form-field inputs, etc.).
-- [x] Sortable headers keyboard-nav: `tabindex="0"` added via JS init; Enter/Space triggers click. `aria-sort` already managed by the click handler.
-- [x] `aria-live="polite"` on filter-count spans (`#recent-stigs-count`, `#stig-page-info`, `#scap-page-info`) so screen readers announce filter result counts as they update.
-- [x] Heading hierarchy spot-checked: one h1 per page, h2 for sections, h3 for footer cols, no skipped levels.
-- [x] Already done earlier: skip link (§3.1), theme-toggle aria (§5.1), severity-pill aria-label (§2.2), status-dot text pairing (§2.4).
+Items I could tackle without an outside tester. Real practitioner
+validation is its own follow-up — the engine is now ready for that
+pass and any iteration will be on prose templates / question wording,
+not the rendering pipeline.
+
+- [x] CM glossary expanded from 4 to 14 entries covering the full
+      vocabulary a CM Plan typically uses (Authorization Boundary,
+      Change Request, Configuration Audit, Configuration Identification,
+      Configuration Status Accounting, Drift, Functional Baseline,
+      Production Baseline, Security-Impact Analysis, etc.)
+- [x] CM acronyms list authored: ATO, CCB, CI, CM, CMDB, ISSM, ISSO,
+      NIST, POAM, RMF, SP, SSP, STIG (13 entries)
+- [x] Section 6 — Continuous Monitoring — added with family-specific
+      template prose. Renders in HTML preview and DOCX.
+- [x] Appendix B — Acronyms — added to schema + builder + HTML
+      preview + DOCX renderer (rendered as a two-column table in DOCX,
+      definition list in HTML)
+- [x] Table of Contents added to DOCX. PHPWord generates a TOC field
+      that Word users right-click → "Update Field" to populate. A
+      hint is rendered above the empty TOC explaining this.
+- [x] Editorial title case via new `editorial_title` Twig filter and
+      mirrored helper in DocxRenderer. 800-53 r5 stores titles in
+      ALL CAPS so the default `|title` filter produced "Policy And
+      Procedures"; now reads "Policy and Procedures" as it should.
+- [x] Full self-validation: rendered an end-to-end CM Plan with all
+      12 applicable controls (mix of Implemented / Inherited / Not
+      Applicable). 17.6 KB DOCX, valid Word 2007+, 12 H1 / 18 H2 /
+      24 H3 hierarchy, all sections + appendices present.
+- [x] References list fixed (PHPWord 1.4 doesn't expose addLink on
+      list items - hand-rolled bullet glyph + addLink on a TextRun).
+
+Outstanding for true ongoing validation:
+- [x] Real RMF practitioner generates a CM Plan end-to-end against
+      a fake/test system; capture friction (DONE 2026-05-02 — feedback
+      received, drove the Phase 2 scope below)
+- [x] Gap analysis vs a real delivered CM Plan from a package
+      (DONE 2026-05-02 — see Phase 2 mapping)
+- [ ] Iterate on DOCX styling / prose / question wording based on
+      that feedback (rolls into Phase 2)
 
 ---
 
-## Group 6 · Performance (§21)  ✓ done
+## Phase 2 — Assessability (CM-baseline for all families)
 
-- [x] Homepage table: top 100 rows (§4.3 / user request).
-- [x] Stig list 50/page client-side pagination (§4.5); scap list same (§4.8). DataTables retained on `cci/index` per Group 8 decision.
-- [x] **Self-hosted fonts** — Fraunces variable + IBM Plex Sans variable + 3 IBM Plex Mono weights in `public/fonts/` (latin subset, ~360 KB total). Google Fonts dependency removed entirely.
-- [x] Fraunces normal woff2 preloaded with `<link rel="preload" as="font" type="font/woff2" crossorigin>` — used by every hero h1 above the fold.
-- [x] `font-display: swap` on every @font-face.
-- [x] Lazy-apply `.grain` class via `requestAnimationFrame` inside `app.init()` so the inlined SVG noise doesn't push back first paint.
-- [x] **Closed:** Inline critical CSS for above-the-fold — site is fast enough without it; non-trivial FOUC risk if extracted incorrectly. Revisit if perf measurement ever flags first paint.
+### Why this exists
+
+Phase 1 produced a structurally valid CM Plan but a real RMF
+practitioner reviewing it called out twenty assessability gaps. The
+core deficiency: the plan documents *intent and structure* but lacks
+the **enforceable, measurable, organization-defined parameters** that
+ATO evidence requires. Phase 2 closes those gaps.
+
+**This becomes the new floor for every family plan.** Engine changes
+in Phase 2 benefit AC, AU, IR, etc. for free; the CM-specific schema
+authoring becomes the template every other family copies from.
+
+### How the 20 reviewer items map to Phase 2 work
+
+| # | Reviewer item                              | Slice | Solvable? | Notes |
+|---|--------------------------------------------|-------|-----------|-------|
+|  1 | Missing organization-defined values (ODVs) | 2A    | Fully     | Engine: parse `[Assignment: …]` from catalog; per-control ODV input fields; render substituted statement. **Single biggest impact.** |
+|  2 | "No CM-3 section"                          | 2B/2C | Misread   | CM-3 is rendered. Reviewer meant *narrative depth* — addressed via 2C structured fields for change-control specifics. |
+|  3 | Enhancements tailoring traceability         | 2A    | Fully     | Engine: return ALL enhancements with `in_baseline` flag; per-enhancement disposition picker (Selected / Inherited / Tailored Out + rationale). |
+|  4 | Implementation sections empty               | 2C    | Partial   | User must type substance. Engine: per-control prompts checklist alongside narrative textarea. |
+|  5 | Evidence model placeholders                 | 2C    | Partial   | Engine: per-control `evidence_suggestions` rendered as one-click "add" buttons. |
+|  6 | CI identification methodology               | 2B    | Fully     | New family-question group: naming conventions, categorization, relationship mapping, version control. |
+|  7 | Hardening sources (DISA STIG, CIS, vendor)  | 2B    | Fully     | New family-question list field for authoritative sources. |
+|  8 | CM-7 least functionality not operationalized| 2C    | Partial   | Per-control extra-fields for CM-7: allowed services/ports, disabled services, allowlisting approach. |
+|  9 | Drift detection automation strategy         | 2B    | Fully     | Extend §6 Continuous Monitoring schema with structured sub-fields: tooling, scan frequency, alert thresholds, SIEM integration. |
+| 10 | Integration with other RMF artifacts        | 2B    | Mostly    | New §7 "Integration" section with boilerplate + user-fillable cross-reference fields (SSP section, POA&M ID prefix, RA-5 scan source, CA-7 monitoring strategy). |
+| 11 | Separation of duties / CM-5                 | 2C    | Fully     | Per-control CM-5 extra-fields: who submits / approves / implements; AC-6 cross-reference; enforcement mechanism. |
+| 12 | Configuration audit strategy                | 2B    | Fully     | New family-question group: functional vs physical audits, frequency, independent vs system-owner role, reconciliation. |
+| 13 | CM-8 inventory attributes                   | 2C    | Fully     | Per-control CM-8 extra-fields enumerating tracked attributes (Asset ID, Owner, Location, Software Version, Patch Level, Auth Status). |
+| 14 | Exception management process                | 2B    | Fully     | New family-question group: deviation approval workflow, time-bound waivers, POA&M linkage, revalidation cadence. |
+| 15 | Backup integration (CM-9 / CP overlap)      | 2B    | Fully     | New family-question group: baseline recoverability, versioning, integrity protection. |
+| 16 | CM metrics / KPIs                           | 2B    | Fully     | New family-question list field with suggested examples (% compliant, MTTR, unauthorized changes). |
+| 17 | CCB definition incomplete                   | 2B    | Fully     | Replace single `ccb_chair` field with structured CCB group: membership, quorum, decision thresholds, emergency-change criteria, doc standards. |
+| 18 | Supply chain / software provenance          | 2C    | Partial   | Per-control CM-10 / CM-11 prompts and structured fields. |
+| 19 | Configuration documentation control         | 2B    | Fully     | New family-question group: versioning schema, approval signatures, retention requirements. |
+| 20 | Inheritance / hybrid control discussion     | 2B    | Mostly    | Already supported per-control via "Inherited" status. Add a §1.5 boilerplate reminder paragraph naming commonly-inheritable controls (CM-1 from org policy, etc.) and prompting users to check inheritance before defaulting to Implemented. |
+
+### Phase 2 decisions
+
+- **Schema-driven still applies.** All Phase 2 features are configured
+  through schema fields; engine knows how to consume any schema.
+- **No LLM.** Phase 2 expands the *structure* the user fills in, not
+  the prose itself.
+- **Backward compatibility.** Existing BYOJSON drafts from Phase 1
+  must still load. New schema fields default to empty when absent.
+  `schema_version` bumps to 2 when any net-new field is required.
+- **Sub-field rendering follows the existing CSS-class pattern.**
+  Per-control extra-fields appear under the existing per-control card,
+  conditional on status (mostly Implemented / Partially Implemented).
+- **The CM schema becomes the canonical template.** When the engine
+  is solid, copying `cm.json` to `<fam>.json` produces a starting
+  point with all 9 family-question groups, the §7 Integration block,
+  the inheritance reminder, and per-control structured guidance for
+  high-impact controls.
+- **Tradeoff acknowledged.** A user who skips the new fields gets a
+  weaker plan. That's intentional: the wizard *prompts* for the
+  content an assessor will look for; the user still owns supplying
+  it. Plan quality scales with input thoroughness.
+
+### Phase 2A — Engine core (~12–16 h)
+
+Foundational infrastructure that every other slice depends on. The
+biggest investment in Phase 2 and the part that pays back across all
+17+ families.
+
+- [ ] **ODV extraction**. Add `OdvExtractor` service that parses
+      `<statement>` text in the 800-53 r5 catalog and pulls out every
+      `[Assignment: organization-defined …]`, `[Selection: …]`, and
+      `[Selection (one or more): …]` placeholder. Returns a list of
+      `{id, kind: assignment|selection, prompt, options?}` per control.
+- [ ] **Per-control ODV input fields in the wizard.** When a control
+      card is rendered, show one input per ODV under a new "Define
+      organizational values" section of the card. Selection-types
+      render as multi-select; Assignment-types as text. Field IDs
+      are derived from a stable hash of the ODV prompt so they survive
+      catalog re-parsing.
+- [ ] **ODV substitution at render time.** `PlanBuilder` builds a
+      substituted version of each control's `statement` text where
+      `[Assignment: …]` placeholders are replaced inline with the
+      user's chosen value (formatted as **bold** in the rendered
+      output to call out org-supplied content). Both HTML preview and
+      DOCX renderer use the substituted version.
+- [ ] **BYOJSON shape for ODVs.** New `controls.<num>.odv` map keyed
+      by ODV id. Bumps `schema_version` to 2.
+- [ ] **Enhancement tailoring traceability.** Modify `ControlResolver`
+      to return ALL enhancements for a control, with an `in_baseline`
+      boolean flag. Per-control card in the wizard shows enhancements
+      collapsed into a sub-list with a per-enhancement disposition
+      picker: **Selected** (treated as a regular control, gets its
+      own implementation block) / **Inherited** / **Tailored Out**
+      (with mandatory rationale).
+- [ ] **Render enhancement dispositions.** HTML preview and DOCX
+      renderer show every enhancement under its parent control with
+      its disposition. Tailored-out enhancements render their
+      rationale prominently so the assessor can see the decision.
+- [ ] **Generic per-control guidance mechanism.** Add a
+      `per_control_guidance` block to the family schema, keyed by
+      control number. Each entry can supply:
+      - `prompts`: array of strings → rendered as a checklist next to
+        the narrative textarea (visual only, doesn't gate input)
+      - `evidence_suggestions`: array of strings → rendered as
+        one-click "add this evidence" buttons that pre-populate the
+        evidence list field
+      - `extra_fields`: array of additional structured fields (same
+        shape as `control_questions`) appended to the per-control card
+- [ ] **Conditional extra-field rendering.** Extra fields honor the
+      same status-class show/hide pattern (`is-implemented`,
+      `is-inherited`, etc.) so they only appear when relevant.
+- [ ] **Update plans.js** to collect extra-field answers into the
+      `controls.<num>.extras` sub-key alongside the existing core
+      answers. Hydration logic reads them back into the right fields.
+- [ ] **Regression test.** A Phase 1-era CM-only payload (no ODVs, no
+      tailoring decisions, no extras) still renders cleanly through
+      the Phase 2 engine — fields just go empty.
+
+### Phase 2B — CM family schema enrichment (~6–8 h)
+
+Authoring work on `cm.json` that reaches all the "Fully solvable"
+items above. Becomes the canonical template for AC, AU, IR, etc.
+
+- [ ] **CCB definition** (item 17). Replace `ccb_chair` and
+      `ccb_cadence` simple fields with a `ccb` group:
+      - `chair_role`, `membership` (list), `quorum`,
+      - `decision_thresholds` (text — e.g., "All changes require
+        majority; high-impact require unanimous"),
+      - `emergency_change_criteria`,
+      - `documentation_standards`.
+      `approach_template` updated to weave these into the §4 narrative.
+- [ ] **CI identification methodology** (item 6). New family-question
+      group `ci_methodology`:
+      - `naming_convention` (textarea),
+      - `categorization` (multi-select: Hardware / Software / Firmware /
+        Documentation / Configuration Files / other),
+      - `relationship_mapping` (textarea),
+      - `version_control_structure` (textarea).
+      Renders in §3.5 (new sub-section under System Overview) titled
+      "Configuration Item Identification."
+- [ ] **Hardening sources** (item 7). New family-question
+      `hardening_sources` as a list field with suggestions:
+      "DISA STIGs", "CIS Benchmarks", "NIST SP 800-70", "Vendor
+      hardening guides (specify which)". Renders in §4 narrative + a
+      bullet list.
+- [ ] **Drift detection automation** (item 9). Extend §6 Continuous
+      Monitoring with structured sub-fields:
+      - `drift_tooling` (text — e.g., "SCCM compliance baselines,
+        Tenable, Ansible idempotent run"),
+      - `drift_scan_frequency` (text — e.g., "weekly"),
+      - `alert_thresholds` (textarea),
+      - `siem_integration` (textarea).
+      `continuous_monitoring_template` reworked to weave these in.
+- [ ] **§7 Integration with other RMF artifacts** (item 10). New
+      schema block + new section in the document. Family-questions:
+      - `ssp_section_reference`,
+      - `poam_id_prefix`,
+      - `ra5_scan_source` (text — e.g., "Tenable.sc Container A"),
+      - `ca7_monitoring_strategy_link`.
+      Boilerplate prose template substitutes these in.
+- [ ] **Configuration audit strategy** (item 12). New family-question
+      group `audit_strategy`:
+      - `audit_types` (multi-select: Functional / Physical / Both),
+      - `audit_frequency`,
+      - `independent_assessor_role`,
+      - `system_owner_role`,
+      - `reconciliation_process` (textarea).
+      Renders in §4 narrative as a sub-bullet list.
+- [ ] **Exception management** (item 14). New family-question group
+      `exception_management`:
+      - `approval_workflow` (textarea),
+      - `waiver_max_duration`,
+      - `poam_linkage` (textarea),
+      - `revalidation_cadence`.
+      Renders in §4 narrative.
+- [ ] **Backup integration** (item 15). New family-question group
+      `backup_strategy`:
+      - `recoverability_approach` (textarea),
+      - `versioning` (textarea),
+      - `integrity_protection` (textarea — e.g., "git tags signed
+        with org GPG key, hash-verified at deploy").
+      Renders in a new sub-section under §6 Continuous Monitoring.
+- [ ] **CM metrics / KPIs** (item 16). New family-question
+      `cm_metrics` as a list field with suggestions: "% assets
+      compliant with baseline", "Mean time to remediate drift",
+      "Unauthorized changes detected per quarter", "% changes routed
+      through CCB", "% emergency changes". Renders as a bullet list
+      under §6.
+- [ ] **Configuration documentation control** (item 19). New
+      family-question group `documentation_control`:
+      - `versioning_schema` (text — e.g., "MAJOR.MINOR.PATCH"),
+      - `approval_signatures_required` (multi-select: System Owner /
+        ISSO / ISSM / CCB Chair / AO),
+      - `retention_period`.
+      Renders as a sub-section under §4.
+- [ ] **§1.5 Inheritance reminder** (item 20). New boilerplate section
+      injected after §1.4 References:
+      - Brief paragraph reminding the reader that controls can be
+        inherited from common control providers
+      - List of commonly-inheritable controls in this family (for CM:
+        CM-1 from organizational policy, possibly CM-10 from
+        enterprise SAM)
+      - Prompt to verify inheritance in §5 before defaulting to
+        Implemented.
+      Schema field `commonly_inheritable_controls` enumerates them
+      so each family can list its own.
+- [ ] **Glossary expansion**. Add terms surfaced by the new sections:
+      "Functional Configuration Audit", "Physical Configuration Audit",
+      "Tailoring", "Selection Statement", "Assignment Statement",
+      "Common Control Provider", "Hybrid Control", "Waiver",
+      "Drift Detection".
+- [ ] **Acronyms expansion**. CCB, CI, ODV, FCA, PCA, PII, NIST,
+      SCCM, GPO, RBAC, SP, SSP, STIG, CIS, NVD.
+- [ ] **References expansion**. Add NIST SP 800-128 sections, NIST SP
+      800-137 (continuous monitoring), CNSSI 1253 if relevant for the
+      common federal use case.
+
+### Phase 2C — Per-control guided content for CM (~4–6 h)
+
+Schema-only effort using the `per_control_guidance` mechanism from 2A.
+Hits the high-impact controls identified by the reviewer.
+
+- [ ] **CM-3** (Configuration Change Control) prompts + extra-fields:
+      - prompts: "approval thresholds", "separation of duties",
+        "enforcement mechanisms", "emergency change pathway"
+      - evidence_suggestions: "CCB meeting minutes (last 90 days)",
+        "Sample change ticket", "Emergency change log"
+      - extra-fields: `approval_thresholds` (textarea),
+        `separation_of_duties` (textarea), `enforcement_mechanism` (text)
+- [ ] **CM-5** (Access Restrictions for Change) — item 11:
+      - prompts: "who can submit changes", "who can approve",
+        "who can implement", "AC-6 cross-reference"
+      - evidence_suggestions: "IAM group membership report (CM
+        privileged group)", "Quarterly access review records"
+      - extra-fields: `submitters` (text), `approvers` (text),
+        `implementers` (text), `ac6_reference` (text),
+        `enforcement_rbac` (textarea)
+- [ ] **CM-6** (Configuration Settings) — item 7 reinforcement:
+      - prompts: "STIG / CIS / vendor hardening sources cited",
+        "Deviation register", "Enforcement mechanism (Ansible /
+        SCCM / GPO)", "Verification cadence"
+      - evidence_suggestions: "Ansible playbook repository link",
+        "Tenable scan results dashboard", "Approved deviation
+        register", "STIG compliance report"
+      - extra-fields: `hardening_sources_cited` (list),
+        `deviation_register_link` (text),
+        `enforcement_mechanism` (textarea)
+- [ ] **CM-7** (Least Functionality) — item 8:
+      - prompts: "Allowed services and ports", "Disabled services",
+        "Application allowlisting approach"
+      - evidence_suggestions: "Allowed-services baseline document",
+        "Tenable scan output (port/service)", "Allowlisting policy"
+      - extra-fields: `allowed_services` (textarea — long),
+        `disabled_services` (textarea), `allowlisting_approach`
+        (textarea)
+- [ ] **CM-8** (System Component Inventory) — item 13:
+      - prompts: "Tracked attributes per CI", "Inventory tooling",
+        "Reconciliation cadence"
+      - evidence_suggestions: "ServiceNow CMDB report", "AWS Config
+        inventory snapshot", "Monthly inventory review minutes"
+      - extra-fields:
+        `tracked_attributes` (multi-select with custom: Asset ID,
+        Owner, Location, Hardware Specs, Software Version, Patch
+        Level, Authorization Status, IP Address, MAC, Hostname,
+        Criticality, Data Classification),
+        `inventory_tooling` (text),
+        `reconciliation_cadence` (text)
+- [ ] **CM-10** (Software Usage Restrictions) — item 18:
+      - prompts: "License tracking system", "Usage compliance
+        verification", "Upstream provenance"
+      - evidence_suggestions: "License inventory report", "SBOM if
+        available"
+      - extra-fields: `license_tracking_system` (text),
+        `provenance_approach` (textarea)
+- [ ] **CM-11** (User-Installed Software) — item 18:
+      - prompts: "Restriction enforcement (allowlist / endpoint
+        management / OS-level)", "Approved exception process"
+      - evidence_suggestions: "Endpoint management policy",
+        "Exception register"
+      - extra-fields: `restriction_enforcement` (text),
+        `exception_process` (textarea)
+
+### Phase 2D — Validation pass (~2–3 h)
+
+- [ ] Generate a full CM Plan with all Phase 2 features exercised
+      (ODVs filled, every CM enhancement dispositioned, every new
+      family-question group answered, per-control extras populated
+      for the 7 enhanced controls).
+- [ ] Manual review against the original 20-item list — confirm each
+      item is meaningfully addressed in the rendered output.
+- [ ] Compare DOCX page count and content density to a real
+      delivered CM Plan from a federal package.
+- [ ] Verify backward compatibility: load a Phase 1 BYOJSON draft
+      into the Phase 2 wizard; new fields default to empty; preview
+      and download still succeed.
+- [ ] Update the lessons-learned section if new gotchas emerge.
+
+### Phase 2 totals
+
+- 2A engine: 12–16 h
+- 2B CM schema enrichment: 6–8 h
+- 2C CM per-control guidance: 4–6 h
+- 2D validation: 2–3 h
+- **Total: ~25–33 h** for the assessability bump
+
+### Knock-on effect on Future families
+
+Once Phase 2 is shipped, each additional family schema is bigger
+than the original Phase 1 estimate but the per-family ratio is much
+better. Per-family cost rises from ~4–8 h (Phase 1 floor) to
+**~12–18 h** (Phase 2 floor), but the resulting plan is genuinely
+assessable instead of a structural shell. The engine work itself
+amortizes across all 17+ families.
 
 ---
 
-## Group 7 · Code Hygiene (§22)  ✓ done
+### Future: additional family plans
 
-- [x] All custom CSS hex values audited — all are inside `:root` / `[data-theme="dark"]` token definitions or comments. Component CSS uses tokens exclusively.
-- [x] `.ident` wrapping verified site-wide (§2.1).
-- [x] `.sev` pills verified (§2.2).
-- [x] Release dates paired with freshness dot (§2.4).
-- [x] Inline `style=""` swept. Three small utility classes added (`.pre-wrap`, `.requirement-title`, `.u-mt-0`); five templates updated. Only inline styles remaining are spec-allowed: sev-bar computed widths in macros.html.twig, animation delays (none currently), and functional cases (`display:none` on hidden file input, iframe sizing on download templates not yet redesigned).
-- [x] `<style>` blocks in templates: only inside `printWindow.document.write(...)` (JS-generated print popup CSS). Acceptable.
+Each family below is a schema-only effort once Phase 2 ships.
+Expected effort: ~12–18 h per family (was 4–8 h before Phase 2 raised
+the assessability floor) for prose templates, family questions,
+per-control guidance, glossary, acronyms, references. Order suggested
+by RMF priority, but reorderable based on demand.
 
----
+- [ ] AC — Access Control Plan
+- [ ] AU — Audit and Accountability Plan
+- [ ] AT — Awareness and Training Plan
+- [ ] CP — Contingency Plan (intersection with COOP/DR)
+- [ ] IA — Identification and Authentication Plan
+- [ ] IR — Incident Response Plan
+- [ ] MA — Maintenance Plan
+- [ ] MP — Media Protection Plan
+- [ ] PE — Physical and Environmental Protection Plan
+- [ ] PL — Planning (lightweight; mostly meta-plan)
+- [ ] PM — Program Management (org-wide, may not fit single-system pattern)
+- [ ] PS — Personnel Security Plan
+- [ ] RA — Risk Assessment Plan
+- [ ] SA — System and Services Acquisition Plan
+- [ ] SC — System and Communications Protection Plan
+- [ ] SI — System and Information Integrity Plan
+- [ ] SR — Supply Chain Risk Management Plan (r5 only)
+- [ ] PT — PII Processing and Transparency Plan (r5 only)
 
-## Group 8 · Resolved Decisions
+### Stretch / nice-to-have (post-MVP)
 
-All decisions resolved 2026-04-28. Captured here for traceability; affected sections above have been updated.
-
-- [x] **Top nav vs sidebar** (§3.1) → **Replace sidebar with top nav.** Header gets `position: sticky` to compensate for losing always-visible nav on long pages.
-- [x] **DataTables retain vs replace** (§4.3, §4.5, §4.8, §4.11) → **Replace** on `home/index`, `stig/index`, `scap/index`; **retain + theme** on `cci/index` (export buttons heavily used).
-- [x] **Severity counts in `stig_toc.json`** (§4.3) → **Pre-compute.** Extend the toc generator in `StigController` to capture high/med/low per stig at parse time. One-time backfill required for existing entries.
-- [x] **GitHub link for colophon CTA** (§4.4) → **Placeholder.** No public repo yet; render as `href="#"` with `aria-disabled="true"` or `data-coming-soon`. Revisit when repo exists.
-- [x] **Sync status source** (§5.2) → **Explicit `sync_status.json`** at `resources/data/sync_status.json` with shape `{"disa": "ISO-date", "nist": "ISO-date"}`. Updated by whatever process refreshes source data; loaded once and exposed as Twig globals.
-- [x] **Issue-number format** (§4.1) → **Auto from current date** via `{{ "now"|date("m · Y") }}`, prefixed with `No. ` — purely decorative magazine framing, no semantic meaning.
-
----
-
-## Suggested execution order
-
-The spec recommends starting with §1 (tokens), §2 (typography), §3 (idents), §6 (freshness). Translated to this doc:
-
-1. **Group 1** entirely (foundations — stylesheet structure, tokens, typography). Prerequisite for everything else.
-2. **Group 2.1** (`.ident`) and **2.4** (freshness dots) — highest visual ROI sweeps.
-3. **Group 2.2–2.3, 2.5–2.6** (remaining components).
-4. **Group 3** (layout shell — header, footer, atmospheric).
-5. **Group 4** by page priority — home → STIG list → STIG detail → others.
-6. **Group 5** (cross-cutting: theme toggle, animations, a11y, responsive) interleaved with Group 4 work.
-7. **Group 6** (performance) once content is in place.
-8. **Group 7** (final cleanup sweep).
+- [ ] Configurable DOCX cover (org name + logo upload, color theme)
+- [ ] Multiple draft management UI (currently BYOJSON files manage themselves)
+- [ ] Plan diff: upload two drafts, see what changed control-by-control
+- [ ] Cross-family combined SSP generator (consume multiple per-family
+      drafts, emit a single SSP)
+- [ ] Plan templates per overlay (e.g., a CM Plan tuned to FedRAMP High
+      versus CNSSI 1253 Classified — different boilerplate)
+- [ ] Versioned draft history within a single JSON file (revision array)
+- [ ] PDF export option (in addition to DOCX) via headless renderer

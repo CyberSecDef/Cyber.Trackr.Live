@@ -1,0 +1,30 @@
+{
+    "_comment": "Questions shared by every family plan. system_questions runs once at the top of the wizard; control_questions is the per-control template applied to each applicable control. Field types are interpreted by templates/plans/wizard.html.twig and the plans.js client-side state. show_when expressions are evaluated by the wizard JS to drive conditional rendering.",
+    "system_questions": [
+        { "id": "system_name",         "label": "System name",                              "type": "text",     "required": true,  "help": "Full official name of the information system." },
+        { "id": "system_acronym",      "label": "System acronym / short name",              "type": "text",     "required": false, "help": "Short identifier used in headings and references." },
+        { "id": "system_owner",        "label": "System owner",                             "type": "text",     "required": false, "help": "Role or named individual accountable for the system." },
+        { "id": "isso",                "label": "Information System Security Officer (ISSO)", "type": "text",   "required": false },
+        { "id": "issm",                "label": "Information System Security Manager (ISSM)", "type": "text",   "required": false },
+        { "id": "ato_date",            "label": "ATO date / target ATO date",               "type": "date",     "required": false },
+        { "id": "environment",         "label": "Environment",                              "type": "select",   "required": false, "options": ["Production", "Pre-production", "Development", "Test", "Disaster Recovery"] },
+        { "id": "classification",      "label": "Classification level",                     "type": "select",   "required": false, "options": ["Unclassified", "CUI", "Confidential", "Secret", "Top Secret"] },
+        { "id": "boundary_description","label": "System boundary description",              "type": "textarea", "rows": 5, "help": "Describe what falls inside the authorization boundary - components, services, networks, data flows." }
+    ],
+
+    "control_questions": [
+        { "id": "status",              "label": "Implementation status",                    "type": "select",   "required": false, "options": ["Implemented", "Partially Implemented", "Not Implemented", "Not Applicable", "Inherited"] },
+        { "id": "narrative",           "label": "Implementation narrative",                 "type": "textarea", "rows": 6, "show_when": "status in Implemented,Partially Implemented", "help": "Describe how this control is satisfied - tools, processes, frequencies, responsible parties." },
+        { "id": "inheritance_provider","label": "Inheritance provider",                     "type": "text",     "show_when": "status is Inherited", "help": "Common control provider this control is inherited from (e.g., 'Enterprise IAM Service')." },
+        { "id": "inheritance_details", "label": "Inheritance details",                      "type": "textarea", "rows": 3, "show_when": "status is Inherited", "help": "Reference the provider's authorization, MOU, or boundary documentation." },
+        { "id": "na_rationale",        "label": "Not Applicable rationale",                 "type": "textarea", "rows": 3, "show_when": "status is Not Applicable", "help": "Justify why this control does not apply." },
+        { "id": "responsible_role",    "label": "Responsible role",                         "type": "text",     "help": "Role accountable for this control's implementation and maintenance." },
+        { "id": "evidence",            "label": "Evidence / artifacts",                     "type": "list",     "help": "Supporting documents, configurations, scan reports, screenshots." }
+    ],
+
+    "document_questions": [
+        { "id": "version",             "label": "Document version",                         "type": "text",     "default": "1.0" },
+        { "id": "author",              "label": "Document author",                          "type": "text" },
+        { "id": "publication_date",    "label": "Publication date",                         "type": "date" }
+    ]
+}
