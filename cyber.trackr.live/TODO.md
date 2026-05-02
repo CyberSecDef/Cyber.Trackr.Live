@@ -768,7 +768,7 @@ Tiered by impact + natural pairings to plans already authored.
 **Tier 3 — physical, personnel, operational**
 
 - [x] PE — Physical and Environmental Protection Plan (authored at Phase 2 floor; 14 family-question groups, 8 guided controls — PE-2 / PE-3 / PE-4 / PE-6 / PE-8 / PE-13 / PE-16 / PE-17 — with 14 extra fields, 23 glossary entries, 57 acronyms, 10 references; renders 50 cards at nist-moderate — 16 bases + 34 enhancements — with 67 ODV inputs and 34 disposition pickers; explicit inheritance-posture extras handle the common FedRAMP / colo case)
-- [ ] PS — Personnel Security Plan *(screening, termination, access agreements, third-party personnel)*
+- [x] PS — Personnel Security Plan (authored at Phase 2 floor; 13 family-question groups, 7 guided controls — PS-2 / PS-3 / PS-4 / PS-5 / PS-6 / PS-7 / PS-8 — with 10 extra fields, 23 glossary entries, 56 acronyms, 9 references; renders 18 cards at nist-moderate — 9 bases + 9 enhancements; CV / Trusted Workforce 2.0, FIS Tier 1-5, EO 12968 in scope)
 - [ ] MA — Maintenance Plan *(scheduled maintenance, vendor maintenance, remote maintenance, sanitization before service)*
 - [ ] MP — Media Protection Plan *(media handling, storage, transport, sanitization, marking)*
 - [ ] AT — Awareness and Training Plan *(role-based training, security awareness, phishing exercises)*

@@ -1,0 +1,550 @@
+{
+    "_comment": "Personnel Security Plan generator. Authored at the Phase 2 assessability floor; pairs with PE (PS-3 screening underwrites PE-2 physical-access authorization), AC (PS-3 screening underwrites AC-2 logical-account authorization), AT (PS-6 access agreements paired with AT-2 awareness training), and SA (PS-7 external-personnel hooks into SA-9 external-service governance). Smallest 800-53 family — 9 base controls and no enhancements at moderate; the rigor is in process documentation rather than tooling.",
+
+    "family": "PS",
+    "family_name": "Personnel Security",
+    "title": "Personnel Security Plan",
+    "description": "Documents how the system's personnel-security risks are managed across the employee / contractor lifecycle: position risk designation, pre-access screening, termination, transfer, access agreements, external-personnel governance, sanctions, and position descriptions. Covers the controls of the PS family in NIST SP 800-53 r5 and aligns with 5 CFR Part 731 (Suitability), 5 CFR Part 1400 (Designation of National Security Positions), Executive Order 12968 (Access to Classified Information), Federal Investigative Standards (FIS), HSPD-12, and OPM background-investigation policies.",
+
+    "intro_template": "This Personnel Security Plan documents the personnel-security approach for {system_name}. It establishes the practices, criteria, cadences, and roles used to designate position risk, screen personnel before access is granted, manage terminations and transfers, obtain and maintain access agreements, govern external personnel, apply sanctions for security violations, and align position descriptions with security responsibilities.\n\nThe scope covers position risk / sensitivity designation per PS-2, personnel screening per PS-3, terminations per PS-4, transfers per PS-5, access agreements per PS-6, external personnel per PS-7, sanctions per PS-8, and position descriptions per PS-9 within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Personnel Security family), 5 CFR Part 731 (Suitability), and the Federal Investigative Standards.",
+
+    "approach_section_title": "Personnel Security Approach",
+    "approach_template": "{system_name} relies on {hr_partner_role} for personnel-security workflow execution and {screening_provider} for background-investigation services. Position risk is designated per {position_risk_authority} using the criteria in §4.2. Personnel are screened to the levels in §4.3 before access is granted; screenings are reauthorized on the cadence in §4.3. Terminations, transfers, and external-personnel access follow the workflows in §4.4 through §4.7. Sanctions for security violations are administered per {sanctions_authority}.\n\nAdditional details on position risk designation, screening, termination, transfer, access agreements, external personnel, sanctions, and position descriptions are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Personnel-security performance for {system_name} is tracked through the metrics in §6.1 (active-screening currency rate, termination-revocation SLA compliance, access-agreement currency rate, transfer-rescreening completion rate, sanctions issued, external-personnel attestation completion). The personnel roster is reconciled with system access lists on the cadence in §6.2; gaps surface terminated personnel still holding access (a recurring audit finding when not actively monitored). Continuous Vetting (CV) status — for federal personnel under 5 CFR Part 731 — is monitored through the federal CV system; flag events trigger PE-2 / AC-2 access reviews.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Personnel Security Plan does not stand alone. The PE family inherits PS-3 screening as the prerequisite for PE-2 physical-access authorization; the AC family inherits PS-3 / PS-4 / PS-5 outcomes as the lifecycle of AC-2 logical accounts; the AT family delivers PS-6 access-agreement training and the awareness program PS-8 sanctions reference; the SA family treats external personnel via PS-7 / SA-9 external-service governance; the IR family escalates security violations into the PS-8 sanctions workflow. The following cross-references identify the specific artifacts and locations where PS-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "PS-1", "from": "Organizational personnel-security policy" },
+        { "number": "PS-2", "from": "Organizational position-designation methodology / OPM Position Designation System" },
+        { "number": "PS-3", "from": "Organizational background-investigation program (federal: OPM / NBIB / DCSA)" },
+        { "number": "PS-8", "from": "Organizational HR sanctions / discipline program" },
+        { "number": "PS-9", "from": "Organizational position-description template / classification" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Roles and providers that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "hr_partner_role",
+                    "label": "HR partner role (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role that owns the personnel-security workflow on the HR side (e.g., 'Personnel Security Branch within HR', 'Agency PSO under the CSO')."
+                },
+                {
+                    "id": "screening_provider",
+                    "label": "Background-investigation provider",
+                    "type": "text",
+                    "required": true,
+                    "help": "Provider conducting background investigations (e.g., 'OPM / NBIB / DCSA for federal positions', 'HireRight + private references for contractor-only positions')."
+                },
+                {
+                    "id": "position_risk_authority",
+                    "label": "Position-risk designation authority",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role / methodology used to designate position risk (e.g., 'OPM Position Designation Tool with HR-CSO joint review', 'Internal position-sensitivity matrix based on data access level')."
+                },
+                {
+                    "id": "sanctions_authority",
+                    "label": "Sanctions-administration authority",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role responsible for applying sanctions for security violations (e.g., 'HR with CSO concurrence', 'CO / contracting officer for contractor staff')."
+                },
+                {
+                    "id": "access_agreement_storage",
+                    "label": "Access-agreement storage location",
+                    "type": "text",
+                    "help": "Where signed access agreements (NDAs, Rules of Behavior, AUPs) are stored. HRMS, contract file, secure document repository."
+                }
+            ]
+        },
+
+        {
+            "id": "position_risk",
+            "type": "group",
+            "section": "approach",
+            "label": "Position Risk Designation (PS-2)",
+            "description": "How positions are categorized for screening level.",
+            "questions": [
+                { "id": "ps2_methodology",          "label": "Designation methodology",            "type": "select",
+                  "options": ["OPM Position Designation Tool (federal default)", "Agency-specific matrix derived from OPM tool", "5 CFR Part 1400 + 5 CFR Part 731 split", "Internal three-tier (Low / Moderate / High) based on system access", "External commercial framework"] },
+                { "id": "ps2_risk_levels",          "label": "Risk levels in use",                 "type": "multi_select",
+                  "options": ["Low Risk (Tier 1 / NACI legacy)", "Moderate Risk Public Trust (Tier 2 / Tier 4)", "High Risk Public Trust (Tier 4)", "National Security Non-Critical Sensitive (Tier 3)", "National Security Critical Sensitive (Tier 5)", "National Security Special Sensitive (Tier 5 + SCI eligibility)"] },
+                { "id": "ps2_review_cadence",       "label": "Designation-review cadence (PS-2 ODV)", "type": "text",
+                  "help": "How often position-risk designations are reviewed (typical: 'Annual + on position-description change'). PS-2 ODV." },
+                { "id": "ps2_review_role",          "label": "Designation-review role",            "type": "text",
+                  "help": "Role accountable for periodic review of position-risk designations." },
+                { "id": "ps2_mapping_to_screening", "label": "Mapping from risk level to screening type", "type": "textarea", "rows": 4,
+                  "help": "Crosswalk from each risk level to the corresponding background-investigation type (e.g., 'Low Risk → Tier 1; Moderate Risk Public Trust → Tier 2; High Risk Public Trust → Tier 4')." }
+            ]
+        },
+
+        {
+            "id": "personnel_screening",
+            "type": "group",
+            "section": "approach",
+            "label": "Personnel Screening (PS-3)",
+            "description": "Pre-access investigation and reauthorization.",
+            "questions": [
+                { "id": "ps3_pre_access_required",  "label": "Pre-access screening required for",  "type": "multi_select",
+                  "options": ["Government employees", "Contractor staff with system access", "Contractor staff without system access (escorted only)", "Vendor maintenance staff (PS-7 / MA-5)", "Volunteer / unpaid associates", "Foreign nationals (with special handling per EO 12968)"] },
+                { "id": "ps3_investigation_types",  "label": "Investigation types in use",         "type": "multi_select",
+                  "options": ["Tier 1 / NACI (Low Risk)", "Tier 2 (Moderate Risk Public Trust)", "Tier 3 (National Security Non-Critical Sensitive)", "Tier 4 (High Risk Public Trust)", "Tier 5 (National Security Critical Sensitive / SCI)", "FBI Name Check (interim)", "Fingerprint check (interim while Tier-N processes)", "State / local criminal history check (commercial)"] },
+                { "id": "ps3_reauthorization_cadence","label": "Reauthorization cadence",          "type": "textarea", "rows": 3,
+                  "help": "When screenings must be redone (e.g., 'Tier 5: every 5 years; Tier 4: every 5 years; Tier 2: every 10 years; or upon Continuous Vetting flag event'). Reference Federal Investigative Standards." },
+                { "id": "ps3_continuous_vetting",   "label": "Continuous Vetting (CV) participation", "type": "select",
+                  "options": ["Yes — federal CV via DCSA Trusted Workforce 2.0", "Yes — internal CV beyond federal program", "Partial (only critical-sensitive positions)", "No (legacy periodic-reinvestigation only)"] },
+                { "id": "ps3_interim_access",       "label": "Interim-access criteria",            "type": "textarea", "rows": 3,
+                  "help": "When and how interim access is granted while full investigation is in progress. Common criteria: favorable fingerprint result + signed SF-86 + supervisor approval." }
+            ]
+        },
+
+        {
+            "id": "personnel_termination",
+            "type": "group",
+            "section": "approach",
+            "label": "Personnel Termination (PS-4)",
+            "description": "Off-boarding workflow that cuts access and recovers assets.",
+            "questions": [
+                { "id": "ps4_revocation_sla",       "label": "Access-revocation SLA",              "type": "text",
+                  "help": "Time from termination effective date until logical and physical access is revoked. PS-4 ODV. Common: 'Same business day for involuntary; end-of-business-day for voluntary'." },
+                { "id": "ps4_workflow_steps",       "label": "Termination workflow steps",         "type": "multi_select",
+                  "options": ["HR-initiated termination notification", "Disable AD / IdP account (AC-2)", "Revoke physical badges (PE-2)", "Recover GFE laptop / mobile / hardware tokens", "Conduct exit interview", "Reaffirm NDA / non-disclosure obligations", "Forward email / out-of-office", "Document hand-off to successor / supervisor", "Transfer file ownership", "Return classified materials (if applicable)", "Update PS-3 screening record"] },
+                { "id": "ps4_involuntary_handling", "label": "Involuntary-termination handling",   "type": "textarea", "rows": 3,
+                  "help": "Special handling for terminations for cause (immediate access cut prior to notification, escort during exit, asset-recovery procedure)." },
+                { "id": "ps4_evidence_retention",   "label": "Termination-evidence retention",     "type": "text",
+                  "help": "How long termination-checklist evidence is retained (typically per NARA records-retention schedule for personnel records)." }
+            ]
+        },
+
+        {
+            "id": "personnel_transfer",
+            "type": "group",
+            "section": "approach",
+            "label": "Personnel Transfer (PS-5)",
+            "description": "Reassignment workflow that updates access entitlements.",
+            "questions": [
+                { "id": "ps5_transfer_triggers",    "label": "Transfer trigger events",            "type": "multi_select",
+                  "options": ["Promotion / role change within team", "Move to different organizational unit", "Move to different system / project", "Detail to another agency", "Demotion or reassignment for cause", "Role expansion (added duties)", "Role reduction (removed duties)"] },
+                { "id": "ps5_review_sla",           "label": "Access-review SLA on transfer",      "type": "text",
+                  "help": "Time from transfer effective date until access entitlements are reviewed and adjusted. Common: 'Within 7 days of effective date'." },
+                { "id": "ps5_temporary_dual_access","label": "Temporary dual-access policy",       "type": "textarea", "rows": 3,
+                  "help": "Whether and how a transferring employee retains access to the old role during transition. Time limit, justification, removal trigger." },
+                { "id": "ps5_screening_review",     "label": "Screening review on transfer",       "type": "textarea", "rows": 3,
+                  "help": "Whether the new role requires a higher-tier screening; trigger for upgrade investigation." }
+            ]
+        },
+
+        {
+            "id": "access_agreements",
+            "type": "group",
+            "section": "approach",
+            "label": "Access Agreements (PS-6)",
+            "description": "Documents personnel sign before access is granted.",
+            "questions": [
+                { "id": "ps6_required_agreements",  "label": "Required agreements",                "type": "multi_select",
+                  "options": ["Non-Disclosure Agreement (NDA / SF-312 for classified)", "Acceptable Use Policy / Rules of Behavior", "Conflict-of-interest disclosure", "Telework agreement (if PE-17 applicable)", "Security awareness acknowledgment (cross-reference AT-2)", "Privacy Act agreement (if PII handled)", "HIPAA Business Associate Agreement (if PHI handled)", "Foreign-disclosure briefing (if applicable)"] },
+                { "id": "ps6_renewal_cadence",      "label": "Agreement-renewal cadence (PS-6 ODV)", "type": "text",
+                  "help": "How often agreements are reviewed / re-signed. PS-6 ODV. Common: 'Annual', 'On significant change to terms'." },
+                { "id": "ps6_storage_practice",     "label": "Storage practice",                   "type": "textarea", "rows": 3,
+                  "help": "Where signed agreements are stored, retention period, who has read access. Reference NARA records schedule." },
+                { "id": "ps6_completion_tracking",  "label": "Completion-tracking mechanism",      "type": "text",
+                  "help": "How current-agreement status is tracked (HRMS field, separate compliance dashboard, expiration alerts)." }
+            ]
+        },
+
+        {
+            "id": "external_personnel",
+            "type": "group",
+            "section": "approach",
+            "label": "External Personnel (PS-7)",
+            "description": "Contractor staff, vendor staff, partner-organization staff.",
+            "questions": [
+                { "id": "ps7_external_categories",  "label": "External-personnel categories",      "type": "multi_select",
+                  "options": ["Direct contractor staff (deployed to system)", "Subcontractor staff (visibility through prime)", "Vendor maintenance / support staff (MA-5)", "Cloud-provider staff (SA-9 / FedRAMP-cleared)", "Partner-agency staff", "Foreign-national contractors", "Volunteer / unpaid associates"] },
+                { "id": "ps7_screening_requirement","label": "Screening requirement for external", "type": "textarea", "rows": 3,
+                  "help": "What background screening external personnel must complete (typically same standard as employees in equivalent risk positions). Reference contract clauses (DFARS 252.204-7012 for DoD)." },
+                { "id": "ps7_contract_clauses",     "label": "Contract clauses required",          "type": "multi_select",
+                  "options": ["Personnel-screening clause (FAR 52.204-9)", "Notification of personnel changes within N business days", "Sanctions for noncompliance (PS-8 reference)", "Continuous-vetting cooperation", "Foreign-national disclosure clause", "DFARS 252.204-7012 (DoD CDI)", "Section 889 attestation"] },
+                { "id": "ps7_change_notification",  "label": "Personnel-change notification SLA",  "type": "text",
+                  "help": "Time within which external organization must notify the agency of personnel changes (terminations, transfers, new staff requiring access)." },
+                { "id": "ps7_periodic_attestation", "label": "Periodic external attestation cadence", "type": "text",
+                  "help": "How often external organizations attest to current screening / agreement status (e.g., 'Quarterly')." }
+            ]
+        },
+
+        {
+            "id": "personnel_sanctions",
+            "type": "group",
+            "section": "approach",
+            "label": "Personnel Sanctions (PS-8)",
+            "description": "Disciplinary process for security-policy violations.",
+            "questions": [
+                { "id": "ps8_violation_categories", "label": "Violation categories addressed",     "type": "multi_select",
+                  "options": ["Unauthorized disclosure of CUI / classified", "Misuse of system access", "Failure to complete required training", "Failure to renew access agreement", "Sharing credentials", "Intentional bypass of security controls", "Mishandling of media / hardcopy", "Failure to report security incident", "Insider-threat indicators"] },
+                { "id": "ps8_sanction_levels",      "label": "Sanction levels",                     "type": "multi_select",
+                  "options": ["Verbal warning + retraining", "Written reprimand", "Performance-improvement plan", "Suspension of access", "Suspension of employment", "Termination of employment / contract", "Referral for criminal investigation"] },
+                { "id": "ps8_decision_authority",   "label": "Sanction-decision authority",         "type": "textarea", "rows": 3,
+                  "help": "Who decides what sanction applies. Mix of HR, security, supervisor, contracting officer for contractors." },
+                { "id": "ps8_notification",         "label": "Notification process",               "type": "textarea", "rows": 3,
+                  "help": "How affected parties are notified, due-process steps, appeal mechanism. Reference org HR policy." },
+                { "id": "ps8_reporting_to_leadership","label": "Reporting to leadership",          "type": "text",
+                  "help": "Cadence at which sanctions are summarized to senior leadership (anonymous trends or named per HR policy)." }
+            ]
+        },
+
+        {
+            "id": "position_descriptions",
+            "type": "group",
+            "section": "approach",
+            "label": "Position Descriptions (PS-9)",
+            "description": "Security responsibilities written into position descriptions.",
+            "questions": [
+                { "id": "ps9_security_in_pds",      "label": "Security responsibilities in PDs",   "type": "multi_select",
+                  "options": ["General security awareness expectations", "Role-specific security duties (per AT-3 role-based training)", "Position risk designation cite", "Required clearance / screening level", "Security training requirements", "Reporting responsibilities for security incidents", "Compliance with applicable laws / regulations"] },
+                { "id": "ps9_review_cadence",       "label": "PD-review cadence",                  "type": "text",
+                  "help": "How often position descriptions are reviewed for currency (typical: 'Annually'). PS-9 ODV." },
+                { "id": "ps9_template_location",    "label": "PD-template location",                "type": "text",
+                  "help": "Where the standard PD template (with security clauses) lives." }
+            ]
+        },
+
+        {
+            "id": "ps_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Personnel Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_total_personnel",     "label": "Total personnel in scope",          "type": "text",
+                  "help": "Approximate count of all personnel (employees + contractors) in scope." },
+                { "id": "scope_contractor_pct",      "label": "Contractor percentage (approximate)","type": "text",
+                  "help": "Approximate % of total personnel that are contractor / vendor staff." },
+                { "id": "scope_high_risk_count",     "label": "High-risk position count",          "type": "text",
+                  "help": "Count of positions designated High Risk Public Trust or higher." },
+                { "id": "scope_external_orgs",       "label": "External organizations in scope (PS-7)", "type": "text",
+                  "help": "Count of external organizations (contractors, partners, vendors with system access)." }
+            ]
+        },
+
+        {
+            "id": "ps_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Personnel-Security Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate PS control effectiveness.",
+            "questions": [
+                { "id": "ps_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "% Personnel with current PS-3 screening",
+                      "% Personnel with current PS-6 access agreement",
+                      "Termination-revocation SLA compliance rate (PS-4)",
+                      "Mean time from termination effective to access cut (hours)",
+                      "Transfer-rescreening completion rate (PS-5)",
+                      "External-personnel attestation completion rate (PS-7)",
+                      "Sanctions issued per quarter (by category, anonymized)",
+                      "Continuous-vetting flag events processed within SLA",
+                      "Position-description currency rate (% reviewed in last cycle)",
+                      "Personnel-system-to-access-list reconciliation gap count",
+                      "Open POA&M items linked to PS controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "reconciliation",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Personnel-to-Access Reconciliation",
+            "description": "Continuous verification that personnel records match access entitlements.",
+            "questions": [
+                { "id": "reconciliation_cadence",   "label": "Reconciliation cadence",             "type": "text",
+                  "help": "How often the personnel system (HRMS) is reconciled against logical (AC-2) and physical (PE-2) access lists. Common: 'Weekly automated; monthly manual review'." },
+                { "id": "reconciliation_gap_handling","label": "Gap-handling SLA",                  "type": "text",
+                  "help": "Time from identification of a reconciliation gap to closure (e.g., 'Same business day for terminated personnel still holding access'). Common audit finding when not actively monitored." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the PS control implementations are summarized (e.g., 'SSP §13.10')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for PS findings", "type": "text",
+                  "help": "Convention for PS-related POA&M items (e.g., 'POAM-PS-' for general)." },
+                { "id": "pe_handoff",                   "label": "PE handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PS-3 screening status feeds PE-2 physical-access authorization. Trigger that updates PE-2 list when screening lapses or terminates." },
+                { "id": "ac_handoff",                   "label": "AC handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PS-3 / PS-4 / PS-5 outcomes drive AC-2 logical-account lifecycle. Termination automation, transfer review trigger." },
+                { "id": "at_handoff",                   "label": "AT handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PS-6 access agreements pair with AT-2 awareness training. Co-administered or separate?" },
+                { "id": "sa_handoff",                   "label": "SA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PS-7 external-personnel governance ties to SA-9 external-system-services management. Personnel-change notification flowing through both pathways." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How security incidents involving personnel feed PS-8 sanctions workflow. Insider-threat reporting." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying PS continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "PS-2": {
+            "prompts": [
+                "Reference §4.2 — methodology, risk levels, review cadence and role.",
+                "Document the position-risk-to-screening-tier crosswalk.",
+                "Address how new positions are designated before posting.",
+                "Reference 5 CFR Part 731 (Suitability) and 5 CFR Part 1400 (National Security Positions).",
+                "Reference PS-2 ODV — review frequency for position-risk designations."
+            ],
+            "evidence_suggestions": [
+                "Position Designation Tool output (sample)",
+                "Position-risk register",
+                "Annual-review attestation",
+                "Risk-level-to-screening-tier crosswalk"
+            ],
+            "extra_fields": [
+                { "id": "ps2_designation_artifact","label": "Designation-record location",       "type": "text",
+                  "help": "Where the official position-risk designations are stored (HRMS field, dedicated register)." }
+            ]
+        },
+
+        "PS-3": {
+            "prompts": [
+                "Reference §4.3 — pre-access scope, investigation types, reauthorization cadence, CV participation, interim access.",
+                "Document the investigation-type-to-position-risk crosswalk explicitly.",
+                "Address Continuous Vetting (CV) participation per Trusted Workforce 2.0.",
+                "Address foreign-national handling per EO 12968 if applicable.",
+                "Reference PS-3(1) classified information access, PS-3(2) formal indoctrination, PS-3(3) information requiring special protection, PS-3(4) citizenship requirements."
+            ],
+            "evidence_suggestions": [
+                "Investigation-tier inventory",
+                "Sample favorable-fingerprint interim access decision",
+                "CV enrollment record",
+                "Reinvestigation-due tracker",
+                "Foreign-national-disclosure briefing record (if applicable)"
+            ],
+            "extra_fields": [
+                { "id": "ps3_cv_provider",          "label": "Continuous Vetting provider",      "type": "text",
+                  "help": "Provider conducting CV (DCSA Trusted Workforce 2.0, internal commercial CV, etc.)." },
+                { "id": "ps3_foreign_national_count","label": "Foreign-national personnel count", "type": "text",
+                  "help": "Count of foreign-national personnel (if applicable). Reference EO 12968." }
+            ]
+        },
+
+        "PS-4": {
+            "prompts": [
+                "Reference §4.4 — revocation SLA, workflow steps, involuntary handling, evidence retention.",
+                "Document the integration between HR system (termination event) and access systems (revocation).",
+                "Address recovery of GFE, PIV / CAC cards, classified materials.",
+                "Reference PS-4 ODV — revocation timeline.",
+                "Reference PS-4(1) post-employment requirements, PS-4(2) automated notification."
+            ],
+            "evidence_suggestions": [
+                "Termination-checklist sample",
+                "AC-2 deactivation log showing terminated accounts",
+                "PE-2 badge-revocation log",
+                "Asset-recovery records",
+                "Sample exit-interview notes"
+            ],
+            "extra_fields": [
+                { "id": "ps4_automation_level",     "label": "Automation level for revocation", "type": "select",
+                  "options": ["Fully automated (HR event → IdP → physical access in minutes)", "Partially automated (HR event triggers tickets requiring manual action)", "Manual workflow (checklist-driven)", "Mixed by personnel category"] },
+                { "id": "ps4_post_employment_terms","label": "Post-employment-obligations reference", "type": "textarea", "rows": 3,
+                  "help": "Where post-employment obligations are documented (NDA, conflict-of-interest restrictions, classified-debrief). Reference legal counsel's standard." }
+            ]
+        },
+
+        "PS-5": {
+            "prompts": [
+                "Reference §4.5 — transfer triggers, review SLA, dual-access policy, screening review.",
+                "Document how the access-review-on-transfer is initiated (who triggers it).",
+                "Address handling of upgrades vs downgrades to position risk.",
+                "Reference PS-5 ODV — transfer-review timeline."
+            ],
+            "evidence_suggestions": [
+                "Transfer-checklist sample",
+                "Sample access-review-on-transfer ticket",
+                "Quarterly transfer-completion attestation"
+            ],
+            "extra_fields": [
+                { "id": "ps5_review_owner",          "label": "Transfer-review owner role",         "type": "text",
+                  "help": "Role accountable for reviewing access entitlements after a transfer." }
+            ]
+        },
+
+        "PS-6": {
+            "prompts": [
+                "Reference §4.6 — required agreements, renewal cadence, storage, completion tracking.",
+                "Document how access is conditioned on signed agreements (no agreement → no access).",
+                "Address electronic-signature acceptance vs wet-ink requirements.",
+                "Reference PS-6 ODV — review and update cadence.",
+                "Reference PS-6(1) information requiring special protection (withdrawn — incorporated into PS-6), PS-6(2) classified information requiring special protection, PS-6(3) post-employment requirements."
+            ],
+            "evidence_suggestions": [
+                "Sample signed access agreement (sanitized)",
+                "Agreement-renewal-due dashboard",
+                "AC-2 onboarding workflow showing PS-6 gate",
+                "Annual completion-rate report"
+            ],
+            "extra_fields": [
+                { "id": "ps6_esign_acceptance",    "label": "Electronic-signature acceptance",  "type": "select",
+                  "options": ["Accepted (DocuSign / Adobe Sign / similar)", "Accepted with PIV-derived credential signing", "Wet ink only (legacy)", "Mixed by agreement type"] },
+                { "id": "ps6_completion_dashboard","label": "Completion-tracking dashboard reference", "type": "text",
+                  "help": "Where the agreement-completion dashboard is exposed (HRMS report, GRC tool dashboard, internal compliance portal)." }
+            ]
+        },
+
+        "PS-7": {
+            "prompts": [
+                "Reference §4.7 — external categories, screening requirement, contract clauses, change-notification SLA.",
+                "Document handling of subcontractor visibility (often through prime).",
+                "Address foreign-national contractor handling per EO 12968.",
+                "Reference PS-7 ODV — types of external personnel and screening requirements.",
+                "Reference PS-7(1) information requiring special protection (withdrawn — incorporated into PS-7)."
+            ],
+            "evidence_suggestions": [
+                "External-organization roster",
+                "Contract clauses showing PS-3 screening requirement",
+                "Sample external-personnel quarterly attestation",
+                "Cloud-provider personnel-screening evidence (FedRAMP CRM)",
+                "Sample personnel-change notification from contractor"
+            ],
+            "extra_fields": [
+                { "id": "ps7_subcontractor_visibility","label": "Subcontractor visibility approach", "type": "textarea", "rows": 3,
+                  "help": "How visibility into subcontractor staff is maintained (prime-flow-down clauses, direct PIV issuance, registry-of-subcontractor-personnel)." }
+            ]
+        },
+
+        "PS-8": {
+            "prompts": [
+                "Reference §4.8 — violation categories, sanction levels, decision authority, notification, leadership reporting.",
+                "Document the process for sanctions involving contractor staff (contracting officer involvement).",
+                "Address insider-threat-program coordination if applicable.",
+                "Reference PS-8 ODV — formal sanctions process; personnel notification of process; reporting to organizational personnel."
+            ],
+            "evidence_suggestions": [
+                "Personnel-sanctions policy document",
+                "Anonymized sanction-summary report (last cycle)",
+                "Sample sanctions-action record (sanitized)",
+                "Insider-threat-program coordination MOU (if applicable)"
+            ],
+            "extra_fields": [
+                { "id": "ps8_insider_threat_link", "label": "Insider-threat program reference", "type": "text",
+                  "help": "Pointer to the org's insider-threat program (often CISA-aligned for federal). Coordination POC." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Access Agreement",        "definition": "A signed acknowledgment of obligations and rules that personnel must adhere to as a condition of system access. Per PS-6. Includes NDAs, Rules of Behavior, AUPs." },
+        { "term": "Background Investigation","definition": "An inquiry conducted to determine an individual's suitability for federal employment or eligibility for access to classified information. Per Federal Investigative Standards." },
+        { "term": "Continuous Vetting (CV)", "definition": "An ongoing process of monitoring eligible personnel for issues that may affect their continued suitability or eligibility, replacing periodic-reinvestigation cycles. Per Trusted Workforce 2.0." },
+        { "term": "DCSA",                    "definition": "Defense Counterintelligence and Security Agency — current federal background-investigation provider, successor to NBIB." },
+        { "term": "EO 12968",                "definition": "Executive Order 12968 (Access to Classified Information) — establishes uniform criteria and procedures for granting personnel access to classified information." },
+        { "term": "Federal Investigative Standards (FIS)", "definition": "Standards for the investigations required to determine eligibility for various levels of federal access (Tier 1-5)." },
+        { "term": "GFE",                     "definition": "Government-Furnished Equipment — equipment provided by the government for use by employees and contractors." },
+        { "term": "HRMS",                    "definition": "Human Resources Management System — the system of record for personnel data; typically the source-of-truth for PS-2 / PS-3 status." },
+        { "term": "Insider Threat",          "definition": "A threat originating from a person with authorized access who uses that access to harm the organization. CISA-aligned programs coordinate with PS-8 sanctions." },
+        { "term": "NACI",                    "definition": "National Agency Check with Inquiries — legacy investigation type, replaced by Tier 1 under FIS." },
+        { "term": "NBIB",                    "definition": "National Background Investigations Bureau — predecessor to DCSA for federal background investigations." },
+        { "term": "OPM",                     "definition": "Office of Personnel Management — federal agency administering personnel policies and the Position Designation System." },
+        { "term": "PIV / CAC",               "definition": "Personal Identity Verification card / Common Access Card — federal smart-card credentials whose issuance depends on PS-3 screening." },
+        { "term": "Position Designation",    "definition": "Per PS-2, the assignment of a risk / sensitivity level to a position based on the duties and access involved. Drives the required investigation tier." },
+        { "term": "PSO",                     "definition": "Personnel Security Officer — role responsible for personnel-security workflow at an organization." },
+        { "term": "Reauthorization",         "definition": "Per PS-3, the periodic redetermination of an individual's eligibility for continued access. Now usually achieved through Continuous Vetting rather than periodic reinvestigation." },
+        { "term": "Rules of Behavior",       "definition": "A document signed by personnel describing acceptable use of system resources and security responsibilities. Common form of PS-6 access agreement." },
+        { "term": "SF-86",                   "definition": "Standard Form 86 — Questionnaire for National Security Positions; submitted as part of background investigations for sensitive positions." },
+        { "term": "SF-312",                   "definition": "Standard Form 312 — Classified Information Nondisclosure Agreement; required for personnel granted access to classified information." },
+        { "term": "Suitability",             "definition": "Per 5 CFR Part 731, fitness for federal employment based on character or conduct. Distinct from clearance, which is for classified-information access." },
+        { "term": "Tier 1-5",                "definition": "Federal Investigative Standards investigation tiers, replacing legacy NACI / MBI / BI. Tier 1 (Low Risk) through Tier 5 (Critical Sensitive National Security)." },
+        { "term": "Trusted Workforce 2.0",   "definition": "Federal initiative modernizing the personnel-vetting process, including Continuous Vetting and consolidation of investigation tiers." },
+        { "term": "Sanctions",               "definition": "Per PS-8, formal disciplinary actions taken in response to security-policy violations. Range from retraining to termination and criminal referral." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AC",      "expansion": "Access Control (NIST 800-53 family)" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "AT",      "expansion": "Awareness and Training (NIST 800-53 family)" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "AUP",     "expansion": "Acceptable Use Policy" },
+        { "abbr": "BI",      "expansion": "Background Investigation (legacy)" },
+        { "abbr": "BAA",     "expansion": "Business Associate Agreement (HIPAA)" },
+        { "abbr": "CAC",     "expansion": "Common Access Card (DoD)" },
+        { "abbr": "CDI",     "expansion": "Covered Defense Information" },
+        { "abbr": "CFR",     "expansion": "Code of Federal Regulations" },
+        { "abbr": "CISA",    "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CO",      "expansion": "Contracting Officer" },
+        { "abbr": "CSO",     "expansion": "Chief Security Officer" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "CV",      "expansion": "Continuous Vetting" },
+        { "abbr": "DCSA",    "expansion": "Defense Counterintelligence and Security Agency" },
+        { "abbr": "DFARS",   "expansion": "Defense Federal Acquisition Regulation Supplement" },
+        { "abbr": "EO",      "expansion": "Executive Order" },
+        { "abbr": "FAR",     "expansion": "Federal Acquisition Regulation" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FIS",     "expansion": "Federal Investigative Standards" },
+        { "abbr": "GFE",     "expansion": "Government-Furnished Equipment" },
+        { "abbr": "GRC",     "expansion": "Governance, Risk, and Compliance" },
+        { "abbr": "HIPAA",   "expansion": "Health Insurance Portability and Accountability Act" },
+        { "abbr": "HRMS",    "expansion": "Human Resources Management System" },
+        { "abbr": "HSPD-12", "expansion": "Homeland Security Presidential Directive 12" },
+        { "abbr": "IdP",     "expansion": "Identity Provider" },
+        { "abbr": "IR",      "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "MA",      "expansion": "Maintenance (NIST 800-53 family)" },
+        { "abbr": "MBI",     "expansion": "Moderate Background Investigation (legacy)" },
+        { "abbr": "MOU",     "expansion": "Memorandum of Understanding" },
+        { "abbr": "NACI",    "expansion": "National Agency Check with Inquiries (legacy)" },
+        { "abbr": "NARA",    "expansion": "National Archives and Records Administration" },
+        { "abbr": "NBIB",    "expansion": "National Background Investigations Bureau (predecessor to DCSA)" },
+        { "abbr": "NDA",     "expansion": "Non-Disclosure Agreement" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OPM",     "expansion": "Office of Personnel Management" },
+        { "abbr": "PD",      "expansion": "Position Description" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PHI",     "expansion": "Protected Health Information" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "PSO",     "expansion": "Personnel Security Officer" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SA",      "expansion": "System and Services Acquisition (NIST 800-53 family)" },
+        { "abbr": "SCI",     "expansion": "Sensitive Compartmented Information" },
+        { "abbr": "SF",      "expansion": "Standard Form" },
+        { "abbr": "SLA",     "expansion": "Service-Level Agreement" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TW",      "expansion": "Trusted Workforce (federal initiative)" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-181 r1 — Workforce Framework for Cybersecurity (NICE Framework)", "url": "https://csrc.nist.gov/pubs/sp/800/181/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "5 CFR Part 731 — Suitability",                                  "url": "https://www.ecfr.gov/current/title-5/chapter-I/subchapter-B/part-731" },
+        { "label": "5 CFR Part 1400 — Designation of National Security Positions", "url": "https://www.ecfr.gov/current/title-5/chapter-XXXIV/part-1400" },
+        { "label": "Executive Order 12968 — Access to Classified Information",     "url": "https://www.archives.gov/isoo/policy-documents/eo-12968.html" },
+        { "label": "OPM Position Designation System",                               "url": "https://www.opm.gov/suitability/suitability-executive-agent/position-designation-tool/" },
+        { "label": "DCSA — Trusted Workforce 2.0 / Continuous Vetting",            "url": "https://www.dcsa.mil/Personnel-Vetting/" },
+        { "label": "Federal Investigative Standards (FIS)",                         "url": "https://www.dcsa.mil/Portals/91/Documents/pv/PSMO/Federal-Investigative-Standards-Approved-12-2012.pdf" }
+    ]
+}
