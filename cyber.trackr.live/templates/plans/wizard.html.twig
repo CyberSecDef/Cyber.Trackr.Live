@@ -2,7 +2,11 @@
 
 {% block title %}{{ schema.title }} &mdash; Wizard{% endblock %}
 {% block og_title %}{{ schema.title }} generator{% endblock %}
-{% block og_description %}{{ schema.description }}{% endblock %}
+{# Hand-crafted per-family — schema.description runs 200-500+ chars (it's
+   the prose used inside the generated plan, not a meta-line). Pick the
+   shorter of family_name vs family code so PT ("PII Processing and
+   Transparency") doesn't blow past 160 chars. #}
+{% block og_description %}{% if schema.family_name|length <= 28 %}Generate a NIST 800-53 r5 {{ schema.family_name }} ({{ schema.family }}) plan{% else %}Generate a NIST 800-53 r5 {{ schema.family }} family plan{% endif %}. Schema-driven wizard with ODV substitution, baseline tailoring, Word + JSON output.{% endblock %}
 {% block og_image_name %}plans{% endblock %}
 
 {% block body %}

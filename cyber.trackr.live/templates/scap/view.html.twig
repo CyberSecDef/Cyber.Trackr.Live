@@ -1,11 +1,18 @@
 {% extends 'base.html.twig' %}
 {% import 'macros.html.twig' as ui %}
 
-{% set _scap_title = scap.xpath("//xccdf:Benchmark/xccdf:title")|first|default(title|replace({'_': ' '})) %}
+{% set _scap_title    = scap.xpath("//xccdf:Benchmark/xccdf:title")|first|default(title|replace({'_': ' '})) %}
+{% set _scap_status   = scap.xpath("//xccdf:Benchmark/xccdf:status/@date")|first %}
+{% set _scap_hi       = scap.xpath("//xccdf:Benchmark/xccdf:Group/xccdf:Rule[@severity = 'high']")|length %}
+{% set _scap_med      = scap.xpath("//xccdf:Benchmark/xccdf:Group/xccdf:Rule[@severity = 'medium']")|length %}
+{% set _scap_low      = scap.xpath("//xccdf:Benchmark/xccdf:Group/xccdf:Rule[@severity = 'low']")|length %}
+{% set _scap_rules    = _scap_hi + _scap_med + _scap_low %}
 
 {% block title %}View SCAP - {{ _scap_title }} V{{ version }}R{{ release }}{% endblock %}
 {% block og_title %}{{ _scap_title }} V{{ version }}R{{ release }} (SCAP){% endblock %}
-{% block og_description %}{{ _scap_title }} SCAP benchmark — automated scanning content for STIG compliance.{% endblock %}
+{# Per-version content-driven SCAP description — same approach as the
+   STIG view. Rule counts + severity mix make every (title, V, R) unique. #}
+{% block og_description %}{{ _scap_title }} V{{ version }}R{{ release }}{% if _scap_status %} ({{ _scap_status }}){% endif %} — {{ _scap_rules }} XCCDF rules: {{ _scap_hi }} CAT I, {{ _scap_med }} CAT II, {{ _scap_low }} CAT III. Automated SCAP scanning content from DISA.{% endblock %}
 {% block og_image_name %}scap{% endblock %}
 {% block og_type %}article{% endblock %}
 

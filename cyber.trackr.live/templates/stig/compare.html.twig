@@ -1,6 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Compare STIGs{% endblock %}
+{% set _human_title = title|replace({'_': ' '}) %}
+{% set _xml_title   = stig1.xpath("/xmlns:Benchmark/xmlns:title")|first|default(_human_title) %}
+
+{% block title %}Compare {{ _xml_title }} V{{v1}}R{{r1}} vs V{{v2}}R{{r2}} &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}{{ _xml_title }} V{{v1}}R{{r1}} vs V{{v2}}R{{r2}}{% endblock %}
+{# Per-pair description so every (title, v1, r1, v2, r2) combination has its
+   own meta line — each compare URL ends up unique to crawlers. #}
+{% block og_description %}Side-by-side diff of the {{ _human_title }} STIG: V{{v1}}R{{r1}} vs V{{v2}}R{{r2}}. Added rules, removed rules, severity changes, and content edits per Vuln ID.{% endblock %}
+{% block og_image_name %}stig{% endblock %}
+{% block og_type %}article{% endblock %}
 
 {% block body %}
     <nav class="breadcrumbs" aria-label="Breadcrumb">

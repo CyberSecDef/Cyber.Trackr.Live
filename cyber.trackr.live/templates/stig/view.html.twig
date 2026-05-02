@@ -1,11 +1,20 @@
 {% extends 'base.html.twig' %}
 {% import 'macros.html.twig' as ui %}
 
-{% set _stig_title = stig.xpath("/xmlns:Benchmark/xmlns:title")|first|default(title|replace({'_': ' '})) %}
+{% set _stig_title    = stig.xpath("/xmlns:Benchmark/xmlns:title")|first|default(title|replace({'_': ' '})) %}
+{% set _release_info  = stig.xpath("/xmlns:Benchmark/xmlns:plain-text[@id='release-info']/text()")|first %}
+{% set _released_date = _release_info|split('Date:')[1]|default('')|trim %}
+{% set _hi_count      = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'high']")|length %}
+{% set _med_count     = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'medium']")|length %}
+{% set _low_count     = stig.xpath("/xmlns:Benchmark/xmlns:Group/xmlns:Rule[@severity = 'low']")|length %}
+{% set _rules_total   = _hi_count + _med_count + _low_count %}
 
 {% block title %}View STIG - {{ _stig_title }} V{{ version }}R{{ release }} {% endblock %}
 {% block og_title %}{{ _stig_title }} V{{ version }}R{{ release }}{% endblock %}
-{% block og_description %}{{ _stig_title }} version {{ version }} release {{ release }} — full rule set, severity counts, version diff, linked CCIs, and 800-53 cross-references on Cyber Trackr.{% endblock %}
+{# Per-version content-driven description: rule counts, severity mix,
+   release date — every (title, V, R) gets a unique meta description.
+   Surrounding text trimmed so the dynamic facts dominate. #}
+{% block og_description %}{{ _stig_title }} V{{ version }}R{{ release }}{% if _released_date %} ({{ _released_date }}){% endif %} — {{ _rules_total }} rules: {{ _hi_count }} CAT I, {{ _med_count }} CAT II, {{ _low_count }} CAT III. Linked CCIs and 800-53 cross-references.{% endblock %}
 {% block og_image_name %}stig{% endblock %}
 {% block og_type %}article{% endblock %}
 
