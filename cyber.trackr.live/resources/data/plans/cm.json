@@ -1,5 +1,5 @@
 {
-    "_comment": "Configuration Management Plan generator. Adding a new family is essentially copying this file, changing 'family' + 'title' + intro/approach prose, and authoring 5-ish family_questions appropriate to that domain.",
+    "_comment": "Configuration Management Plan generator. Phase 2B canonical template. Adding a new family is essentially copying this file, changing 'family' + 'title' + intro/approach prose, and authoring the family_questions groups appropriate to that domain. Groups carry a 'section' field that determines which document section they render under: system_overview (§3.x sub-section), approach (§4.x sub-section), continuous_monitoring (§6.x sub-section), or integration (§7).",
 
     "family": "CM",
     "family_name": "Configuration Management",
@@ -9,44 +9,404 @@
     "intro_template": "This Configuration Management Plan documents the configuration management approach for {system_name}. It establishes the practices, roles, and procedures used to manage the integrity of system components throughout the system's lifecycle.\n\nThe scope of this plan covers all hardware, software, firmware, and supporting documentation comprising the {system_name} authorization boundary. The plan is consistent with NIST SP 800-128 (Guide for Security-Focused Configuration Management of Information Systems) and the controls of the CM family in NIST SP 800-53 r5.",
 
     "approach_section_title": "Configuration Management Approach",
-    "approach_template": "{system_name} uses {cm_tool} as the system of record for configuration items and baselines. Proposed changes are reviewed by a Configuration Control Board (CCB) chaired by {ccb_chair}, which meets on a {ccb_cadence} cadence. Baselines are documented and stored as follows: {baseline_storage}. The end-to-end change-request workflow is: {change_workflow}.",
+    "approach_template": "{system_name} uses {cm_tool} as the system of record for configuration items and baselines. Proposed changes are reviewed by a Configuration Control Board (CCB) chaired by {ccb_chair_role}, which meets on a {ccb_cadence} cadence. Baselines are documented and stored as follows: {baseline_storage}. The end-to-end change-request workflow is: {change_workflow}.\n\nAdditional details on the CCB, configuration audit strategy, exception management, backup approach, hardening sources, and documentation control are captured in the sub-sections below.",
 
     "continuous_monitoring_section_title": "Continuous Monitoring",
-    "continuous_monitoring_template": "Configuration baselines for {system_name} are reviewed against the active configuration on a defined cadence and any drift is reconciled through the change-management workflow described above. The CCB is the authoritative body for evaluating drift findings, scheduling remediation, and approving exceptions. Findings, drift remediation actions, and CCB decisions are recorded in {cm_tool} and reviewed during periodic CM audits. Continuous monitoring of CM controls supports the broader ongoing-authorization strategy for the system.",
+    "continuous_monitoring_template": "Configuration baselines for {system_name} are reviewed against the active configuration on a defined cadence and any drift is reconciled through the change-management workflow described in section 4. The CCB is the authoritative body for evaluating drift findings, scheduling remediation, and approving exceptions. Findings, drift remediation actions, and CCB decisions are recorded in {cm_tool} and reviewed during periodic CM audits. Continuous monitoring of CM controls supports the broader ongoing-authorization strategy for the system. Detailed drift-detection automation, backup integration, and CM metrics are documented in the sub-sections below.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Configuration Management Plan does not stand alone. Control implementations described herein are referenced from the System Security Plan (SSP); deviations and findings flow into the Plan of Action and Milestones (POA&M); vulnerability scan output and continuous-monitoring metrics inform CM activities. The following cross-references identify the specific artifacts and locations where CM-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "CM-1", "from": "Organizational configuration management policy" },
+        { "number": "CM-10", "from": "Enterprise software asset management service" },
+        { "number": "CM-11", "from": "Enterprise endpoint management policy" }
+    ],
+
+    "per_control_guidance": {
+        "CM-3": {
+            "prompts": [
+                "Reference the CCB definition in §4.2 (chair, membership, cadence, quorum, decision thresholds).",
+                "Describe approval thresholds — what changes need majority vs unanimous; what changes require AO concurrence.",
+                "Document separation of duties: who can submit changes vs review vs approve vs implement vs verify.",
+                "Identify the enforcement mechanism (RBAC / Git branch protection / SCCM permission groups / GPO).",
+                "Address the emergency change pathway — criteria, who can authorize, retroactive review window.",
+                "State the security-impact analysis (CM-4) requirement and its position in the workflow."
+            ],
+            "evidence_suggestions": [
+                "Change-management procedure document",
+                "CCB meeting minutes (last 90 days)",
+                "Sample approved change ticket",
+                "Sample emergency change record + retroactive review",
+                "Security impact analysis template",
+                "Change-control workflow diagram"
+            ],
+            "extra_fields": [
+                { "id": "cm3_approval_thresholds",   "label": "Approval thresholds",   "type": "textarea", "rows": 3,
+                  "help": "Map change types to required approval levels (routine / standard / emergency / security-impacting)." },
+                { "id": "cm3_separation_of_duties",  "label": "Separation of duties",  "type": "textarea", "rows": 3,
+                  "help": "Who submits / reviews / approves / implements / verifies. The same person should not own consecutive steps where it allows unilateral change." },
+                { "id": "cm3_enforcement_mechanism", "label": "Enforcement mechanism", "type": "textarea", "rows": 2,
+                  "help": "Technical control that enforces the workflow (e.g., 'Git branch protection requires 2 reviewers including a security team member; main branch deploys via Ansible only from CCB-approved tags')." }
+            ]
+        },
+
+        "CM-5": {
+            "prompts": [
+                "List the privileged role/group in your IAM that holds change-modification rights.",
+                "Describe how membership is reviewed and approved (cadence, approving role).",
+                "Cross-reference AC-6 (Least Privilege) — CM-5 access restrictions are enforced through the AC-6 implementation.",
+                "State the enforcement mechanism (RBAC in SCCM / OS-level privileges / Git CODEOWNERS / cloud IAM policy).",
+                "Identify any logging that captures privileged change events for AU-2 / AU-12 visibility."
+            ],
+            "evidence_suggestions": [
+                "IAM group / role membership report (privileged CM group)",
+                "Quarterly access review records",
+                "RBAC policy document",
+                "Audit log sample showing privileged change events",
+                "Onboarding / offboarding procedure for the privileged group"
+            ],
+            "extra_fields": [
+                { "id": "cm5_submitters",       "label": "Who can SUBMIT changes",          "type": "text",     "help": "Roles that can open a change request." },
+                { "id": "cm5_approvers",        "label": "Who can APPROVE changes",         "type": "text",     "help": "Roles that hold approval authority (typically the CCB or its designees)." },
+                { "id": "cm5_implementers",    "label": "Who can IMPLEMENT changes",       "type": "text",     "help": "Roles with technical permission to deploy approved changes." },
+                { "id": "cm5_ac6_reference",   "label": "AC-6 cross-reference",            "type": "text",     "help": "How this ties to your AC-6 (Least Privilege) implementation." },
+                { "id": "cm5_enforcement_rbac","label": "Enforcement mechanism (RBAC etc.)","type": "textarea", "rows": 3,
+                  "help": "Technical enforcement (e.g., 'AWS IAM permission boundary on the CMOps role; SCCM compliance baseline restricts deployment console access')." }
+            ]
+        },
+
+        "CM-6": {
+            "prompts": [
+                "Cite each authoritative configuration source (DISA STIGs, CIS Benchmarks, vendor hardening guides) — see §4.3 for the catalog.",
+                "Describe how baselines are derived from those sources (manual mapping vs automated import).",
+                "Document the deviation register: where exceptions to the baseline live, who approves them, and how they're tracked.",
+                "State the enforcement mechanism (Ansible playbook, SCCM compliance baseline, GPO, Salt state, etc.).",
+                "Specify the verification cadence (how often actual config is compared to documented baseline)."
+            ],
+            "evidence_suggestions": [
+                "Ansible playbook / Salt states repository link",
+                "Tenable / Nessus compliance scan results",
+                "STIG Viewer compliance report",
+                "Approved deviation register",
+                "Sample baseline document for one CI type (workstation / server / appliance)"
+            ],
+            "extra_fields": [
+                { "id": "cm6_hardening_sources_cited",  "label": "Hardening sources cited (specific to this control)", "type": "list",
+                  "suggestions": ["DISA STIG: Windows 11", "DISA STIG: RHEL 9", "DISA STIG: NetApp ONTAP", "CIS Benchmark: Ubuntu 22.04", "CIS Benchmark: AWS"],
+                  "help": "Reference the specific STIGs / Benchmarks applicable to this system. Suggestions are common picks; customize." },
+                { "id": "cm6_deviation_register_link",  "label": "Deviation register location",     "type": "text",
+                  "help": "Where approved deviations / exceptions to baseline are tracked (URL, document path, ticketing query)." },
+                { "id": "cm6_enforcement_mechanism",    "label": "Enforcement mechanism",            "type": "textarea", "rows": 3,
+                  "help": "How baseline settings are actively enforced on the system (push-config tool, immutable infrastructure, etc.)." }
+            ]
+        },
+
+        "CM-7": {
+            "prompts": [
+                "Enumerate the set of allowed services / ports / protocols (or reference a baseline document that does).",
+                "Identify services that are explicitly disabled in the baseline.",
+                "Describe the application allowlisting approach (AppLocker / WDAC / OS-level allowlist / endpoint management product).",
+                "Address how the system limits inbound and outbound network exposure (security groups, host firewall, network segmentation).",
+                "Mention how unnecessary functions are reviewed periodically (CM-7(1))."
+            ],
+            "evidence_suggestions": [
+                "Allowed services / ports baseline document",
+                "Tenable scan output (open-port report)",
+                "Host firewall configuration export",
+                "Application allowlist policy",
+                "Periodic review record (CM-7(1))"
+            ],
+            "extra_fields": [
+                { "id": "cm7_allowed_services",      "label": "Allowed services / ports / protocols", "type": "textarea", "rows": 5,
+                  "help": "Enumerate or reference the authorized set. Include both inbound and outbound where relevant." },
+                { "id": "cm7_disabled_services",     "label": "Explicitly disabled services",         "type": "textarea", "rows": 3,
+                  "help": "Services / features turned off that the OS or application would enable by default (e.g., Telnet, FTP, RDP for non-admin VLANs)." },
+                { "id": "cm7_allowlisting_approach", "label": "Application allowlisting approach",    "type": "textarea", "rows": 3,
+                  "help": "How application execution is controlled. Reference the CM-7(5) enhancement if applicable." }
+            ]
+        },
+
+        "CM-8": {
+            "prompts": [
+                "Identify the system of record for inventory (CMDB, AWS Config, ServiceNow, Excel, etc.).",
+                "Enumerate the ATTRIBUTES tracked per CI — see the structured field below.",
+                "Describe how inventory is updated (event-driven vs scheduled, automated vs manual).",
+                "State the reconciliation cadence (how often actual systems are compared to inventory).",
+                "Address ownership: who is responsible for inventory accuracy, and what review cadence applies."
+            ],
+            "evidence_suggestions": [
+                "ServiceNow / CMDB inventory report",
+                "AWS Config inventory snapshot",
+                "Sample reconciliation report",
+                "Monthly / quarterly inventory review minutes",
+                "Inventory update procedure document"
+            ],
+            "extra_fields": [
+                { "id": "cm8_tracked_attributes", "label": "Attributes tracked per CI", "type": "multi_select",
+                  "options": ["Asset ID / unique identifier", "Owner / responsible role", "Location (physical or logical)", "Hardware specifications", "Software / firmware version", "Patch level", "Authorization status", "IP address", "MAC address", "Hostname / DNS name", "Criticality tier", "Data classification", "Network zone / VLAN", "Decommission date"] },
+                { "id": "cm8_inventory_tooling",  "label": "Inventory tooling (system of record)", "type": "text",
+                  "help": "Primary system that holds inventory (e.g., 'ServiceNow CMDB synced nightly with AWS Config and Active Directory')." },
+                { "id": "cm8_reconciliation_cadence","label": "Reconciliation cadence",          "type": "text",
+                  "help": "How often inventory is reconciled with active state (e.g., 'continuous via AWS Config rules; monthly manual spot-check')." }
+            ]
+        },
+
+        "CM-10": {
+            "prompts": [
+                "Identify the license-tracking system that tracks software usage rights for the system.",
+                "Describe how license counts are verified against actual deployed instances.",
+                "If software provenance is tracked (vendor source, signed installers, SBOM), describe the approach — supports SR / SA-12 alignment.",
+                "Address how unauthorized software acquisition is prevented (procurement gating, package allowlist)."
+            ],
+            "evidence_suggestions": [
+                "License inventory report",
+                "Software bill of materials (SBOM) for primary components",
+                "Software acquisition / procurement policy",
+                "Vendor contract or EULA register"
+            ],
+            "extra_fields": [
+                { "id": "cm10_license_tracking_system", "label": "License tracking system",  "type": "text",
+                  "help": "System that holds license records (e.g., 'Flexera ITAM', 'Snow License Manager', 'spreadsheet')." },
+                { "id": "cm10_provenance_approach",     "label": "Software provenance approach", "type": "textarea", "rows": 3,
+                  "help": "How software origin is verified. SBOM availability, signed-package verification, vendor authenticity checks." }
+            ]
+        },
+
+        "CM-11": {
+            "prompts": [
+                "Describe the enforcement mechanism preventing user-installed software (endpoint management, OS-level UAC / SUDO restrictions, AppLocker / WDAC).",
+                "Document the exception process for legitimate user-installed needs (developers, kiosks, etc.).",
+                "Address detection: how unauthorized installs are discovered after the fact (HIDS / EDR / scheduled scans).",
+                "State the user-acceptable-use policy that articulates the restriction to end users."
+            ],
+            "evidence_suggestions": [
+                "Endpoint management policy document",
+                "AppLocker / WDAC policy export",
+                "Acceptable use policy",
+                "Sample exception register entry",
+                "EDR / HIDS detection rule for unauthorized installations"
+            ],
+            "extra_fields": [
+                { "id": "cm11_restriction_enforcement", "label": "Restriction enforcement mechanism", "type": "textarea", "rows": 3,
+                  "help": "Tooling and OS-level controls that block user-installed software." },
+                { "id": "cm11_exception_process",       "label": "Exception process",                 "type": "textarea", "rows": 3,
+                  "help": "How a legitimate exception is requested, approved, and tracked. Reference the exception management group in §4.5." }
+            ]
+        }
+    },
 
     "family_questions": [
         {
-            "id": "cm_tool",
-            "label": "Configuration management tool / repository of record",
-            "type": "text",
-            "required": true,
-            "help": "What tool, repo, or system holds your authoritative configuration baselines? Examples: Git, Ansible Tower, Puppet Enterprise, SCCM, Chef, Salt."
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Tools, baselines, and the change-request flow that everything else hangs off.",
+            "questions": [
+                {
+                    "id": "cm_tool",
+                    "label": "Configuration management tool / repository of record",
+                    "type": "text",
+                    "required": true,
+                    "help": "Tool, repo, or system holding your authoritative configuration baselines (e.g., GitHub Enterprise, Ansible Automation Platform, SCCM, Puppet Enterprise, Chef, Salt)."
+                },
+                {
+                    "id": "baseline_storage",
+                    "label": "How are baselines documented and stored?",
+                    "type": "textarea",
+                    "rows": 3,
+                    "help": "Where baseline configurations live and how they're versioned. Example: 'In a Git repository under config/baselines/, tagged at each release. Hardware inventory tracked in ServiceNow CMDB.'"
+                },
+                {
+                    "id": "change_workflow",
+                    "label": "Change-request workflow",
+                    "type": "textarea",
+                    "rows": 4,
+                    "help": "Workflow from change request through review, approval, implementation, and verification. Mention tooling (Jira, ServiceNow), approval thresholds, and the emergency change pathway."
+                }
+            ]
         },
+
         {
-            "id": "ccb_chair",
-            "label": "Configuration Control Board chair",
-            "type": "text",
-            "help": "Role or named individual that chairs your CCB."
+            "id": "ccb",
+            "type": "group",
+            "section": "approach",
+            "label": "Configuration Control Board",
+            "description": "Membership, quorum, decision authority, and emergency-change criteria.",
+            "questions": [
+                { "id": "ccb_chair_role",     "label": "CCB chair role",                      "type": "text",     "help": "Role title (e.g., 'Director of Engineering') rather than a named individual; the role outlasts the person." },
+                { "id": "ccb_cadence",        "label": "CCB meeting cadence",                  "type": "select",
+                  "options": ["Weekly", "Bi-weekly", "Monthly", "Quarterly", "Ad hoc / on demand"] },
+                { "id": "ccb_membership",     "label": "CCB voting membership",                "type": "list",
+                  "help": "Roles that hold votes. Example list: System Owner, ISSO, ISSM, Engineering Lead, Network Lead." },
+                { "id": "ccb_quorum",         "label": "Quorum requirement",                   "type": "text",
+                  "help": "Number or percentage of voting members required to make a binding decision (e.g., '4 of 6', 'simple majority')." },
+                { "id": "ccb_decision_thresholds", "label": "Decision thresholds",             "type": "textarea", "rows": 3,
+                  "help": "What changes require simple majority vs unanimous? What's the threshold for changes affecting the security posture?" },
+                { "id": "ccb_emergency_change_criteria", "label": "Emergency change criteria + pathway", "type": "textarea", "rows": 3,
+                  "help": "What qualifies as an emergency change? Who can authorize? What's the retroactive review window?" },
+                { "id": "ccb_documentation_standards", "label": "Documentation standards",     "type": "textarea", "rows": 3,
+                  "help": "What's recorded for each CCB meeting? Where are minutes stored? Retention?" }
+            ]
         },
+
         {
-            "id": "ccb_cadence",
-            "label": "CCB meeting cadence",
-            "type": "select",
-            "options": ["Weekly", "Bi-weekly", "Monthly", "Quarterly", "Ad hoc / on demand"]
+            "id": "ci_methodology",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Configuration Item Identification",
+            "description": "How CIs are named, classified, and related to each other.",
+            "questions": [
+                { "id": "ci_naming_convention",   "label": "CI naming convention",            "type": "textarea", "rows": 3,
+                  "help": "How CIs are named, e.g., '<env>-<role>-<serial>' or 'aws/<account>/<region>/<resource_id>'." },
+                { "id": "ci_categorization",      "label": "CI categories tracked",           "type": "multi_select",
+                  "options": ["Hardware", "Software", "Firmware", "Documentation", "Configuration files", "Network components", "Cryptographic keys / certificates", "Cloud resources"] },
+                { "id": "ci_relationship_mapping","label": "Relationship-mapping approach",   "type": "textarea", "rows": 3,
+                  "help": "How dependencies between CIs are documented (e.g., 'CMDB relationship table with hosts → applications → databases'). Critical for impact analysis." },
+                { "id": "ci_version_control_structure", "label": "Version-control structure", "type": "textarea", "rows": 3,
+                  "help": "Branch / tag / release strategy used to track CI versions." }
+            ]
         },
+
         {
-            "id": "baseline_storage",
-            "label": "How are baselines documented and stored?",
-            "type": "textarea",
-            "rows": 3,
-            "help": "Briefly describe where baseline configurations live and how they're versioned. Example: 'In a Git repository under config/baselines/, tagged at each release. Hardware inventory tracked in ServiceNow CMDB.'"
+            "id": "hardening_sources",
+            "type": "group",
+            "section": "approach",
+            "label": "Hardening sources",
+            "description": "Authoritative configuration sources cited for CM-6 baseline composition.",
+            "questions": [
+                { "id": "hardening_sources_list", "label": "Cited hardening sources", "type": "list",
+                  "suggestions": ["DISA STIGs", "CIS Benchmarks", "NIST SP 800-70 NCP", "Vendor hardening guides", "Internal hardening standard"],
+                  "help": "Add each authoritative source. Suggestions auto-populate one click; you can edit or add custom entries." }
+            ]
         },
+
         {
-            "id": "change_workflow",
-            "label": "Change-request workflow",
-            "type": "textarea",
-            "rows": 4,
-            "help": "Describe the workflow from change request through review, approval, implementation, and verification. Mention any tooling (Jira, ServiceNow, etc.) and approval thresholds."
+            "id": "audit_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Configuration Audit Strategy",
+            "description": "Functional vs physical audits, frequency, roles, and reconciliation.",
+            "questions": [
+                { "id": "audit_types",                "label": "Audit types performed",      "type": "multi_select",
+                  "options": ["Functional Configuration Audit (FCA)", "Physical Configuration Audit (PCA)", "Software composition audit", "License audit"] },
+                { "id": "audit_frequency",            "label": "Audit frequency",            "type": "text",
+                  "help": "How often each audit type runs (e.g., 'FCA quarterly, PCA annually')." },
+                { "id": "audit_independent_role",     "label": "Independent assessor role",  "type": "text",
+                  "help": "Role responsible for independent verification (e.g., 'Internal Audit', 'Third-party assessor')." },
+                { "id": "audit_system_owner_role",    "label": "System-owner role in audit", "type": "text",
+                  "help": "What the System Owner provides / signs off during the audit." },
+                { "id": "audit_reconciliation_process","label": "Reconciliation process",    "type": "textarea", "rows": 3,
+                  "help": "How discrepancies between audited configuration and the documented baseline are reconciled, who decides, and how it's tracked." }
+            ]
+        },
+
+        {
+            "id": "exception_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Exception Management",
+            "description": "Approval workflow, time-bound waivers, POA&M linkage, and revalidation.",
+            "questions": [
+                { "id": "exception_approval_workflow", "label": "Deviation / waiver approval workflow", "type": "textarea", "rows": 3,
+                  "help": "Who can request, who reviews, who approves a deviation from baseline. Reference CCB if relevant." },
+                { "id": "exception_waiver_max_duration", "label": "Maximum waiver duration", "type": "text",
+                  "help": "Hard limit on how long a waiver can stand before it must be revisited (e.g., '90 days', '6 months')." },
+                { "id": "exception_poam_linkage",      "label": "POA&M linkage",            "type": "textarea", "rows": 2,
+                  "help": "How active waivers are tracked in the POA&M (e.g., 'Each waiver opens a POA&M item with milestone = waiver expiration')." },
+                { "id": "exception_revalidation_cadence","label": "Revalidation cadence",   "type": "text",
+                  "help": "How often open waivers are reviewed for continued applicability." }
+            ]
+        },
+
+        {
+            "id": "backup_strategy",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Backup & Recoverability of Baselines",
+            "description": "Recoverability, versioning, and integrity protection for configuration data (CM-9 / CP overlap).",
+            "questions": [
+                { "id": "backup_recoverability",        "label": "Recoverability approach",  "type": "textarea", "rows": 3,
+                  "help": "How baselines + supporting configuration data can be restored if lost or corrupted. RTO / RPO if defined." },
+                { "id": "backup_versioning",            "label": "Versioning scheme",        "type": "textarea", "rows": 2,
+                  "help": "How successive baseline versions are tracked (Git tags, retention policy on snapshots, etc.)." },
+                { "id": "backup_integrity_protection",  "label": "Integrity protection",     "type": "textarea", "rows": 3,
+                  "help": "How baselines are protected from undetected modification (signed Git tags, SHA-256 hashes in CMDB, etc.)." }
+            ]
+        },
+
+        {
+            "id": "drift_detection",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Drift Detection Automation",
+            "description": "Tooling, frequency, alerting, and integration with SIEM / ticketing.",
+            "questions": [
+                { "id": "drift_tooling",          "label": "Drift detection tooling", "type": "textarea", "rows": 3,
+                  "help": "What runs the periodic comparison (SCCM compliance baselines, Tenable, Ansible idempotent run, custom scripts, etc.)." },
+                { "id": "drift_scan_frequency",   "label": "Scan frequency",         "type": "text",
+                  "help": "How often drift detection runs (e.g., 'continuous', 'daily', 'weekly')." },
+                { "id": "drift_alert_thresholds", "label": "Alert thresholds",       "type": "textarea", "rows": 3,
+                  "help": "What level of drift triggers a page vs a daily summary. How false positives are tuned out." },
+                { "id": "drift_siem_integration", "label": "SIEM / ticketing integration", "type": "textarea", "rows": 3,
+                  "help": "Where drift findings flow (SIEM rule, Jira queue, ServiceNow incident). Owner of triage." }
+            ]
+        },
+
+        {
+            "id": "cm_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "CM Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate CM control effectiveness over time.",
+            "questions": [
+                { "id": "cm_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "% assets compliant with baseline",
+                      "Mean time to remediate drift",
+                      "Unauthorized changes detected per quarter",
+                      "% changes routed through CCB (vs emergency / out-of-band)",
+                      "% emergency changes",
+                      "Time to detect drift (median)",
+                      "Open exceptions / waivers (count + age)"
+                  ],
+                  "help": "Add each metric your program reports on. Suggestions are common picks; customize as needed." }
+            ]
+        },
+
+        {
+            "id": "documentation_control",
+            "type": "group",
+            "section": "approach",
+            "label": "Configuration Documentation Control",
+            "description": "Versioning schema, approval signatures, and retention requirements.",
+            "questions": [
+                { "id": "doc_versioning_schema",         "label": "Versioning schema",     "type": "text",
+                  "help": "Format used for plan / baseline document versions (e.g., 'MAJOR.MINOR.PATCH', '<year>.<release>')." },
+                { "id": "doc_approval_signatures_required", "label": "Required approval signatures", "type": "multi_select",
+                  "options": ["System Owner", "ISSO", "ISSM", "CCB Chair", "Authorizing Official", "Privacy Officer"] },
+                { "id": "doc_retention_period",          "label": "Retention period",      "type": "text",
+                  "help": "How long approved baseline documents and supporting records are retained (e.g., '7 years post-decommission', 'per NARA GRS 4.2')." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the CM control implementations are summarized (e.g., 'SSP §13.5')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for CM findings","type": "text",
+                  "help": "Convention used to identify CM-related POA&M items (e.g., 'CM-' or 'POAM-CM-####')." },
+                { "id": "ra5_scan_source",              "label": "RA-5 scan source feeding CM",  "type": "text",
+                  "help": "Vulnerability scanner whose output drives CM remediation (e.g., 'Tenable.sc Container A', 'Nessus Manager')." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document that ties CM continuous-monitoring activities to the broader ConMon plan." }
+            ]
         }
     ],
 
@@ -54,6 +414,7 @@
         { "term": "Authorization Boundary",     "definition": "All components of an information system to be authorized for operation; excludes separately authorized systems to which the system is connected." },
         { "term": "Baseline Configuration",     "definition": "A documented, formally reviewed and agreed-upon set of specifications for a system at a given point in time. Serves as the reference against which subsequent changes are evaluated." },
         { "term": "Change Request",             "definition": "A formal proposal to modify a configuration item, submitted for review and approval through the configuration-management workflow." },
+        { "term": "Common Control Provider",    "definition": "Entity responsible for the implementation, assessment, and monitoring of a common control inherited by one or more information systems." },
         { "term": "Configuration Audit",        "definition": "An independent verification that a configuration item conforms to its specified configuration. Includes both functional and physical configuration audits." },
         { "term": "Configuration Control",      "definition": "The systematic evaluation, approval/disapproval, and implementation of changes to configuration items, performed after formal establishment of their baselines." },
         { "term": "Configuration Control Board (CCB)", "definition": "An organizational body responsible for evaluating proposed changes to configuration baselines and approving or disapproving their implementation." },
@@ -62,31 +423,55 @@
         { "term": "Configuration Management Database (CMDB)", "definition": "A repository for storing configuration items and the relationships between them; supports configuration status accounting." },
         { "term": "Configuration Status Accounting", "definition": "The recording and reporting of information needed to manage configuration items effectively, including the status of proposed changes and the implementation status of approved changes." },
         { "term": "Drift",                      "definition": "Unintended divergence between an active configuration and its documented baseline. Detected through periodic comparison and reconciled via the change-management workflow." },
+        { "term": "Functional Configuration Audit (FCA)", "definition": "Verification that a configuration item's functional and performance characteristics meet its specifications." },
         { "term": "Functional Baseline",        "definition": "Initial approved technical documentation describing the functional, interoperability, and interface characteristics of a configuration item." },
+        { "term": "Hybrid Control",             "definition": "Control whose implementation is shared between a common control provider and the information system itself." },
+        { "term": "Organization-Defined Value (ODV)", "definition": "A parameter in a NIST 800-53 control that the implementing organization must specify (e.g., a frequency, threshold, role, or selection from a set of options) to make the control assessable." },
+        { "term": "Physical Configuration Audit (PCA)", "definition": "Verification that the physical embodiment of a configuration item matches its as-built documentation." },
         { "term": "Production Baseline",        "definition": "Approved configuration documentation describing the configuration of a configuration item as it is to be produced or fielded." },
-        { "term": "Security-Impact Analysis",   "definition": "Analysis conducted by qualified personnel to determine the extent to which proposed changes could affect the security posture of a system." }
+        { "term": "Security-Impact Analysis",   "definition": "Analysis conducted by qualified personnel to determine the extent to which proposed changes could affect the security posture of a system." },
+        { "term": "Selection Statement",        "definition": "An ODV form in NIST 800-53 where the organization must choose one (or one-or-more) options from a defined list." },
+        { "term": "Tailoring",                  "definition": "Process by which an organization adjusts a control baseline by selecting, removing, or modifying controls and enhancements to align with system-specific risk." },
+        { "term": "Waiver",                     "definition": "A formally approved, time-bound deviation from a baseline configuration or control requirement." }
     ],
 
     "acronyms": [
+        { "abbr": "AO",   "expansion": "Authorizing Official" },
         { "abbr": "ATO",  "expansion": "Authority to Operate" },
+        { "abbr": "CA-7", "expansion": "Continuous Monitoring (NIST 800-53 control)" },
         { "abbr": "CCB",  "expansion": "Configuration Control Board" },
         { "abbr": "CI",   "expansion": "Configuration Item" },
+        { "abbr": "CIS",  "expansion": "Center for Internet Security" },
         { "abbr": "CM",   "expansion": "Configuration Management" },
         { "abbr": "CMDB", "expansion": "Configuration Management Database" },
+        { "abbr": "ConMon","expansion": "Continuous Monitoring" },
+        { "abbr": "DISA", "expansion": "Defense Information Systems Agency" },
+        { "abbr": "FCA",  "expansion": "Functional Configuration Audit" },
+        { "abbr": "GPO",  "expansion": "Group Policy Object" },
         { "abbr": "ISSM", "expansion": "Information System Security Manager" },
         { "abbr": "ISSO", "expansion": "Information System Security Officer" },
+        { "abbr": "NCP",  "expansion": "National Checklist Program" },
         { "abbr": "NIST", "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "NVD",  "expansion": "National Vulnerability Database" },
+        { "abbr": "ODV",  "expansion": "Organization-Defined Value" },
+        { "abbr": "PCA",  "expansion": "Physical Configuration Audit" },
         { "abbr": "POAM", "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RA-5", "expansion": "Vulnerability Monitoring and Scanning (NIST 800-53 control)" },
+        { "abbr": "RBAC", "expansion": "Role-Based Access Control" },
         { "abbr": "RMF",  "expansion": "Risk Management Framework" },
+        { "abbr": "SCCM", "expansion": "System Center Configuration Manager (Microsoft)" },
+        { "abbr": "SIEM", "expansion": "Security Information and Event Management" },
         { "abbr": "SP",   "expansion": "Special Publication (NIST series)" },
         { "abbr": "SSP",  "expansion": "System Security Plan" },
         { "abbr": "STIG", "expansion": "Security Technical Implementation Guide" }
     ],
 
     "references": [
-        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",       "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",          "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
         { "label": "NIST SP 800-128 — Security-Focused Configuration Management","url": "https://csrc.nist.gov/pubs/sp/800/128/final" },
-        { "label": "NIST SP 800-37 r2 — Risk Management Framework",            "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
-        { "label": "NIST SP 800-160 v1 — Systems Security Engineering",        "url": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final" }
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",              "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-137 — Information Security Continuous Monitoring","url": "https://csrc.nist.gov/pubs/sp/800/137/final" },
+        { "label": "NIST SP 800-160 v1 — Systems Security Engineering",          "url": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final" },
+        { "label": "CNSSI 1253 — Security Categorization and Control Selection for National Security Systems", "url": "https://www.cnss.gov/CNSS/issuances/Instructions.cfm" }
     ]
 }

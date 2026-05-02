@@ -1,7 +1,21 @@
 {# Per-control card fragment loaded by plans.js when the baseline changes.
    No layout extension - this is injected into section 4 of wizard.html.twig.
-   Each card has its own form scope; conditional fields are toggled by CSS
-   classes set on the .plan-control container, not by global show_when. #}
+
+   Phase 2A additions:
+     - Enhancement cards carry a disposition picker (Selected / Inherited /
+       Tailored Out). Tailored Out is the JS-default for enhancements
+       outside the baseline; Selected is the default for in-baseline
+       enhancements; the user can change either.
+     - Each control gets a "Define organizational values" section if the
+       catalog statement contains [Assignment]/[Selection] placeholders.
+       Each ODV is an input keyed by its position-index within the control.
+     - per_control_guidance from the schema (prompts checklist, evidence
+       suggestions, extra fields) renders below the standard form. CM
+       schema does not yet populate this; it lands in Phase 2C.
+
+   Conditional fields in each card are still toggled by CSS classes set
+   on the .plan-control container. New classes: is-selected, is-tailored
+   alongside the existing is-implemented / is-inherited / is-na. #}
 {% import 'macros.html.twig' as ui %}
 
 {% if controls is empty %}
@@ -9,17 +23,24 @@
         No controls in the {{ family|upper }} family match this baseline. Pick a different baseline or check your overlay configuration.
     </p>
 {% else %}
+    {% set base_count = 0 %}{% set enh_count = 0 %}
+    {% for c in controls %}{% if c.is_enhancement %}{% set enh_count = enh_count + 1 %}{% else %}{% set base_count = base_count + 1 %}{% endif %}{% endfor %}
     <p class="plan-control-list__intro">
-        {{ controls|length }} controls and enhancements applicable to this baseline. Skip a card and the plan will render <code>[TO BE COMPLETED]</code> for that control rather than blocking generation.
+        {{ base_count }} base controls and {{ enh_count }} enhancements in the {{ family|upper }} family. Base controls in the selected baseline are required; enhancements can be Selected, Inherited, or Tailored Out (with rationale). Skip a card and the plan will render <code>[TO BE COMPLETED]</code> for that control rather than blocking generation.
     </p>
 
     <div class="plan-control-list">
     {% for c in controls %}
-        <details class="plan-control" data-control-num="{{ c.number }}">
+        {% set guidance = c.guidance|default({}) %}
+        <details class="plan-control{% if c.is_enhancement %} plan-control--enhancement{% endif %}{% if not c.in_baseline %} plan-control--not-in-baseline{% endif %}"
+                 data-control-num="{{ c.number }}"
+                 data-is-enhancement="{{ c.is_enhancement ? '1' : '0' }}"
+                 data-in-baseline="{{ c.in_baseline ? '1' : '0' }}">
             <summary>
                 <span class="plan-control__num">{{ c.number }}</span>
                 <span class="plan-control__title">{{ c.title|editorial_title }}</span>
                 {% if c.is_enhancement %}<span class="plan-control__enh">enhancement of {{ c.parent }}</span>{% endif %}
+                {% if not c.in_baseline %}<span class="plan-control__base-flag">not in baseline</span>{% endif %}
                 <span class="plan-control__status-badge" data-control-status-badge>—</span>
             </summary>
 
@@ -56,7 +77,28 @@
 
                 {# Form: per-control answers #}
                 <div class="plan-control__form">
-                    <div class="form-field">
+
+                    {# Enhancement disposition (enhancements only) #}
+                    {% if c.is_enhancement %}
+                        <div class="form-field">
+                            <label>Disposition</label>
+                            <select data-control-num="{{ c.number }}" data-control-key="disposition" data-control-disposition>
+                                <option value="Selected">Selected</option>
+                                <option value="Inherited">Inherited</option>
+                                <option value="Tailored Out"{% if not c.in_baseline %} selected{% endif %}>Tailored Out</option>
+                            </select>
+                            <span class="form-field__hint">Default for in-baseline enhancements is <em>Selected</em>; for out-of-baseline, <em>Tailored Out</em>. Either way, document the choice.</span>
+                        </div>
+
+                        {# Tailoring rationale: only when Tailored Out #}
+                        <div class="form-field plan-control__when-tailored">
+                            <label>Tailoring rationale</label>
+                            <textarea rows="3" data-control-num="{{ c.number }}" data-control-key="disposition_rationale" placeholder="Why is this enhancement not applicable to this system? Reference baseline scope, system characteristics, or compensating controls."></textarea>
+                        </div>
+                    {% endif %}
+
+                    {# Implementation status: shown for base controls always, and for Selected/Inherited enhancements #}
+                    <div class="form-field plan-control__when-active">
                         <label>Implementation status</label>
                         <select data-control-num="{{ c.number }}" data-control-key="status" data-control-status>
                             <option value="">— Select —</option>
@@ -68,39 +110,141 @@
                         </select>
                     </div>
 
-                    <div class="form-field plan-control__when-implemented">
+                    <div class="form-field plan-control__when-active plan-control__when-implemented">
                         <label>Implementation narrative</label>
                         <textarea rows="5" data-control-num="{{ c.number }}" data-control-key="narrative" placeholder="How is this control satisfied? Tools, processes, frequencies, responsible parties."></textarea>
                     </div>
 
-                    <div class="form-field plan-control__when-inherited">
+                    <div class="form-field plan-control__when-active plan-control__when-inherited">
                         <label>Inheritance provider</label>
                         <input type="text" data-control-num="{{ c.number }}" data-control-key="inheritance_provider" placeholder="e.g., Enterprise IAM Service">
                     </div>
-                    <div class="form-field plan-control__when-inherited">
+                    <div class="form-field plan-control__when-active plan-control__when-inherited">
                         <label>Inheritance details</label>
                         <textarea rows="3" data-control-num="{{ c.number }}" data-control-key="inheritance_details" placeholder="Reference the provider's authorization, MOU, or boundary documentation."></textarea>
                     </div>
 
-                    <div class="form-field plan-control__when-na">
+                    <div class="form-field plan-control__when-active plan-control__when-na">
                         <label>Not Applicable rationale</label>
                         <textarea rows="3" data-control-num="{{ c.number }}" data-control-key="na_rationale" placeholder="Justify why this control does not apply."></textarea>
                     </div>
 
-                    <div class="form-field">
+                    <div class="form-field plan-control__when-active">
                         <label>Responsible role</label>
                         <input type="text" data-control-num="{{ c.number }}" data-control-key="responsible_role" placeholder="Role accountable for this control">
                     </div>
 
-                    <div class="form-field">
+                    <div class="form-field plan-control__when-active">
                         <label>Evidence / artifacts</label>
                         <div class="form-field__list" data-control-num="{{ c.number }}" data-control-key="evidence">
                             <ul class="form-field__list-items"></ul>
                             <button type="button" class="cta-secondary form-field__list-add" onclick="planWizard.listAdd(this)">
                                 <i class="bi bi-plus" aria-hidden="true"></i> Add evidence
                             </button>
+                            {% if guidance.evidence_suggestions is defined and guidance.evidence_suggestions %}
+                                <div class="form-field__suggestions">
+                                    <span class="form-field__suggestions-label">Suggested:</span>
+                                    {% for s in guidance.evidence_suggestions %}
+                                        <button type="button" class="chip plan-control__suggestion-chip"
+                                                onclick="planWizard.evidenceSuggestionAdd(this, {{ s|json_encode|escape('html_attr') }})">
+                                            + {{ s }}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
+
+                    {# Implementation prompts checklist (per_control_guidance) #}
+                    {% if guidance.prompts is defined and guidance.prompts %}
+                        <div class="form-field plan-control__when-active">
+                            <label>Things to address in your narrative</label>
+                            <ul class="plan-control__prompts">
+                                {% for p in guidance.prompts %}
+                                    <li>{{ p }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {# Extra structured fields (per_control_guidance) #}
+                    {% if guidance.extra_fields is defined and guidance.extra_fields %}
+                        {% for f in guidance.extra_fields %}
+                            <div class="form-field plan-control__when-active{% if f.show_when_status is defined %} plan-control__extra-conditional{% endif %}"
+                                 {% if f.show_when_status is defined %}data-extra-show-when-status="{{ f.show_when_status|join(',') }}"{% endif %}>
+                                <label>{{ f.label }}</label>
+                                {% if f.type == 'textarea' %}
+                                    <textarea rows="{{ f.rows|default(3) }}" data-control-num="{{ c.number }}" data-control-extra-key="{{ f.id }}" placeholder="{{ f.placeholder|default('') }}"></textarea>
+                                {% elseif f.type == 'list' %}
+                                    <div class="form-field__list" data-control-num="{{ c.number }}" data-control-extra-key="{{ f.id }}">
+                                        <ul class="form-field__list-items"></ul>
+                                        <button type="button" class="cta-secondary form-field__list-add" onclick="planWizard.listAdd(this)">
+                                            <i class="bi bi-plus" aria-hidden="true"></i> Add
+                                        </button>
+                                        {% if f.suggestions is defined and f.suggestions %}
+                                            <div class="form-field__suggestions">
+                                                <span class="form-field__suggestions-label">Suggested:</span>
+                                                {% for s in f.suggestions %}
+                                                    <button type="button" class="chip plan-control__suggestion-chip"
+                                                            onclick="planWizard.evidenceSuggestionAdd(this, {{ s|json_encode|escape('html_attr') }})">
+                                                        + {{ s }}
+                                                    </button>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% elseif f.type == 'select' %}
+                                    <select data-control-num="{{ c.number }}" data-control-extra-key="{{ f.id }}">
+                                        <option value="">— Select —</option>
+                                        {% for opt in f.options %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}
+                                    </select>
+                                {% elseif f.type == 'multi_select' %}
+                                    <div class="form-field__multiselect" data-control-num="{{ c.number }}" data-control-extra-key="{{ f.id }}" data-multi-select="1">
+                                        {% for opt in f.options %}
+                                            <label class="form-field__multiselect-opt">
+                                                <input type="checkbox" value="{{ opt }}"> {{ opt }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <input type="text" data-control-num="{{ c.number }}" data-control-extra-key="{{ f.id }}" placeholder="{{ f.placeholder|default('') }}">
+                                {% endif %}
+                                {% if f.help is defined %}<span class="form-field__hint">{{ f.help }}</span>{% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {# ODVs - organization-defined values from the catalog #}
+                    {% if c.odvs %}
+                        <div class="plan-control__odvs">
+                            <h5>Define organizational values</h5>
+                            <p class="plan-control__odvs-hint">
+                                The catalog leaves these blanks for the organization. Filling them in here makes the rendered control statement assessable.
+                            </p>
+                            {% for odv in c.odvs %}
+                                <div class="form-field plan-control__odv">
+                                    <label>{{ odv.prompt|default('Define') }}</label>
+                                    {% if odv.kind == 'selection_one' %}
+                                        <select data-control-num="{{ c.number }}" data-control-odv-id="{{ odv.id }}">
+                                            <option value="">— Select —</option>
+                                            {% for opt in odv.options %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}
+                                        </select>
+                                    {% elseif odv.kind == 'selection_many' %}
+                                        <div class="plan-control__odv-checks" data-control-num="{{ c.number }}" data-control-odv-id="{{ odv.id }}" data-control-odv-multi="1">
+                                            {% for opt in odv.options %}
+                                                <label class="plan-control__odv-check">
+                                                    <input type="checkbox" value="{{ opt }}"> {{ opt }}
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <input type="text" data-control-num="{{ c.number }}" data-control-odv-id="{{ odv.id }}" placeholder="e.g., quarterly, the System Owner, within 5 business days">
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
                 </div>
 
             </div>

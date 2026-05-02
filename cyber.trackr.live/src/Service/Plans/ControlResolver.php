@@ -9,7 +9,15 @@ use App\Service\OverlayLoader;
  * 'fedramp-moderate'), returns the ordered list of applicable controls
  * and enhancements from the 800-53 r5 catalog with the data needed by
  * PlanBuilder: number, title, statement text, related controls, linked
- * CCIs, and discussion paragraphs.
+ * CCIs, discussion paragraphs, ODV placeholders.
+ *
+ * Phase 2A change: enhancements are returned for **every** member of
+ * the family regardless of baseline membership - each carries an
+ * `in_baseline` boolean. The wizard surfaces all of them so the user
+ * can disposition tailored-out enhancements explicitly (Selected /
+ * Inherited / Tailored Out + rationale). Base controls still filter
+ * to the baseline since a base control outside the baseline isn't
+ * part of the plan at all.
  *
  * The OverlayLoader does the heavy lifting for "is this control in this
  * baseline?" by mapping XML control numbers to their member overlays.
@@ -26,6 +34,7 @@ class ControlResolver
     public function __construct(
         string $projectDir,
         private OverlayLoader $overlays,
+        private OdvExtractor $odvExtractor,
     ) {
         $this->catalogPath = $projectDir . '/resources/data/rmf/800-53v5-controls.xml';
         $this->cciPath     = $projectDir . '/resources/data/cci/U_CCI_List.xml';
@@ -37,10 +46,12 @@ class ControlResolver
      *   title: string,
      *   is_enhancement: bool,
      *   parent: ?string,
+     *   in_baseline: bool,
      *   statement: string,
      *   discussion: string,
      *   related: string[],
-     *   ccis: array<int, array{id:string, definition:string}>
+     *   ccis: array<int, array{id:string, definition:string}>,
+     *   odvs: array<int, array{id:int, kind:string, prompt:string, options:string[], placeholder:string}>
      * }>
      */
     public function resolve(string $family, string $baselineId): array
@@ -52,34 +63,78 @@ class ControlResolver
         $out = [];
 
         foreach ($catalog->xpath('/controls:controls/controls:control') ?: [] as $ctrl) {
+            $ctrl->registerXPathNamespace('controls', 'http://scap.nist.gov/schema/sp800-53/feed/2.0');
             $ctrl->registerXPathNamespace('aaa', 'http://scap.nist.gov/schema/sp800-53/2.0');
             $number = trim((string) (($ctrl->xpath('./aaa:number')[0] ?? '') ?: ''));
             if ($number === '' || !str_starts_with($number, $familyPrefix)) continue;
 
-            // Skip statement-letter sub-numbers like "CM-1a." which OverlayLoader rejects.
-            if (OverlayLoader::normalize($number) === null) continue;
+            $base = $this->buildEntry($ctrl, $number, false, null, $baselineId);
+            if ($base === null) {
+                // Base control isn't in the selected baseline. Per RMF
+                // semantics, enhancements can't apply without their base,
+                // so skip the entire enhancement walk for this control.
+                // This also keeps the wizard from showing 50+ tailored-out
+                // cards for controls the user isn't considering at all.
+                continue;
+            }
+            $out[] = $base;
 
-            // Filter by selected baseline.
-            $overlaysForControl = $this->overlays->getControlOverlays($number);
-            if (!in_array($baselineId, $overlaysForControl, true)) continue;
-
-            $isEnhancement = (bool) preg_match('/^[A-Z]+-\d+\(\d+\)$/', $number);
-            $parent = $isEnhancement ? preg_replace('/\(\d+\)$/', '', $number) : null;
-
-            $out[] = [
-                'number'         => $number,
-                'title'          => trim((string) (($ctrl->xpath('./aaa:title')[0] ?? '') ?: '')),
-                'is_enhancement' => $isEnhancement,
-                'parent'         => $parent,
-                'statement'      => $this->renderStatement($ctrl),
-                'discussion'     => $this->renderDiscussion($ctrl),
-                'related'        => $this->extractRelated($ctrl),
-                'ccis'           => $this->ccisForControl($number),
-            ];
+            // Walk control-enhancement siblings nested under this control.
+            // The catalog stores them as <control-enhancement> elements
+            // inside a <control-enhancements> wrapper, NOT as top-level
+            // <controls:control>s, so the parent xpath would never see them.
+            // These wrapper + enhancement elements are unprefixed in the
+            // XML, putting them in the default namespace (sp800-53/2.0 =
+            // our 'aaa' prefix) - NOT the 'controls:' (feed/2.0) namespace.
+            foreach ($ctrl->xpath('./aaa:control-enhancements/aaa:control-enhancement') ?: [] as $enh) {
+                $enh->registerXPathNamespace('aaa', 'http://scap.nist.gov/schema/sp800-53/2.0');
+                $enhNumber = trim((string) (($enh->xpath('./aaa:number')[0] ?? '') ?: ''));
+                if ($enhNumber === '') continue;
+                $entry = $this->buildEntry($enh, $enhNumber, true, $number, $baselineId);
+                if ($entry !== null) $out[] = $entry;
+            }
         }
 
         usort($out, fn($a, $b) => $this->compareControlNumbers($a['number'], $b['number']));
         return $out;
+    }
+
+    /**
+     * Builds one resolved-control entry from a SimpleXMLElement representing
+     * either a <control> or a <control-enhancement>. Returns null when the
+     * entry should be filtered out:
+     *   - Statement-letter sub-numbers (CM-1a.) which OverlayLoader rejects
+     *   - Base controls outside the selected baseline
+     */
+    private function buildEntry(\SimpleXMLElement $node, string $number, bool $isEnhancement, ?string $parent, string $baselineId): ?array
+    {
+        if (OverlayLoader::normalize($number) === null) {
+            return null;
+        }
+
+        $inBaseline = in_array($baselineId, $this->overlays->getControlOverlays($number), true);
+
+        // Base controls outside the baseline are skipped entirely.
+        // Enhancements outside the baseline are kept so the wizard can
+        // present a disposition picker (default: Tailored Out).
+        if (!$isEnhancement && !$inBaseline) {
+            return null;
+        }
+
+        $statement = $this->renderStatement($node);
+
+        return [
+            'number'         => $number,
+            'title'          => trim((string) (($node->xpath('./aaa:title')[0] ?? '') ?: '')),
+            'is_enhancement' => $isEnhancement,
+            'parent'         => $parent,
+            'in_baseline'    => $inBaseline,
+            'statement'      => $statement,
+            'discussion'     => $this->renderDiscussion($node),
+            'related'        => $this->extractRelated($node),
+            'ccis'           => $this->ccisForControl($number),
+            'odvs'           => $this->odvExtractor->extract($statement),
+        ];
     }
 
     private function loadCatalog(): ?\SimpleXMLElement

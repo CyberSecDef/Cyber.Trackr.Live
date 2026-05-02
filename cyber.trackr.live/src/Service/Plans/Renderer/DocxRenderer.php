@@ -45,6 +45,17 @@ class DocxRenderer
 
     private function build(array $plan): PhpWord
     {
+        // PHPWord 1.4 does NOT XML-escape body text passed to addText() —
+        // a literal `<env>` or `P&L` in user input produces invalid
+        // document.xml that unzip accepts but Word refuses. Pre-encoding
+        // every string in the plan before it reaches the writer makes
+        // entity-encoded text round-trip correctly: PHPWord writes the
+        // bytes as-is, and Word decodes the entities on open. Catalog
+        // text rarely contains the trio so this is a no-op on it.
+        // Headings are still routed through safeHeading() because the
+        // TOC bug is an entity-rejecting bug — even `&amp;` breaks it.
+        $plan = $this->escapeStringsRecursively($plan);
+
         $phpword = new PhpWord();
 
         $phpword->setDefaultFontName(self::FONT);
@@ -66,6 +77,7 @@ class DocxRenderer
         $this->buildFamilyApproach($phpword, $plan);
         $this->buildControls($phpword, $plan);
         $this->buildContinuousMonitoring($phpword, $plan);
+        $this->buildIntegration($phpword, $plan);
         $this->buildGlossary($phpword, $plan);
         $this->buildAcronyms($phpword, $plan);
         $this->buildReferences($phpword, $plan);
@@ -177,11 +189,67 @@ class DocxRenderer
     private function buildContinuousMonitoring(PhpWord $w, array $plan): void
     {
         $cm = $plan['body']['continuous_monitoring'] ?? [];
-        if (empty($cm['narrative'])) return;
+        if (empty($cm['narrative']) && empty($cm['sub_sections'])) return;
 
         $section = $w->addSection();
         $section->addTitle($this->safeHeading('6. ' . ($cm['title'] ?? 'Continuous Monitoring')), 1);
-        $this->addPreservedText($section, (string) $cm['narrative']);
+        if (!empty($cm['narrative'])) {
+            $this->addPreservedText($section, (string) $cm['narrative']);
+        }
+        foreach ($cm['sub_sections'] ?? [] as $i => $sub) {
+            $this->renderFamilySubSection($section, $sub, '6.' . ($i + 1));
+        }
+    }
+
+    private function buildIntegration(PhpWord $w, array $plan): void
+    {
+        $integ = $plan['body']['integration'] ?? [];
+        if (empty($integ['narrative']) && empty($integ['sub_sections'])) return;
+
+        $section = $w->addSection();
+        $section->addTitle($this->safeHeading('7. ' . ($integ['title'] ?? 'Integration with Other RMF Artifacts')), 1);
+        if (!empty($integ['narrative'])) {
+            $this->addPreservedText($section, (string) $integ['narrative']);
+        }
+        foreach ($integ['sub_sections'] ?? [] as $i => $sub) {
+            $this->renderFamilySubSection($section, $sub, '7.' . ($i + 1));
+        }
+    }
+
+    /**
+     * Renders one family sub-section (group of structured fields) as an
+     * H3 followed by a 2-column table of {field label → user value}.
+     * Empty fields render with the Todo style.
+     */
+    private function renderFamilySubSection(Section $section, array $sub, string $sectionNum): void
+    {
+        $heading = $sectionNum . ' ' . ($sub['label'] ?? '');
+        $section->addTitle($this->safeHeading($heading), 3);
+
+        if (!empty($sub['description'])) {
+            $section->addText((string) $sub['description'], 'Muted');
+        }
+
+        if (empty($sub['fields'])) return;
+
+        $table = $section->addTable('PlanTable');
+        foreach ($sub['fields'] as $f) {
+            $table->addRow();
+            $labelCell = $table->addCell(2800, ['bgColor' => 'f5f5f5']);
+            $labelCell->addText((string) ($f['label'] ?? ''), ['bold' => true, 'size' => 9]);
+            $valueCell = $table->addCell(8000);
+            $val = $f['value'] ?? null;
+            $hasValue = !empty($f['has_value']);
+            if (!$hasValue) {
+                $valueCell->addText('[TO BE COMPLETED]', 'Todo');
+            } elseif (is_array($val)) {
+                foreach ($val as $item) {
+                    $valueCell->addListItem((string) $item);
+                }
+            } else {
+                $this->addPreservedText($valueCell, (string) $val);
+            }
+        }
     }
 
     private function buildAcronyms(PhpWord $w, array $plan): void
@@ -220,6 +288,20 @@ class DocxRenderer
 
         $section->addTitle('1.4 References', 2);
         $this->addLinkList($section, $intro['references'] ?? []);
+
+        // Phase 2B: §1.5 Common Control Inheritance reminder
+        $reminder = $plan['body']['inheritance_reminder'] ?? [];
+        if (!empty($reminder['commonly_inheritable'])) {
+            $section->addTitle('1.5 Common Control Inheritance', 2);
+            $section->addText(
+                'Some controls in the ' . ($reminder['family_name'] ?? '') . ' family are typically inherited from a common control provider rather than implemented at the system level. Before defaulting to "Implemented" for any control in section 5, verify whether your organization has an authoritative inheritance source. Commonly inheritable controls in this family:'
+            );
+            foreach ($reminder['commonly_inheritable'] as $entry) {
+                $run = $section->addTextRun(['spaceAfter' => 60]);
+                $run->addText('• ' . ($entry['number'] ?? '') . ' — typically inherited from ', null);
+                $run->addText((string) ($entry['from'] ?? ''), ['italic' => true]);
+            }
+        }
     }
 
     private function buildSystemOverview(PhpWord $w, array $plan): void
@@ -241,6 +323,13 @@ class DocxRenderer
             if (!empty($sys['environment']))    $line .= 'Environment: ' . $sys['environment'] . '. ';
             if (!empty($sys['classification'])) $line .= 'Classification: ' . $sys['classification'] . '.';
             $section->addText(trim($line));
+        }
+
+        // Phase 2B: family-defined sub-sections under System Overview (e.g. CI methodology)
+        $idx = 3;
+        foreach ($sys['sub_sections'] ?? [] as $sub) {
+            $this->renderFamilySubSection($section, $sub, '2.' . $idx);
+            $idx++;
         }
     }
 
@@ -266,6 +355,12 @@ class DocxRenderer
         $approach = $plan['body']['family_approach'] ?? [];
         $section->addTitle($this->safeHeading('4. ' . ($approach['title'] ?? 'Approach')), 1);
         $this->addPreservedText($section, (string) ($approach['narrative'] ?? ''));
+
+        // Phase 2B: structured sub-sections (CCB, audit strategy,
+        // exception management, hardening sources, doc control, etc.)
+        foreach ($approach['sub_sections'] ?? [] as $i => $sub) {
+            $this->renderFamilySubSection($section, $sub, '4.' . ($i + 1));
+        }
     }
 
     private function buildControls(PhpWord $w, array $plan): void
@@ -279,32 +374,122 @@ class DocxRenderer
             return;
         }
 
-        $section->addText(count($controls) . ' controls and enhancements applicable to this baseline.', 'Muted');
+        $totalControls = count($controls);
+        $totalEnhancements = 0;
+        foreach ($controls as $c) {
+            $totalEnhancements += count($c['enhancements'] ?? []);
+        }
+        $section->addText(
+            $totalControls . ' base controls and ' . $totalEnhancements . ' enhancements documented in this section.',
+            'Muted'
+        );
 
         foreach ($controls as $i => $c) {
-            $heading = '5.' . ($i + 1) . ' ' . ($c['number'] ?? '') . ' — ' . $this->titleCase($c['title'] ?? '');
-            if (!empty($c['is_enhancement'])) {
-                $heading .= ' (enhancement of ' . ($c['parent'] ?? '') . ')';
-            }
-            $section->addTitle($this->safeHeading($heading), 2);
+            $this->renderOneControl($section, $c, '5.' . ($i + 1), false);
 
-            // Status line
-            $statusRun = $section->addTextRun(['spaceAfter' => 80]);
+            // Enhancements inline under their parent base control
+            foreach ($c['enhancements'] ?? [] as $j => $e) {
+                $this->renderOneControl($section, $e, '5.' . ($i + 1) . '.' . ($j + 1), true);
+            }
+        }
+    }
+
+    /**
+     * Renders one control (base or enhancement) into the given section.
+     * Enhancements with disposition "Tailored Out" or "Inherited" get a
+     * compact form (rationale or inheritance details only); Selected
+     * enhancements and base controls render the full form.
+     */
+    private function renderOneControl(Section $section, array $c, string $sectionNum, bool $isEnhancement): void
+    {
+        $heading = $sectionNum . ' ' . ($c['number'] ?? '') . ' — ' . $this->titleCase($c['title'] ?? '');
+        if ($isEnhancement) {
+            $heading .= ' (enhancement)';
+        }
+        $section->addTitle($this->safeHeading($heading), 2);
+
+        // Status / disposition line
+        $statusRun = $section->addTextRun(['spaceAfter' => 80]);
+        if ($isEnhancement) {
+            $disp = $c['disposition'] ?: 'Selected';
+            $statusRun->addText('Disposition: ', ['bold' => true]);
+            $statusRun->addText($disp);
+            if ($disp === 'Selected' && !empty($c['answers']['status'])) {
+                $statusRun->addText('   Status: ', ['bold' => true]);
+                $statusRun->addText($c['answers']['status']);
+            }
+        } else {
             $statusRun->addText('Status: ', ['bold' => true]);
             $statusRun->addText($c['answers']['status'] ?? '[TO BE COMPLETED]', $c['answers']['status'] ? null : 'Todo');
+        }
 
-            // Statement
-            if (!empty($c['statement'])) {
-                $section->addTitle('Control statement', 3);
-                $this->addCodeBlock($section, $c['statement']);
+        // Statement (with ODVs substituted + bolded)
+        if (!empty($c['statement_segments'])) {
+            $section->addTitle('Control statement', 3);
+            $this->addStatementSegments($section, $c['statement_segments']);
+        }
+
+        // Tailored Out enhancements: rationale only
+        if ($isEnhancement && ($c['disposition'] ?? null) === 'Tailored Out') {
+            $section->addTitle('Tailoring rationale', 3);
+            $rationale = $c['disposition_rationale'] ?: '[TO BE COMPLETED: tailoring rationale]';
+            $section->addText($rationale, $c['disposition_rationale'] ? null : 'Todo');
+            return;
+        }
+
+        // Inherited disposition: surface the inheritance details directly
+        if ($isEnhancement && ($c['disposition'] ?? null) === 'Inherited') {
+            $section->addTitle('Inheritance', 3);
+            $section->addText('Inherited from: ' . ($c['answers']['inheritance_provider'] ?: '[TO BE COMPLETED]'), ['bold' => true]);
+            if (!empty($c['answers']['inheritance_details'])) {
+                $this->addPreservedText($section, $c['answers']['inheritance_details']);
             }
-
-            // Implementation block
-            $section->addTitle('Implementation', 3);
-            $this->addImplementationBlock($section, $c);
-
-            // Meta
             $this->addControlMeta($section, $c);
+            return;
+        }
+
+        // Selected enhancement or base control: full implementation block
+        $section->addTitle('Implementation', 3);
+        $this->addImplementationBlock($section, $c);
+        $this->addControlMeta($section, $c);
+    }
+
+    /**
+     * Adds a control statement preserving line breaks AND bolding any
+     * ODV-substituted segments. Leans on the segmented form produced
+     * by OdvExtractor::tokenize() in PlanBuilder.
+     */
+    private function addStatementSegments(Section $section, array $segments): void
+    {
+        if (empty($segments)) return;
+
+        $run = $section->addTextRun(['spaceAfter' => 200, 'shading' => ['fill' => 'f5f5f5']]);
+        foreach ($segments as $seg) {
+            if (($seg['type'] ?? '') === 'odv') {
+                $style = !empty($seg['filled']) ? ['name' => self::FONT_MONO, 'size' => 10, 'bold' => true]
+                                                : ['name' => self::FONT_MONO, 'size' => 10, 'bold' => true, 'color' => '7A1E1E', 'italic' => true];
+                $this->addRunWithBreaks($run, $seg['value'], $style);
+            } else {
+                $this->addRunWithBreaks($run, $seg['value'] ?? '', 'CodeFont');
+            }
+        }
+    }
+
+    /**
+     * PHPWord text runs don't honor \n — split and emit textBreaks.
+     * Style passed through to addText.
+     *
+     * @param string|array $style
+     */
+    private function addRunWithBreaks($run, string $text, $style): void
+    {
+        if ($text === '') return;
+        $lines = preg_split('/\r?\n/', $text);
+        $first = true;
+        foreach ($lines as $line) {
+            if (!$first) $run->addTextBreak();
+            $run->addText($line, $style);
+            $first = false;
         }
     }
 
@@ -377,6 +562,32 @@ class DocxRenderer
             $ids = array_map(fn($x) => $x['id'] ?? '', $c['ccis']);
             $addRow('Linked CCIs (' . count($ids) . ')', implode(', ', $ids));
         }
+
+        // Per-control "extras" populated by Phase 2C schema (CM-7 allowed
+        // services, CM-8 inventory attributes, etc.). Iterates the schema-
+        // ordered extras_rendered list so labels come from the schema rather
+        // than humanized field IDs, and unfilled fields render as [TO BE
+        // COMPLETED] so the assessor sees the gap.
+        if (!empty($c['extras_rendered']) && is_array($c['extras_rendered'])) {
+            foreach ($c['extras_rendered'] as $f) {
+                $label = (string) ($f['label'] ?? '');
+                if (empty($f['has_value'])) {
+                    $addRow($label, '[TO BE COMPLETED]', 'Todo');
+                    continue;
+                }
+                $val = $f['value'];
+                if (is_array($val)) {
+                    $table->addRow();
+                    $table->addCell(2800, ['bgColor' => 'f5f5f5'])->addText($label, ['bold' => true, 'size' => 9]);
+                    $cell = $table->addCell(8000);
+                    foreach ($val as $item) {
+                        $cell->addListItem((string) $item);
+                    }
+                } else {
+                    $addRow($label, (string) $val);
+                }
+            }
+        }
     }
 
     private function buildGlossary(PhpWord $w, array $plan): void
@@ -407,13 +618,14 @@ class DocxRenderer
 
     /**
      * Adds text preserving line breaks. PHPWord's addText doesn't honor \n;
-     * use addTextRun with addTextBreak between lines.
+     * use addTextRun with addTextBreak between lines. Container can be any
+     * PHPWord element exposing addTextRun() — Section, Cell, TextRun, etc.
      */
-    private function addPreservedText(Section $section, string $text): void
+    private function addPreservedText($container, string $text): void
     {
         if ($text === '') return;
         $lines = preg_split('/\r?\n/', $text);
-        $run = $section->addTextRun();
+        $run = $container->addTextRun();
         $first = true;
         foreach ($lines as $line) {
             if (!$first) $run->addTextBreak();
@@ -442,11 +654,37 @@ class DocxRenderer
      * Strips characters that PHPWord 1.4's TOC field rendering fails to
      * XML-escape when it copies heading text into <w:hyperlink><w:t>.
      * The canonical XML-illegal trio is &, <, >; we replace & with "and"
-     * (most natural in titles) and strip the other two outright.
+     * (most natural in titles) and strip the other two outright. Headings
+     * can't use entity encoding because the TOC bug rejects even `&amp;`.
      */
     private function safeHeading(string $s): string
     {
+        // Decode any entity-encoded chars that came from
+        // escapeStringsRecursively() so the heading sanitiser sees the
+        // raw chars, then strip / replace them.
+        $s = html_entity_decode($s, ENT_XML1 | ENT_QUOTES, 'UTF-8');
         return strtr($s, ['&' => 'and', '<' => '', '>' => '']);
+    }
+
+    /**
+     * Walks the plan structure and XML-encodes every string value with
+     * htmlspecialchars(ENT_XML1). PHPWord 1.4's writer treats text as
+     * already-escaped and emits it verbatim into <w:t>; pre-encoding is
+     * the simplest way to dodge that without monkey-patching the writer.
+     */
+    private function escapeStringsRecursively($value)
+    {
+        if (is_string($value)) {
+            return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        }
+        if (is_array($value)) {
+            $out = [];
+            foreach ($value as $k => $v) {
+                $out[$k] = $this->escapeStringsRecursively($v);
+            }
+            return $out;
+        }
+        return $value;
     }
 
     /**

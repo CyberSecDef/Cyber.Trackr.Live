@@ -81,7 +81,17 @@ class PlansController extends AbstractController
         }
 
         $controls = $resolver->resolve(strtoupper($family), $baseline);
-        $shared = $registry->getShared();
+        $schema   = $registry->getSchema($family) ?? [];
+        $shared   = $registry->getShared();
+
+        // Inline per-control guidance from the schema onto the resolver
+        // output so the fragment template doesn't need to do dictionary
+        // lookups itself.
+        $guidance = $schema['per_control_guidance'] ?? [];
+        foreach ($controls as &$c) {
+            $c['guidance'] = $guidance[$c['number']] ?? [];
+        }
+        unset($c);
 
         return $this->render('plans/_control_cards.html.twig', [
             'family'           => strtolower($family),

@@ -17,6 +17,7 @@ class PlanBuilder
     public function __construct(
         private PlanRegistry $registry,
         private ControlResolver $resolver,
+        private OdvExtractor $odvExtractor,
     ) {}
 
     /**
@@ -43,18 +44,39 @@ class PlanBuilder
         $baseline = (string) ($answers['baseline'] ?? '');
         $controlAns = $answers['controls'] ?? [];
 
-        $controls = $baseline !== ''
+        $resolved = $baseline !== ''
             ? $this->resolver->resolve(strtoupper($family), $baseline)
             : [];
 
-        // Merge user-supplied per-control answers onto the resolved
-        // catalog data. Controls without answers get an empty answers
-        // sub-key so the renderer always sees the same shape - missing
-        // fields render as [TO BE COMPLETED] downstream.
-        foreach ($controls as &$c) {
-            $c['answers'] = $this->normalizeControlAnswers($controlAns[$c['number']] ?? []);
+        // Merge user answers onto the resolved catalog data, then
+        // group enhancements under their parent base controls.
+        $perControlGuidance = $schema['per_control_guidance'] ?? [];
+        foreach ($resolved as &$c) {
+            $userControl = $controlAns[$c['number']] ?? [];
+            $c['answers']         = $this->normalizeControlAnswers($userControl);
+            $c['odv_values']      = is_array($userControl['odv'] ?? null) ? $userControl['odv'] : [];
+            $c['extras']          = is_array($userControl['extras'] ?? null) ? $userControl['extras'] : [];
+            $c['disposition']     = $userControl['disposition'] ?? ($c['is_enhancement'] && !$c['in_baseline'] ? 'Tailored Out' : null);
+            $c['disposition_rationale'] = $userControl['disposition_rationale'] ?? null;
+            $c['statement_segments']    = $this->odvExtractor->tokenize(
+                $c['statement'],
+                $c['odvs'],
+                $c['odv_values']
+            );
+            $c['guidance']         = $perControlGuidance[$c['number']] ?? [];
+            $c['extras_rendered']  = $this->prepareExtrasForRender($c['guidance'], $c['extras']);
         }
         unset($c);
+
+        // Group enhancements under their parent base control. Renderers
+        // walk top-level entries; enhancements live in $base['enhancements'].
+        $controls = $this->groupEnhancementsUnderParents($resolved);
+
+        // Phase 2B: walk grouped family_questions and bucket the user's
+        // answers per group, sorted by their target document section.
+        // Renderers iterate body.family_sections to render structured
+        // sub-sections for CCB, audit strategy, drift detection, etc.
+        $familySections = $this->buildFamilySections($schema['family_questions'] ?? [], $famAns);
 
         return [
             'meta' => [
@@ -89,10 +111,15 @@ class PlanBuilder
                     'audience'   => 'System owner, ISSO, ISSM, assessors, auditors, and personnel involved in the configuration management of the system.',
                     'references' => $schema['references'] ?? [],
                 ],
+                'inheritance_reminder' => [
+                    'commonly_inheritable' => $schema['commonly_inheritable_controls'] ?? [],
+                    'family_name'          => $schema['family_name'] ?? '',
+                ],
                 'system_overview' => [
-                    'description' => $system['boundary_description'] ?? '[TO BE COMPLETED]',
-                    'environment' => $system['environment'] ?? '',
+                    'description'    => $system['boundary_description'] ?? '[TO BE COMPLETED]',
+                    'environment'    => $system['environment']    ?? '',
                     'classification' => $system['classification'] ?? '',
+                    'sub_sections'   => $familySections['system_overview'] ?? [],
                 ],
                 'roles' => [
                     ['role' => 'System Owner',  'name' => $system['system_owner'] ?? '[TO BE COMPLETED]'],
@@ -100,14 +127,20 @@ class PlanBuilder
                     ['role' => 'ISSM',          'name' => $system['issm']         ?? '[TO BE COMPLETED]'],
                 ],
                 'family_approach' => [
-                    'title'   => $schema['approach_section_title'] ?? 'Approach',
-                    'narrative' => $this->renderTemplate($schema['approach_template'] ?? '', $system + $famAns),
-                    'family_answers' => $famAns,
+                    'title'        => $schema['approach_section_title'] ?? 'Approach',
+                    'narrative'    => $this->renderTemplate($schema['approach_template'] ?? '', $system + $famAns),
+                    'sub_sections' => $familySections['approach'] ?? [],
                 ],
                 'controls' => $controls,
                 'continuous_monitoring' => [
-                    'title'     => $schema['continuous_monitoring_section_title'] ?? 'Continuous Monitoring',
-                    'narrative' => $this->renderTemplate($schema['continuous_monitoring_template'] ?? '', $system + $famAns),
+                    'title'        => $schema['continuous_monitoring_section_title'] ?? 'Continuous Monitoring',
+                    'narrative'    => $this->renderTemplate($schema['continuous_monitoring_template'] ?? '', $system + $famAns),
+                    'sub_sections' => $familySections['continuous_monitoring'] ?? [],
+                ],
+                'integration' => [
+                    'title'        => $schema['integration_section_title'] ?? 'Integration with Other RMF Artifacts',
+                    'narrative'    => $this->renderTemplate($schema['integration_template'] ?? '', $system + $famAns),
+                    'sub_sections' => $familySections['integration'] ?? [],
                 ],
             ],
             'back_matter' => [
@@ -134,6 +167,134 @@ class PlanBuilder
             }
             return (string) $val;
         }, $template) ?? $template;
+    }
+
+    /**
+     * Walks grouped family_questions and produces a map keyed by the
+     * group's `section` attribute. Each section maps to a list of
+     * sub-sections, each carrying a label, description, and the user's
+     * answers paired with their field metadata. Flat (non-grouped)
+     * questions land under section 'approach' by default.
+     *
+     * @return array<string, array<int, array{
+     *   id: string,
+     *   label: string,
+     *   description: string,
+     *   fields: array<int, array{id:string, label:string, type:string, value:mixed, has_value:bool}>
+     * }>>
+     */
+    private function buildFamilySections(array $familyQuestions, array $answers): array
+    {
+        $out = [];
+        foreach ($familyQuestions as $entry) {
+            $isGroup = ($entry['type'] ?? null) === 'group';
+            $section = $entry['section'] ?? 'approach';
+
+            if ($isGroup) {
+                $fields = [];
+                foreach ($entry['questions'] ?? [] as $q) {
+                    $fields[] = $this->prepareFieldEntry($q, $answers);
+                }
+                $out[$section][] = [
+                    'id'          => (string) ($entry['id'] ?? ''),
+                    'label'       => (string) ($entry['label'] ?? ''),
+                    'description' => (string) ($entry['description'] ?? ''),
+                    'fields'      => $fields,
+                ];
+            } else {
+                // Flat question - bucket each individually so old schemas
+                // without groups still produce something usable.
+                $out[$section][] = [
+                    'id'          => (string) ($entry['id'] ?? ''),
+                    'label'       => (string) ($entry['label'] ?? ''),
+                    'description' => '',
+                    'fields'      => [$this->prepareFieldEntry($entry, $answers)],
+                ];
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Pairs the schema's per-control extra_fields metadata (label, type)
+     * with the user's per-control extras values. Returns an ordered list
+     * matching the schema's field order so the rendered output reads
+     * predictably regardless of how the JSON keys were serialized. Fields
+     * not yet answered get has_value=false so renderers can stub them.
+     *
+     * @return array<int, array{id:string, label:string, type:string, value:mixed, has_value:bool}>
+     */
+    private function prepareExtrasForRender(array $guidance, array $extras): array
+    {
+        $fields = $guidance['extra_fields'] ?? [];
+        if (empty($fields)) return [];
+
+        $out = [];
+        foreach ($fields as $f) {
+            $id = (string) ($f['id'] ?? '');
+            if ($id === '') continue;
+            $value = $extras[$id] ?? null;
+            $hasValue = !($value === null || $value === '' || $value === []);
+            $out[] = [
+                'id'        => $id,
+                'label'     => (string) ($f['label'] ?? $id),
+                'type'      => (string) ($f['type'] ?? 'text'),
+                'value'     => $value,
+                'has_value' => $hasValue,
+            ];
+        }
+        return $out;
+    }
+
+    private function prepareFieldEntry(array $q, array $answers): array
+    {
+        $id = (string) ($q['id'] ?? '');
+        $value = $answers[$id] ?? null;
+        $hasValue = !($value === null || $value === '' || $value === []);
+        return [
+            'id'        => $id,
+            'label'     => (string) ($q['label'] ?? ''),
+            'type'      => (string) ($q['type'] ?? 'text'),
+            'value'     => $value,
+            'has_value' => $hasValue,
+        ];
+    }
+
+    /**
+     * Walks the resolved-control list (which mixes base controls and their
+     * enhancements in document order) and attaches each enhancement to its
+     * parent base under an `enhancements` key. Returns just the base
+     * controls. Renderers display enhancements inline within their parent
+     * section, so this avoids duplicate iteration logic in every renderer.
+     *
+     * Orphan enhancements (no parent in the list, e.g. parent base wasn't
+     * in the baseline) get attached to a synthetic parent key 'orphan'
+     * which renderers can choose to ignore or to render at the end.
+     */
+    private function groupEnhancementsUnderParents(array $controls): array
+    {
+        $bases = [];
+        $enhancements = [];
+        foreach ($controls as $c) {
+            if ($c['is_enhancement']) {
+                $enhancements[] = $c;
+            } else {
+                $c['enhancements'] = [];
+                $bases[$c['number']] = $c;
+            }
+        }
+        foreach ($enhancements as $e) {
+            $parent = $e['parent'];
+            if ($parent !== null && isset($bases[$parent])) {
+                $bases[$parent]['enhancements'][] = $e;
+            }
+            // If the parent base isn't in the baseline, the enhancement is
+            // dropped silently. This matches RMF semantics: an enhancement
+            // can't be assessed if its base control isn't part of the
+            // package - the catalog implicitly requires the base for
+            // enhancements to apply.
+        }
+        return array_values($bases);
     }
 
     /**

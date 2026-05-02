@@ -458,6 +458,141 @@
     border-radius: var(--radius-md);
 }
 
+/* Phase 2B: grouped family questions inside a wizard section */
+.plan-wizard__group-host {
+    gap: var(--space-3);
+}
+
+.plan-wizard__group {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.plan-wizard__group > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    transition: background-color 0.1s ease;
+}
+
+.plan-wizard__group > summary::-webkit-details-marker {
+    display: none;
+}
+
+.plan-wizard__group > summary::after {
+    content: '+';
+    color: var(--text-muted);
+    font-size: 16px;
+    margin-left: var(--space-2);
+}
+
+.plan-wizard__group[open] > summary::after {
+    content: '−';
+}
+
+.plan-wizard__group > summary:hover {
+    background: var(--surface-2);
+}
+
+.plan-wizard__group-label {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    color: var(--text);
+    flex: 1;
+}
+
+.plan-wizard__group-section {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: var(--radius-md);
+}
+
+.plan-wizard__group-body {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.plan-wizard__group-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0 0 6px;
+}
+
+/* Multi-select checkbox group field */
+.form-field__multiselect {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 0;
+}
+
+.form-field__multiselect-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.form-field__multiselect-opt input[type="checkbox"] {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+/* Plan preview sub-section styling */
+.plan-preview__sub-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 8px;
+    font-style: italic;
+}
+
+.plan-preview__sub-fields {
+    display: grid;
+    grid-template-columns: minmax(200px, 280px) 1fr;
+    gap: 6px var(--space-4);
+    margin: 0 0 var(--space-4);
+}
+
+.plan-preview__sub-fields dt {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding-top: 2px;
+}
+
+.plan-preview__sub-fields dd {
+    margin: 0;
+    color: var(--text);
+}
+
+.plan-preview__sub-fields dd ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.plan-preview__sub-fields dd.plan-preview__todo {
+    color: var(--accent);
+    font-style: italic;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
 .plan-wizard__footer {
     margin-top: var(--space-5);
     color: var(--text-muted);
@@ -663,13 +798,144 @@
 /* Conditional fields toggled by status class on .plan-control */
 .plan-control__when-implemented,
 .plan-control__when-inherited,
-.plan-control__when-na {
+.plan-control__when-na,
+.plan-control__when-tailored,
+.plan-control__when-active {
     display: none;
 }
 
 .plan-control.is-implemented   .plan-control__when-implemented { display: flex; }
 .plan-control.is-inherited     .plan-control__when-inherited   { display: flex; }
 .plan-control.is-na            .plan-control__when-na          { display: flex; }
+
+/* Disposition-driven (enhancements only):
+   - Selected enhancements + base controls show the full active form
+   - Tailored Out enhancements hide the form, show only the rationale
+   - Inherited (disposition) enhancements show the inheritance fields */
+.plan-control.is-selected         .plan-control__when-active     { display: flex; }
+.plan-control.is-tailored         .plan-control__when-tailored   { display: flex; }
+.plan-control.is-disp-inherited   .plan-control__when-active     { display: flex; }
+.plan-control.is-disp-inherited   .plan-control__when-inherited  { display: flex; }
+
+/* Visual differentiation for tailored-out enhancements - dim the card
+   so the user's eye knows it's not part of the active scope. */
+.plan-control--enhancement.is-tailored {
+    opacity: 0.85;
+}
+
+.plan-control--enhancement.is-tailored .plan-control__sidebar {
+    opacity: 0.7;
+}
+
+.plan-control__base-flag,
+.plan-control__enh {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.plan-control__base-flag {
+    background: color-mix(in srgb, var(--text-muted) 12%, var(--surface));
+}
+
+/* Status badge variants for new states */
+.plan-control__status-badge--tailored-out {
+    background: color-mix(in srgb, var(--text-muted) 18%, var(--surface));
+    color: var(--text-muted);
+    border-color: color-mix(in srgb, var(--text-muted) 40%, var(--border));
+}
+
+.plan-control__status-badge--selected {
+    background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+
+/* Suggestions row inside form-field__list (evidence_suggestions) */
+.form-field__suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.form-field__suggestions-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.plan-control__suggestion-chip {
+    cursor: pointer;
+    font-size: 11px;
+    padding: 3px 8px;
+}
+
+/* Implementation prompts checklist */
+.plan-control__prompts {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.plan-control__prompts li {
+    line-height: 1.5;
+    margin-bottom: 2px;
+}
+
+/* ODV section per control */
+.plan-control__odvs {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+}
+
+.plan-control__odvs h5 {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin: 0 0 4px;
+}
+
+.plan-control__odvs-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-3);
+}
+
+.plan-control__odv {
+    margin-bottom: var(--space-2);
+}
+
+.plan-control__odv-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 0;
+}
+
+.plan-control__odv-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.plan-control__odv-check input[type="checkbox"] {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
 
 .form-field__req {
     color: var(--accent);

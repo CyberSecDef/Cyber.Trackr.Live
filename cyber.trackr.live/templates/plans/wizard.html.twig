@@ -77,9 +77,24 @@
                     <span class="plan-wizard__section-num">3</span>
                     <span class="plan-wizard__section-label">{{ schema.family_name }} approach</span>
                 </summary>
-                <div class="plan-wizard__section-body" data-question-group="family_answers">
-                    {% for q in schema.family_questions %}
-                        {{ _self.field(q, 'family_answers') }}
+                <div class="plan-wizard__section-body plan-wizard__group-host" data-question-group="family_answers">
+                    {% for entry in schema.family_questions %}
+                        {% if entry.type|default('') == 'group' %}
+                            <details class="plan-wizard__group">
+                                <summary>
+                                    <span class="plan-wizard__group-label">{{ entry.label }}</span>
+                                    {% if entry.section is defined %}<span class="plan-wizard__group-section">{{ {'system_overview': '§3 sub-section', 'approach': '§4 sub-section', 'continuous_monitoring': '§6 sub-section', 'integration': '§7'}[entry.section]|default(entry.section) }}</span>{% endif %}
+                                </summary>
+                                <div class="plan-wizard__group-body">
+                                    {% if entry.description is defined %}<p class="plan-wizard__group-desc">{{ entry.description }}</p>{% endif %}
+                                    {% for q in entry.questions %}
+                                        {{ _self.field(q, 'family_answers') }}
+                                    {% endfor %}
+                                </div>
+                            </details>
+                        {% else %}
+                            {{ _self.field(entry, 'family_answers') }}
+                        {% endif %}
                     {% endfor %}
                 </div>
             </details>
@@ -163,6 +178,25 @@
                 <button type="button" class="cta-secondary form-field__list-add" onclick="planWizard.listAdd(this)">
                     <i class="bi bi-plus" aria-hidden="true"></i> Add item
                 </button>
+                {% if q.suggestions is defined and q.suggestions %}
+                    <div class="form-field__suggestions">
+                        <span class="form-field__suggestions-label">Suggested:</span>
+                        {% for s in q.suggestions %}
+                            <button type="button" class="chip plan-control__suggestion-chip"
+                                    onclick="planWizard.evidenceSuggestionAdd(this, {{ s|json_encode|escape('html_attr') }})">
+                                + {{ s }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% elseif q.type == 'multi_select' %}
+            <div class="form-field__multiselect" data-answer-group="{{ group }}" data-answer-key="{{ q.id }}" data-multi-select="1">
+                {% for opt in q.options %}
+                    <label class="form-field__multiselect-opt">
+                        <input type="checkbox" value="{{ opt }}"> {{ opt }}
+                    </label>
+                {% endfor %}
             </div>
         {% else %}
             <input type="text" id="{{ fid }}" name="{{ fid }}"

@@ -65,6 +65,21 @@
                     <li><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.label }}</a></li>
                 {% endfor %}
             </ul>
+
+            {% if plan.body.inheritance_reminder.commonly_inheritable %}
+                <h3>1.5 Common Control Inheritance</h3>
+                <p>
+                    Some controls in the {{ plan.body.inheritance_reminder.family_name }} family are typically
+                    <strong>inherited</strong> from a common control provider rather than implemented at the system level.
+                    Before defaulting to <em>Implemented</em> for any control in section 5, verify whether your
+                    organization has an authoritative inheritance source. Commonly inheritable controls in this family:
+                </p>
+                <ul>
+                    {% for c in plan.body.inheritance_reminder.commonly_inheritable %}
+                        <li>{{ ui.rmf_link(c.number) }} &mdash; typically inherited from <em>{{ c.from }}</em></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </section>
 
         <section class="plan-preview__section">
@@ -73,12 +88,17 @@
             <p class="pre-wrap">{{ plan.body.system_overview.description }}</p>
 
             {% if plan.body.system_overview.environment or plan.body.system_overview.classification %}
-                <h3>2.2 Environment &amp; classification</h3>
+                <h3>2.2 Environment and Classification</h3>
                 <p>
                     {% if plan.body.system_overview.environment %}Environment: <strong>{{ plan.body.system_overview.environment }}</strong>.{% endif %}
                     {% if plan.body.system_overview.classification %} Classification: <strong>{{ plan.body.system_overview.classification }}</strong>.{% endif %}
                 </p>
             {% endif %}
+
+            {# Phase 2B: family-defined sub-sections (e.g., CI methodology) under System Overview #}
+            {% for sub in plan.body.system_overview.sub_sections %}
+                {{ _self.familySubSection(sub, '2.' ~ (loop.index + 2)) }}
+            {% endfor %}
         </section>
 
         <section class="plan-preview__section">
@@ -96,6 +116,11 @@
         <section class="plan-preview__section">
             <h2>4. {{ plan.body.family_approach.title }}</h2>
             <p class="pre-wrap">{{ plan.body.family_approach.narrative }}</p>
+
+            {# Phase 2B: structured sub-sections (CCB, audit strategy, exception management, etc.) #}
+            {% for sub in plan.body.family_approach.sub_sections %}
+                {{ _self.familySubSection(sub, '4.' ~ loop.index) }}
+            {% endfor %}
         </section>
 
         <section class="plan-preview__section">
@@ -111,67 +136,18 @@
 
                 {% for c in plan.body.controls %}
                     <article class="plan-preview__control" id="control-{{ c.number }}">
-                        <header class="plan-preview__control-header">
-                            <h3>5.{{ loop.index }} {{ ui.rmf_link(c.number) }} &middot; {{ c.title|editorial_title }}{% if c.is_enhancement %} <em>(enhancement of {{ c.parent }})</em>{% endif %}</h3>
-                            <span class="plan-preview__control-status plan-preview__control-status--{{ (c.answers.status ?: 'pending')|lower|replace({' ': '-'}) }}">
-                                {{ c.answers.status ?: 'TO BE COMPLETED' }}
-                            </span>
-                        </header>
+                        {{ _self.controlBlock(c, '5.' ~ loop.index, false) }}
 
-                        {% if c.statement %}
-                            <h4>Control statement</h4>
-                            <pre class="plan-preview__statement">{{ c.statement }}</pre>
+                        {% if c.enhancements is defined and c.enhancements %}
+                            <div class="plan-preview__enhancements">
+                                <h4>Enhancements</h4>
+                                {% for e in c.enhancements %}
+                                    <article class="plan-preview__enhancement plan-preview__enhancement--{{ e.disposition|default('Selected')|lower|replace({' ': '-'}) }}" id="control-{{ e.number }}">
+                                        {{ _self.controlBlock(e, '5.' ~ loop.parent.loop.index ~ '.' ~ loop.index, true) }}
+                                    </article>
+                                {% endfor %}
+                            </div>
                         {% endif %}
-
-                        <h4>Implementation</h4>
-                        {% set status = c.answers.status %}
-                        {% if status == 'Inherited' %}
-                            <p>
-                                <strong>Inherited from:</strong> {{ c.answers.inheritance_provider ?: '[TO BE COMPLETED]' }}
-                            </p>
-                            {% if c.answers.inheritance_details %}
-                                <p class="pre-wrap">{{ c.answers.inheritance_details }}</p>
-                            {% endif %}
-                        {% elseif status == 'Not Applicable' %}
-                            <p>
-                                <strong>Not applicable.</strong>
-                                {{ c.answers.na_rationale ?: '[TO BE COMPLETED: rationale]' }}
-                            </p>
-                        {% elseif status in ['Implemented', 'Partially Implemented'] %}
-                            <p class="pre-wrap">{{ c.answers.narrative ?: '[TO BE COMPLETED]' }}</p>
-                        {% else %}
-                            <p class="plan-preview__todo">[TO BE COMPLETED]</p>
-                        {% endif %}
-
-                        <dl class="plan-preview__control-meta">
-                            <dt>Responsible role</dt>
-                            <dd>{{ c.answers.responsible_role ?: '[TO BE COMPLETED]' }}</dd>
-
-                            <dt>Evidence / artifacts</dt>
-                            <dd>
-                                {% if c.answers.evidence %}
-                                    <ul>
-                                        {% for e in c.answers.evidence %}<li>{{ e }}</li>{% endfor %}
-                                    </ul>
-                                {% else %}
-                                    <span class="plan-preview__todo">[TO BE COMPLETED]</span>
-                                {% endif %}
-                            </dd>
-
-                            {% if c.related %}
-                                <dt>Related controls</dt>
-                                <dd>
-                                    {% for r in c.related %}{{ ui.rmf_link(r) }}{% if not loop.last %} {% endif %}{% endfor %}
-                                </dd>
-                            {% endif %}
-
-                            {% if c.ccis %}
-                                <dt>Linked CCIs ({{ c.ccis|length }})</dt>
-                                <dd>
-                                    {% for cci in c.ccis %}{{ ui.cci_link(cci.id) }}{% if not loop.last %} {% endif %}{% endfor %}
-                                </dd>
-                            {% endif %}
-                        </dl>
                     </article>
                 {% endfor %}
             {% endif %}
@@ -181,6 +157,22 @@
             <section class="plan-preview__section">
                 <h2>6. {{ plan.body.continuous_monitoring.title }}</h2>
                 <p class="pre-wrap">{{ plan.body.continuous_monitoring.narrative }}</p>
+
+                {% for sub in plan.body.continuous_monitoring.sub_sections %}
+                    {{ _self.familySubSection(sub, '6.' ~ loop.index) }}
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% if plan.body.integration is defined and (plan.body.integration.narrative or plan.body.integration.sub_sections) %}
+            <section class="plan-preview__section">
+                <h2>7. {{ plan.body.integration.title }}</h2>
+                {% if plan.body.integration.narrative %}
+                    <p class="pre-wrap">{{ plan.body.integration.narrative }}</p>
+                {% endif %}
+                {% for sub in plan.body.integration.sub_sections %}
+                    {{ _self.familySubSection(sub, '7.' ~ loop.index) }}
+                {% endfor %}
             </section>
         {% endif %}
 
@@ -222,3 +214,140 @@
 
     </article>
 {% endblock %}
+
+{# ----- family sub-section rendering macro -----
+   Renders one structured family-question group (CCB definition, audit
+   strategy, etc.) as an h3 sub-section with a definition list of
+   field label → user value. Empty fields render as [TO BE COMPLETED]
+   in muted style so gaps are visible. #}
+{% macro familySubSection(sub, sectionNum) %}
+    <h3>{{ sectionNum }} {{ sub.label }}</h3>
+    {% if sub.description %}<p class="plan-preview__sub-desc">{{ sub.description }}</p>{% endif %}
+    <dl class="plan-preview__sub-fields">
+        {% for f in sub.fields %}
+            <dt>{{ f.label }}</dt>
+            <dd{% if not f.has_value %} class="plan-preview__todo"{% endif %}>
+                {% if f.has_value %}
+                    {% if f.value is iterable %}
+                        <ul>{% for v in f.value %}<li>{{ v }}</li>{% endfor %}</ul>
+                    {% else %}
+                        <span class="pre-wrap">{{ f.value }}</span>
+                    {% endif %}
+                {% else %}
+                    [TO BE COMPLETED]
+                {% endif %}
+            </dd>
+        {% endfor %}
+    </dl>
+{% endmacro %}
+
+{# ----- per-control rendering macro -----
+   Renders a single control (base or enhancement) with its statement
+   (ODVs substituted + bolded), implementation block, and meta. The
+   $isEnhancement flag drives the disposition heading variant. #}
+{% macro controlBlock(c, sectionNum, isEnhancement) %}
+    {% import 'macros.html.twig' as ui %}
+    <header class="plan-preview__control-header">
+        <h3>
+            {{ sectionNum }} {{ ui.rmf_link(c.number) }} &middot; {{ c.title|editorial_title }}
+            {% if c.is_enhancement %} <em>(enhancement)</em>{% endif %}
+        </h3>
+        {% if c.is_enhancement %}
+            {% set disp = c.disposition|default('Selected') %}
+            <span class="plan-preview__control-status plan-preview__control-status--{{ disp|lower|replace({' ': '-'}) }}">
+                {{ disp }}
+            </span>
+        {% else %}
+            <span class="plan-preview__control-status plan-preview__control-status--{{ (c.answers.status ?: 'pending')|lower|replace({' ': '-'}) }}">
+                {{ c.answers.status ?: 'TO BE COMPLETED' }}
+            </span>
+        {% endif %}
+    </header>
+
+    {% if c.statement_segments is defined and c.statement_segments %}
+        <h4>Control statement</h4>
+        <pre class="plan-preview__statement">{% for seg in c.statement_segments -%}
+            {%- if seg.type == 'odv' -%}
+                <strong class="plan-preview__odv{% if not seg.filled %} plan-preview__odv--unfilled{% endif %}">{{ seg.value }}</strong>
+            {%- else -%}
+                {{ seg.value }}
+            {%- endif -%}
+        {%- endfor %}</pre>
+    {% endif %}
+
+    {# Tailored Out enhancements: rationale only, skip implementation #}
+    {% if c.is_enhancement and c.disposition == 'Tailored Out' %}
+        <h4>Tailoring rationale</h4>
+        <p class="pre-wrap{% if not c.disposition_rationale %} plan-preview__todo{% endif %}">
+            {{ c.disposition_rationale ?: '[TO BE COMPLETED: tailoring rationale]' }}
+        </p>
+    {% else %}
+        <h4>Implementation</h4>
+        {% set status = c.is_enhancement and c.disposition == 'Inherited' ? 'Inherited' : c.answers.status %}
+        {% if status == 'Inherited' %}
+            <p><strong>Inherited from:</strong> {{ c.answers.inheritance_provider ?: '[TO BE COMPLETED]' }}</p>
+            {% if c.answers.inheritance_details %}
+                <p class="pre-wrap">{{ c.answers.inheritance_details }}</p>
+            {% endif %}
+        {% elseif status == 'Not Applicable' %}
+            <p>
+                <strong>Not applicable.</strong>
+                {{ c.answers.na_rationale ?: '[TO BE COMPLETED: rationale]' }}
+            </p>
+        {% elseif status in ['Implemented', 'Partially Implemented'] %}
+            <p class="pre-wrap">{{ c.answers.narrative ?: '[TO BE COMPLETED]' }}</p>
+        {% else %}
+            <p class="plan-preview__todo">[TO BE COMPLETED]</p>
+        {% endif %}
+
+        <dl class="plan-preview__control-meta">
+            <dt>Responsible role</dt>
+            <dd{% if not c.answers.responsible_role %} class="plan-preview__todo"{% endif %}>{{ c.answers.responsible_role ?: '[TO BE COMPLETED]' }}</dd>
+
+            <dt>Evidence / artifacts</dt>
+            <dd>
+                {% if c.answers.evidence %}
+                    <ul>
+                        {% for e in c.answers.evidence %}<li>{{ e }}</li>{% endfor %}
+                    </ul>
+                {% else %}
+                    <span class="plan-preview__todo">[TO BE COMPLETED]</span>
+                {% endif %}
+            </dd>
+
+            {# Per-control extras populated by Phase 2C; renders schema-ordered
+               with proper field labels. Empty-but-defined extras render as
+               [TO BE COMPLETED] so their absence is visible. #}
+            {% if c.extras_rendered is defined and c.extras_rendered %}
+                {% for f in c.extras_rendered %}
+                    <dt>{{ f.label }}</dt>
+                    <dd{% if not f.has_value %} class="plan-preview__todo"{% endif %}>
+                        {% if f.has_value %}
+                            {% if f.value is iterable %}
+                                <ul>{% for item in f.value %}<li>{{ item }}</li>{% endfor %}</ul>
+                            {% else %}
+                                <span class="pre-wrap">{{ f.value }}</span>
+                            {% endif %}
+                        {% else %}
+                            [TO BE COMPLETED]
+                        {% endif %}
+                    </dd>
+                {% endfor %}
+            {% endif %}
+
+            {% if c.related %}
+                <dt>Related controls</dt>
+                <dd>
+                    {% for r in c.related %}{{ ui.rmf_link(r) }}{% if not loop.last %} {% endif %}{% endfor %}
+                </dd>
+            {% endif %}
+
+            {% if c.ccis %}
+                <dt>Linked CCIs ({{ c.ccis|length }})</dt>
+                <dd>
+                    {% for cci in c.ccis %}{{ ui.cci_link(cci.id) }}{% if not loop.last %} {% endif %}{% endfor %}
+                </dd>
+            {% endif %}
+        </dl>
+    {% endif %}
+{% endmacro %}

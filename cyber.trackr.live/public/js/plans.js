@@ -11,20 +11,28 @@
  *   - Load draft: parse an uploaded .json file and hydrate the form.
  *   - Generate preview: POST the answers to /plans/{family}/preview and
  *     open the rendered HTML in a new tab.
- *   - Conditional fields:
- *       * System / family / document fields use [data-show-when="..."]
- *         evaluated against a sibling field's value (single-instance).
- *       * Per-control fields use a CSS-class toggle on the parent
- *         .plan-control card based on the selected status, scoped per
- *         card so multiple status dropdowns don't fight each other.
+ *   - Per-control fields: scoped per .plan-control card via CSS-class
+ *     toggles (is-implemented, is-inherited, is-na, is-selected,
+ *     is-tailored).
  *   - Per-control cards: lazy-loaded via fetch when the baseline
  *     changes; existing answers in state.controls are preserved across
  *     baseline switches and re-hydrated into matching cards on swap.
- *   - Evidence list field: dynamic add/remove rows.
+ *
+ * Phase 2A additions:
+ *   - Enhancement disposition pickers (Selected / Inherited / Tailored
+ *     Out). Tailored Out auto-selected for not-in-baseline enhancements.
+ *   - ODV (organization-defined value) input fields per control,
+ *     keyed by position-index (data-control-odv-id="0|1|2...").
+ *     Selection-many ODVs render as checkbox groups; collected as arrays.
+ *   - Per-control extra fields (data-control-extra-key) feeding
+ *     state.controls[num].extras for schema-driven extensibility.
+ *   - Evidence-suggestion chips that one-click prepopulate the evidence
+ *     list field.
+ *   - schema_version bumped to 2.
  */
 (function () {
     var STORAGE_KEY = 'plan.draft.' + window.planConfig.family;
-    var SCHEMA_VERSION = 1;
+    var SCHEMA_VERSION = 2;
 
     var state = {
         schema_version: SCHEMA_VERSION,
@@ -49,7 +57,7 @@
             state.controls[num] = liveControls[num];
         });
 
-        var s = {
+        return {
             schema_version: SCHEMA_VERSION,
             family: state.family,
             saved_at: new Date().toISOString(),
@@ -59,7 +67,6 @@
             controls: state.controls || {},
             document: collectGroup('document')
         };
-        return s;
     }
 
     function collectGroup(group) {
@@ -69,6 +76,12 @@
             if (!key) return;
             if (el.classList.contains('form-field__list')) {
                 out[key] = listValues(el);
+            } else if (el.getAttribute('data-multi-select') === '1') {
+                var picked = [];
+                el.querySelectorAll('input[type="checkbox"]:checked').forEach(function (cb) {
+                    picked.push(cb.value);
+                });
+                out[key] = picked;
             } else {
                 out[key] = el.value;
             }
@@ -76,20 +89,76 @@
         return out;
     }
 
+    /**
+     * Walk every per-control element and bucket its value into the right
+     * sub-key of the per-control record. Three attribute conventions:
+     *
+     *   data-control-key="status|narrative|disposition|..." → top-level
+     *   data-control-odv-id="N"                            → controls[num].odv[N]
+     *   data-control-extra-key="K"                         → controls[num].extras[K]
+     *
+     * Multi-select ODVs use a wrapping div with data-control-odv-multi="1"
+     * containing checkboxes; collected as an array of checked values.
+     */
     function collectControls() {
         var out = {};
-        document.querySelectorAll('[data-control-num]').forEach(function (el) {
+
+        // Top-level keys
+        document.querySelectorAll('[data-control-num][data-control-key]').forEach(function (el) {
             var num = el.getAttribute('data-control-num');
             var key = el.getAttribute('data-control-key');
             if (!num || !key) return;
-            if (!out[num]) out[num] = {};
+            ensureControl(out, num);
             if (el.classList.contains('form-field__list')) {
                 out[num][key] = listValues(el);
             } else {
                 out[num][key] = el.value;
             }
         });
+
+        // ODVs (single + multi)
+        document.querySelectorAll('[data-control-odv-id]').forEach(function (el) {
+            var num = el.getAttribute('data-control-num');
+            var id  = el.getAttribute('data-control-odv-id');
+            if (!num || id === null) return;
+            ensureControl(out, num);
+            if (!out[num].odv) out[num].odv = {};
+            if (el.getAttribute('data-control-odv-multi') === '1') {
+                var picked = [];
+                el.querySelectorAll('input[type="checkbox"]:checked').forEach(function (cb) {
+                    picked.push(cb.value);
+                });
+                out[num].odv[id] = picked;
+            } else {
+                out[num].odv[id] = el.value;
+            }
+        });
+
+        // Extras (text / textarea / select / multi_select / list)
+        document.querySelectorAll('[data-control-num][data-control-extra-key]').forEach(function (el) {
+            var num = el.getAttribute('data-control-num');
+            var key = el.getAttribute('data-control-extra-key');
+            if (!num || !key) return;
+            ensureControl(out, num);
+            if (!out[num].extras) out[num].extras = {};
+            if (el.classList.contains('form-field__list')) {
+                out[num].extras[key] = listValues(el);
+            } else if (el.getAttribute('data-multi-select') === '1') {
+                var picked = [];
+                el.querySelectorAll('input[type="checkbox"]:checked').forEach(function (cb) {
+                    picked.push(cb.value);
+                });
+                out[num].extras[key] = picked;
+            } else {
+                out[num].extras[key] = el.value;
+            }
+        });
+
         return out;
+    }
+
+    function ensureControl(out, num) {
+        if (!out[num]) out[num] = {};
     }
 
     function listValues(container) {
@@ -138,6 +207,11 @@
             var ul = el.querySelector('.form-field__list-items');
             ul.innerHTML = '';
             (val || []).forEach(function (v) { listAddRow(el, v); });
+        } else if (el.getAttribute('data-multi-select') === '1') {
+            var picked = Array.isArray(val) ? val : [];
+            el.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+                cb.checked = picked.indexOf(cb.value) !== -1;
+            });
         } else {
             el.value = val == null ? '' : val;
         }
@@ -167,6 +241,7 @@
                 wireControlCards();
                 hydrateControlCards();
                 applyControlStatusClasses();
+                applyControlDispositionClasses();
             })
             .catch(function (err) {
                 target.innerHTML = '<p class="plan-wizard__placeholder">Could not load controls: ' + err.message + '</p>';
@@ -174,22 +249,23 @@
     }
 
     function wireControlCards() {
-        // input/change → autosave + status class refresh
-        document.querySelectorAll('[data-control-num]').forEach(function (el) {
-            el.addEventListener('input', function () {
+        // Top-level + extras: any [data-control-num] gets autosave + class refresh hooks
+        document.querySelectorAll('.plan-control [data-control-num]').forEach(function (el) {
+            var handler = function () {
                 autosave();
                 if (el.hasAttribute('data-control-status')) {
-                    setControlStatusClass(el.closest('.plan-control'), el.value);
-                    refreshStatusBadge(el.closest('.plan-control'), el.value);
+                    var card = el.closest('.plan-control');
+                    setControlStatusClass(card, el.value);
+                    refreshStatusBadge(card);
                 }
-            });
-            el.addEventListener('change', function () {
-                autosave();
-                if (el.hasAttribute('data-control-status')) {
-                    setControlStatusClass(el.closest('.plan-control'), el.value);
-                    refreshStatusBadge(el.closest('.plan-control'), el.value);
+                if (el.hasAttribute('data-control-disposition')) {
+                    var card = el.closest('.plan-control');
+                    setControlDispositionClass(card, el.value);
+                    refreshStatusBadge(card);
                 }
-            });
+            };
+            el.addEventListener('input', handler);
+            el.addEventListener('change', handler);
         });
     }
 
@@ -199,11 +275,37 @@
             var num = card.getAttribute('data-control-num');
             var ans = state.controls[num];
             if (!ans) return;
-            card.querySelectorAll('[data-control-num="' + num + '"]').forEach(function (el) {
+
+            // Top-level keys
+            card.querySelectorAll('[data-control-num="' + num + '"][data-control-key]').forEach(function (el) {
                 var key = el.getAttribute('data-control-key');
                 if (key in ans) applyValue(el, ans[key]);
             });
-            refreshStatusBadge(card, ans.status || '');
+
+            // ODVs
+            if (ans.odv) {
+                card.querySelectorAll('[data-control-num="' + num + '"][data-control-odv-id]').forEach(function (el) {
+                    var id = el.getAttribute('data-control-odv-id');
+                    if (!(id in ans.odv)) return;
+                    var val = ans.odv[id];
+                    if (el.getAttribute('data-control-odv-multi') === '1') {
+                        var picked = Array.isArray(val) ? val : [];
+                        el.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+                            cb.checked = picked.indexOf(cb.value) !== -1;
+                        });
+                    } else {
+                        el.value = val == null ? '' : val;
+                    }
+                });
+            }
+
+            // Extras
+            if (ans.extras) {
+                card.querySelectorAll('[data-control-num="' + num + '"][data-control-extra-key]').forEach(function (el) {
+                    var key = el.getAttribute('data-control-extra-key');
+                    if (key in ans.extras) applyValue(el, ans.extras[key]);
+                });
+            }
         });
     }
 
@@ -212,7 +314,21 @@
             var statusEl = card.querySelector('[data-control-status]');
             if (statusEl) {
                 setControlStatusClass(card, statusEl.value);
-                refreshStatusBadge(card, statusEl.value);
+                refreshStatusBadge(card);
+            }
+        });
+    }
+
+    function applyControlDispositionClasses() {
+        document.querySelectorAll('.plan-control').forEach(function (card) {
+            var dispEl = card.querySelector('[data-control-disposition]');
+            if (dispEl) {
+                setControlDispositionClass(card, dispEl.value);
+                refreshStatusBadge(card);
+            } else {
+                // Base controls don't have a disposition; treat as "active"
+                // so when-active fields are visible.
+                card.classList.add('is-selected');
             }
         });
     }
@@ -229,13 +345,41 @@
         }
     }
 
-    function refreshStatusBadge(card, status) {
+    function setControlDispositionClass(card, disposition) {
+        if (!card) return;
+        card.classList.remove('is-selected', 'is-tailored', 'is-disp-inherited');
+        switch (disposition) {
+            case 'Selected':     card.classList.add('is-selected');         break;
+            case 'Inherited':    card.classList.add('is-disp-inherited');   break;
+            case 'Tailored Out': card.classList.add('is-tailored');         break;
+            default:             card.classList.add('is-selected');         break;
+        }
+    }
+
+    function refreshStatusBadge(card) {
         if (!card) return;
         var badge = card.querySelector('[data-control-status-badge]');
         if (!badge) return;
-        badge.textContent = status || '—';
+
+        // Enhancement badge prefers disposition (Tailored Out / Inherited
+        // / Selected) since that's the primary decision. For Selected
+        // enhancements and base controls, the implementation status is
+        // the relevant signal.
+        var dispEl   = card.querySelector('[data-control-disposition]');
+        var statusEl = card.querySelector('[data-control-status]');
+        var label = '—';
+        if (dispEl && (dispEl.value === 'Tailored Out' || dispEl.value === 'Inherited')) {
+            label = dispEl.value;
+        } else if (statusEl && statusEl.value) {
+            label = statusEl.value;
+        } else if (dispEl && dispEl.value === 'Selected') {
+            label = 'Selected';
+        }
+        badge.textContent = label;
         badge.className = 'plan-control__status-badge';
-        if (status) badge.classList.add('plan-control__status-badge--' + status.toLowerCase().replace(/[^a-z]+/g, '-'));
+        if (label !== '—') {
+            badge.classList.add('plan-control__status-badge--' + label.toLowerCase().replace(/[^a-z]+/g, '-'));
+        }
     }
 
     /* ---- show_when (system / family / document scope only) ---- */
@@ -310,6 +454,15 @@
             var container = btn.closest('.form-field__list');
             listAddRow(container, '');
         },
+        evidenceSuggestionAdd: function (btn, value) {
+            var container = btn.closest('.form-field__list');
+            if (!container) return;
+            // Don't double-add identical values
+            var existing = listValues(container);
+            if (existing.indexOf(value) !== -1) return;
+            listAddRow(container, value);
+            autosave();
+        },
         saveDraft: function () {
             var blob = new Blob([JSON.stringify(collect(), null, 2)], { type: 'application/json' });
             var url = URL.createObjectURL(blob);
@@ -366,7 +519,6 @@
                 body: JSON.stringify(payload)
             }).then(function (res) {
                 if (!res.ok) throw new Error('Download failed: ' + res.status);
-                // Pull the filename from Content-Disposition; fall back to a sane default.
                 var disp = res.headers.get('Content-Disposition') || '';
                 var match = disp.match(/filename="([^"]+)"/);
                 var filename = match ? match[1] : window.planConfig.family + '-plan.docx';
@@ -391,13 +543,20 @@
     /* ---- bootstrap ---- */
 
     document.addEventListener('DOMContentLoaded', function () {
-        // System / family / document field handlers
         document.querySelectorAll('[data-answer-group], [data-answer-key="baseline"]').forEach(function (el) {
             el.addEventListener('input', function () { autosave(); applyShowWhen(); });
             el.addEventListener('change', function () { autosave(); applyShowWhen(); });
         });
 
-        // Baseline change triggers per-control card load
+        // Multi-select checkboxes nested inside a [data-multi-select] wrapper
+        // bubble change events up to the wrapper, which the listener above
+        // already fields. Add an explicit listener on the inner checkboxes
+        // too so older browsers without bubbling on the wrapper still
+        // trigger autosave.
+        document.querySelectorAll('[data-multi-select="1"] input[type="checkbox"]').forEach(function (cb) {
+            cb.addEventListener('change', function () { autosave(); applyShowWhen(); });
+        });
+
         var baselineEl = document.querySelector('[data-answer-key="baseline"]');
         if (baselineEl) {
             baselineEl.addEventListener('change', function () {
