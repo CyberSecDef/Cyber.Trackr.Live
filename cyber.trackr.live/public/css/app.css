@@ -5977,3 +5977,259 @@ del {
     font-size: 14px;
     margin-top: var(--space-4);
 }
+
+/* ============================================================
+   Baseline coverage heat map (/baselines)
+   20 families × 4 NIST baselines + a catalog-total column.
+   Cell intensity is driven by --bl-intensity (0 → 1) which the
+   template emits as count / max_cell. Per-baseline tint hue
+   keeps columns visually grouped while intensity carries data.
+   ============================================================ */
+
+.bl-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+.bl-summary__cell {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-left-width: 4px;
+}
+.bl-summary__cell--low      { border-left-color: #3b82f6; }
+.bl-summary__cell--moderate { border-left-color: #f59e0b; }
+.bl-summary__cell--high     { border-left-color: #b91c1c; }
+.bl-summary__cell--privacy  { border-left-color: #8b5cf6; }
+.bl-summary__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+.bl-summary__value {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 30px;
+    line-height: 1.05;
+    color: var(--text);
+}
+.bl-summary__sub {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.bl-heatmap-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    margin-top: var(--space-5);
+}
+.bl-heatmap {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.bl-heatmap th,
+.bl-heatmap td {
+    padding: 0;
+    text-align: center;
+}
+.bl-heatmap__corner {
+    width: 240px;
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border-strong);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.bl-heatmap__col-head {
+    padding: var(--space-3) var(--space-2);
+    border-bottom: 1px solid var(--border-strong);
+    background: var(--bg);
+    min-width: 110px;
+}
+.bl-heatmap__col-head--low      { box-shadow: inset 0 -3px 0 #3b82f6; }
+.bl-heatmap__col-head--moderate { box-shadow: inset 0 -3px 0 #f59e0b; }
+.bl-heatmap__col-head--high     { box-shadow: inset 0 -3px 0 #b91c1c; }
+.bl-heatmap__col-head--privacy  { box-shadow: inset 0 -3px 0 #8b5cf6; }
+.bl-heatmap__col-head--total    { box-shadow: inset 0 -3px 0 var(--accent); }
+.bl-heatmap__col-title {
+    display: block;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+}
+.bl-heatmap__col-sub {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.bl-heatmap tbody tr:nth-child(even) .bl-heatmap__row-head {
+    background: var(--bg);
+}
+.bl-heatmap__row-head {
+    text-align: left;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+}
+.bl-heatmap__family-link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-3) var(--space-4);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 400;
+    transition: background 0.15s ease;
+}
+.bl-heatmap__family-link:hover {
+    background: linear-gradient(90deg, rgba(34, 122, 200, 0.08), transparent);
+    color: var(--accent);
+}
+.bl-heatmap__family-code {
+    font-family: 'Inconsolata', 'Consolas', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+}
+.bl-heatmap__family-name {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* The cells. Per-baseline tint sets hue; --bl-intensity sets opacity.
+   Light themes: tint over white surface. Dark themes get an inverted
+   block — a darker tint on a darker surface still shows the gradient. */
+.bl-heatmap__cell {
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    transition: outline 0.15s ease, transform 0.1s ease;
+    position: relative;
+    --bl-tint-r: 59;
+    --bl-tint-g: 130;
+    --bl-tint-b: 246;
+    background: rgba(var(--bl-tint-r), var(--bl-tint-g), var(--bl-tint-b), calc(var(--bl-intensity, 0) * 0.85));
+}
+.bl-heatmap__cell--low      { --bl-tint-r: 59;  --bl-tint-g: 130; --bl-tint-b: 246; }   /* blue */
+.bl-heatmap__cell--moderate { --bl-tint-r: 245; --bl-tint-g: 158; --bl-tint-b: 11;  }   /* amber */
+.bl-heatmap__cell--high     { --bl-tint-r: 220; --bl-tint-g: 38;  --bl-tint-b: 38;  }   /* red */
+.bl-heatmap__cell--privacy  { --bl-tint-r: 139; --bl-tint-g: 92;  --bl-tint-b: 246; }   /* violet */
+.bl-heatmap__cell--empty {
+    background: repeating-linear-gradient(
+        45deg,
+        var(--bg),
+        var(--bg) 6px,
+        var(--surface) 6px,
+        var(--surface) 12px
+    );
+}
+.bl-heatmap__cell--total {
+    background: var(--surface);
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--text);
+    cursor: default;
+}
+.bl-heatmap__cell:not(.bl-heatmap__cell--total):hover {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    transform: scale(1.03);
+    z-index: 2;
+}
+.bl-heatmap__cell:not(.bl-heatmap__cell--total):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+.bl-heatmap__count {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    /* Subtle text shadow improves contrast against tinted backgrounds
+       without obscuring the heat-map intensity signal. */
+    text-shadow:
+         0 0  3px rgba(255,255,255,0.8),
+         0 0  3px rgba(255,255,255,0.8),
+         0 0  6px rgba(255,255,255,0.4);
+}
+.bl-heatmap__cell--empty .bl-heatmap__count {
+    color: var(--text-muted);
+    text-shadow: none;
+    font-size: 14px;
+    opacity: 0.4;
+}
+[data-theme="ink"] .bl-heatmap__count,
+[data-theme="dracula"] .bl-heatmap__count,
+[data-theme="solarized-dark"] .bl-heatmap__count,
+[data-theme="nord"] .bl-heatmap__count {
+    text-shadow:
+         0 0  3px rgba(0,0,0,0.7),
+         0 0  3px rgba(0,0,0,0.7),
+         0 0  6px rgba(0,0,0,0.5);
+    color: #fff;
+}
+[data-theme="ink"] .bl-heatmap__cell--empty .bl-heatmap__count,
+[data-theme="dracula"] .bl-heatmap__cell--empty .bl-heatmap__count,
+[data-theme="solarized-dark"] .bl-heatmap__cell--empty .bl-heatmap__count {
+    color: var(--text-muted);
+    text-shadow: none;
+}
+
+/* Detail panel — shown after a cell click. */
+.bl-detail {
+    margin-top: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+}
+.bl-detail__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+.bl-detail__title {
+    margin: 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+}
+.bl-detail__meta {
+    margin: 0 0 var(--space-3);
+    color: var(--text-muted);
+    font-size: 13px;
+}
+.bl-detail__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+.bl-detail__control {
+    padding: 4px 10px;
+    font-size: 13px;
+    font-family: 'Inconsolata', 'Consolas', monospace;
+    border-radius: var(--radius-sm, 4px);
+}
+.bl-detail__empty {
+    margin: 0;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 13px;
+}

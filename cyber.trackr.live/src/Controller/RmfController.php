@@ -136,4 +136,47 @@ class RmfController extends AbstractController
     {
         return $this->render('rmf/view_4_to_5.html.twig', $mapper->map());
     }
+
+    #[Route('/baselines', name: 'baselines_view')]
+    public function baselines_view(OverlayLoader $overlays): Response
+    {
+        // Heat map covers the four NIST baselines published as OSCAL profiles.
+        // Adding more is one line — drop new overlay IDs in the array below.
+        $matrix = $overlays->getFamilyMatrix([
+            'nist-low',
+            'nist-moderate',
+            'nist-high',
+            'nist-privacy',
+        ]);
+
+        // Map family code → human label so each row carries context. Pulled
+        // from the 20 plan-generator family JSONs we already author since
+        // they're the authoritative naming we use sitewide.
+        $familyNames = [
+            'AC' => 'Access Control',
+            'AT' => 'Awareness and Training',
+            'AU' => 'Audit and Accountability',
+            'CA' => 'Assessment, Authorization, and Monitoring',
+            'CM' => 'Configuration Management',
+            'CP' => 'Contingency Planning',
+            'IA' => 'Identification and Authentication',
+            'IR' => 'Incident Response',
+            'MA' => 'Maintenance',
+            'MP' => 'Media Protection',
+            'PE' => 'Physical and Environmental Protection',
+            'PL' => 'Planning',
+            'PM' => 'Program Management',
+            'PS' => 'Personnel Security',
+            'PT' => 'PII Processing and Transparency',
+            'RA' => 'Risk Assessment',
+            'SA' => 'System and Services Acquisition',
+            'SC' => 'System and Communications Protection',
+            'SI' => 'System and Information Integrity',
+            'SR' => 'Supply Chain Risk Management',
+        ];
+
+        return $this->render('rmf/baselines.html.twig', array_merge($matrix, [
+            'family_names' => $familyNames,
+        ]));
+    }
 }

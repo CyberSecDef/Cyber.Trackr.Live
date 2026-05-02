@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}Baseline Coverage &mdash; Cyber Trackr{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="baselines-page-title">
+        <div class="rule-text">&sect; Library &middot; Baseline coverage</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">800-53 r5</span>
+            <h1 id="baselines-page-title" class="lib-page__title-large">
+                Baseline coverage <em>heat map.</em>
+            </h1>
+            <p class="lib-page__lede">
+                Where each NIST 800-53 r5 baseline puts its weight, family by family. Cell intensity scales with the number of controls (base + enhancements) the baseline selects from that family. Hover any cell to see the full control list; click a family name to jump into that family on the catalog page.
+            </p>
+
+            <div class="bl-summary">
+                {% for b in baselines %}
+                    <div class="bl-summary__cell bl-summary__cell--{{ b.level }}">
+                        <span class="bl-summary__label">{{ b.short_title }}</span>
+                        <span class="bl-summary__value">{{ baseline_totals[b.id]|default(0)|number_format }}</span>
+                        <span class="bl-summary__sub">controls + enhancements</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </header>
+
+        <div class="bl-heatmap-wrap" id="bl-heatmap-wrap">
+            <table class="bl-heatmap" aria-label="Baseline coverage matrix" id="bl-heatmap-table">
+                <thead>
+                    <tr>
+                        <th class="bl-heatmap__corner">Family</th>
+                        {% for b in baselines %}
+                            <th class="bl-heatmap__col-head bl-heatmap__col-head--{{ b.level }}" scope="col">
+                                <span class="bl-heatmap__col-title">{{ b.short_title }}</span>
+                                <span class="bl-heatmap__col-sub">{{ baseline_totals[b.id]|default(0)|number_format }} total</span>
+                            </th>
+                        {% endfor %}
+                        <th class="bl-heatmap__col-head bl-heatmap__col-head--total" scope="col">
+                            <span class="bl-heatmap__col-title">Catalog</span>
+                            <span class="bl-heatmap__col-sub">union</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fam in families %}
+                        {% set row_total = family_totals[fam]|default(0) %}
+                        <tr data-family="{{ fam }}">
+                            <th class="bl-heatmap__row-head" scope="row">
+                                <a class="bl-heatmap__family-link" href="{{ path('rmf_v5_view') }}#rmf_{{ fam }}-1" title="Open the {{ fam }} family in the 800-53 r5 catalog">
+                                    <span class="bl-heatmap__family-code">{{ fam }}</span>
+                                    <span class="bl-heatmap__family-name">{{ family_names[fam]|default(fam) }}</span>
+                                </a>
+                            </th>
+                            {% for b in baselines %}
+                                {% set cell = cells[fam][b.id]|default({'count': 0, 'controls': []}) %}
+                                {% set intensity = max_cell > 0 ? cell.count / max_cell : 0 %}
+                                <td class="bl-heatmap__cell bl-heatmap__cell--{{ b.level }} {% if cell.count == 0 %}bl-heatmap__cell--empty{% endif %}"
+                                    style="--bl-intensity: {{ intensity }};"
+                                    data-fam="{{ fam }}"
+                                    data-baseline-id="{{ b.id }}"
+                                    data-baseline-title="{{ b.short_title }}"
+                                    data-controls="{{ cell.controls|join(',') }}"
+                                    data-count="{{ cell.count }}"
+                                    title="{{ family_names[fam]|default(fam) }} &middot; {{ b.short_title }}: {{ cell.count }} {% if cell.count == 1 %}control{% else %}controls{% endif %}{% if cell.controls|length %} &mdash; {{ cell.controls|slice(0, 8)|join(', ') }}{% if cell.controls|length > 8 %} (+{{ cell.controls|length - 8 }} more){% endif %}{% endif %}">
+                                    <span class="bl-heatmap__count">{{ cell.count }}</span>
+                                </td>
+                            {% endfor %}
+                            <td class="bl-heatmap__cell bl-heatmap__cell--total">
+                                <span class="bl-heatmap__count">{{ row_total }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Click-detail panel — shows full control list for the focused cell. #}
+        <aside class="bl-detail" id="bl-detail" hidden>
+            <header class="bl-detail__header">
+                <h2 class="bl-detail__title">
+                    <span data-bind="title">Cell</span>
+                </h2>
+                <button type="button" class="cta-tertiary" onclick="baselineHeatmap.closeDetail()" aria-label="Close detail">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+            </header>
+            <p class="bl-detail__meta" data-bind="meta">—</p>
+            <div class="bl-detail__controls" data-bind="controls"></div>
+        </aside>
+    </section>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const detail = document.getElementById("bl-detail");
+            const detailTitle    = detail.querySelector("[data-bind='title']");
+            const detailMeta     = detail.querySelector("[data-bind='meta']");
+            const detailControls = detail.querySelector("[data-bind='controls']");
+
+            function showDetail(cell) {
+                const fam      = cell.dataset.fam;
+                const baseline = cell.dataset.baselineTitle;
+                const count    = parseInt(cell.dataset.count, 10) || 0;
+                const list     = (cell.dataset.controls || "").split(",").filter(Boolean);
+
+                detailTitle.textContent = fam + " · " + baseline;
+                detailMeta.textContent  = count + (count === 1 ? " control selected." : " controls selected.");
+                detailControls.innerHTML = "";
+
+                if (list.length === 0) {
+                    detailControls.innerHTML = "<p class='bl-detail__empty'>This baseline does not select any controls from this family.</p>";
+                } else {
+                    list.forEach(function (cid) {
+                        // OSCAL form 'ac-2.1' → display 'AC-2(1)' for the link/label.
+                        const display = cid
+                            .replace(/^([a-z]+)/, function (m) { return m.toUpperCase(); })
+                            .replace(/\.(\d+)$/, "($1)");
+                        const a = document.createElement("a");
+                        a.className = "bl-detail__control ident ident--link";
+                        a.href = "{{ path('rmf_v5_view') }}#rmf_" + display;
+                        a.textContent = display;
+                        a.title = "Open " + display + " in the 800-53 r5 catalog";
+                        detailControls.appendChild(a);
+                    });
+                }
+                detail.hidden = false;
+                detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+
+            function closeDetail() {
+                detail.hidden = true;
+            }
+
+            document.querySelectorAll(".bl-heatmap__cell:not(.bl-heatmap__cell--total)").forEach(function (cell) {
+                if (cell.dataset.fam === undefined) return;
+                cell.addEventListener("click", function () { showDetail(cell); });
+                cell.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        showDetail(cell);
+                    }
+                });
+                // Keyboard focus
+                cell.tabIndex = 0;
+            });
+
+            // Expose close handler globally for the modal close button.
+            window.baselineHeatmap = { closeDetail: closeDetail };
+        })();
+    </script>
+{% endblock %}

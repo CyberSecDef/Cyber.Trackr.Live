@@ -228,6 +228,98 @@ class OverlayLoader
     }
 
     /**
+     * Build a (family × baseline) coverage matrix for the given overlay ids.
+     * Returns the data shape consumed by the heat map page at /baselines.
+     *
+     * Each cell contains:
+     *   - 'count' — distinct controls (base + enhancements) the overlay
+     *     selects from that family. Enhancements count individually since
+     *     each one is a separately-tailorable item.
+     *   - 'controls' — the OSCAL ids ('ac-1', 'ac-2.1', …) for hover tooltip
+     *     + deep-linking back into /rmf/5.
+     *
+     * Family axis is derived from the overlay control prefixes (every loaded
+     * overlay's controls' family letters are unioned), so when a new family
+     * appears in any future overlay it shows up automatically.
+     *
+     * @param array<int,string> $overlayIds e.g. ['nist-low','nist-moderate','nist-high','nist-privacy']
+     * @return array{
+     *     families: array<int,string>,
+     *     baselines: array<int, array{id:string, short_title:string, level:string, source:string}>,
+     *     cells: array<string, array<string, array{count:int, controls: array<int,string>}>>,
+     *     family_totals: array<string,int>,
+     *     baseline_totals: array<string,int>,
+     *     max_cell: int
+     * }
+     */
+    public function getFamilyMatrix(array $overlayIds): array
+    {
+        $this->ensureLoaded();
+
+        $baselines        = [];
+        $families         = [];
+        $cells            = [];
+        $familyUnion      = [];   // family => [controlId => true] for union dedup
+        $baselineTotals   = [];
+        $maxCell          = 0;
+
+        foreach ($overlayIds as $oid) {
+            if (!isset($this->overlays[$oid])) continue;
+            $o = $this->overlays[$oid];
+            $baselines[] = [
+                'id'          => $o['id'],
+                'short_title' => $o['short_title'],
+                'level'       => $o['level'],
+                'source'      => $o['source'],
+            ];
+            $baselineTotals[$oid] = count($o['controls']);
+
+            foreach ($o['controls'] as $cid) {
+                if (!preg_match('/^([a-z]+)-\d/', $cid, $m)) continue;
+                $fam = strtoupper($m[1]);
+
+                if (!isset($cells[$fam])) $cells[$fam] = [];
+                if (!isset($cells[$fam][$oid])) $cells[$fam][$oid] = ['count' => 0, 'controls' => []];
+                $cells[$fam][$oid]['controls'][] = $cid;
+                $cells[$fam][$oid]['count']++;
+
+                $familyUnion[$fam][$cid] = true;
+                if ($cells[$fam][$oid]['count'] > $maxCell) {
+                    $maxCell = $cells[$fam][$oid]['count'];
+                }
+
+                if (!in_array($fam, $families, true)) $families[] = $fam;
+            }
+        }
+
+        // Family total = distinct controls appearing in *any* of the selected
+        // overlays. Avoids the obvious bug of counting AC-1 four times because
+        // it's in low + moderate + high + privacy.
+        $familyTotals = array_map('count', $familyUnion);
+
+        sort($families);
+
+        // Make sure every (family, baseline) pair has a cell so the template
+        // doesn't have to special-case missing entries.
+        foreach ($families as $fam) {
+            foreach ($overlayIds as $oid) {
+                if (!isset($cells[$fam][$oid])) {
+                    $cells[$fam][$oid] = ['count' => 0, 'controls' => []];
+                }
+            }
+        }
+
+        return [
+            'families'        => $families,
+            'baselines'       => $baselines,
+            'cells'           => $cells,
+            'family_totals'   => $familyTotals,
+            'baseline_totals' => $baselineTotals,
+            'max_cell'        => $maxCell,
+        ];
+    }
+
+    /**
      * Extract the bits we care about from one OSCAL Profile JSON document.
      *
      * @param array<string,mixed> $profile
