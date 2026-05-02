@@ -14,11 +14,21 @@
             <p class="lib-page__lede">
                 Answer a structured set of questions and download a Word document &mdash; cover page, control-by-control implementation narrative, linked CCIs, and back matter included. Saves and reloads as JSON so a half-finished draft travels with you.
             </p>
+            <div class="plans-data-banner" role="alert">
+                <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                <div>
+                    <strong>Public site &mdash; unclassified data only.</strong>
+                    Do <strong>not</strong> enter classified, CUI, or other sensitive non-public information into any plan generator. You will be asked to confirm before starting.
+                </div>
+            </div>
         </header>
 
         <div class="plan-grid">
             {% for code, p in plans %}
-                <a href="{{ path('plans_wizard', {family: code}) }}" class="plan-card">
+                <a href="{{ path('plans_wizard', {family: code}) }}"
+                   class="plan-card"
+                   data-plan-link
+                   data-plan-name="{{ p.title }}">
                     <span class="eyebrow">{{ p.family_name }}</span>
                     <h2 class="plan-card__title">{{ p.title }}</h2>
                     <p class="plan-card__description">{{ p.description }}</p>
@@ -32,4 +42,121 @@
         </div>
 
     </section>
+
+    {# Confirmation modal — shown every time a plan card is clicked. #}
+    <div class="modal fade" id="planDataPolicyModal" tabindex="-1" aria-labelledby="planDataPolicyTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content plan-policy-modal">
+                <div class="modal-header plan-policy-modal__header">
+                    <h2 class="modal-title plan-policy-modal__title" id="planDataPolicyTitle">
+                        <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                        Public Site &mdash; Unclassified Data Only
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body plan-policy-modal__body">
+                    <p class="plan-policy-modal__lede">
+                        <strong>cyber.trackr.live is a public, unclassified website.</strong> Your inputs are processed in your browser and travel over the public internet. Anything you type into a plan generator can be transmitted to this server.
+                    </p>
+
+                    <p class="plan-policy-modal__warning">
+                        Before you continue, you must confirm that you will only enter <strong>unclassified, non-sensitive</strong> information into the plan generator.
+                    </p>
+
+                    <div class="plan-policy-modal__categories">
+                        <div class="plan-policy-modal__category plan-policy-modal__category--prohibited">
+                            <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                            <strong>NEVER enter Classified data</strong>
+                            <span>Confidential, Secret, Top Secret, SCI, SAP &mdash; any data marked or controlled under E.O. 13526.</span>
+                        </div>
+                        <div class="plan-policy-modal__category plan-policy-modal__category--prohibited">
+                            <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                            <strong>NEVER enter CUI</strong>
+                            <span>Controlled Unclassified Information of any category &mdash; PII, PHI, FTI, ITAR / EAR, FOUO, law-enforcement-sensitive, etc.</span>
+                        </div>
+                        <div class="plan-policy-modal__category plan-policy-modal__category--allowed">
+                            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                            <strong>ONLY enter unclassified, non-sensitive data</strong>
+                            <span>Generic role names, fictional / placeholder system names, sanitized examples, public reference URLs.</span>
+                        </div>
+                    </div>
+
+                    <p class="plan-policy-modal__advice">
+                        If your real plan needs sensitive content, use this site to author the structure with placeholders, download the JSON or Word file, then complete the sensitive parts on an authorized system within the appropriate enclave.
+                    </p>
+
+                    <div class="form-check plan-policy-modal__check">
+                        <input class="form-check-input" type="checkbox" id="planPolicyAcknowledge">
+                        <label class="form-check-label" for="planPolicyAcknowledge">
+                            <strong>I understand and confirm</strong> that I will only enter unclassified, non-sensitive data into <span data-plan-policy-name>this plan generator</span>. I will not enter classified information or CUI of any category.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer plan-policy-modal__footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" class="btn btn-danger" id="planPolicyContinue" aria-disabled="true" tabindex="-1">
+                        Continue to <span data-plan-policy-name>plan</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var modalEl = document.getElementById('planDataPolicyModal');
+            if (!modalEl || typeof bootstrap === 'undefined') return;
+            var modal = new bootstrap.Modal(modalEl);
+            var checkbox = document.getElementById('planPolicyAcknowledge');
+            var continueBtn = document.getElementById('planPolicyContinue');
+            var nameSpans = modalEl.querySelectorAll('[data-plan-policy-name]');
+            var pendingHref = null;
+
+            function setName(name) {
+                nameSpans.forEach(function (s) { s.textContent = name; });
+            }
+            function setEnabled(on) {
+                if (on) {
+                    continueBtn.classList.remove('disabled');
+                    continueBtn.removeAttribute('aria-disabled');
+                    continueBtn.setAttribute('tabindex', '0');
+                } else {
+                    continueBtn.classList.add('disabled');
+                    continueBtn.setAttribute('aria-disabled', 'true');
+                    continueBtn.setAttribute('tabindex', '-1');
+                }
+            }
+            function reset() {
+                checkbox.checked = false;
+                setEnabled(false);
+                pendingHref = null;
+            }
+
+            document.querySelectorAll('[data-plan-link]').forEach(function (a) {
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    pendingHref = a.getAttribute('href');
+                    setName(a.dataset.planName || 'plan');
+                    reset();
+                    pendingHref = a.getAttribute('href'); // restore after reset()
+                    continueBtn.setAttribute('href', pendingHref);
+                    modal.show();
+                });
+            });
+
+            checkbox.addEventListener('change', function () {
+                setEnabled(checkbox.checked);
+            });
+
+            continueBtn.addEventListener('click', function (e) {
+                if (!checkbox.checked) {
+                    e.preventDefault();
+                    return;
+                }
+                // Allow normal navigation via href.
+            });
+
+            modalEl.addEventListener('hidden.bs.modal', reset);
+        })();
+    </script>
 {% endblock %}

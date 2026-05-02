@@ -360,6 +360,224 @@
     gap: 4px;
 }
 
+/* Banner on the plans index — repeats the policy in case the modal-JS doesn't load. */
+.plans-data-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid #b54708;
+    background: rgba(255, 159, 67, 0.10);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+.plans-data-banner > i {
+    font-size: 22px;
+    color: #b54708;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+[data-theme="ink"] .plans-data-banner,
+[data-theme="dracula"] .plans-data-banner,
+[data-theme="solarized-dark"] .plans-data-banner {
+    background: rgba(255, 159, 67, 0.14);
+    border-color: #f97316;
+}
+[data-theme="ink"] .plans-data-banner > i,
+[data-theme="dracula"] .plans-data-banner > i,
+[data-theme="solarized-dark"] .plans-data-banner > i {
+    color: #fb923c;
+}
+
+/* Data-policy modal — confirmation users see when launching any plan. */
+.plan-policy-modal {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+}
+.plan-policy-modal__header {
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.08), transparent);
+    padding: var(--space-4) var(--space-5);
+}
+.plan-policy-modal__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--text);
+}
+.plan-policy-modal__title > i {
+    color: #b91c1c;
+    font-size: 24px;
+}
+[data-theme="ink"] .plan-policy-modal__title > i,
+[data-theme="dracula"] .plan-policy-modal__title > i,
+[data-theme="solarized-dark"] .plan-policy-modal__title > i {
+    color: #f87171;
+}
+.plan-policy-modal__body {
+    padding: var(--space-5);
+    font-size: 15px;
+    line-height: 1.55;
+}
+.plan-policy-modal__lede {
+    margin: 0 0 var(--space-3);
+    color: var(--text);
+}
+.plan-policy-modal__warning {
+    margin: 0 0 var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: rgba(220, 38, 38, 0.08);
+    border-left: 3px solid #b91c1c;
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 15px;
+}
+[data-theme="ink"] .plan-policy-modal__warning,
+[data-theme="dracula"] .plan-policy-modal__warning,
+[data-theme="solarized-dark"] .plan-policy-modal__warning {
+    background: rgba(248, 113, 113, 0.10);
+    border-left-color: #f87171;
+}
+.plan-policy-modal__categories {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-4);
+}
+.plan-policy-modal__category {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 2px var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-subtle, var(--bg));
+    align-items: start;
+}
+.plan-policy-modal__category > i {
+    grid-row: 1 / span 2;
+    align-self: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+.plan-policy-modal__category > strong {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.plan-policy-modal__category > span {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+.plan-policy-modal__category--prohibited {
+    border-color: #b91c1c;
+    background: rgba(220, 38, 38, 0.06);
+}
+.plan-policy-modal__category--prohibited > i {
+    color: #b91c1c;
+}
+.plan-policy-modal__category--prohibited > strong {
+    color: #991b1b;
+}
+.plan-policy-modal__category--allowed {
+    border-color: #15803d;
+    background: rgba(34, 197, 94, 0.07);
+}
+.plan-policy-modal__category--allowed > i {
+    color: #15803d;
+}
+.plan-policy-modal__category--allowed > strong {
+    color: #14532d;
+}
+[data-theme="ink"] .plan-policy-modal__category--prohibited,
+[data-theme="dracula"] .plan-policy-modal__category--prohibited,
+[data-theme="solarized-dark"] .plan-policy-modal__category--prohibited {
+    border-color: #f87171;
+    background: rgba(248, 113, 113, 0.08);
+}
+[data-theme="ink"] .plan-policy-modal__category--prohibited > i,
+[data-theme="dracula"] .plan-policy-modal__category--prohibited > i,
+[data-theme="solarized-dark"] .plan-policy-modal__category--prohibited > i {
+    color: #fca5a5;
+}
+[data-theme="ink"] .plan-policy-modal__category--prohibited > strong,
+[data-theme="dracula"] .plan-policy-modal__category--prohibited > strong,
+[data-theme="solarized-dark"] .plan-policy-modal__category--prohibited > strong {
+    color: #fecaca;
+}
+[data-theme="ink"] .plan-policy-modal__category--allowed,
+[data-theme="dracula"] .plan-policy-modal__category--allowed,
+[data-theme="solarized-dark"] .plan-policy-modal__category--allowed {
+    border-color: #86efac;
+    background: rgba(134, 239, 172, 0.08);
+}
+[data-theme="ink"] .plan-policy-modal__category--allowed > i,
+[data-theme="dracula"] .plan-policy-modal__category--allowed > i,
+[data-theme="solarized-dark"] .plan-policy-modal__category--allowed > i {
+    color: #86efac;
+}
+[data-theme="ink"] .plan-policy-modal__category--allowed > strong,
+[data-theme="dracula"] .plan-policy-modal__category--allowed > strong,
+[data-theme="solarized-dark"] .plan-policy-modal__category--allowed > strong {
+    color: #d1fae5;
+}
+.plan-policy-modal__advice {
+    margin: 0 0 var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-subtle, var(--bg));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-muted);
+}
+.plan-policy-modal__check {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(220, 38, 38, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+.plan-policy-modal__check .form-check-input {
+    margin-top: 4px;
+    width: 1.25em;
+    height: 1.25em;
+    cursor: pointer;
+}
+.plan-policy-modal__check .form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 38, 38, 0.25);
+    border-color: #b91c1c;
+}
+.plan-policy-modal__check .form-check-input:checked {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+}
+.plan-policy-modal__check .form-check-label {
+    cursor: pointer;
+    line-height: 1.55;
+    color: var(--text);
+}
+.plan-policy-modal__footer {
+    border-top: 1px solid var(--border);
+    padding: var(--space-3) var(--space-5);
+}
+.plan-policy-modal__footer .btn-danger.disabled,
+.plan-policy-modal__footer .btn-danger[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: 0.55;
+    background-color: #6b7280;
+    border-color: #6b7280;
+}
+
 /* Wizard */
 .plan-wizard {
     display: flex;
