@@ -1,0 +1,521 @@
+{
+    "_comment": "Assessment, Authorization, and Monitoring Plan generator. The meta family — documents how the system itself is assessed, authorized, and continuously monitored. Every other plan's §7 already references CA-7 (Continuous Monitoring); this plan defines that strategy. Authoring a system-level CA plan is unusual — most orgs treat CA as the assessment process layer above any single system — but explicit documentation supports clean traceability and is increasingly expected for ongoing-authorization regimes.",
+
+    "family": "CA",
+    "family_name": "Assessment, Authorization, and Monitoring",
+    "title": "Assessment, Authorization, and Monitoring Plan",
+    "description": "Documents how the system is assessed for control effectiveness, authorized for operation, and continuously monitored. Covers the controls of the CA family in NIST SP 800-53 r5 and aligns with NIST SP 800-37 r2 (RMF), NIST SP 800-53A r5 (Assessment), NIST SP 800-137 (Continuous Monitoring), NIST SP 800-47 r1 (Information Exchange), and NIST SP 800-115 (Penetration Testing).",
+
+    "intro_template": "This Assessment, Authorization, and Monitoring Plan documents the assessment-and-authorization approach for {system_name}. It establishes the assessment methodology, authorization process, continuous-monitoring strategy, and information-exchange controls that together support the system's ongoing Authority to Operate (ATO).\n\nThe scope covers control assessments, information exchanges with external systems, plan-of-action-and-milestones (POA&M) management, the authorization process, continuous-monitoring strategy, penetration-testing program, and internal-system-connection controls within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (CA family), NIST SP 800-37 r2 (RMF), and NIST SP 800-137 (Continuous Monitoring).",
+
+    "approach_section_title": "Assessment, Authorization, and Monitoring Approach",
+    "approach_template": "{system_name} is authorized under {authorization_type} and operates under continuous monitoring per the strategy in §4.6. Control assessments are performed by {assessment_authority} on the cadence in §4.2. The Authorizing Official ({authorizing_official}) makes authorization decisions based on assessment results, POA&M status, and ConMon trends. Information exchanges with external systems are governed per §4.3.\n\nAdditional details on assessment strategy, information exchange, POA&M management, the authorization process, the continuous-monitoring strategy, penetration testing, and internal connections are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "{system_name} maintains its authorization through continuous monitoring as described in this plan. Control-effectiveness data, POA&M status, and risk indicators are reviewed at the cadence in §6.1. ConMon-derived metrics from each other RMF artifact (CM, AC, AU, IA, IR, CP, SI) feed into the assessment of ongoing authorization. Material changes in risk posture trigger AO notification per the criteria in §4.6.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This plan is the integration hub for the entire RMF package. The CA-7 continuous-monitoring strategy is referenced from every family plan (CM §7, AC §7, AU §7, IA §7, IR §7, CP §7, SI §7). The POA&M defined in CA-5 receives findings from every plan. The authorization decisions of CA-6 are informed by control implementations documented across the entire package. The cross-references below identify where each subordinate plan plugs into this CA plan.",
+
+    "commonly_inheritable_controls": [
+        { "number": "CA-1", "from": "Organizational assessment-and-authorization policy" },
+        { "number": "CA-2", "from": "Enterprise assessment program (when shared assessor team)" },
+        { "number": "CA-3", "from": "Enterprise interconnection-management process" },
+        { "number": "CA-7", "from": "Enterprise continuous-monitoring program (ConMon framework, dashboards, reporting cadence)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Authorization type, who assesses, who authorizes, the ConMon framework.",
+            "questions": [
+                {
+                    "id": "authorization_type",
+                    "label": "Authorization type",
+                    "type": "select",
+                    "required": true,
+                    "options": ["Full Authority to Operate (ATO)", "Provisional ATO (FedRAMP/JAB)", "Conditional ATO (with stipulations)", "Ongoing Authorization (continuous)", "Authority to Test (ATT)", "Interim Authority to Test (IATT)", "Denial of Authorization to Operate (DATO)"]
+                },
+                {
+                    "id": "authorizing_official",
+                    "label": "Authorizing Official (AO) role",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role that holds authorization decision authority (e.g., 'Department CIO', 'Program AO', 'Designated Approving Authority'). Use the role title, not a named individual."
+                },
+                {
+                    "id": "assessment_authority",
+                    "label": "Assessment authority",
+                    "type": "text",
+                    "required": true,
+                    "help": "Who performs control assessments (e.g., 'Independent Internal Audit team', 'Third-party 3PAO', 'In-house ISSO with peer review', 'FedRAMP-accredited 3PAO')."
+                },
+                {
+                    "id": "ato_grant_date",
+                    "label": "Current ATO grant date",
+                    "type": "date",
+                    "help": "When the current authorization was granted."
+                },
+                {
+                    "id": "ato_expiration",
+                    "label": "ATO expiration / re-authorization due",
+                    "type": "date",
+                    "help": "Traditional 3-year cycle, or 'Ongoing' for continuous-authorization regimes."
+                },
+                {
+                    "id": "conmon_framework",
+                    "label": "ConMon framework reference",
+                    "type": "text",
+                    "help": "Authoritative ConMon strategy document (e.g., 'Org ConMon Strategy v2.1', 'FedRAMP ConMon Strategy & Guide', 'NIST SP 800-137 derived plan')."
+                }
+            ]
+        },
+
+        {
+            "id": "assessment_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Control Assessment Strategy (CA-2)",
+            "description": "Assessment methodology, scope per cycle, and reporting.",
+            "questions": [
+                { "id": "assessment_methods",         "label": "Assessment methods used",        "type": "multi_select",
+                  "options": ["Test (technical testing)", "Examine (document review)", "Interview (stakeholder discussion)", "Automated assessment (config scanning, compliance scanning)", "Continuous (ConMon-derived evidence)"] },
+                { "id": "assessment_cadence",         "label": "Assessment cadence",            "type": "select",
+                  "options": ["Annual full assessment", "Continuous ConMon-driven (ongoing)", "Triennial full + annual subset", "Quarterly subset rotating across all controls", "Other (specify)"] },
+                { "id": "assessment_independence",    "label": "Assessor independence",         "type": "select",
+                  "options": ["Fully independent (3PAO / external)", "Organizationally independent (separate from system team, same org)", "Peer review (in-house, separate function)", "Self-assessment (lowest assurance)"] },
+                { "id": "assessment_subset_strategy",  "label": "Subset / rotation strategy",   "type": "textarea", "rows": 4,
+                  "help": "If not all controls assessed every cycle: how the subset is selected (risk-based, rotation, ConMon-driven). Reference NIST SP 800-53A r5 §3 for guidance." },
+                { "id": "assessment_sar_recipients",   "label": "SAR distribution / recipients", "type": "textarea", "rows": 3,
+                  "help": "Who receives the Security Assessment Report (System Owner, AO, ISSO, ISSM, audit committee). Distribution control given the SAR contains finding details." }
+            ]
+        },
+
+        {
+            "id": "info_exchange",
+            "type": "group",
+            "section": "approach",
+            "label": "Information Exchange (CA-3)",
+            "description": "External system connections, ISAs / MOUs / IAs, and ongoing review.",
+            "questions": [
+                { "id": "external_connection_inventory_loc","label": "External-connection inventory location", "type": "text",
+                  "help": "Where the inventory of external system connections is maintained (e.g., 'Boundary diagram in SSP §4.2 + ISA register in Confluence'). The inventory drives this group." },
+                { "id": "isa_management_process",          "label": "ISA / MOU / IA management process", "type": "textarea", "rows": 4,
+                  "help": "How agreements are negotiated, approved (by AO), tracked, and reviewed. Reference NIST SP 800-47 r1 for federal interconnection guidance." },
+                { "id": "isa_review_cadence",              "label": "ISA review cadence",       "type": "select",
+                  "options": ["Annual", "Bi-annual", "On material change to either party", "Annual + on material change"] },
+                { "id": "external_connection_categories",  "label": "Categories of external connections", "type": "multi_select",
+                  "options": ["Federal-agency-to-federal-agency", "Federal to federal contractor (cleared facility)", "Federal to commercial (non-federal)", "Cloud service provider (CSP) integration", "Public-internet-facing (no agreement needed)", "Vendor support / break-glass connection", "Sister-system within same organization"] },
+                { "id": "external_connection_decommission","label": "Connection decommission process", "type": "textarea", "rows": 3,
+                  "help": "How a connection is properly torn down when no longer needed (network rules removed, access revoked, ISA formally terminated)." }
+            ]
+        },
+
+        {
+            "id": "poam_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Plan of Action and Milestones (CA-5)",
+            "description": "POA&M tooling, lifecycle, and SLAs.",
+            "questions": [
+                { "id": "poam_tool",                  "label": "POA&M tooling / system of record", "type": "text",
+                  "help": "System holding POA&M items (e.g., 'eMASS', 'Xacta 360', 'CSAM', 'ServiceNow GRC', 'Confluence + Jira tracker')." },
+                { "id": "poam_severity_slas",         "label": "Remediation SLAs by severity",   "type": "textarea", "rows": 5,
+                  "help": "How long POA&M items can stay open by severity. Federal references: BOD 22-01 for KEVs (15-30 days), FedRAMP for non-KEV (Critical 30 / High 90 / Medium 180). Adapt to your authority." },
+                { "id": "poam_review_cadence",        "label": "POA&M review cadence",           "type": "select",
+                  "options": ["Weekly status review", "Monthly with leadership", "Quarterly formal review", "Continuous (real-time dashboard)"] },
+                { "id": "poam_acceptance_criteria",   "label": "Risk-acceptance criteria",       "type": "textarea", "rows": 4,
+                  "help": "When can a POA&M item be closed by risk acceptance rather than remediation? Who must concur? What documentation is required?" },
+                { "id": "poam_closure_validation",    "label": "Closure validation",             "type": "textarea", "rows": 3,
+                  "help": "How a POA&M item is validated as closed (re-test by assessor, ISSO sign-off, automated re-scan). Independent validation requirement." }
+            ]
+        },
+
+        {
+            "id": "authorization_process",
+            "type": "group",
+            "section": "approach",
+            "label": "Authorization Process (CA-6)",
+            "description": "How authorization decisions are made and documented.",
+            "questions": [
+                { "id": "ato_decision_documents",  "label": "ATO decision package contents", "type": "multi_select",
+                  "options": ["System Security Plan (SSP)", "Security Assessment Plan (SAP)", "Security Assessment Report (SAR)", "Plan of Action and Milestones (POA&M)", "Risk Assessment Report (RAR)", "Privacy Impact Assessment (PIA)", "Contingency Plan", "Incident Response Plan", "Configuration Management Plan", "Boundary diagram / data-flow diagram", "Hardware / software inventory"] },
+                { "id": "ato_decision_workflow",   "label": "ATO decision workflow",         "type": "textarea", "rows": 4,
+                  "help": "Step-by-step from package submission to AO decision. SCA review → ISSM concurrence → AO decision → ATO letter issued." },
+                { "id": "ato_revocation_criteria", "label": "Authorization revocation / denial criteria", "type": "textarea", "rows": 3,
+                  "help": "Conditions that trigger AO consideration of DATO (Denial of ATO) or revocation: critical unaddressed POA&Ms, high-impact incident, compliance violation." },
+                { "id": "interim_authorization",    "label": "Interim authorization (IATT/ATT) approach", "type": "textarea", "rows": 3,
+                  "help": "When and how IATT (Interim Authority to Test) is used for development / test environments before full ATO. Time-bound, scope-limited." }
+            ]
+        },
+
+        {
+            "id": "continuous_monitoring_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Continuous Monitoring Strategy (CA-7)",
+            "description": "The strategy that every other family plan's §7 references back to.",
+            "questions": [
+                { "id": "conmon_metrics_categories",  "label": "ConMon metric categories",     "type": "multi_select",
+                  "options": ["Vulnerability metrics (from SI plan)", "Configuration drift metrics (from CM plan)", "Account / access metrics (from AC plan)", "Authentication metrics (from IA plan)", "Audit-pipeline health (from AU plan)", "Incident metrics (from IR plan)", "Recovery / RTO metrics (from CP plan)", "Privacy / PII handling metrics", "Supply-chain / SBOM metrics"] },
+                { "id": "conmon_reporting_cadence",   "label": "ConMon reporting cadence",     "type": "select",
+                  "options": ["Continuous dashboard with daily exec summary", "Weekly status report to AO", "Monthly ConMon report", "Quarterly ConMon report", "Per-event escalation only"] },
+                { "id": "conmon_change_triggers",     "label": "Material-change reauthorization triggers", "type": "textarea", "rows": 4,
+                  "help": "What constitutes a 'material change' that requires AO notification or re-assessment of authorization (significant architecture change, scope expansion, new data category, control failure trend)." },
+                { "id": "conmon_dashboard_location",  "label": "ConMon dashboard location",   "type": "text",
+                  "help": "Where the live ConMon dashboard lives (Splunk, Tableau, eMASS, custom)." },
+                { "id": "conmon_evidence_retention",  "label": "ConMon evidence retention",   "type": "text",
+                  "help": "How long ConMon-derived evidence (scan results, audit-trail snapshots) is retained for re-authorization use." }
+            ]
+        },
+
+        {
+            "id": "pen_testing",
+            "type": "group",
+            "section": "approach",
+            "label": "Penetration Testing (CA-8)",
+            "description": "Pen-test scope, frequency, and reporting.",
+            "questions": [
+                { "id": "pentest_authority",     "label": "Pen-test authority",            "type": "select",
+                  "options": ["Internal red team", "External commercial firm", "Mixed (internal recurring + external annual)", "Coordinated disclosure / bug bounty", "Not currently performed"] },
+                { "id": "pentest_scope",         "label": "Pen-test scope",                "type": "multi_select",
+                  "options": ["External (public-facing) network", "Internal network (assumed-breach)", "Web applications", "API / microservices", "Mobile applications", "Wireless infrastructure", "Social engineering / phishing", "Physical security", "Insider-threat scenarios"] },
+                { "id": "pentest_frequency",     "label": "Pen-test frequency",            "type": "select",
+                  "options": ["Annually", "Biennially", "Continuous (ongoing red-team operation)", "Per major release", "Triennial baseline + annual targeted"] },
+                { "id": "pentest_rules_of_engagement","label": "Rules of engagement reference", "type": "text",
+                  "help": "Where the ROE document lives (defines scope, timing, prohibited actions, escalation contacts)." },
+                { "id": "pentest_report_handling","label": "Pen-test report handling",      "type": "textarea", "rows": 3,
+                  "help": "Who receives the report, how it's stored, and how findings flow into the POA&M. Reports often warrant tighter access controls than other documentation." }
+            ]
+        },
+
+        {
+            "id": "internal_connections",
+            "type": "group",
+            "section": "approach",
+            "label": "Internal System Connections (CA-9)",
+            "description": "Connections within the authorization boundary that warrant explicit authorization.",
+            "questions": [
+                { "id": "internal_connections_inventory","label": "Internal connections inventory", "type": "textarea", "rows": 4,
+                  "help": "Connections between distinct components within the boundary (DMZ→app tier→DB; admin VLAN→production; jump-host→target). Many systems document these in a network diagram + flow table." },
+                { "id": "internal_connection_authorization", "label": "Connection authorization mechanism", "type": "textarea", "rows": 3,
+                  "help": "How each internal connection is authorized — usually via the architecture-decision record reviewed by the CCB at design time, then enforced by network policy / security groups." }
+            ]
+        },
+
+        {
+            "id": "assessment_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Assessment Scope and Boundary",
+            "description": "What's in scope for assessment, in plain terms.",
+            "questions": [
+                { "id": "scope_control_count",       "label": "Approximate control count in scope", "type": "text",
+                  "help": "Total controls + enhancements applicable to the chosen baseline." },
+                { "id": "scope_external_connections","label": "Number of external system connections", "type": "text",
+                  "help": "Approximate count of distinct external connections (each typically requires an ISA / IA)." },
+                { "id": "scope_data_categories",      "label": "Data categories in scope",         "type": "textarea", "rows": 3,
+                  "help": "Brief enumeration of data categories the system handles (informs assessment depth — PII / PHI / classified data warrant heightened assessment)." }
+            ]
+        },
+
+        {
+            "id": "conmon_metrics_published",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Published ConMon Metrics",
+            "description": "Specific metric values reported to the AO.",
+            "questions": [
+                { "id": "ca_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "% controls assessed within current cycle",
+                      "Open POA&M items by severity (count + age)",
+                      "Mean time to remediate POA&M (by severity)",
+                      "% POA&M items overdue",
+                      "ConMon report on-time rate (% reports issued by SLA)",
+                      "Material changes notified to AO (count per quarter)",
+                      "External-connection ISA review compliance (%)",
+                      "Pen-test findings closed within target",
+                      "Time since last full assessment"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "conmon_review_cadence",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "ConMon Review Cadence",
+            "description": "How and when ConMon outputs drive decisions.",
+            "questions": [
+                { "id": "conmon_review_frequency", "label": "ConMon review meeting frequency", "type": "select",
+                  "options": ["Weekly operational review", "Monthly with system stakeholders", "Quarterly with leadership", "Annually with AO"] },
+                { "id": "conmon_review_attendees", "label": "ConMon review attendees",         "type": "multi_select",
+                  "options": ["System Owner", "ISSO", "ISSM", "AO (or designate)", "SOC representative", "Engineering lead", "Privacy Officer", "External assessor (3PAO when applicable)"] },
+                { "id": "conmon_decision_rights",  "label": "Decision rights at review",       "type": "textarea", "rows": 3,
+                  "help": "What decisions are made at review (POA&M reprioritization, risk acceptance, AO escalation, plan revisions)." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "This plan is the integration hub — it both references and is referenced by every other plan.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the CA control implementations are summarized (e.g., 'SSP §13.2')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for CA findings", "type": "text",
+                  "help": "Convention for CA-related POA&M items (e.g., 'POAM-CA-')." },
+                { "id": "subordinate_plan_inventory",   "label": "Subordinate plan inventory",    "type": "textarea", "rows": 5,
+                  "help": "List the family plans that feed CA: CM, AC, AU, IA, IR, CP, SI plus any others. Each plan's CA-7 ConMon section ties back to this plan." },
+                { "id": "rar_location",                 "label": "Risk Assessment Report (RAR) location", "type": "text",
+                  "help": "Where the current RAR lives. Authoritative input to the AO's decision." },
+                { "id": "ssp_owner",                    "label": "SSP owner role",                "type": "text",
+                  "help": "Role responsible for keeping the SSP current (typically ISSO)." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "CA-2": {
+            "prompts": [
+                "Reference §4.2 — assessment methods, cadence, assessor independence.",
+                "State the SAR (Security Assessment Report) production cadence.",
+                "Document subset selection criteria if not all controls assessed every cycle.",
+                "Address coordination with FedRAMP / DoD-specific assessment programs if applicable.",
+                "Reference CA-2(1) independent assessors, CA-2(2) specialized assessments, CA-2(3) leveraging results from external organizations."
+            ],
+            "evidence_suggestions": [
+                "Security Assessment Plan (SAP)",
+                "Most recent Security Assessment Report (SAR)",
+                "Assessor independence attestation",
+                "Subset-selection methodology document",
+                "FedRAMP / DoD assessment record (if applicable)"
+            ],
+            "extra_fields": [
+                { "id": "ca2_independent_assessment_cadence","label": "Independent assessment cadence", "type": "text",
+                  "help": "How often a fully-independent (CA-2(1)) assessment is performed. Federal: typically every 3 years." },
+                { "id": "ca2_specialized_assessments",      "label": "Specialized assessments performed", "type": "multi_select",
+                  "options": ["FedRAMP 3PAO assessment", "FISMA annual review", "DoD A&A assessment", "Internal Audit IT general controls", "PCI DSS assessment", "SOC 2 Type II"] }
+            ]
+        },
+
+        "CA-3": {
+            "prompts": [
+                "Reference §4.3 — connection inventory, ISA / MOU / IA management.",
+                "Document the categories of external connections — see §4.3.",
+                "Address ongoing review of existing agreements.",
+                "Document monitoring of information exchange (volume, anomalies, content controls).",
+                "Reference CA-3(6) transfer authorizations, CA-3(7) transitive information exchanges."
+            ],
+            "evidence_suggestions": [
+                "Active ISA / MOU / IA register",
+                "Sample executed ISA",
+                "Boundary diagram showing external connections",
+                "Information-exchange monitoring report",
+                "Connection-decommission record"
+            ],
+            "extra_fields": [
+                { "id": "ca3_information_exchange_monitoring","label": "Information-exchange monitoring approach", "type": "textarea", "rows": 3,
+                  "help": "How traffic across external connections is monitored for anomalies, exfiltration attempts, or scope violations." },
+                { "id": "ca3_transitive_exchange_handling",   "label": "Transitive exchange handling (CA-3(7))", "type": "textarea", "rows": 3,
+                  "help": "How information that flows through one external system to a downstream system is governed. Often the trickiest part of CA-3 — chains of trust must be documented." }
+            ]
+        },
+
+        "CA-5": {
+            "prompts": [
+                "Reference §4.4 — POA&M tool, severity SLAs, review cadence, closure validation.",
+                "Document the integration with vulnerability scanning, audit findings, and incident lessons-learned (each generates POA&M items).",
+                "Address risk-acceptance workflow when remediation is impractical.",
+                "Reference CA-5(1) automation support for accuracy and currency."
+            ],
+            "evidence_suggestions": [
+                "POA&M export (sanitized — by ID, severity, age, status)",
+                "Sample POA&M closure record (with validation evidence)",
+                "Risk-acceptance documentation for an open accepted item",
+                "POA&M trend dashboard"
+            ],
+            "extra_fields": [
+                { "id": "ca5_automation_status",  "label": "POA&M automation status (CA-5(1))", "type": "select",
+                  "options": ["Fully automated (vuln-scan → auto POA&M)", "Partial (some sources auto-create; others manual)", "Manual (analysts open all items)"] },
+                { "id": "ca5_quarterly_aging",    "label": "Quarterly aging review",          "type": "textarea", "rows": 3,
+                  "help": "Process for surfacing aging items at quarterly review (escalation thresholds based on age * severity)." }
+            ]
+        },
+
+        "CA-6": {
+            "prompts": [
+                "Reference §4.5 — decision package contents, workflow, revocation criteria.",
+                "Identify the AO and AO designate (alternate).",
+                "Address authorization-package version control and retention.",
+                "Document the relationship between authorization decisions and ConMon trends (ongoing authorization).",
+                "Reference CA-6(1) joint authorization, CA-6(2) authorization periodicity."
+            ],
+            "evidence_suggestions": [
+                "Current ATO letter (signed by AO)",
+                "Authorization package table of contents",
+                "AO designation document",
+                "Sample DATO / revocation record (if any historical)"
+            ],
+            "extra_fields": [
+                { "id": "ca6_ao_designate",    "label": "AO designate / alternate",     "type": "text",
+                  "help": "Backup AO when the primary is unavailable. Documented designation required." },
+                { "id": "ca6_joint_authorization","label": "Joint authorization (CA-6(1))", "type": "textarea", "rows": 3,
+                  "help": "If multiple organizations share authorization responsibility (e.g., FedRAMP JAB, joint federal-state programs), describe the arrangement." }
+            ]
+        },
+
+        "CA-7": {
+            "prompts": [
+                "Reference §4.6 — ConMon metric categories, reporting cadence, change triggers, dashboard.",
+                "**This is the strategy that every subordinate plan's §7 references back to.** Document the reciprocal — how each plan's ConMon outputs feed this CA-7 strategy.",
+                "Address the difference between operational monitoring (real-time) and ConMon reporting (aggregated, periodic).",
+                "Document how ConMon results inform ongoing-authorization decisions.",
+                "Reference CA-7(1) independent assessment, CA-7(3) trend analyses, CA-7(4) risk monitoring, CA-7(6) automation support for monitoring."
+            ],
+            "evidence_suggestions": [
+                "Continuous Monitoring Strategy document (organizational or system-specific)",
+                "ConMon dashboard screenshot (sanitized)",
+                "Sample monthly / quarterly ConMon report",
+                "Material-change AO notification record",
+                "Trend-analysis report (last quarter)"
+            ],
+            "extra_fields": [
+                { "id": "ca7_independent_review_cadence","label": "Independent assessment within ConMon (CA-7(1))", "type": "text",
+                  "help": "How often an independent party reviews ConMon results (vs the implementing team's self-attestation). Increases assurance." },
+                { "id": "ca7_trend_analysis_method",     "label": "Trend analysis method (CA-7(3))", "type": "textarea", "rows": 3,
+                  "help": "How control-effectiveness trends are calculated and presented over time. Identifies degrading controls before they fail." },
+                { "id": "ca7_risk_monitoring_integration","label": "Risk monitoring (CA-7(4))",     "type": "textarea", "rows": 3,
+                  "help": "How risk indicators (threat intel, vulnerability trends, incident frequency) are integrated into ConMon to detect changing risk posture." }
+            ]
+        },
+
+        "CA-8": {
+            "prompts": [
+                "Reference §4.7 — pen-test authority, scope, frequency, ROE, report handling.",
+                "Document independence of pen-test team from system development / operation.",
+                "Address handling of unintended impact on production during testing.",
+                "Reference CA-8(1) independent penetration agent or team, CA-8(2) red team exercises."
+            ],
+            "evidence_suggestions": [
+                "Pen-test contract or charter (executive summary)",
+                "Most recent pen-test report (with redactions)",
+                "Rules of engagement document",
+                "Pen-test findings → POA&M traceability sample",
+                "Red team exercise record (if applicable)"
+            ],
+            "extra_fields": [
+                { "id": "ca8_red_team_program",   "label": "Red team / adversary emulation program (CA-8(2))", "type": "textarea", "rows": 3,
+                  "help": "Whether ongoing red-team / adversary emulation is performed beyond point-in-time pen tests. Describe the program if so." },
+                { "id": "ca8_findings_traceability","label": "Pen-test findings traceability",  "type": "textarea", "rows": 3,
+                  "help": "How each pen-test finding is tracked to closure in the POA&M. Sample finding-to-POA&M-item linkage." }
+            ]
+        },
+
+        "CA-9": {
+            "prompts": [
+                "Reference §4.8 — internal connections inventory + authorization mechanism.",
+                "Document the difference between architectural design-review (CCB) authorization and ongoing operational verification of internal connections.",
+                "Address how internal-connection inventory is kept current as architecture evolves."
+            ],
+            "evidence_suggestions": [
+                "Network diagram with internal connections",
+                "Internal connection-flow table",
+                "Architecture decision records (ADRs) for major connections",
+                "Network policy / security-group enforcement evidence"
+            ],
+            "extra_fields": [
+                { "id": "ca9_inventory_review_cadence","label": "Internal-connection inventory review cadence", "type": "text",
+                  "help": "How often the internal-connection inventory is verified against actual network state." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "ATC",                       "definition": "Authority to Connect — authorization for two systems to interconnect, often a subset of an ATO." },
+        { "term": "ATD",                       "definition": "Authority to Disconnect — order to terminate a previously authorized connection." },
+        { "term": "ATO",                       "definition": "Authority to Operate — formal authorization from an AO permitting a system to operate in production." },
+        { "term": "Authorization Boundary",    "definition": "All components included within the scope of a system authorization. Excludes systems separately authorized to which this system is connected." },
+        { "term": "Authorizing Official (AO)", "definition": "Senior executive with authority to formally assume responsibility for operating a system at an acceptable level of risk." },
+        { "term": "Common Control",            "definition": "A control that is inheritable by multiple systems from a common provider. Reduces duplicate implementation effort." },
+        { "term": "Continuous Authorization",  "definition": "An ongoing-authorization regime in which authorization remains valid as long as ConMon evidence demonstrates acceptable risk, vs a fixed 3-year cycle." },
+        { "term": "Continuous Monitoring (ConMon)", "definition": "The ongoing observation of a system's security and privacy posture to ensure controls remain effective and risk remains acceptable." },
+        { "term": "DATO",                      "definition": "Denial of Authorization to Operate — formal AO decision to refuse or revoke authorization." },
+        { "term": "Hybrid Control",            "definition": "A control whose implementation is shared between an inherited common control and system-specific implementation." },
+        { "term": "IATT",                      "definition": "Interim Authority to Test — time-bound, scope-limited authorization for testing prior to full ATO." },
+        { "term": "Information Exchange Agreement (IEA / IA)", "definition": "Formal agreement governing information sharing between two organizations or systems." },
+        { "term": "Interconnection Security Agreement (ISA)", "definition": "Document defining the technical and security requirements for connecting two systems. Per NIST SP 800-47." },
+        { "term": "Joint Authorization Board (JAB)", "definition": "FedRAMP body that issues Provisional ATOs (P-ATOs) for cloud services. AOs are DoD CIO, GSA CIO, DHS CIO." },
+        { "term": "Memorandum of Agreement (MOA)", "definition": "Agreement between organizations covering broader cooperation than an ISA, often a parent for one or more ISAs." },
+        { "term": "Memorandum of Understanding (MOU)", "definition": "Less-formal agreement than an MOA, often used for non-binding cooperation arrangements." },
+        { "term": "Ongoing Authorization",     "definition": "A continuous-authorization regime authorized via NIST SP 800-37 r2 §3.6, replacing fixed-cycle re-authorization with continuous evidence of control effectiveness." },
+        { "term": "Plan of Action and Milestones (POA&M)", "definition": "A document tracking weaknesses identified during assessments, the planned actions to correct them, and milestones for completion." },
+        { "term": "Provisional ATO (P-ATO)",   "definition": "FedRAMP-issued authorization at a specific impact level (Low/Moderate/High) granted by the JAB. Federal agencies leverage P-ATOs for shared cloud services." },
+        { "term": "Risk Assessment Report (RAR)", "definition": "Document summarizing assessed risk to the system, supporting the AO's authorization decision." },
+        { "term": "Security Assessment Plan (SAP)", "definition": "Document describing the scope, methodology, and schedule of a control assessment. Per NIST SP 800-53A." },
+        { "term": "Security Assessment Report (SAR)", "definition": "Document presenting the results of a control assessment, including findings, observations, and recommendations." },
+        { "term": "Security Control Assessor (SCA)", "definition": "The individual or team responsible for conducting a comprehensive assessment of system security controls." },
+        { "term": "Third-Party Assessment Organization (3PAO)", "definition": "FedRAMP-accredited firm that performs independent security assessments of cloud services." }
+    ],
+
+    "acronyms": [
+        { "abbr": "3PAO",  "expansion": "Third-Party Assessment Organization (FedRAMP-accredited)" },
+        { "abbr": "AO",    "expansion": "Authorizing Official" },
+        { "abbr": "ATC",   "expansion": "Authority to Connect" },
+        { "abbr": "ATD",   "expansion": "Authority to Disconnect" },
+        { "abbr": "ATO",   "expansion": "Authority to Operate" },
+        { "abbr": "ATT",   "expansion": "Authority to Test" },
+        { "abbr": "BOD",   "expansion": "Binding Operational Directive (CISA)" },
+        { "abbr": "CA",    "expansion": "Assessment, Authorization, and Monitoring (NIST 800-53 family)" },
+        { "abbr": "CISA",  "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "ConMon","expansion": "Continuous Monitoring" },
+        { "abbr": "CSAM",  "expansion": "Cyber Security Assessment & Management (DOJ system)" },
+        { "abbr": "CSP",   "expansion": "Cloud Service Provider" },
+        { "abbr": "DATO",  "expansion": "Denial of Authorization to Operate" },
+        { "abbr": "FedRAMP","expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FISMA", "expansion": "Federal Information Security Modernization Act" },
+        { "abbr": "GRC",   "expansion": "Governance, Risk, and Compliance" },
+        { "abbr": "IA",    "expansion": "Information-Exchange Agreement (in context of CA-3) — note: also acronym for Identification & Authentication family" },
+        { "abbr": "IATT",  "expansion": "Interim Authority to Test" },
+        { "abbr": "ISA",   "expansion": "Interconnection Security Agreement" },
+        { "abbr": "ISSM",  "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",  "expansion": "Information System Security Officer" },
+        { "abbr": "JAB",   "expansion": "Joint Authorization Board (FedRAMP)" },
+        { "abbr": "KEV",   "expansion": "Known Exploited Vulnerabilities (CISA catalog)" },
+        { "abbr": "MOA",   "expansion": "Memorandum of Agreement" },
+        { "abbr": "MOU",   "expansion": "Memorandum of Understanding" },
+        { "abbr": "NIST",  "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",   "expansion": "Organization-Defined Value" },
+        { "abbr": "OMB",   "expansion": "Office of Management and Budget" },
+        { "abbr": "P-ATO", "expansion": "Provisional Authority to Operate (FedRAMP)" },
+        { "abbr": "PIA",   "expansion": "Privacy Impact Assessment" },
+        { "abbr": "POAM",  "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RAR",   "expansion": "Risk Assessment Report" },
+        { "abbr": "RMF",   "expansion": "Risk Management Framework" },
+        { "abbr": "ROE",   "expansion": "Rules of Engagement (pen testing)" },
+        { "abbr": "SAP",   "expansion": "Security Assessment Plan" },
+        { "abbr": "SAR",   "expansion": "Security Assessment Report" },
+        { "abbr": "SCA",   "expansion": "Security Control Assessor" },
+        { "abbr": "SOC",   "expansion": "Security Operations Center / SOC 2 attestation (context-dependent)" },
+        { "abbr": "SP",    "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",   "expansion": "System Security Plan" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",          "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-53A r5 — Assessing Security and Privacy Controls", "url": "https://csrc.nist.gov/pubs/sp/800/53/a/r5/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",              "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-137 — Information Security Continuous Monitoring", "url": "https://csrc.nist.gov/pubs/sp/800/137/final" },
+        { "label": "NIST SP 800-137A — Assessing Information Security Continuous Monitoring", "url": "https://csrc.nist.gov/pubs/sp/800/137/a/final" },
+        { "label": "NIST SP 800-47 r1 — Managing the Security of Information Exchanges", "url": "https://csrc.nist.gov/pubs/sp/800/47/r1/final" },
+        { "label": "NIST SP 800-115 — Technical Guide to Information Security Testing and Assessment", "url": "https://csrc.nist.gov/pubs/sp/800/115/final" },
+        { "label": "OMB Circular A-130 — Managing Information as a Strategic Resource", "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/circulars/A130/a130revised.pdf" },
+        { "label": "FedRAMP Continuous Monitoring Strategy & Guide",             "url": "https://www.fedramp.gov/assets/resources/documents/CSP_Continuous_Monitoring_Strategy_Guide.pdf" }
+    ]
+}
