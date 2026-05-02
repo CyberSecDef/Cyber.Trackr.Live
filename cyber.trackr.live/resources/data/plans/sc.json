@@ -1,0 +1,655 @@
+{
+    "_comment": "System and Communications Protection Plan generator. Authored at the Phase 2 assessability floor; pairs with SI (SC-7 boundary alarms feed SI-4 monitoring), AU (SC-8 / SC-13 cryptographic events go into the audit trail), IA (SC-12 key establishment underwrites IA-5 authenticators), and CM (SC-7 boundary changes route through CM-3 change control). Largest technical family in 800-53 r5 — 51 base controls authored at moderate baseline scope.",
+
+    "family": "SC",
+    "family_name": "System and Communications Protection",
+    "title": "System and Communications Protection Plan",
+    "description": "Documents how the system protects information at rest and in transit, partitions trust, defends boundaries, manages cryptographic key material, secures DNS / certificate / session integrity, and provides architectural protections (process isolation, DoS resilience, mobile-code containment). Covers the controls of the SC family in NIST SP 800-53 r5 and aligns with NIST SP 800-52 r2 (TLS), NIST SP 800-57 (Key Management), NIST SP 800-77 r1 (IPsec VPNs), NIST SP 800-95 (Web Services Security), FIPS 140-3 (Cryptographic Module Validation), and FIPS 199 / FIPS 200.",
+
+    "intro_template": "This System and Communications Protection Plan documents the protections applied to {system_name}'s communications channels, cryptographic operations, network boundary, and shared system resources. It establishes the practices, tooling, cadences, and roles used to safeguard data in transit and at rest, manage cryptographic key material across its lifecycle, partition trusted from untrusted code, secure name resolution, defend against denial-of-service, and contain mobile code.\n\nThe scope covers boundary protection, transmission protection, cryptographic key establishment and management, FIPS-validated cryptographic protection, data at rest, secure name resolution (authoritative and recursive), session authenticity, mobile-code controls, process isolation, and resource-availability protections within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (System and Communications Protection family), NIST SP 800-52 r2 (TLS), NIST SP 800-57 (Key Management), and FIPS 140-3 (Cryptographic Module Validation Program).",
+
+    "approach_section_title": "System and Communications Protection Approach",
+    "approach_template": "{system_name} relies on {boundary_tooling} for boundary protection, {encryption_in_transit_tooling} for protection of data in transit, {encryption_at_rest_tooling} for protection of data at rest, and {key_management_system} for cryptographic key management. FIPS 140-3 validation status of cryptographic modules is tracked at {fips_validation_evidence}. DNS integrity is protected via {dns_protection_summary}.\n\nAdditional details on boundary protection, transmission protection, cryptographic key management, FIPS-validated protection, data at rest, name resolution, session authenticity, mobile code, and architectural protections are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Communications-protection performance for {system_name} is tracked through the metrics in §6.1 (TLS coverage rate, certificate-expiration lead time, FIPS-validated module coverage, boundary alarm volume + signal-to-noise, DNSSEC validation rate, key-rotation SLA compliance). The cryptographic inventory is reviewed on the cadence in §6.2; certificate expirations are managed via the automation described in §4.4 with alerts well in advance of expiration. Boundary alarms (SC-7(18) fail-secure events, SC-7 unauthorized connection attempts) feed the SI-4 monitoring pipeline and the IR triage queue.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This System and Communications Protection Plan does not stand alone. The CM family deploys boundary and cryptographic configuration changes through the change-control workflow; the SI family monitors boundary alarms and integrity events; the AU family captures cryptographic-key-management and boundary-incident events; the IA family relies on SC-12 key establishment to underwrite authenticators; the CP family inherits cryptographic-recovery requirements when restoring from backup. The following cross-references identify the specific artifacts and locations where SC-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "SC-1",  "from": "Organizational system-and-communications-protection policy" },
+        { "number": "SC-12", "from": "Enterprise PKI / CA infrastructure (when shared certificate authority underwrites system certs)" },
+        { "number": "SC-13", "from": "Enterprise FIPS-validated cryptographic module library / provider" },
+        { "number": "SC-20", "from": "Enterprise authoritative DNS service (when externally hosted with DNSSEC)" },
+        { "number": "SC-21", "from": "Enterprise recursive / caching DNS service" },
+        { "number": "SC-22", "from": "Enterprise DNS service architecture (internal + external authoritative split)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Tooling and one-line summaries that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "boundary_tooling",
+                    "label": "Boundary protection tooling (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Primary boundary defense (e.g., 'Palo Alto NGFW + AWS Network Firewall + AWS WAF', 'Cisco Firepower + ACI segmentation', 'Azure Firewall Premium + App Gateway WAF')."
+                },
+                {
+                    "id": "encryption_in_transit_tooling",
+                    "label": "Encryption in transit (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "TLS terminator(s) + version policy (e.g., 'TLS 1.3 enforced at AWS ALB; TLS 1.2 minimum on internal mTLS via Istio')."
+                },
+                {
+                    "id": "encryption_at_rest_tooling",
+                    "label": "Encryption at rest (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Mechanisms protecting data at rest (e.g., 'AWS KMS-managed CMKs for EBS / S3 / RDS; LUKS for on-prem; SQL TDE for legacy DB')."
+                },
+                {
+                    "id": "key_management_system",
+                    "label": "Key management system (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Cryptographic key custody (e.g., 'AWS KMS (FIPS 140-2 L3 HSM-backed) for app data; HashiCorp Vault for secrets; internal CA for mTLS certificates')."
+                },
+                {
+                    "id": "fips_validation_evidence",
+                    "label": "FIPS 140-3 validation evidence location",
+                    "type": "text",
+                    "help": "Where FIPS 140-3 / 140-2 validation certificates are tracked (e.g., 'Cryptographic-inventory register in GRC tool; vendor CMVP certs filed at /repo/compliance/crypto/')."
+                },
+                {
+                    "id": "dns_protection_summary",
+                    "label": "DNS protection summary (one-liner)",
+                    "type": "text",
+                    "help": "Brief phrase summarizing DNS integrity / DNSSEC / DoH posture. Detail goes in the Name Resolution sub-section."
+                }
+            ]
+        },
+
+        {
+            "id": "boundary_protection",
+            "type": "group",
+            "section": "approach",
+            "label": "Boundary Protection (SC-7)",
+            "description": "Network boundary architecture, ingress / egress controls, and managed interfaces.",
+            "questions": [
+                { "id": "boundary_topology",        "label": "Boundary topology summary",         "type": "textarea", "rows": 4,
+                  "help": "Where the authorization boundary sits relative to the internet, partner networks, and other systems. DMZ structure, public subnets, private subnets, transit gateway, etc. Reference an architecture diagram if maintained." },
+                { "id": "boundary_managed_interfaces", "label": "Managed interfaces (SC-7(3))",   "type": "multi_select",
+                  "options": ["Public-facing web (WAF + ALB)", "Public-facing API gateway", "Site-to-site VPN", "Client VPN / ZTNA", "Partner-network direct connect", "Reverse proxy / bastion", "Mail gateway", "DNS forwarder", "Outbound proxy / SWG"] },
+                { "id": "boundary_default_deny",    "label": "Default-deny enforcement",          "type": "select",
+                  "options": ["Default deny on ingress and egress (SC-7(5) full)", "Default deny ingress, monitored egress (SC-7(5) ingress only)", "Allowlist-only outbound (high-assurance)", "Stateful inspection without strict default deny"] },
+                { "id": "boundary_egress_filtering","label": "Egress filtering approach (SC-7(4) / SC-7(5))", "type": "textarea", "rows": 4,
+                  "help": "How outbound traffic is restricted: allowlisted destinations, DNS-based egress filtering (e.g., AWS Route 53 Resolver DNS Firewall), proxy-enforced URL category filtering, SNI inspection." },
+                { "id": "boundary_split_tunneling", "label": "Split-tunneling restriction (SC-7(7))", "type": "select",
+                  "options": ["Split-tunneling prohibited (all traffic tunneled)", "Split-tunneling allowed only for specific allowlisted destinations", "Split-tunneling allowed (with documented risk acceptance)", "Not applicable (no remote access tunnels in this system)"] },
+                { "id": "boundary_external_telecom", "label": "External telecom routing (SC-7(8))", "type": "textarea", "rows": 3,
+                  "help": "How traffic to external organizations or networks is routed through proxies / gateways for inspection. Reference any TIC / TIC 3.0 alignment for federal systems." },
+                { "id": "boundary_change_review",   "label": "Boundary-rule change review",        "type": "text",
+                  "help": "Cadence at which boundary-policy / firewall-rule sets are reviewed for stale or overly permissive rules (e.g., 'Quarterly NIPR review; immediate review on any expedited add')." }
+            ]
+        },
+
+        {
+            "id": "transmission_protection",
+            "type": "group",
+            "section": "approach",
+            "label": "Transmission Protection (SC-8)",
+            "description": "TLS / mTLS / IPsec coverage, version policy, and inspection.",
+            "questions": [
+                { "id": "transmission_tls_min_version", "label": "Minimum TLS version (external)", "type": "select",
+                  "options": ["TLS 1.3", "TLS 1.2", "TLS 1.2 with HSTS preload"] },
+                { "id": "transmission_tls_internal", "label": "Internal traffic TLS posture",     "type": "select",
+                  "options": ["mTLS enforced on all internal east-west traffic (zero trust)", "TLS enforced on all internal traffic (one-way auth)", "TLS enforced for service-to-service; cleartext only on isolated control plane", "Mixed (documented exceptions)"] },
+                { "id": "transmission_cipher_policy", "label": "Cipher / curve policy",            "type": "textarea", "rows": 3,
+                  "help": "Approved ciphers and elliptic curves (e.g., 'TLS_AES_128_GCM_SHA256, TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256; ECDH curves P-256 / P-384'). Reference NIST SP 800-52 r2." },
+                { "id": "transmission_certificate_source","label": "TLS certificate source",     "type": "multi_select",
+                  "options": ["Public CA (Let's Encrypt / DigiCert / etc.)", "AWS Certificate Manager (ACM)", "Internal CA (enterprise PKI)", "GovTLS / federal CA", "Self-signed (development only)"] },
+                { "id": "transmission_inspection",   "label": "TLS inspection / break-and-inspect", "type": "textarea", "rows": 3,
+                  "help": "Whether and how outbound TLS is inspected for malware / DLP. Boundary location of break-and-inspect; PKI trust establishment on endpoints; bypass list for sensitive destinations (banking, healthcare)." },
+                { "id": "transmission_legacy_cleartext", "label": "Legacy cleartext traffic register", "type": "textarea", "rows": 3,
+                  "help": "Any cleartext flows that remain (e.g., legacy SCADA, isolated test net). Compensating controls and POA&M reference." }
+            ]
+        },
+
+        {
+            "id": "key_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Cryptographic Key Establishment & Management (SC-12)",
+            "description": "Key lifecycle: generation, distribution, storage, rotation, destruction.",
+            "questions": [
+                { "id": "kms_generation_method",    "label": "Key generation method",             "type": "select",
+                  "options": ["FIPS 140-3 / 140-2 validated HSM", "FIPS 140-3 / 140-2 validated software module", "Cloud KMS (FIPS-validated)", "Mixed (HSM for high-assurance keys; software module otherwise)"] },
+                { "id": "kms_storage_protection",   "label": "Key storage protection",            "type": "textarea", "rows": 3,
+                  "help": "How key material is protected at rest. HSM-backed, sealed by KMS, escrow process. Reference NIST SP 800-57 Part 1 §6 for storage requirements." },
+                { "id": "kms_rotation_policy",      "label": "Rotation policy by key class",      "type": "textarea", "rows": 5,
+                  "help": "Rotation frequency by key class. Example: 'Customer master keys: annual; data encryption keys: per-object; signing keys: 2 years (overlapping); session keys: per-session; TLS certificates: 90 days (Let's Encrypt) / 1 year (internal CA).'" },
+                { "id": "kms_compromise_recovery",  "label": "Key compromise recovery procedure", "type": "textarea", "rows": 3,
+                  "help": "Steps when a key is suspected compromised. Revocation of dependent certs, rotation of dependent secrets, notification to stakeholders. Reference IR plan for incident handling." },
+                { "id": "kms_destruction_method",   "label": "Key destruction method",            "type": "textarea", "rows": 3,
+                  "help": "How keys are destroyed at end of life. Cryptographic erasure for cloud KMS, zeroize commands for HSM, NIST SP 800-88 r1 sanitization for media holding key material." },
+                { "id": "kms_inventory_location",   "label": "Cryptographic key inventory location", "type": "text",
+                  "help": "Where the cryptographic-key inventory is maintained (CMDB, GRC tool, dedicated KMS dashboard). Reference SC-13 cryptographic inventory." }
+            ]
+        },
+
+        {
+            "id": "fips_validation",
+            "type": "group",
+            "section": "approach",
+            "label": "FIPS 140-3 Cryptographic Protection (SC-13)",
+            "description": "Cryptographic module validation and inventory.",
+            "questions": [
+                { "id": "fips_module_inventory",    "label": "Cryptographic module inventory summary", "type": "textarea", "rows": 4,
+                  "help": "List of cryptographic modules in use with FIPS 140-3 / 140-2 certificate numbers. Example: 'OpenSSL FIPS 3.0 (CMVP #4282) for app TLS; AWS KMS HSM (CMVP #4523) for key custody; macOS CoreCrypto (CMVP #4244) for endpoint encryption.'" },
+                { "id": "fips_validation_status",   "label": "Validation status posture",         "type": "select",
+                  "options": ["All modules FIPS 140-3 validated", "All modules FIPS 140-2 validated (transitioning to 140-3)", "Mixed validated + non-validated (with documented exceptions)", "Not currently FIPS-aligned (non-federal system)"] },
+                { "id": "fips_use_contexts",        "label": "Use contexts requiring FIPS validation", "type": "multi_select",
+                  "options": ["Authentication (passwords, tokens, SSH)", "Encryption in transit (TLS, IPsec, SSH)", "Encryption at rest (filesystem, database, object storage)", "Code signing", "Digital signature on transactions", "Key wrapping / key transport", "PRNG / random-number generation", "MAC / HMAC for integrity"] },
+                { "id": "fips_reaccreditation_tracking", "label": "Re-accreditation tracking",     "type": "textarea", "rows": 3,
+                  "help": "How FIPS certificate expiration is tracked and re-validated modules are adopted before expiry. Lead time, owner role." }
+            ]
+        },
+
+        {
+            "id": "data_at_rest",
+            "type": "group",
+            "section": "approach",
+            "label": "Data at Rest (SC-28)",
+            "description": "Encryption coverage by storage class and what's not yet protected.",
+            "questions": [
+                { "id": "rest_coverage_by_storage", "label": "Coverage by storage class",         "type": "multi_select",
+                  "options": ["Block storage (EBS / managed disks)", "Object storage (S3 / Blob / GCS)", "Relational databases (RDS / Cloud SQL / on-prem)", "NoSQL databases (DynamoDB / Cosmos / Firestore)", "Filesystems (EFS / FSx / NFS / on-prem)", "Backups + snapshots", "Endpoint disks (laptops / mobile)", "Removable media", "Cache / queue persistence (ElastiCache / SQS / Kafka)", "Logs at rest"] },
+                { "id": "rest_key_origin",          "label": "Key origin for at-rest encryption", "type": "select",
+                  "options": ["Cloud-managed (CMKs in cloud KMS)", "Customer-managed in cloud KMS (BYOK)", "Customer-held HSM (HYOK / external KMS)", "On-prem HSM-backed", "Mixed (per data classification)"] },
+                { "id": "rest_envelope_strategy",   "label": "Envelope-encryption strategy",      "type": "textarea", "rows": 3,
+                  "help": "How DEKs and KEKs are layered. Per-object DEKs, per-tenant DEKs, per-database DEKs. KEK rotation independent of DEK rotation. Reference NIST SP 800-57 Part 1 §5 envelope encryption." },
+                { "id": "rest_classified_handling", "label": "Classified / sensitive data handling", "type": "textarea", "rows": 3,
+                  "help": "If CUI / PII / classified data is in scope: special handling (separate keys, FIPS 140-3 L3, hardware-backed). Reference SI-12 for retention." },
+                { "id": "rest_unprotected_register","label": "Unprotected-data register (if any)", "type": "textarea", "rows": 3,
+                  "help": "Any locations where encryption at rest is not yet applied. Compensating controls (physical security, network isolation) and POA&M reference." }
+            ]
+        },
+
+        {
+            "id": "name_resolution",
+            "type": "group",
+            "section": "approach",
+            "label": "Name Resolution Security (SC-20, SC-21, SC-22)",
+            "description": "DNSSEC, DNS forwarding, and DNS architecture.",
+            "questions": [
+                { "id": "dns_authoritative_provider", "label": "Authoritative DNS provider",        "type": "text",
+                  "help": "Who hosts the authoritative zones for system domains (e.g., 'AWS Route 53', 'Cloudflare DNS', 'enterprise BIND clusters')." },
+                { "id": "dns_dnssec_status",        "label": "DNSSEC signing status (SC-20)",      "type": "select",
+                  "options": ["DNSSEC signed on all authoritative zones", "DNSSEC signed on external zones only", "DNSSEC signed on critical zones only (with rationale)", "Not signed (with compensating controls and POA&M)"] },
+                { "id": "dns_recursive_provider",   "label": "Recursive / caching DNS provider (SC-21)", "type": "text",
+                  "help": "Resolver(s) used by hosts (e.g., 'AWS Route 53 Resolver with DNS Firewall', 'Cisco Umbrella', 'Quad9 with DoT')." },
+                { "id": "dns_validation_enforcement", "label": "DNSSEC validation enforcement (SC-21)", "type": "select",
+                  "options": ["Validating resolvers (DNSSEC validation enforced on lookup)", "Validating resolvers with permissive logging", "Non-validating (relies on upstream)"] },
+                { "id": "dns_architecture_separation","label": "Internal / external DNS separation (SC-22)", "type": "textarea", "rows": 3,
+                  "help": "How internal and external DNS views are separated. Split-horizon DNS, internal-only zones, exfiltration-resistance via DNS firewall." },
+                { "id": "dns_doh_dot_policy",       "label": "DoH / DoT policy",                   "type": "textarea", "rows": 3,
+                  "help": "Whether DNS-over-HTTPS or DNS-over-TLS is enforced or restricted. Some orgs block external DoH to retain DNS-firewall visibility." }
+            ]
+        },
+
+        {
+            "id": "session_authenticity",
+            "type": "group",
+            "section": "approach",
+            "label": "Session Authenticity & Network Disconnect (SC-10, SC-15, SC-23)",
+            "description": "Session integrity, idle disconnect, and collaborative-computing controls.",
+            "questions": [
+                { "id": "session_integrity_mechanism", "label": "Session integrity mechanism (SC-23)", "type": "textarea", "rows": 3,
+                  "help": "How session authenticity is preserved (signed JWTs, session-bound tokens, mTLS-enforced bindings, Token Binding). Anti-replay, session-fixation prevention." },
+                { "id": "session_idle_disconnect",  "label": "Idle disconnect threshold (SC-10)",  "type": "text",
+                  "help": "Time after which an idle session is terminated. SC-10 ODV (e.g., '15 minutes for privileged sessions; 30 minutes for standard')." },
+                { "id": "session_total_lifetime",   "label": "Maximum total session lifetime",     "type": "text",
+                  "help": "Hard cap on session duration regardless of activity (e.g., '8 hours for users; 1 hour for service-to-service tokens')." },
+                { "id": "session_collaborative_controls","label": "Collaborative-computing controls (SC-15)", "type": "textarea", "rows": 3,
+                  "help": "Camera / microphone / screen-share controls. Whether SC-15 ODV requires explicit indication when active. Common with VTC, Teams / Zoom integrations." },
+                { "id": "session_revocation",       "label": "Session revocation mechanism",       "type": "textarea", "rows": 3,
+                  "help": "How sessions can be invalidated globally (compromise scenario): token-version increment, denylist cache, force-logout, OAuth refresh-token revocation." }
+            ]
+        },
+
+        {
+            "id": "mobile_code",
+            "type": "group",
+            "section": "approach",
+            "label": "Mobile Code (SC-18)",
+            "description": "Restrictions on JavaScript / WASM / mobile applets / browser extensions.",
+            "questions": [
+                { "id": "mobile_code_in_scope",     "label": "Mobile-code technologies in scope",  "type": "multi_select",
+                  "options": ["Browser JavaScript (server-rendered + client-side)", "Browser WebAssembly (WASM)", "Browser extensions (Chrome / Edge / Firefox)", "Java applets (legacy)", "Adobe Flash (legacy — should be eliminated)", "Microsoft ActiveX (legacy)", "Office macros (VBA)", "PostScript / PDF JavaScript", "Mobile applications (iOS / Android)"] },
+                { "id": "mobile_code_authorized",   "label": "Authorized mobile-code list",        "type": "textarea", "rows": 3,
+                  "help": "What mobile code is authorized to run in the system, by source / origin / trust level. Allowlist sources." },
+                { "id": "mobile_code_csp",          "label": "Content Security Policy (CSP) posture", "type": "textarea", "rows": 3,
+                  "help": "If browser-facing: CSP policy summary. Strict-source vs nonce/hash, frame-ancestors, blocking inline scripts. Reference OWASP guidance." },
+                { "id": "mobile_code_office_macro","label": "Office macro policy",                "type": "select",
+                  "options": ["Office macros disabled by GPO (allowlist signed only)", "Office macros disabled (no exceptions)", "Macros allowed with warning prompt (legacy)", "Not applicable (no Office in environment)"] }
+            ]
+        },
+
+        {
+            "id": "architecture_isolation",
+            "type": "group",
+            "section": "approach",
+            "label": "Architectural Protections (SC-2, SC-3, SC-4, SC-39)",
+            "description": "Process isolation, separation of system and user functionality.",
+            "questions": [
+                { "id": "arch_user_admin_separation","label": "User vs admin function separation (SC-2)", "type": "textarea", "rows": 3,
+                  "help": "How user and admin functionality are separated (different ports, different hosts, different identity domains, different management VLAN)." },
+                { "id": "arch_security_function_isolation","label": "Security-function isolation (SC-3)", "type": "textarea", "rows": 3,
+                  "help": "How security-relevant functions are isolated from non-security functions. Privilege rings, hypervisor / container boundaries, separate management plane." },
+                { "id": "arch_shared_resource_handling","label": "Shared-resource handling (SC-4)",  "type": "textarea", "rows": 3,
+                  "help": "How information in shared system resources (memory, scratch disk, cache) is prevented from leaking between users / processes. Object reuse, memory-zeroing, cache partitioning." },
+                { "id": "arch_process_isolation",   "label": "Process-isolation mechanism (SC-39)",  "type": "select",
+                  "options": ["Hypervisor virtualization (VMs)", "OS-level virtualization (containers)", "Process-level (separate OS users / namespaces)", "Microkernel / capability-based OS", "Unikernel / language-runtime sandbox", "Mixed (per workload)"] }
+            ]
+        },
+
+        {
+            "id": "denial_of_service",
+            "type": "group",
+            "section": "approach",
+            "label": "Denial-of-Service Protection (SC-5)",
+            "description": "DoS / DDoS resilience for availability.",
+            "questions": [
+                { "id": "dos_threats_in_scope",     "label": "DoS threats in scope",              "type": "multi_select",
+                  "options": ["Volumetric (bandwidth saturation)", "Protocol (SYN flood, fragmented packets)", "Application-layer (HTTP flood, slowloris)", "Authentication-layer (credential stuffing → lockout)", "Resource-exhaustion (CPU, memory, connection pool)", "Algorithmic (hash collision, ReDoS)", "Cryptographic-key DoS (asymmetric key wear)"] },
+                { "id": "dos_mitigations",          "label": "DoS mitigation mechanisms",         "type": "multi_select",
+                  "options": ["DDoS-protection service (AWS Shield / Cloudflare / Azure DDoS Protection)", "WAF rate-limiting", "API gateway throttling", "Connection-rate caps at boundary", "Auto-scaling for elasticity", "Circuit breakers in app code", "Request-size + timeout limits", "Caching / CDN absorption", "Tar-pitting / temporary blackhole"] },
+                { "id": "dos_runbook_reference",   "label": "DoS runbook reference",             "type": "text",
+                  "help": "Pointer to the DoS-response runbook in the IR plan / wiki. Activation criteria, escalation path." }
+            ]
+        },
+
+        {
+            "id": "sc_protection_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Protection Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_endpoints_with_tls", "label": "Endpoints / services with TLS requirement", "type": "text",
+                  "help": "Approximate count of services that must serve TLS (informs TLS coverage rate in metrics)." },
+                { "id": "scope_certificate_count",  "label": "Active certificate count",           "type": "text",
+                  "help": "Approximate count of active TLS / signing certificates managed by the system." },
+                { "id": "scope_data_at_rest_volume","label": "Data-at-rest volume (approximate)",  "type": "text",
+                  "help": "Total volume of data at rest under encryption (e.g., '50 TB across S3 + RDS + EFS')." },
+                { "id": "scope_boundary_interfaces","label": "Managed-interface count at boundary","type": "text",
+                  "help": "Approximate count of managed interfaces at the authorization boundary (informs SC-7(3) summary)." }
+            ]
+        },
+
+        {
+            "id": "sc_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Communications-Protection Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate SC control effectiveness.",
+            "questions": [
+                { "id": "sc_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "TLS coverage rate (% of services serving TLS minimum version)",
+                      "Certificate-expiration lead time (mean days from alert to renewal)",
+                      "Expired-certificate incidents per quarter (target: 0)",
+                      "FIPS-validated module coverage (% of crypto operations on validated modules)",
+                      "Boundary alarm volume (per day; trend)",
+                      "Boundary alarm signal-to-noise ratio",
+                      "DNSSEC-signed zone coverage rate",
+                      "DNSSEC validation-failure rate",
+                      "Key-rotation SLA compliance (% rotated within policy)",
+                      "Encryption-at-rest coverage rate (% of storage volume encrypted)",
+                      "Open POA&M items linked to SC controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "boundary_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Boundary Coverage Verification",
+            "description": "How the org continuously verifies SC boundary tooling is correctly deployed.",
+            "questions": [
+                { "id": "boundary_inventory_reconciliation", "label": "Boundary-inventory reconciliation cadence", "type": "text",
+                  "help": "How often the documented boundary diagram is reconciled with actual deployed firewalls / SGs / WAFs." },
+                { "id": "boundary_rule_review_cadence",      "label": "Boundary-rule review cadence",   "type": "text",
+                  "help": "How often firewall rule sets are reviewed for stale, overly permissive, or deprecated rules." },
+                { "id": "certificate_inventory_cadence",     "label": "Certificate-inventory reconciliation cadence", "type": "text",
+                  "help": "How often certificate inventory is reconciled (CT logs, ACM, internal CA exports). Detects shadow / orphan certs." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the SC control implementations are summarized (e.g., 'SSP §13.13')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for SC findings", "type": "text",
+                  "help": "Convention for SC-related POA&M items (e.g., 'POAM-SC-' for general; 'POAM-SC7-' for boundary findings)." },
+                { "id": "cm_change_workflow",           "label": "CM change-workflow integration", "type": "textarea", "rows": 2,
+                  "help": "How boundary / TLS / cryptographic configuration changes route through CM-3 change control. Emergency-bypass for incident response." },
+                { "id": "si_monitoring_handoff",        "label": "SI-4 monitoring handoff",       "type": "textarea", "rows": 2,
+                  "help": "How SC-7 boundary alarms (denied connections, fail-secure events, anomalous flows) feed the SI-4 monitoring pipeline." },
+                { "id": "au_event_handoff",             "label": "AU event handoff",             "type": "textarea", "rows": 2,
+                  "help": "How cryptographic-key-management events, certificate-issuance events, and boundary-incident events flow into the audit pipeline." },
+                { "id": "ia5_authenticator_dependency", "label": "IA-5 authenticator dependency", "type": "textarea", "rows": 2,
+                  "help": "Where IA-5 authenticator material relies on SC-12 key establishment (PIV cert issuance, FIDO-key attestation, mTLS service identity)." },
+                { "id": "cp_recovery_dependency",       "label": "CP recovery dependency",        "type": "textarea", "rows": 2,
+                  "help": "Where CP recovery procedures depend on SC key material (KMS keys must be available for backup decryption; HSM partition restoration during DR)." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying SC continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "SC-7": {
+            "prompts": [
+                "Reference §4.2 — boundary topology, managed interfaces, default-deny posture, egress filtering.",
+                "Document the inventory of managed interfaces (SC-7(3)) and the rationale for each.",
+                "Address external telecom routing / TIC alignment if applicable (SC-7(8)).",
+                "Document split-tunneling restriction posture (SC-7(7)).",
+                "Reference SC-7(4) external telecommunications services, SC-7(5) deny by default / allow by exception, SC-7(7) split tunneling for remote devices, SC-7(8) route traffic to authenticated proxy servers, SC-7(18) fail secure, SC-7(20) dynamic isolation / segregation, SC-7(21) isolation of system components."
+            ],
+            "evidence_suggestions": [
+                "Network-architecture diagram (current state)",
+                "Managed-interfaces register",
+                "Firewall rule export (sanitized)",
+                "Egress-policy / DNS-firewall rule set",
+                "Sample boundary-rule change ticket through CCB",
+                "Quarterly boundary-rule review attestation"
+            ],
+            "extra_fields": [
+                { "id": "sc7_managed_interfaces_count","label": "Managed interfaces count + rationale", "type": "textarea", "rows": 4,
+                  "help": "Total managed interfaces with brief rationale for each. Example: '4 ingress (public web, public API, partner VPN, admin bastion) + 2 egress (proxy, KMS endpoint).'" },
+                { "id": "sc7_fail_secure_behavior",   "label": "Fail-secure behavior (SC-7(18))",  "type": "textarea", "rows": 3,
+                  "help": "What happens to traffic when boundary devices fail. Default deny on FW failure, alert routing, escalation." },
+                { "id": "sc7_dynamic_isolation",      "label": "Dynamic isolation capability (SC-7(20))", "type": "textarea", "rows": 3,
+                  "help": "Ability to dynamically isolate compromised components from the network (e.g., 'EDR can quarantine host via firewall integration; SOAR playbook auto-isolates on detection-confidence threshold')." }
+            ]
+        },
+
+        "SC-8": {
+            "prompts": [
+                "Reference §4.3 — TLS minimum version, cipher policy, certificate sources, inspection posture.",
+                "Address SC-8(1) cryptographic protection — confidentiality and integrity (almost always required at moderate baseline).",
+                "Document any legacy cleartext flows with compensating controls.",
+                "Reference TLS 1.3 deprecation timeline and any migration plan.",
+                "Reference SC-8(1) cryptographic protection, SC-8(2) pre and post transmission handling, SC-8(3) cryptographic protection for message externals, SC-8(4) conceal or randomize communications, SC-8(5) protected distribution system."
+            ],
+            "evidence_suggestions": [
+                "TLS configuration export (qualys / SSL Labs report)",
+                "Cipher-suite policy document",
+                "Sample certificate chain validation",
+                "TLS-inspection / break-and-inspect topology",
+                "Legacy cleartext-flow register with compensating controls"
+            ],
+            "extra_fields": [
+                { "id": "sc8_tls_assessment_tool",   "label": "TLS configuration assessment tool", "type": "text",
+                  "help": "Tool used to verify TLS posture (Qualys SSL Labs, testssl.sh, Nessus TLS plugin)." },
+                { "id": "sc8_pfs_enforcement",       "label": "Perfect Forward Secrecy enforcement", "type": "select",
+                  "options": ["PFS enforced via cipher selection (ECDHE only)", "PFS preferred but RSA fallback allowed (legacy)", "PFS not specifically enforced"] }
+            ]
+        },
+
+        "SC-12": {
+            "prompts": [
+                "Reference §4.4 — generation method, storage protection, rotation, compromise recovery, destruction.",
+                "Address each enhancement specifically: SC-12(1) availability, SC-12(2) symmetric keys, SC-12(3) asymmetric keys, SC-12(6) physical control of keys.",
+                "Document key escrow / key recovery procedure if any keys are escrowed.",
+                "Reference NIST SP 800-57 Part 1 + Part 2 + Part 3 for key-management practices."
+            ],
+            "evidence_suggestions": [
+                "Cryptographic-key inventory export",
+                "FIPS 140-3 module certificate (CMVP)",
+                "Key-rotation schedule + last-rotation log",
+                "HSM administration policy",
+                "Key-compromise runbook",
+                "Sample key-destruction certificate"
+            ],
+            "extra_fields": [
+                { "id": "sc12_escrow_policy",        "label": "Key escrow / recovery policy",     "type": "textarea", "rows": 3,
+                  "help": "Whether keys are escrowed, who holds escrow material, recovery process. Often minimized or eliminated for confidentiality keys; common for backup-decryption keys." },
+                { "id": "sc12_key_classes",          "label": "Key-class register",                "type": "textarea", "rows": 4,
+                  "help": "Each class of key in the system with its purpose, algorithm, length, rotation frequency, generation method. Example: 'KMS CMK (AES-256, annual, KMS-generated); App DEK (AES-256-GCM, per-object, KMS-generated); JWT signing key (Ed25519, 90-day, HSM-generated).'" }
+            ]
+        },
+
+        "SC-13": {
+            "prompts": [
+                "Reference §4.5 — module inventory, validation status, use contexts, re-accreditation tracking.",
+                "Address each cryptographic use that requires FIPS validation per organizational policy.",
+                "Document any uses of non-validated cryptography with rationale and POA&M.",
+                "Reference FIPS 140-3 transition timeline (140-2 modules sunset; 140-3 mandated)."
+            ],
+            "evidence_suggestions": [
+                "Cryptographic-module inventory with CMVP certificate numbers",
+                "FIPS 140-3 / 140-2 certificate copies",
+                "FIPS-mode configuration verification (per OS / per service)",
+                "Non-validated-crypto exception register"
+            ],
+            "extra_fields": [
+                { "id": "sc13_fips_mode_verification","label": "FIPS-mode operational verification", "type": "textarea", "rows": 3,
+                  "help": "How the org verifies FIPS mode is actually enabled at runtime (not just configured). Boot-time check, periodic attestation, runtime API." },
+                { "id": "sc13_nonvalidated_register","label": "Non-validated cryptography register", "type": "textarea", "rows": 3,
+                  "help": "Any uses of non-validated cryptography (e.g., legacy library, debugging tool, third-party SaaS) with risk rationale and POA&M." }
+            ]
+        },
+
+        "SC-23": {
+            "prompts": [
+                "Reference §4.7 — session integrity mechanism, idle / total lifetime, revocation.",
+                "Address SC-23(3) unique session identifiers and SC-23(5) allowed certificate authorities.",
+                "Document anti-replay protection (timestamp window, nonce store).",
+                "Reference SC-23(1) invalidate session identifiers at logout, SC-23(3) unique session identifiers with randomness, SC-23(5) allowed certificate authorities."
+            ],
+            "evidence_suggestions": [
+                "Session-management implementation specification",
+                "Token-format / claims documentation (JWT / SAML)",
+                "Session-revocation runbook",
+                "Anti-replay / nonce-store configuration"
+            ],
+            "extra_fields": [
+                { "id": "sc23_token_binding",        "label": "Session-token binding mechanism",   "type": "textarea", "rows": 3,
+                  "help": "How session tokens are bound to client context (mTLS, IP / device fingerprint, refresh-token rotation). Resistant-to-replay-after-theft posture." },
+                { "id": "sc23_logout_invalidation",  "label": "Session invalidation on logout (SC-23(1))", "type": "textarea", "rows": 3,
+                  "help": "How session identifiers are invalidated on user logout. Token denylist, refresh-token revocation, server-side session destruction." }
+            ]
+        },
+
+        "SC-28": {
+            "prompts": [
+                "Reference §4.6 — coverage by storage class, key origin, envelope strategy, classified handling.",
+                "Address SC-28(1) cryptographic protection at rest — typically required at moderate.",
+                "Document any unprotected data with compensating controls and POA&M.",
+                "Reference SC-28(1) cryptographic protection, SC-28(2) offline storage, SC-28(3) cryptographic keys."
+            ],
+            "evidence_suggestions": [
+                "Encryption-at-rest coverage report by storage type",
+                "KMS / HSM configuration export",
+                "Sample encrypted-bucket / volume / DB configuration",
+                "Offline-storage handling procedure (SC-28(2))",
+                "Unprotected-data register with POA&M references"
+            ],
+            "extra_fields": [
+                { "id": "sc28_offline_storage_handling","label": "Offline-storage handling (SC-28(2))", "type": "textarea", "rows": 3,
+                  "help": "How offline storage media (backup tapes, cold archives) are handled. Encryption at write, physical security, sanitization at end of life (NIST SP 800-88 r1)." },
+                { "id": "sc28_envelope_summary",     "label": "Envelope-encryption layering summary", "type": "textarea", "rows": 3,
+                  "help": "DEK / KEK layering for at-rest data. Per-object DEKs, KEKs in HSM, KEK rotation cadence." }
+            ]
+        },
+
+        "SC-18": {
+            "prompts": [
+                "Reference §4.9 — mobile-code technologies in scope, authorization list, CSP posture, macro policy.",
+                "Address SC-18(1) identify unacceptable code and take corrective actions and SC-18(2) acquisition / development / use.",
+                "Document any sandboxing applied to mobile code (browser sandbox, Office Protected View).",
+                "Reference SC-18(1) identify unacceptable code + corrective actions, SC-18(2) acquisition / development / use, SC-18(3) prevent downloading / execution, SC-18(4) prevent automatic execution, SC-18(5) allow execution only in confined environments."
+            ],
+            "evidence_suggestions": [
+                "Mobile-code policy document",
+                "CSP header configuration export (browser-facing apps)",
+                "Office-macro GPO export",
+                "Browser-extension allowlist (managed via MDM)"
+            ],
+            "extra_fields": [
+                { "id": "sc18_browser_csp_strictness","label": "Browser CSP strictness level",     "type": "select",
+                  "options": ["Strict (no inline; nonce / hash for scripts)", "Moderate (some inline allowed; default-src tight)", "Permissive (legacy compatibility)", "Not applicable (no browser-facing app)"] },
+                { "id": "sc18_macro_default",        "label": "Office macro default behavior",     "type": "select",
+                  "options": ["Disabled (allowlist signed only)", "Disabled (no exceptions)", "Allowed with warning prompt", "Not applicable"] }
+            ]
+        },
+
+        "SC-21": {
+            "prompts": [
+                "Reference §4.7 — recursive / caching DNS provider, DNSSEC validation enforcement, DNS-firewall posture.",
+                "Address whether resolvers enforce DNSSEC validation (SC-21).",
+                "Document DNS-over-HTTPS / DNS-over-TLS policy.",
+                "Reference SC-21 ODV — services to obtain authentication / integrity for."
+            ],
+            "evidence_suggestions": [
+                "Resolver configuration export",
+                "DNSSEC validation-failure log sample",
+                "DNS firewall rule / category-block configuration",
+                "DoH / DoT enforcement policy"
+            ],
+            "extra_fields": [
+                { "id": "sc21_validation_failure_handling","label": "DNSSEC validation-failure handling", "type": "textarea", "rows": 3,
+                  "help": "How resolvers handle SERVFAIL responses and validation failures. Whether they refuse to resolve (strict) or fall back (permissive)." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Boundary Protection",      "definition": "Per SC-7, controls that monitor and protect communications at the system boundary. Includes firewalls, gateways, proxies, and managed interfaces." },
+        { "term": "Cryptographic Module",     "definition": "The set of hardware, software, and / or firmware that implements cryptographic functions and is the unit of FIPS 140-3 / 140-2 validation." },
+        { "term": "DEK / KEK",                "definition": "Data Encryption Key (encrypts user data) and Key Encryption Key (encrypts DEKs). Standard layering in envelope encryption per NIST SP 800-57." },
+        { "term": "DNSSEC",                   "definition": "DNS Security Extensions — cryptographic signing of DNS records to provide origin authenticity and integrity. Required for SC-20 authoritative-zone signing on federal systems." },
+        { "term": "Envelope Encryption",      "definition": "Encrypting data with a DEK and then encrypting the DEK with a KEK. Allows DEK rotation per object without re-encrypting the underlying data." },
+        { "term": "Fail Secure",              "definition": "Per SC-7(18), the property that a boundary device denies traffic by default when it fails or its configuration is unavailable. Contrast with fail-open." },
+        { "term": "FIPS 140-3",               "definition": "Federal Information Processing Standard 140-3 — validation requirements for cryptographic modules. Successor to FIPS 140-2." },
+        { "term": "HSM",                      "definition": "Hardware Security Module — a physical device designed for cryptographic key storage and processing, typically FIPS 140-3 / 140-2 Level 3 validated." },
+        { "term": "KMS",                      "definition": "Key Management System — infrastructure for generating, storing, distributing, rotating, and destroying cryptographic keys." },
+        { "term": "Managed Interface",         "definition": "Per SC-7(3), a connection between the system and another system or network that has documented protections and is monitored." },
+        { "term": "Mobile Code",               "definition": "Per SC-18, executable code that is transferred from a remote system to a target system (e.g., JavaScript, WebAssembly, Office macros, Java applets)." },
+        { "term": "mTLS",                      "definition": "Mutual TLS — TLS where both client and server present certificates to authenticate each other. Common in service-to-service communication." },
+        { "term": "PFS",                       "definition": "Perfect Forward Secrecy — a property of TLS cipher suites (ECDHE / DHE) where compromise of long-term keys does not compromise past session keys." },
+        { "term": "PKI",                      "definition": "Public Key Infrastructure — the framework of certificate authorities, registration authorities, and certificates that supports asymmetric cryptography." },
+        { "term": "Process Isolation",        "definition": "Per SC-39, separation of system processes such that one cannot read or write the memory or resources of another. Enforced via OS-level protections, hypervisors, containers, or hardware." },
+        { "term": "Recursive Resolver",       "definition": "A DNS server that performs the recursive lookup process on behalf of clients (querying authoritative servers and returning the result). Subject to SC-21." },
+        { "term": "Session Authenticity",     "definition": "Per SC-23, assurance that the session is genuine (not hijacked, replayed, or fabricated). Enforced via session integrity mechanisms (signed tokens, mTLS, anti-replay)." },
+        { "term": "Split Tunneling",           "definition": "A remote-access configuration where some traffic flows through the corporate VPN and other traffic flows directly to the internet. Restricted by SC-7(7) on most federal systems." },
+        { "term": "Tarpit",                   "definition": "A DoS-mitigation technique where malicious connections are deliberately slowed or held to consume the attacker's resources rather than the target's." },
+        { "term": "TIC 3.0",                  "definition": "Trusted Internet Connections 3.0 — federal initiative governing how agency networks connect to the internet. Influences SC-7(8) external-telecom routing." },
+        { "term": "TLS",                      "definition": "Transport Layer Security — the cryptographic protocol securing data in transit. Required at SC-8 with NIST SP 800-52 r2 specifying acceptable versions and ciphers." },
+        { "term": "WAF",                      "definition": "Web Application Firewall — a filter applied to HTTP / HTTPS traffic that detects and blocks application-layer attacks. Common at managed interfaces (SC-7) and feeds boundary alarms." },
+        { "term": "Zero Trust",               "definition": "An architectural philosophy of 'never trust, always verify' — treating every request as untrusted regardless of source location. Drives mTLS-everywhere designs (SC-8 internal posture)." }
+    ],
+
+    "acronyms": [
+        { "abbr": "ACM",     "expansion": "AWS Certificate Manager" },
+        { "abbr": "ALB",     "expansion": "Application Load Balancer" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "BYOK",    "expansion": "Bring Your Own Key" },
+        { "abbr": "CA",      "expansion": "Certificate Authority" },
+        { "abbr": "CCB",     "expansion": "Configuration Control Board" },
+        { "abbr": "CDN",     "expansion": "Content Delivery Network" },
+        { "abbr": "CMVP",    "expansion": "Cryptographic Module Validation Program (NIST)" },
+        { "abbr": "CSP",     "expansion": "Content Security Policy" },
+        { "abbr": "CT",      "expansion": "Certificate Transparency" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "DDoS",    "expansion": "Distributed Denial of Service" },
+        { "abbr": "DEK",     "expansion": "Data Encryption Key" },
+        { "abbr": "DLP",     "expansion": "Data Loss Prevention" },
+        { "abbr": "DMZ",     "expansion": "Demilitarized Zone" },
+        { "abbr": "DNS",     "expansion": "Domain Name System" },
+        { "abbr": "DNSSEC",  "expansion": "Domain Name System Security Extensions" },
+        { "abbr": "DoH",     "expansion": "DNS over HTTPS" },
+        { "abbr": "DoS",     "expansion": "Denial of Service" },
+        { "abbr": "DoT",     "expansion": "DNS over TLS" },
+        { "abbr": "ECDHE",   "expansion": "Elliptic-curve Diffie-Hellman Ephemeral" },
+        { "abbr": "EDR",     "expansion": "Endpoint Detection and Response" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "FIPS 140-3","expansion": "Cryptographic Module Validation standard" },
+        { "abbr": "GPO",     "expansion": "Group Policy Object" },
+        { "abbr": "HSM",     "expansion": "Hardware Security Module" },
+        { "abbr": "HSTS",    "expansion": "HTTP Strict Transport Security" },
+        { "abbr": "HYOK",    "expansion": "Hold Your Own Key" },
+        { "abbr": "IPsec",   "expansion": "Internet Protocol Security" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "JWT",     "expansion": "JSON Web Token" },
+        { "abbr": "KEK",     "expansion": "Key Encryption Key" },
+        { "abbr": "KMS",     "expansion": "Key Management System / Service" },
+        { "abbr": "MAC",     "expansion": "Message Authentication Code" },
+        { "abbr": "MDM",     "expansion": "Mobile Device Management" },
+        { "abbr": "mTLS",    "expansion": "Mutual TLS" },
+        { "abbr": "NDR",     "expansion": "Network Detection and Response" },
+        { "abbr": "NGFW",    "expansion": "Next-Generation Firewall" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "PFS",     "expansion": "Perfect Forward Secrecy" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification" },
+        { "abbr": "PKI",     "expansion": "Public Key Infrastructure" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PRNG",    "expansion": "Pseudo-Random Number Generator" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SAML",    "expansion": "Security Assertion Markup Language" },
+        { "abbr": "SBOM",    "expansion": "Software Bill of Materials" },
+        { "abbr": "SC",      "expansion": "System and Communications Protection (NIST 800-53 family)" },
+        { "abbr": "SCADA",   "expansion": "Supervisory Control and Data Acquisition" },
+        { "abbr": "SG",      "expansion": "Security Group (cloud firewall)" },
+        { "abbr": "SIEM",    "expansion": "Security Information and Event Management" },
+        { "abbr": "SNI",     "expansion": "Server Name Indication" },
+        { "abbr": "SOAR",    "expansion": "Security Orchestration, Automation, and Response" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "SWG",     "expansion": "Secure Web Gateway" },
+        { "abbr": "TDE",     "expansion": "Transparent Data Encryption (database)" },
+        { "abbr": "TIC",     "expansion": "Trusted Internet Connections (federal program)" },
+        { "abbr": "TLS",     "expansion": "Transport Layer Security" },
+        { "abbr": "URL",     "expansion": "Uniform Resource Locator" },
+        { "abbr": "VPC",     "expansion": "Virtual Private Cloud" },
+        { "abbr": "VPN",     "expansion": "Virtual Private Network" },
+        { "abbr": "VTC",     "expansion": "Video Teleconferencing" },
+        { "abbr": "WAF",     "expansion": "Web Application Firewall" },
+        { "abbr": "WASM",    "expansion": "WebAssembly" },
+        { "abbr": "WDAC",    "expansion": "Windows Defender Application Control" },
+        { "abbr": "ZTNA",    "expansion": "Zero Trust Network Access" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-52 r2 — Guidelines for the Selection, Configuration, and Use of TLS Implementations", "url": "https://csrc.nist.gov/pubs/sp/800/52/r2/final" },
+        { "label": "NIST SP 800-57 Part 1 r5 — Recommendation for Key Management: General", "url": "https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final" },
+        { "label": "NIST SP 800-57 Part 2 r1 — Best Practices for Key Management Organizations", "url": "https://csrc.nist.gov/pubs/sp/800/57/pt2/r1/final" },
+        { "label": "NIST SP 800-77 r1 — Guide to IPsec VPNs",                       "url": "https://csrc.nist.gov/pubs/sp/800/77/r1/final" },
+        { "label": "NIST SP 800-95 — Guide to Secure Web Services",                 "url": "https://csrc.nist.gov/pubs/sp/800/95/final" },
+        { "label": "FIPS 140-3 — Security Requirements for Cryptographic Modules", "url": "https://csrc.nist.gov/pubs/fips/140-3/final" },
+        { "label": "FIPS 199 — Standards for Security Categorization of Federal Information and Information Systems", "url": "https://csrc.nist.gov/pubs/fips/199/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "CISA Trusted Internet Connections (TIC) 3.0 Guidance",         "url": "https://www.cisa.gov/trusted-internet-connections" },
+        { "label": "NIST SP 800-88 r1 — Guidelines for Media Sanitization",         "url": "https://csrc.nist.gov/pubs/sp/800/88/r1/final" }
+    ]
+}
