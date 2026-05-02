@@ -41,6 +41,9 @@
             <link rel="stylesheet" href="/css/app.css" />
         {% endblock %}
 
+        {# Feed-reader auto-discovery — the STIG updates Atom feed. #}
+        <link rel="alternate" type="application/atom+xml" title="Cyber Trackr — STIG updates" href="{{ path('stig_feed') }}" />
+
         {% block javascripts %}
             <script src="/js/jquery-3.7.1.min.js"></script>
             <script src="/js/bootstrap.bundle.min.js"></script>

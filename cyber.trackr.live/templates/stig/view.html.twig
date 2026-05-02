@@ -100,6 +100,126 @@
             {{ stig.xpath("/xmlns:Benchmark/xmlns:description")|first }}
         </div>
 
+        {% if digest %}
+            <details class="stig-digest">
+                <summary class="stig-digest__summary">
+                    <span class="stig-digest__summary-label">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i>
+                        Digest of Updates
+                    </span>
+                    <span class="stig-digest__summary-meta">
+                        vs. V{{ digest.previous.version }}R{{ digest.previous.release }}{% if digest.previous.released %} &middot; {{ digest.previous.released }}{% endif %}
+                    </span>
+                    <span class="stig-digest__summary-counts">
+                        {% if digest.totals.added %}
+                            <span class="stig-digest__count stig-digest__count--added">+{{ digest.totals.added }}</span>
+                        {% endif %}
+                        {% if digest.totals.removed %}
+                            <span class="stig-digest__count stig-digest__count--removed">&minus;{{ digest.totals.removed }}</span>
+                        {% endif %}
+                        {% if digest.totals.severity_changed %}
+                            <span class="stig-digest__count stig-digest__count--severity">&#9888; {{ digest.totals.severity_changed }}</span>
+                        {% endif %}
+                        {% if digest.totals.content_changed %}
+                            <span class="stig-digest__count stig-digest__count--content">&#9998; {{ digest.totals.content_changed }}</span>
+                        {% endif %}
+                        {% if digest.totals.added == 0 and digest.totals.removed == 0 and digest.totals.severity_changed == 0 and digest.totals.content_changed == 0 %}
+                            <span class="stig-digest__count stig-digest__count--unchanged">No substantive changes</span>
+                        {% endif %}
+                    </span>
+                </summary>
+
+                <div class="stig-digest__body">
+                    <p class="stig-digest__lede">
+                        Comparison against the immediately-prior release
+                        ({{ ui.ident('V' ~ digest.previous.version ~ 'R' ~ digest.previous.release) }}).
+                        Rule matching uses the Group Vuln ID. Content-change detection compares the rule&rsquo;s description, check, and fix text after stripping inline markup &mdash; cosmetic-only edits aren&rsquo;t flagged.
+                    </p>
+
+                    {% if digest.added|length %}
+                        <section class="stig-digest__section stig-digest__section--added">
+                            <h3 class="stig-digest__section-title">
+                                <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                                Added rules <span class="stig-digest__section-count">{{ digest.added|length }}</span>
+                            </h3>
+                            <ul class="stig-digest__list">
+                                {% for r in digest.added %}
+                                    <li>
+                                        <a href="#{{ r.vuln_id }}">{{ ui.ident(r.vuln_id) }}</a>
+                                        <span class="stig-digest__sev stig-digest__sev--{{ r.severity }}">{{ r.severity|title }}</span>
+                                        <span class="stig-digest__title-text">{{ r.title }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endif %}
+
+                    {% if digest.removed|length %}
+                        <section class="stig-digest__section stig-digest__section--removed">
+                            <h3 class="stig-digest__section-title">
+                                <i class="bi bi-dash-circle" aria-hidden="true"></i>
+                                Removed rules <span class="stig-digest__section-count">{{ digest.removed|length }}</span>
+                            </h3>
+                            <ul class="stig-digest__list">
+                                {% for r in digest.removed %}
+                                    <li>
+                                        {{ ui.ident(r.vuln_id) }}
+                                        <span class="stig-digest__sev stig-digest__sev--{{ r.severity }}">{{ r.severity|title }}</span>
+                                        <span class="stig-digest__title-text">{{ r.title }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endif %}
+
+                    {% if digest.severity_changed|length %}
+                        <section class="stig-digest__section stig-digest__section--severity">
+                            <h3 class="stig-digest__section-title">
+                                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                Severity changes <span class="stig-digest__section-count">{{ digest.severity_changed|length }}</span>
+                            </h3>
+                            <ul class="stig-digest__list">
+                                {% for r in digest.severity_changed %}
+                                    <li>
+                                        <a href="#{{ r.vuln_id }}">{{ ui.ident(r.vuln_id) }}</a>
+                                        <span class="stig-digest__sev stig-digest__sev--{{ r.old_severity }}">{{ r.old_severity|title }}</span>
+                                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                                        <span class="stig-digest__sev stig-digest__sev--{{ r.new_severity }}">{{ r.new_severity|title }}</span>
+                                        <span class="stig-digest__title-text">{{ r.title }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endif %}
+
+                    {% if digest.content_changed|length %}
+                        <section class="stig-digest__section stig-digest__section--content">
+                            <h3 class="stig-digest__section-title">
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                Content changes <span class="stig-digest__section-count">{{ digest.content_changed|length }}</span>
+                            </h3>
+                            <ul class="stig-digest__list">
+                                {% for r in digest.content_changed %}
+                                    <li>
+                                        <a href="#{{ r.vuln_id }}">{{ ui.ident(r.vuln_id) }}</a>
+                                        <span class="stig-digest__sev stig-digest__sev--{{ r.severity }}">{{ r.severity|title }}</span>
+                                        <span class="stig-digest__fields">
+                                            {% for f in r.fields %}<span class="stig-digest__field-tag">{{ f }}</span>{% endfor %}
+                                        </span>
+                                        <span class="stig-digest__title-text">{{ r.title }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endif %}
+
+                    {% if digest.totals.added == 0 and digest.totals.removed == 0 and digest.totals.severity_changed == 0 and digest.totals.content_changed == 0 %}
+                        <p class="stig-digest__empty">No substantive changes detected against the previous release. {{ digest.totals.unchanged|number_format }} rules matched cleanly.</p>
+                    {% endif %}
+                </div>
+            </details>
+        {% endif %}
+
         <div class="rule-controls">
             <div class="rule-controls__group">
                 <span class="eyebrow">Sort by</span>

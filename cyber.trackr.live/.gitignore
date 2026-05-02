@@ -34,3 +34,8 @@
 # (or auto-rebuilt after DISA pulls). Can be 100+ MB and rebuildable from
 # source data, so we don't track it.
 /resources/data/search/
+
+# STIG digest cache — generated lazily by StigDigestBuilder when a STIG
+# view page is hit (or the Atom feed builds). Self-invalidates against
+# source XML mtime; rebuildable from the catalog. Don't track.
+/resources/data/stig/*.digest.json

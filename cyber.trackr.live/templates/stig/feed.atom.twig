@@ -1,0 +1,73 @@
+{%- set base_url = absolute_url('/')|trim('/') -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Cyber Trackr — STIG updates</title>
+    <subtitle>Recent DISA STIG releases with a per-version digest of added, removed, severity-changed, and content-changed rules.</subtitle>
+    <link rel="self" type="application/atom+xml" href="{{ base_url }}{{ path('stig_feed') }}" />
+    <link rel="alternate" type="text/html" href="{{ base_url }}{{ path('stig') }}" />
+    <id>{{ base_url }}{{ path('stig_feed') }}</id>
+    <updated>{{ latest_updated|date('c') }}</updated>
+    <author>
+        <name>Cyber Trackr</name>
+        <uri>{{ base_url }}/</uri>
+    </author>
+    <generator>Cyber Trackr</generator>
+    <icon>{{ base_url }}/favicon.ico</icon>
+
+    {% for item in items %}
+        {%- set e = item.entry -%}
+        {%- set d = item.digest -%}
+        {%- set view_url = base_url ~ path('stig_view', {title: e.title, version: e.version, release: e.release}) -%}
+        {%- set entry_id = 'urn:cyber-trackr:stig:' ~ e.title|lower|replace({'_': '-'}) ~ ':v' ~ e.version ~ 'r' ~ e.release -%}
+        {%- set human_title = e.title|replace({'_': ' '}) -%}
+    <entry>
+        <title>{{ human_title }} V{{ e.version }}R{{ e.release }}</title>
+        <id>{{ entry_id }}</id>
+        <updated>{{ e.date|date('c') }}</updated>
+        <link rel="alternate" type="text/html" href="{{ view_url }}" />
+        <summary type="text">+{{ d.totals.added }} added · −{{ d.totals.removed }} removed · {{ d.totals.severity_changed }} severity change{{ d.totals.severity_changed == 1 ? '' : 's' }} · {{ d.totals.content_changed }} content change{{ d.totals.content_changed == 1 ? '' : 's' }}. Compared against V{{ d.previous.version }}R{{ d.previous.release }}{% if d.previous.released %} ({{ d.previous.released }}){% endif %}.</summary>
+        <content type="html"><![CDATA[
+<p>
+    <strong>{{ human_title }} V{{ e.version }}R{{ e.release }}</strong>{% if e.released %} released {{ e.released }}.{% endif %}
+    Compared against V{{ d.previous.version }}R{{ d.previous.release }}{% if d.previous.released %} ({{ d.previous.released }}){% endif %}.
+</p>
+<ul>
+    <li>Added: {{ d.totals.added }}</li>
+    <li>Removed: {{ d.totals.removed }}</li>
+    <li>Severity changes: {{ d.totals.severity_changed }}</li>
+    <li>Content changes: {{ d.totals.content_changed }}</li>
+    <li>Unchanged: {{ d.totals.unchanged }}</li>
+</ul>
+{% if d.added|length %}
+<h4>Added rules ({{ d.added|length }})</h4>
+<ul>
+{% for r in d.added|slice(0, 20) %}<li><code>{{ r.vuln_id }}</code> ({{ r.severity }}) — {{ r.title }}</li>
+{% endfor %}{% if d.added|length > 20 %}<li>… and {{ d.added|length - 20 }} more</li>{% endif %}
+</ul>
+{% endif %}
+{% if d.removed|length %}
+<h4>Removed rules ({{ d.removed|length }})</h4>
+<ul>
+{% for r in d.removed|slice(0, 20) %}<li><code>{{ r.vuln_id }}</code> ({{ r.severity }}) — {{ r.title }}</li>
+{% endfor %}{% if d.removed|length > 20 %}<li>… and {{ d.removed|length - 20 }} more</li>{% endif %}
+</ul>
+{% endif %}
+{% if d.severity_changed|length %}
+<h4>Severity changes ({{ d.severity_changed|length }})</h4>
+<ul>
+{% for r in d.severity_changed|slice(0, 20) %}<li><code>{{ r.vuln_id }}</code> {{ r.old_severity }} → {{ r.new_severity }} — {{ r.title }}</li>
+{% endfor %}{% if d.severity_changed|length > 20 %}<li>… and {{ d.severity_changed|length - 20 }} more</li>{% endif %}
+</ul>
+{% endif %}
+{% if d.content_changed|length %}
+<h4>Content changes ({{ d.content_changed|length }})</h4>
+<ul>
+{% for r in d.content_changed|slice(0, 20) %}<li><code>{{ r.vuln_id }}</code> ({{ r.severity }}) [{{ r.fields|join(', ') }}] — {{ r.title }}</li>
+{% endfor %}{% if d.content_changed|length > 20 %}<li>… and {{ d.content_changed|length - 20 }} more</li>{% endif %}
+</ul>
+{% endif %}
+<p><a href="{{ view_url }}">View the full STIG →</a></p>
+]]></content>
+    </entry>
+    {% endfor %}
+</feed>

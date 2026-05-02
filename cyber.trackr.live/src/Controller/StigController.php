@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\Search\IndexBuilder;
+use App\Service\StigDigestBuilder;
 use App\Service\StigTocBuilder;
 use App\Service\SyncStatus;
 use Symfony\Component\Routing\Attribute\Route;
@@ -59,6 +60,47 @@ class StigController extends AbstractController
             'stigs_latest' => $stigs_latest,
             'stig_count'   => count($stigs),
         ]);
+    }
+
+    #[Route('/stig/feed.atom', name: 'stig_feed')]
+    public function stig_feed(StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder): Response
+    {
+        $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
+
+        // Build a flat list of (title, entry) sorted by date desc — one entry
+        // per STIG version, so V1R5 and V1R6 of the same title both appear.
+        $versions = [];
+        foreach ($stigs as $title => $entries) {
+            foreach ($entries as $entry) {
+                $entry['title'] = $title;
+                $versions[] = $entry;
+            }
+        }
+        usort($versions, fn($a, $b) => ($b['date'] ?? '') <=> ($a['date'] ?? ''));
+
+        // Walk the date-sorted list collecting entries that have a buildable
+        // digest (i.e., have a previous version on the same title). Cap at 25.
+        $items = [];
+        foreach ($versions as $v) {
+            if (count($items) >= 25) break;
+            $titleEntries = $stigs[$v['title']] ?? [];
+            $digest = $digestBuilder->buildOrLoad($tocBuilder->stigDir(), $v, $titleEntries);
+            if ($digest === null) continue;
+            $items[] = ['entry' => $v, 'digest' => $digest];
+        }
+
+        $latestUpdated = $items[0]['entry']['date'] ?? date('c');
+        $body = $this->renderView('stig/feed.atom.twig', [
+            'items'          => $items,
+            'latest_updated' => $latestUpdated,
+        ]);
+
+        $resp = new Response($body, 200);
+        $resp->headers->set('Content-Type', 'application/atom+xml; charset=utf-8');
+        if ($latestUpdated) {
+            $resp->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', strtotime($latestUpdated)) . ' GMT');
+        }
+        return $resp;
     }
 
     #[Route('/stig/{title}/{v1}/{r1}/{v2}/{r2}', name: 'stig_compare')]
@@ -126,7 +168,7 @@ class StigController extends AbstractController
     }
 
     #[Route('/stig/{title}/{version}/{release}', name: 'stig_view')]
-    public function stig_view($title, $version, $release): Response
+    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -167,6 +209,15 @@ class StigController extends AbstractController
         }
         $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
 
+        // Resolve previous version + build/load the digest. Returns null if
+        // there's no previous version on this title — the template
+        // conditionally renders the section only when digest is present.
+        $digest = $digestBuilder->buildOrLoad(
+            $tocBuilder->stigDir(),
+            (array) $stig,
+            $stigs[$title]
+        );
+
         return $this->render('stig/view.html.twig', [
             'controller_name' => 'StigController',
             'cci' => $cci_xml,
@@ -175,6 +226,7 @@ class StigController extends AbstractController
             'title' => $title,
             'version' => $version,
             'release' => $release,
+            'digest' => $digest,
         ]);
     }
 

@@ -5122,3 +5122,224 @@ del {
     font-weight: 600;
 }
 
+
+/* ============================================================
+   STIG view — Digest of Updates (collapsible, between description
+   and rule-controls). Mirrors the lib-page tone; surfaces what
+   changed since the previous release.
+   ============================================================ */
+.stig-digest {
+    margin: var(--space-5) 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+}
+.stig-digest[open] {
+    box-shadow: 0 1px 0 var(--border);
+}
+.stig-digest__summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    background: linear-gradient(180deg, rgba(34, 122, 200, 0.05), transparent);
+    transition: background 0.15s ease;
+}
+.stig-digest__summary::-webkit-details-marker { display: none; }
+.stig-digest__summary:hover {
+    background: linear-gradient(180deg, rgba(34, 122, 200, 0.10), transparent);
+}
+.stig-digest__summary-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+}
+.stig-digest__summary-label > i {
+    color: var(--accent);
+    font-size: 18px;
+}
+.stig-digest__summary-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.stig-digest__summary-counts {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+.stig-digest__count {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    white-space: nowrap;
+}
+.stig-digest__count--added    { color: #14532d; background: rgba(34, 197, 94, 0.12); border-color: #15803d; }
+.stig-digest__count--removed  { color: #991b1b; background: rgba(220, 38, 38, 0.12); border-color: #b91c1c; }
+.stig-digest__count--severity { color: #92400e; background: rgba(245, 158, 11, 0.16); border-color: #d97706; }
+.stig-digest__count--content  { color: #1e40af; background: rgba(59, 130, 246, 0.12); border-color: #3b82f6; }
+.stig-digest__count--unchanged{ color: var(--text-muted); }
+
+[data-theme="ink"] .stig-digest__count--added,
+[data-theme="dracula"] .stig-digest__count--added,
+[data-theme="solarized-dark"] .stig-digest__count--added {
+    color: #86efac; background: rgba(134, 239, 172, 0.14); border-color: #4ade80;
+}
+[data-theme="ink"] .stig-digest__count--removed,
+[data-theme="dracula"] .stig-digest__count--removed,
+[data-theme="solarized-dark"] .stig-digest__count--removed {
+    color: #fca5a5; background: rgba(248, 113, 113, 0.14); border-color: #f87171;
+}
+[data-theme="ink"] .stig-digest__count--severity,
+[data-theme="dracula"] .stig-digest__count--severity,
+[data-theme="solarized-dark"] .stig-digest__count--severity {
+    color: #fcd34d; background: rgba(251, 191, 36, 0.16); border-color: #f59e0b;
+}
+[data-theme="ink"] .stig-digest__count--content,
+[data-theme="dracula"] .stig-digest__count--content,
+[data-theme="solarized-dark"] .stig-digest__count--content {
+    color: #93c5fd; background: rgba(96, 165, 250, 0.14); border-color: #60a5fa;
+}
+
+.stig-digest__body {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border);
+}
+.stig-digest__lede {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-4);
+    line-height: 1.55;
+}
+
+.stig-digest__section {
+    margin: 0 0 var(--space-4);
+}
+.stig-digest__section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 var(--space-2);
+    color: var(--text);
+}
+.stig-digest__section-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 4px);
+}
+.stig-digest__section--added .stig-digest__section-title > i    { color: #15803d; }
+.stig-digest__section--removed .stig-digest__section-title > i  { color: #b91c1c; }
+.stig-digest__section--severity .stig-digest__section-title > i { color: #d97706; }
+.stig-digest__section--content .stig-digest__section-title > i  { color: #3b82f6; }
+
+.stig-digest__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.stig-digest__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: 4px 0;
+    font-size: 14px;
+    line-height: 1.45;
+    border-bottom: 1px solid var(--border);
+}
+.stig-digest__list li:last-child {
+    border-bottom: 0;
+}
+.stig-digest__sev {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: var(--surface);
+}
+.stig-digest__sev--high   { color: #991b1b; background: rgba(220, 38, 38, 0.10); border-color: #b91c1c; }
+.stig-digest__sev--medium { color: #92400e; background: rgba(245, 158, 11, 0.12); border-color: #d97706; }
+.stig-digest__sev--low    { color: #1e3a8a; background: rgba(59, 130, 246, 0.10); border-color: #3b82f6; }
+[data-theme="ink"] .stig-digest__sev--high,
+[data-theme="dracula"] .stig-digest__sev--high,
+[data-theme="solarized-dark"] .stig-digest__sev--high {
+    color: #fca5a5; background: rgba(248, 113, 113, 0.14); border-color: #f87171;
+}
+[data-theme="ink"] .stig-digest__sev--medium,
+[data-theme="dracula"] .stig-digest__sev--medium,
+[data-theme="solarized-dark"] .stig-digest__sev--medium {
+    color: #fcd34d; background: rgba(251, 191, 36, 0.16); border-color: #f59e0b;
+}
+[data-theme="ink"] .stig-digest__sev--low,
+[data-theme="dracula"] .stig-digest__sev--low,
+[data-theme="solarized-dark"] .stig-digest__sev--low {
+    color: #93c5fd; background: rgba(96, 165, 250, 0.14); border-color: #60a5fa;
+}
+
+.stig-digest__title-text {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.45;
+    flex: 1 1 100%;
+}
+.stig-digest__fields {
+    display: inline-flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.stig-digest__field-tag {
+    font-size: 11px;
+    padding: 1px 5px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--text-muted);
+    background: var(--surface);
+    text-transform: lowercase;
+}
+.stig-digest__empty {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
+}
+
+.lib-page__feed-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: var(--space-3);
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.lib-page__feed-link:hover {
+    text-decoration: underline;
+}

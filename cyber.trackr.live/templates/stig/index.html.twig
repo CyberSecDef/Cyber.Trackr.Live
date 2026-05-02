@@ -14,6 +14,9 @@
             </h1>
             <p class="lib-page__lede">
                 {{ stig_count|number_format }} guides covering operating systems, applications, network devices, and policies &mdash; sourced from DISA and updated as new releases land.
+                <a class="lib-page__feed-link" href="{{ path('stig_feed') }}" type="application/atom+xml">
+                    <i class="bi bi-rss-fill" aria-hidden="true"></i> Atom feed of recent updates
+                </a>
             </p>
         </header>
 
