@@ -1,7 +1,27 @@
 {% extends 'base.html.twig' %}
 {% import 'macros.html.twig' as ui %}
 
-{% block title %}View STIG - {{ stig.xpath("/xmlns:Benchmark/xmlns:title")|first }} V{{ version }}R{{ release }} {% endblock %}
+{% set _stig_title = stig.xpath("/xmlns:Benchmark/xmlns:title")|first|default(title|replace({'_': ' '})) %}
+
+{% block title %}View STIG - {{ _stig_title }} V{{ version }}R{{ release }} {% endblock %}
+{% block og_title %}{{ _stig_title }} V{{ version }}R{{ release }}{% endblock %}
+{% block og_description %}{{ _stig_title }} version {{ version }} release {{ release }} — full rule set, severity counts, version diff, linked CCIs, and 800-53 cross-references on Cyber Trackr.{% endblock %}
+{% block og_image_name %}stig{% endblock %}
+{% block og_type %}article{% endblock %}
+
+{% block jsonld_extra %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "STIGs",                "item": "{{ absolute_url(path('stig'))|e('js') }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ _stig_title|e('js') }}" },
+        { "@type": "ListItem", "position": 3, "name": "V{{ version }}R{{ release }}", "item": "{{ absolute_url(app.request.uri)|e('js') }}" }
+    ]
+}
+</script>
+{% endblock %}
 
 {% block body %}
     {% set xml_title       = stig.xpath("/xmlns:Benchmark/xmlns:title")|first %}

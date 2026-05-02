@@ -1,7 +1,27 @@
 {% extends 'base.html.twig' %}
 {% import 'macros.html.twig' as ui %}
 
-{% block title %}View SCAP - {{ scap.xpath("//xccdf:Benchmark/xccdf:title")|first }} V{{ version }}R{{ release }}{% endblock %}
+{% set _scap_title = scap.xpath("//xccdf:Benchmark/xccdf:title")|first|default(title|replace({'_': ' '})) %}
+
+{% block title %}View SCAP - {{ _scap_title }} V{{ version }}R{{ release }}{% endblock %}
+{% block og_title %}{{ _scap_title }} V{{ version }}R{{ release }} (SCAP){% endblock %}
+{% block og_description %}{{ _scap_title }} SCAP benchmark — automated scanning content for STIG compliance.{% endblock %}
+{% block og_image_name %}scap{% endblock %}
+{% block og_type %}article{% endblock %}
+
+{% block jsonld_extra %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "SCAP",                  "item": "{{ absolute_url(path('scap'))|e('js') }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ _scap_title|e('js') }}" },
+        { "@type": "ListItem", "position": 3, "name": "V{{ version }}R{{ release }}", "item": "{{ absolute_url(app.request.uri)|e('js') }}" }
+    ]
+}
+</script>
+{% endblock %}
 
 {% block body %}
     {% set xml_title      = scap.xpath("//xccdf:Benchmark/xccdf:title")|first %}

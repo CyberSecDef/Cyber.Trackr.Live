@@ -2,6 +2,9 @@
 {% import 'macros.html.twig' as ui %}
 
 {% block title %}CKL Viewer &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}CKL / CKLB Viewer — browser-only checklist editor{% endblock %}
+{% block og_description %}Drop a STIG checklist (.ckl or .cklb), edit every assessor field, optionally apply a SCAP scan to auto-update statuses, and re-export as CKLB. All processing in your browser — nothing uploaded.{% endblock %}
+{% block og_image_name %}ckl{% endblock %}
 
 {% block body %}
     <section class="lib-page ckl-page" aria-labelledby="ckl-page-title">

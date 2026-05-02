@@ -3,10 +3,74 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="This website was created to help everyone in the Cyber Domain with the new RMF and STIG requirements.">
-        <meta name="keywords" content="RMF, STIG, SCAP, CCI">
 
         <title>{% block title %}Welcome!{% endblock %}</title>
+
+        {# Per-page metadata. Each child template can override:
+            - {% block og_title %}{% endblock %}        — short, ≤70 char
+            - {% block og_description %}{% endblock %}  — 1–2 sentences
+            - {% block og_image_name %}{% endblock %}   — filename stem in public/og/<name>.png
+            - {% block og_type %}{% endblock %}         — defaults to "website"; "article" for compare/digest pages
+           Defaults below cover home; everything else opts in. #}
+        {% set _og_title       %}{% block og_title %}Cyber Trackr — DoD compliance reference{% endblock %}{% endset %}
+        {% set _og_description %}{% block og_description %}Free reference for STIGs, NIST 800-53 controls, CCIs, and SCAP benchmarks — searchable, cross-linked, kept in sync with DISA and NIST.{% endblock %}{% endset %}
+        {% set _og_image_name  %}{% block og_image_name %}home{% endblock %}{% endset %}
+        {% set _og_type        %}{% block og_type %}website{% endblock %}{% endset %}
+        {% set _og_title       = _og_title|trim %}
+        {% set _og_description = _og_description|trim %}
+        {% set _og_image_name  = _og_image_name|trim %}
+        {% set _og_type        = _og_type|trim %}
+        {% set _og_image_url   = absolute_url('/og/' ~ _og_image_name ~ '.png') %}
+
+        <meta name="description" content="{{ _og_description }}">
+        <meta name="keywords" content="RMF, STIG, SCAP, CCI, NIST 800-53, DISA, FedRAMP, compliance">
+
+        {# Open Graph (Facebook / LinkedIn / Slack / Discord / generic). #}
+        <meta property="og:type" content="{{ _og_type }}">
+        <meta property="og:site_name" content="Cyber Trackr">
+        <meta property="og:title" content="{{ _og_title }}">
+        <meta property="og:description" content="{{ _og_description }}">
+        <meta property="og:url" content="{{ absolute_url(app.request.uri) }}">
+        <meta property="og:image" content="{{ _og_image_url }}">
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="{{ _og_title }}">
+        <meta property="og:locale" content="en_US">
+
+        {# Twitter / X. summary_large_image because all 8 OG images are 1200×630. #}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ _og_title }}">
+        <meta name="twitter:description" content="{{ _og_description }}">
+        <meta name="twitter:image" content="{{ _og_image_url }}">
+        <meta name="twitter:image:alt" content="{{ _og_title }}">
+
+        {# Canonical link helps search dedupe identical content reachable via
+           multiple URLs (e.g., the dev/127.0.0.1 vs prod hostname). #}
+        <link rel="canonical" href="{{ absolute_url(app.request.pathInfo) }}">
+
+        {# JSON-LD structured data — WebSite schema is included on every page so
+           search engines understand the site identity + sitelinks search box.
+           Inner pages may add a BreadcrumbList via {% block jsonld_extra %}. #}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Cyber Trackr",
+            "alternateName": "Cyber · Trackr",
+            "url": "{{ absolute_url('/') }}",
+            "description": "{{ _og_description|e('js') }}",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                    "@type": "EntryPoint",
+                    "urlTemplate": "{{ absolute_url('/search/{search_term_string}') }}"
+                },
+                "query-input": "required name=search_term_string"
+            }
+        }
+        </script>
+        {% block jsonld_extra %}{% endblock %}
 
         {# Preflight: apply stored / system theme synchronously to prevent FOUC.
            Also migrates legacy values (light → paper, dark → ink) and rejects

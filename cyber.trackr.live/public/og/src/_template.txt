@@ -1,0 +1,19 @@
+OG image source files.
+
+Each *.svg here is rendered to /public/og/<name>.png at commit time via:
+    convert -density 144 -background none src/<name>.svg <name>.png
+
+The PNG is what we actually serve as og:image (modern crawlers handle SVG
+inconsistently; PNG is universally supported). Keep the SVG as the source
+of truth — when the design needs updating, edit the SVG and re-run the
+conversion.
+
+Design language:
+- 1200×630 (Open Graph + Twitter summary_large_image standard)
+- Dark navy ground (#0f172a) for editorial weight
+- Site accent crimson (#7a1e1e) for the brand stripe + seal
+- "CYBER · TRACKR" wordmark top-left with a "CT" seal
+- Page title in serif at ~76px (2-line max)
+- Subtitle in sans-serif at ~30px (2-line max)
+- Small "cyber.trackr.live/<path>" hint bottom-left
+- Right-side accent column with a page-specific glyph

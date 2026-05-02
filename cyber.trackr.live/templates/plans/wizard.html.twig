@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ schema.title }} &mdash; Wizard{% endblock %}
+{% block og_title %}{{ schema.title }} generator{% endblock %}
+{% block og_description %}{{ schema.description }}{% endblock %}
+{% block og_image_name %}plans{% endblock %}
 
 {% block body %}
     <section class="lib-page" aria-labelledby="plan-wizard-title">
