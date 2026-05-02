@@ -1,0 +1,579 @@
+{
+    "_comment": "Incident Response Plan generator. Authored at the Phase 2 assessability floor; pairs naturally with the AU plan since incidents are detected via the audit pipeline. Note the meta-quirk: IR-8 (Incident Response Plan) is satisfied BY this very document, so the §5.8 implementation block typically references the document itself.",
+
+    "family": "IR",
+    "family_name": "Incident Response",
+    "title": "Incident Response Plan",
+    "description": "Documents how the organization prepares for, detects, contains, eradicates, recovers from, and learns from cybersecurity incidents affecting the system. Covers the controls of the IR family in NIST SP 800-53 r5 and aligns with NIST SP 800-61 r2 (Computer Security Incident Handling Guide).",
+
+    "intro_template": "This Incident Response Plan documents the incident-response approach for {system_name}. It establishes the roles, processes, communication paths, and timelines used to handle cybersecurity incidents from initial detection through post-incident lessons learned.\n\nThe scope covers preparation (training, exercises, tooling), detection and analysis, containment / eradication / recovery, post-incident activity, external reporting, and information-spillage response within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Incident Response family), NIST SP 800-61 r2 (Computer Security Incident Handling Guide), and the CISA Federal Government Cybersecurity Incident & Vulnerability Response Playbooks.\n\nThis document satisfies the IR-8 control requirement for the system to maintain a documented incident-response plan.",
+
+    "approach_section_title": "Incident Response Approach",
+    "approach_template": "Cybersecurity incidents affecting {system_name} are handled by {irt_name}, using {ticketing_tool} as the case-management system of record. Detection draws on {detection_sources} and decision-making is informed by {threat_intel_sources}. Response follows the four phases of NIST SP 800-61 r2: Preparation; Detection and Analysis; Containment, Eradication, and Recovery; and Post-Incident Activity. Severity-tier classification, containment SLAs, external reporting timelines, and the information-spillage process are documented in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Incident-response performance for {system_name} is tracked continuously via the metrics in §6.1 (mean time to detect, mean time to contain, false-positive rate, exercise findings closed). Threat-intelligence feeds are reviewed for newly relevant indicators on the cadence in §6.2. Lessons learned from each incident drive plan revisions; the document is reviewed at the cadence below regardless of incident occurrence.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Incident Response Plan does not stand alone. The AU family supplies the audit records and detection signals that initiate incident response; the SI family provides the system-monitoring infrastructure and integrity tooling that surface candidate incidents; CP coordination ensures recovery actions align with continuity-of-operations objectives. The following cross-references identify the specific artifacts and locations where IR-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "IR-1", "from": "Organizational incident-response policy" },
+        { "number": "IR-2", "from": "Enterprise security-awareness and IR training program" },
+        { "number": "IR-7", "from": "Enterprise SOC / CSIRT and external IR retainer" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "IRT structure, ticketing platform, and the primary detection sources that feed the team.",
+            "questions": [
+                {
+                    "id": "irt_name",
+                    "label": "Incident response team (IRT) name and structure",
+                    "type": "text",
+                    "required": true,
+                    "help": "What the team is called and how it's structured (e.g., '24/7 SOC + on-call IRT', 'Enterprise CSIRT', 'Combined SOC/IRT under the CISO')."
+                },
+                {
+                    "id": "ticketing_tool",
+                    "label": "Case-management / ticketing system of record",
+                    "type": "text",
+                    "required": true,
+                    "help": "Tool that holds incident cases (e.g., ServiceNow Security Operations, Jira Service Management, TheHive, Demisto / Cortex XSOAR, IBM Resilient)."
+                },
+                {
+                    "id": "detection_sources",
+                    "label": "Primary detection source summary (one-line for §4 narrative)",
+                    "type": "text",
+                    "help": "Brief phrase summarizing what generates incident candidates. Detail goes in the dedicated sub-section."
+                },
+                {
+                    "id": "threat_intel_sources",
+                    "label": "Threat-intelligence sources summary",
+                    "type": "text",
+                    "help": "Brief phrase (e.g., 'CISA AIS, MS-ISAC, vendor threat feeds, internal honeypot data')."
+                },
+                {
+                    "id": "irt_24x7",
+                    "label": "24/7 coverage",
+                    "type": "select",
+                    "options": ["24/7 in-house SOC + IRT", "24/7 contracted SOC + in-house IRT escalation", "Business hours + on-call rotation off-hours", "Business hours only (document risk acceptance)"]
+                }
+            ]
+        },
+
+        {
+            "id": "incident_classification",
+            "type": "group",
+            "section": "approach",
+            "label": "Incident Classification & Severity",
+            "description": "How incidents are categorized and prioritized; containment SLAs by tier.",
+            "questions": [
+                { "id": "severity_tiers",         "label": "Severity tiers used", "type": "multi_select",
+                  "options": [
+                      "Critical / Tier 1 (active widespread compromise)",
+                      "High / Tier 2 (single-system compromise or data exposure)",
+                      "Medium / Tier 3 (suspicious activity warranting investigation)",
+                      "Low / Tier 4 (policy violation or anomaly)",
+                      "Informational (no immediate action required)"
+                  ] },
+                { "id": "incident_categories",   "label": "Incident categories (per CISA NCISS)", "type": "multi_select",
+                  "options": [
+                      "Web (defacement, web-app compromise)",
+                      "Attrition (DoS / DDoS)",
+                      "Improper Usage (policy violation)",
+                      "Malicious Code (malware infection)",
+                      "Unauthorized Access",
+                      "Loss / Theft of Equipment",
+                      "Information Spillage / Improper Disclosure",
+                      "Phishing / Social Engineering",
+                      "Supply Chain Compromise",
+                      "Other"
+                  ] },
+                { "id": "containment_sla",       "label": "Containment SLA per tier", "type": "textarea", "rows": 4,
+                  "help": "Target time from detection to containment, by severity tier (e.g., 'Critical: 1h, High: 4h, Medium: 24h, Low: best-effort within 5 business days')." },
+                { "id": "escalation_thresholds", "label": "Escalation thresholds",   "type": "textarea", "rows": 3,
+                  "help": "When does an incident escalate to executive leadership / AO / external IR retainer? Define triggers (severity, scope, time elapsed)." }
+            ]
+        },
+
+        {
+            "id": "detection_sources_detail",
+            "type": "group",
+            "section": "approach",
+            "label": "Detection Sources",
+            "description": "What feeds candidate incidents into the queue.",
+            "questions": [
+                { "id": "detection_categories", "label": "Detection sources used", "type": "multi_select",
+                  "options": [
+                      "SIEM correlation rules (see AU plan)",
+                      "EDR / XDR (endpoint detection)",
+                      "NDR / NIDS (network detection)",
+                      "Antivirus / antimalware",
+                      "DLP (data loss prevention)",
+                      "Vulnerability scanner findings (RA-5)",
+                      "User reports (phishing, suspicious activity)",
+                      "Threat-intel matches (IOC sweeps)",
+                      "Honeypot / deception",
+                      "Cloud provider alerts (GuardDuty, Defender for Cloud)",
+                      "Application-layer detection (WAF, RASP)",
+                      "Insider-threat signals (UEBA)"
+                  ] },
+                { "id": "detection_alert_routing","label": "Alert routing into the case queue",  "type": "textarea", "rows": 3,
+                  "help": "How alerts from each source land in the case-management system. Auto-promotion rules, deduplication, severity scoring." },
+                { "id": "false_positive_handling","label": "False-positive handling",            "type": "textarea", "rows": 3,
+                  "help": "How recurring false positives are tuned out without losing visibility into real signals. Exception-rule register and review cadence." },
+                { "id": "user_reporting_channel", "label": "User incident-reporting channel",   "type": "text",
+                  "help": "How users report suspected incidents (e.g., 'phishing@org email auto-feeds the queue; ServiceNow Security Incident form')." }
+            ]
+        },
+
+        {
+            "id": "handling_phases",
+            "type": "group",
+            "section": "approach",
+            "label": "Handling Phases (NIST SP 800-61 r2)",
+            "description": "Preparation; Detection & Analysis; Containment, Eradication, Recovery; Post-Incident.",
+            "questions": [
+                { "id": "preparation_activities", "label": "Preparation activities",      "type": "textarea", "rows": 4,
+                  "help": "What's prepared in advance: jump-kit contents, known-good images, contact rosters, evidence-collection tooling." },
+                { "id": "analysis_workflow",       "label": "Analysis workflow",          "type": "textarea", "rows": 4,
+                  "help": "How an alert becomes an incident: triage steps, scoping, attribution, classification. Reference SOAR playbooks if used." },
+                { "id": "containment_strategy",    "label": "Containment strategy",       "type": "textarea", "rows": 4,
+                  "help": "Standard containment options (network isolation, account disable, host quarantine). Approval thresholds for containment that disrupts operations." },
+                { "id": "eradication_recovery",    "label": "Eradication and recovery",   "type": "textarea", "rows": 4,
+                  "help": "How threats are removed and systems restored. References CM-2 baseline restoration and CP backup-restore procedures." },
+                { "id": "post_incident_review",    "label": "Post-incident review process","type": "textarea", "rows": 3,
+                  "help": "Lessons-learned cadence (within N days of resolution), participation, and how findings drive plan revisions and POA&M items." }
+            ]
+        },
+
+        {
+            "id": "reporting_external",
+            "type": "group",
+            "section": "approach",
+            "label": "External Reporting & Notifications",
+            "description": "Who outside the organization must be notified, and on what timeline.",
+            "questions": [
+                { "id": "external_recipients", "label": "External notification recipients", "type": "multi_select",
+                  "options": [
+                      "CISA (Federal — US-CERT)",
+                      "FBI / law enforcement",
+                      "MS-ISAC (state, local, tribal, territorial)",
+                      "DoD CYBERCOM (DoD systems)",
+                      "Sector ISAC (FS-ISAC, H-ISAC, etc.)",
+                      "Affected customers / partners (per contract)",
+                      "Privacy regulators (GDPR / state breach laws)",
+                      "Public disclosure (per SEC / contractual)",
+                      "Insurer (cyber-liability policy)"
+                  ] },
+                { "id": "reporting_timelines","label": "Reporting timelines",             "type": "textarea", "rows": 4,
+                  "help": "Mandatory timelines per recipient (e.g., 'CISA major incident: within 1 hour of declaration; PII breach: 72h GDPR / state-specific'). CISA reference: Federal Incident Notification Guidelines." },
+                { "id": "tlp_default",        "label": "Default Traffic Light Protocol marking", "type": "select",
+                  "options": ["TLP:RED (named recipients only)", "TLP:AMBER (limited distribution)", "TLP:AMBER+STRICT (recipient organization only)", "TLP:GREEN (community-wide)", "TLP:CLEAR (public)"],
+                  "help": "Default sensitivity marking on outbound IR communications. Most internal-IR comms start TLP:AMBER+STRICT." },
+                { "id": "external_comms_owner","label": "External-communications owner",  "type": "text",
+                  "help": "Role responsible for external messaging (typically Public Affairs / Comms in coordination with Legal and the IRT)." }
+            ]
+        },
+
+        {
+            "id": "training_exercises",
+            "type": "group",
+            "section": "approach",
+            "label": "Training and Exercises",
+            "description": "Role-based training cadence and exercise programs (IR-2, IR-3).",
+            "questions": [
+                { "id": "training_cadence",       "label": "IR-specific training cadence",        "type": "select",
+                  "options": ["Annually for all IRT roles", "Annually + on role change", "Quarterly for IRT + annual refresh for general staff", "Continuous (e.g., monthly tabletop bites)"] },
+                { "id": "training_audience",       "label": "Training audiences",                 "type": "multi_select",
+                  "options": ["IRT analysts (Tier 1)", "IRT senior responders (Tier 2/3)", "On-call engineers (subject matter experts)", "Executive leadership (decision authority)", "All system users (general awareness)"] },
+                { "id": "exercise_types",         "label": "Exercise types performed",           "type": "multi_select",
+                  "options": ["Tabletop (discussion-based)", "Functional (technical drills)", "Full-scale (real systems, simulated incident)", "Red-team / penetration test", "Purple-team (red + blue collaborative)"] },
+                { "id": "exercise_cadence",        "label": "Exercise cadence",                   "type": "select",
+                  "options": ["Annually (one full-scale)", "Semi-annually (mix of tabletop + functional)", "Quarterly tabletops + annual full-scale", "Monthly tabletops + quarterly functional + annual full-scale"] },
+                { "id": "after_action_process",    "label": "After-action / lessons-learned process", "type": "textarea", "rows": 3,
+                  "help": "How findings from exercises and real incidents are tracked to closure (POA&M? Internal tracker?). Cadence for re-validating closure." }
+            ]
+        },
+
+        {
+            "id": "information_spillage",
+            "type": "group",
+            "section": "approach",
+            "label": "Information Spillage Response (IR-9)",
+            "description": "Process for handling unauthorized disclosure of classified or controlled information.",
+            "questions": [
+                { "id": "spillage_definitions",   "label": "What constitutes spillage in this system", "type": "textarea", "rows": 3,
+                  "help": "Categories of information whose disclosure triggers spillage response (CUI / FOUO / classified / PII / PHI / etc.) and the threshold for declaration." },
+                { "id": "spillage_response_steps","label": "Spillage response steps",                  "type": "textarea", "rows": 5,
+                  "help": "Steps when spillage is suspected or confirmed: containment (isolate affected systems), notification chain, scope assessment, sanitization plan, retention of evidence." },
+                { "id": "spillage_sanitization",  "label": "Sanitization approach",                    "type": "textarea", "rows": 3,
+                  "help": "How affected systems / storage are sanitized per NIST SP 800-88 r1. Reference MP-6 if applicable." },
+                { "id": "spillage_responsible_role","label": "Spillage response lead role",            "type": "text",
+                  "help": "Role responsible for coordinating spillage response (often the ISSO + Privacy Officer for PII)." }
+            ]
+        },
+
+        {
+            "id": "irt_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "IRT Scope and Membership",
+            "description": "Who's on the team and how they're contacted.",
+            "questions": [
+                { "id": "irt_size",              "label": "Approximate IRT size", "type": "text",
+                  "help": "Order of magnitude (e.g., '~10 analysts across 3 tiers')." },
+                { "id": "irt_aor",               "label": "Area of responsibility (AOR)", "type": "textarea", "rows": 2,
+                  "help": "What systems and populations the team covers (single system vs enterprise)." },
+                { "id": "irt_contact_method",    "label": "Primary IRT contact method", "type": "text",
+                  "help": "How users / on-call engineers reach the IRT (e.g., 'PagerDuty service ir-soc; phishing@org for low-priority reports')." },
+                { "id": "irt_external_retainer", "label": "External IR retainer (if any)", "type": "text",
+                  "help": "Third-party IR firm on retainer for surge support (e.g., Mandiant, CrowdStrike Services, Unit 42)." }
+            ]
+        },
+
+        {
+            "id": "incident_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Incident Response Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate IR control effectiveness over time.",
+            "questions": [
+                { "id": "ir_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Mean Time to Detect (MTTD)",
+                      "Mean Time to Acknowledge (MTTA)",
+                      "Mean Time to Contain (MTTC)",
+                      "Mean Time to Recover (MTTR)",
+                      "False-positive rate (% of alerts triaged out as FP)",
+                      "Number of incidents per quarter (by severity)",
+                      "Exercise findings closed within target",
+                      "% playbooks current within review cadence",
+                      "Recurrence rate (same root cause)",
+                      "External-notification timeliness (% within SLA)"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "threat_intel_consumption",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Threat Intelligence Consumption",
+            "description": "Sources, ingestion, and IOC sweeping cadence.",
+            "questions": [
+                { "id": "ti_sources",         "label": "Threat-intel feeds subscribed", "type": "multi_select",
+                  "options": [
+                      "CISA AIS (Automated Indicator Sharing)",
+                      "MS-ISAC",
+                      "Sector ISAC (FS-ISAC, H-ISAC, etc.)",
+                      "Commercial feed (Mandiant / Recorded Future / CrowdStrike / etc.)",
+                      "Vendor product feeds (built into EDR / SIEM)",
+                      "Open-source feeds (AlienVault OTX, abuse.ch)",
+                      "Internal honeypot / deception",
+                      "Dark-web monitoring service"
+                  ] },
+                { "id": "ioc_ingestion",      "label": "IOC ingestion mechanism", "type": "textarea", "rows": 3,
+                  "help": "How indicators flow from feeds into detection (TIP, MISP, direct SIEM watchlist, EDR threat-feed import)." },
+                { "id": "ioc_sweep_cadence",  "label": "Retroactive IOC sweep cadence", "type": "text",
+                  "help": "How often historical logs are searched for newly-published indicators (e.g., 'Daily for high-priority feeds; weekly comprehensive sweep')." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the IR control implementations are summarized (e.g., 'SSP §13.6')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for IR findings", "type": "text",
+                  "help": "Convention for IR-related POA&M items (e.g., 'POAM-IR-')." },
+                { "id": "au_plan_reference",            "label": "AU plan cross-reference",       "type": "textarea", "rows": 2,
+                  "help": "How audit records and SIEM detections from the AU plan feed incident detection. SIEM index, log sources, retention." },
+                { "id": "si_plan_reference",            "label": "SI plan cross-reference",       "type": "textarea", "rows": 2,
+                  "help": "How system-monitoring (SI-4), malware protection (SI-3), and integrity verification (SI-7) generate IR signals." },
+                { "id": "cp_plan_reference",            "label": "CP plan cross-reference",       "type": "textarea", "rows": 2,
+                  "help": "How recovery from incidents coordinates with the contingency plan's restoration procedures." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying IR continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "IR-2": {
+            "prompts": [
+                "Reference §4.6 — training cadence and audience.",
+                "Document role-based training content (Tier-1 analyst vs Tier-3 incident commander).",
+                "Address training records and how completion is tracked.",
+                "Cross-reference AT-3 (role-based training).",
+                "Reference IR-2(1) simulated events and IR-2(2) automated training environments."
+            ],
+            "evidence_suggestions": [
+                "IR training curriculum / syllabus",
+                "Annual training completion report",
+                "Sample role-based training module",
+                "Training-records LMS export"
+            ],
+            "extra_fields": [
+                { "id": "ir2_training_records_system", "label": "Training-records system of record", "type": "text",
+                  "help": "LMS or other system tracking individual completion (e.g., 'Cornerstone LMS', 'TalentLMS')." },
+                { "id": "ir2_curriculum_owner",        "label": "Curriculum owner role",             "type": "text",
+                  "help": "Role responsible for keeping training content current as threats evolve." }
+            ]
+        },
+
+        "IR-3": {
+            "prompts": [
+                "Reference §4.6 — exercise types and cadence.",
+                "Document exercise scenarios used (ransomware, insider, supply-chain compromise, etc.).",
+                "Address coordination with adjacent organizations / agencies during multi-org exercises.",
+                "Document how exercise findings are tracked and closed.",
+                "Reference IR-3(1) automated testing, IR-3(2) coordination with related plans."
+            ],
+            "evidence_suggestions": [
+                "Annual exercise schedule",
+                "After-action reports from last 12 months",
+                "Exercise scenario library",
+                "Findings-closure tracker"
+            ],
+            "extra_fields": [
+                { "id": "ir3_scenarios_library_link", "label": "Exercise scenarios library", "type": "text",
+                  "help": "Where exercise scenarios are stored / authored (Confluence, Git repo, vendor tool)." },
+                { "id": "ir3_findings_closure_target","label": "Target time-to-close exercise findings", "type": "text",
+                  "help": "SLA for closing exercise-derived findings (e.g., '90% within 90 days')." }
+            ]
+        },
+
+        "IR-4": {
+            "prompts": [
+                "Reference §4.4 phases (Preparation; Detection & Analysis; Containment, Eradication, Recovery; Post-Incident).",
+                "Document the case-management workflow in §4.1's ticketing tool.",
+                "Address the chain of custody for digital evidence.",
+                "Reference IR-4(1) automated processes, IR-4(2) dynamic reconfiguration, IR-4(3) continuity of operations, IR-4(4) information correlation, IR-4(11) root-cause analysis."
+            ],
+            "evidence_suggestions": [
+                "Sample closed incident case showing all phases",
+                "Chain-of-custody form",
+                "IR playbook library (SOAR or Confluence)",
+                "Incident-handler runbook"
+            ],
+            "extra_fields": [
+                { "id": "ir4_chain_of_custody",  "label": "Chain-of-custody mechanism", "type": "textarea", "rows": 3,
+                  "help": "How digital evidence is preserved and tracked. Reference NIST SP 800-86 if used." },
+                { "id": "ir4_root_cause_method", "label": "Root-cause analysis method",  "type": "textarea", "rows": 3,
+                  "help": "Methodology used for RCA (5 Whys, Ishikawa, formal causal analysis, MITRE ATT&CK mapping)." }
+            ]
+        },
+
+        "IR-5": {
+            "prompts": [
+                "Identify the case-management system (§4.1).",
+                "Document fields required on each case (severity, category, status, assigned analyst, affected assets, IOCs).",
+                "Address incident-trend reporting (weekly / monthly / quarterly to leadership).",
+                "Reference IR-5(1) automated tracking, data collection, and analysis."
+            ],
+            "evidence_suggestions": [
+                "Case-management dashboard export",
+                "Sample monthly IR trend report to leadership",
+                "Case schema definition"
+            ],
+            "extra_fields": [
+                { "id": "ir5_case_required_fields", "label": "Required fields per incident case", "type": "multi_select",
+                  "options": ["Severity tier", "Incident category", "Affected systems / assets", "Affected users / accounts", "Initial detection time (UTC)", "Acknowledged time", "Containment time", "Recovery time", "Closure time", "Assigned analyst (Tier 1)", "Assigned senior responder (Tier 2/3)", "Indicators of compromise", "Containment actions taken", "Eradication actions taken", "Lessons learned / root cause", "Linked POA&M items"] },
+                { "id": "ir5_trend_reporting_cadence","label": "Trend-reporting cadence to leadership", "type": "text",
+                  "help": "How often incident trends are reported up (weekly / monthly / quarterly)." }
+            ]
+        },
+
+        "IR-6": {
+            "prompts": [
+                "Reference §4.5 external reporting recipients and timelines.",
+                "Document the internal reporting chain (analyst → IRT lead → ISSO → System Owner → AO).",
+                "Address PII / privacy-incident-specific reporting (Privacy Officer involvement).",
+                "Reference CISA Federal Incident Notification Guidelines for major incidents.",
+                "Reference IR-6(1) automated reporting, IR-6(2) vulnerabilities related to incidents."
+            ],
+            "evidence_suggestions": [
+                "External-notification template per recipient",
+                "Sample CISA notification form (redacted)",
+                "Internal escalation matrix",
+                "Privacy-incident-specific procedure"
+            ],
+            "extra_fields": [
+                { "id": "ir6_internal_chain",    "label": "Internal reporting chain", "type": "textarea", "rows": 3,
+                  "help": "Step-by-step internal escalation (e.g., 'Analyst → SOC Manager (within 30 min) → ISSO (within 1h for High+) → System Owner / AO (within 4h for Critical)')." },
+                { "id": "ir6_privacy_specific",  "label": "Privacy-incident-specific reporting", "type": "textarea", "rows": 3,
+                  "help": "How PII spillage triggers Privacy Officer engagement and additional reporting (state breach laws, GDPR, contractual)." }
+            ]
+        },
+
+        "IR-7": {
+            "prompts": [
+                "Identify internal IR resources (in-house IRT capabilities — see §3.4).",
+                "Identify external IR retainer (firm, scope of services, response SLA).",
+                "Document pre-positioned access for the external retainer (legal agreement, network access requirements).",
+                "Reference IR-7(1) automation support, IR-7(2) coordination with external providers."
+            ],
+            "evidence_suggestions": [
+                "External IR retainer contract (executive summary)",
+                "External-retainer activation procedure",
+                "Internal IRT skill matrix",
+                "Sample escalation-to-retainer record"
+            ],
+            "extra_fields": [
+                { "id": "ir7_retainer_scope",  "label": "External retainer scope of services", "type": "textarea", "rows": 3,
+                  "help": "What the external firm is engaged for (forensics, malware analysis, breach communications, advanced incident command)." },
+                { "id": "ir7_retainer_sla",    "label": "External retainer response SLA",      "type": "text",
+                  "help": "Time from activation to first responder on call (e.g., '2h business hours / 4h after-hours')." }
+            ]
+        },
+
+        "IR-8": {
+            "prompts": [
+                "**This document satisfies IR-8.** State that explicitly in the implementation narrative.",
+                "Reference the document version / approval signatures.",
+                "Address the review cadence and the trigger conditions for revision.",
+                "Document distribution: who receives the plan, how access is controlled.",
+                "Reference IR-8(1) breaches involving PII, IR-8(2) plan distribution."
+            ],
+            "evidence_suggestions": [
+                "This document (the IR Plan itself)",
+                "Plan-approval record (System Owner / ISSO / AO signatures)",
+                "Distribution list with read-access control",
+                "Annual review record"
+            ],
+            "extra_fields": [
+                { "id": "ir8_plan_owner",          "label": "IR Plan owner role", "type": "text",
+                  "help": "Role responsible for keeping the plan current (typically ISSO)." },
+                { "id": "ir8_review_triggers",     "label": "Review triggers beyond annual", "type": "textarea", "rows": 3,
+                  "help": "Events that force a plan revision outside the annual review (e.g., 'Major incident, organizational restructure, significant tooling change')." },
+                { "id": "ir8_distribution_control","label": "Plan distribution / access control", "type": "textarea", "rows": 3,
+                  "help": "How the plan is shared and who can read it. The plan often contains procedural detail useful to attackers — control distribution accordingly." }
+            ]
+        },
+
+        "IR-9": {
+            "prompts": [
+                "Reference §4.7 — spillage definitions, response steps, sanitization approach.",
+                "Identify the responsible role for coordinating spillage response.",
+                "Document evidence-retention requirements during spillage response.",
+                "Address user training on what constitutes spillage and how to report it.",
+                "Reference IR-9(2) training, IR-9(3) post-spill operations, IR-9(4) exposure to unauthorized personnel."
+            ],
+            "evidence_suggestions": [
+                "Spillage response procedure document",
+                "Sample (sanitized) spillage incident record",
+                "Spillage user-awareness training material",
+                "Sanitization-of-affected-systems procedure (per NIST SP 800-88)"
+            ],
+            "extra_fields": [
+                { "id": "ir9_evidence_retention", "label": "Evidence-retention requirements during spillage response", "type": "textarea", "rows": 3,
+                  "help": "How evidence is preserved (chain of custody, hashing, separate storage) so investigation isn't compromised by sanitization." },
+                { "id": "ir9_user_training_link",  "label": "Spillage-awareness training reference", "type": "text",
+                  "help": "Pointer to the training module that teaches users what spillage looks like and how to report." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Adverse Event",             "definition": "Any observable occurrence in an information system or network that has a negative consequence — e.g., a system crash. Not all adverse events become incidents." },
+        { "term": "After-Action Report (AAR)", "definition": "Document produced after an exercise or real incident summarizing what happened, what worked, what didn't, and corrective actions." },
+        { "term": "Chain of Custody",          "definition": "Chronological documentation of who handled a piece of evidence, when, and what was done with it. Required for evidence to be admissible." },
+        { "term": "Containment",               "definition": "Phase of incident response that limits damage and prevents spread, before full eradication is possible." },
+        { "term": "CSIRT",                     "definition": "Computer Security Incident Response Team — a formalized IRT, often with regional or sector responsibility." },
+        { "term": "Detection",                 "definition": "Phase of incident response during which an event is identified as a candidate incident." },
+        { "term": "Eradication",               "definition": "Phase of incident response that removes the threat from the environment (delete malware, close attacker accounts, patch the exploited vulnerability)." },
+        { "term": "Event",                     "definition": "Any observable occurrence in a system or network. Most events are benign; a small subset are adverse events; a smaller subset are incidents." },
+        { "term": "False Positive",            "definition": "An alert or finding that, on investigation, was not actually a security incident. Tuning false positives down without losing true-positive sensitivity is a continuous calibration." },
+        { "term": "Functional Exercise",       "definition": "A live drill in which IR processes are exercised against a simulated incident, often using technical tooling but without affecting production." },
+        { "term": "Incident",                  "definition": "An adverse event that has been determined to have a security impact (compromise, policy violation, etc.) and triggers the IR process." },
+        { "term": "Incident Commander",        "definition": "The person leading response to a specific incident, holding decision authority over containment and recovery actions." },
+        { "term": "Incident Response Team (IRT)", "definition": "The team responsible for handling cybersecurity incidents. May be combined with the SOC, may be a separate escalation tier, may be augmented by an external retainer." },
+        { "term": "Indicator of Attack (IOA)", "definition": "A behavioral pattern indicating an attack technique is being attempted (e.g., process-injection sequences). Compares to IOC, which is artifact-based." },
+        { "term": "Indicator of Compromise (IOC)", "definition": "An artifact that indicates a system has been compromised — file hash, IP address, domain, registry key, etc." },
+        { "term": "Information Spillage",      "definition": "Unauthorized disclosure of classified or controlled information to a system not authorized to handle it. Triggers IR-9 response." },
+        { "term": "Lessons Learned",           "definition": "Insights captured during post-incident review — what worked, what failed, what to do differently. Drives plan revision and training updates." },
+        { "term": "MITRE ATT&CK",              "definition": "A globally accessible knowledge base of adversary tactics and techniques. Frequently used for IR analysis and reporting structure." },
+        { "term": "Playbook",                  "definition": "A documented sequence of steps for handling a specific category of incident, often automated in a SOAR platform." },
+        { "term": "Post-Incident Review",      "definition": "Structured review (NIST SP 800-61 r2 phase 4) where the IRT and stakeholders examine what happened and capture lessons learned." },
+        { "term": "Recovery",                  "definition": "Phase of incident response that restores affected systems to operational state, often using CM-2 baseline restoration and CP backup procedures." },
+        { "term": "SOAR",                      "definition": "Security Orchestration, Automation, and Response — a class of tools that automate IR playbooks and integrate with SIEM, ticketing, and security tools." },
+        { "term": "Tabletop Exercise",         "definition": "A discussion-based drill in which IR participants walk through a hypothetical scenario without touching production systems." },
+        { "term": "Threat Intelligence",       "definition": "Information about adversaries — their tactics, techniques, infrastructure, and indicators — that informs detection and response." },
+        { "term": "Traffic Light Protocol (TLP)", "definition": "A set of designations used to ensure that sensitive information is shared with the appropriate audience. Levels: TLP:RED (named recipients only), AMBER, GREEN, CLEAR." },
+        { "term": "TTPs",                      "definition": "Tactics, Techniques, and Procedures — the way an adversary operates, useful for detection and attribution." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AAR",      "expansion": "After-Action Report" },
+        { "abbr": "AO",       "expansion": "Authorizing Official" },
+        { "abbr": "AOR",      "expansion": "Area of Responsibility" },
+        { "abbr": "ATO",      "expansion": "Authority to Operate" },
+        { "abbr": "ATT&CK",   "expansion": "MITRE Adversarial Tactics, Techniques, and Common Knowledge framework" },
+        { "abbr": "CIRT",     "expansion": "Cyber Incident Response Team" },
+        { "abbr": "CISA",     "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CSIRT",    "expansion": "Computer Security Incident Response Team" },
+        { "abbr": "DDoS",     "expansion": "Distributed Denial of Service" },
+        { "abbr": "DLP",      "expansion": "Data Loss Prevention" },
+        { "abbr": "EDR",      "expansion": "Endpoint Detection and Response" },
+        { "abbr": "FBI",      "expansion": "Federal Bureau of Investigation" },
+        { "abbr": "GDPR",     "expansion": "General Data Protection Regulation" },
+        { "abbr": "IDS",      "expansion": "Intrusion Detection System" },
+        { "abbr": "IOA",      "expansion": "Indicator of Attack" },
+        { "abbr": "IOC",      "expansion": "Indicator of Compromise" },
+        { "abbr": "IPS",      "expansion": "Intrusion Prevention System" },
+        { "abbr": "IR",       "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "IRT",      "expansion": "Incident Response Team" },
+        { "abbr": "ISAC",     "expansion": "Information Sharing and Analysis Center" },
+        { "abbr": "ISSM",     "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",     "expansion": "Information System Security Officer" },
+        { "abbr": "MISP",     "expansion": "Malware Information Sharing Platform" },
+        { "abbr": "MS-ISAC",  "expansion": "Multi-State Information Sharing and Analysis Center" },
+        { "abbr": "MTTA",     "expansion": "Mean Time To Acknowledge" },
+        { "abbr": "MTTC",     "expansion": "Mean Time To Contain" },
+        { "abbr": "MTTD",     "expansion": "Mean Time To Detect" },
+        { "abbr": "MTTR",     "expansion": "Mean Time To Recover / Respond" },
+        { "abbr": "NCISS",    "expansion": "National Cyber Incident Scoring System (CISA)" },
+        { "abbr": "NDR",      "expansion": "Network Detection and Response" },
+        { "abbr": "NIST",     "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",      "expansion": "Organization-Defined Value" },
+        { "abbr": "PII",      "expansion": "Personally Identifiable Information" },
+        { "abbr": "PHI",      "expansion": "Protected Health Information" },
+        { "abbr": "POAM",     "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RCA",      "expansion": "Root-Cause Analysis" },
+        { "abbr": "RMF",      "expansion": "Risk Management Framework" },
+        { "abbr": "SIEM",     "expansion": "Security Information and Event Management" },
+        { "abbr": "SOAR",     "expansion": "Security Orchestration, Automation, and Response" },
+        { "abbr": "SOC",      "expansion": "Security Operations Center" },
+        { "abbr": "SP",       "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",      "expansion": "System Security Plan" },
+        { "abbr": "TIP",      "expansion": "Threat Intelligence Platform" },
+        { "abbr": "TLP",      "expansion": "Traffic Light Protocol" },
+        { "abbr": "TTP",      "expansion": "Tactics, Techniques, and Procedures" },
+        { "abbr": "UEBA",     "expansion": "User and Entity Behavior Analytics" },
+        { "abbr": "US-CERT",  "expansion": "United States Computer Emergency Readiness Team (now part of CISA)" },
+        { "abbr": "WAF",      "expansion": "Web Application Firewall" },
+        { "abbr": "XDR",      "expansion": "Extended Detection and Response" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",           "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-61 r2 — Computer Security Incident Handling Guide", "url": "https://csrc.nist.gov/pubs/sp/800/61/r2/final" },
+        { "label": "NIST SP 800-83 r1 — Malware Incident Prevention and Handling for Desktops and Laptops", "url": "https://csrc.nist.gov/pubs/sp/800/83/r1/final" },
+        { "label": "NIST SP 800-86 — Guide to Integrating Forensic Techniques into Incident Response", "url": "https://csrc.nist.gov/pubs/sp/800/86/final" },
+        { "label": "NIST SP 800-184 — Guide for Cybersecurity Event Recovery", "url": "https://csrc.nist.gov/pubs/sp/800/184/final" },
+        { "label": "CISA Federal Government Cybersecurity Incident & Vulnerability Response Playbooks", "url": "https://www.cisa.gov/sites/default/files/publications/Federal_Government_Cybersecurity_Incident_and_Vulnerability_Response_Playbooks_508C.pdf" },
+        { "label": "CISA Federal Incident Notification Guidelines", "url": "https://www.cisa.gov/federal-incident-notification-guidelines" },
+        { "label": "MITRE ATT&CK Framework",                       "url": "https://attack.mitre.org/" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework", "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" }
+    ]
+}
