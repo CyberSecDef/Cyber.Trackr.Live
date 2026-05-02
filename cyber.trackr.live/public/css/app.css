@@ -5404,6 +5404,19 @@ del {
     opacity: 0;
     cursor: pointer;
 }
+/* The SCAP file picker is JS-triggered, never an overlay drop zone — keep
+   it out of the document flow entirely so it can't intercept clicks. */
+.ckl-hidden-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
 .ckl-drop__label {
     display: flex;
     flex-direction: column;
