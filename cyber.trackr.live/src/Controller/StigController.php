@@ -62,6 +62,39 @@ class StigController extends AbstractController
         ]);
     }
 
+    /**
+     * Flat index of every STIG title with all versions inline. Plain HTML —
+     * no DataTables, no pagination — so search-engine crawlers reach every
+     * version in one hop instead of clicking through paginated index pages.
+     * Also a useful page for humans who want a single Cmd-F surface.
+     *
+     * Declared with a fixed-string requirement on the path so it doesn't
+     * collide with /stig/{title}/{version}/{release} (segment count differs
+     * anyway, but being explicit avoids future routing drift).
+     */
+    #[Route('/stig/index', name: 'stig_index_titles')]
+    public function stig_index_titles(StigTocBuilder $tocBuilder): Response
+    {
+        $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
+
+        // Sort each title's versions by date desc so the latest reads first;
+        // sort titles alphabetically.
+        ksort($stigs, SORT_NATURAL | SORT_FLAG_CASE);
+        foreach ($stigs as $title => &$entries) {
+            usort($entries, fn($a, $b) => ($b['date'] ?? '') <=> ($a['date'] ?? ''));
+        }
+        unset($entries);
+
+        $version_count = 0;
+        foreach ($stigs as $entries) $version_count += count($entries);
+
+        return $this->render('stig/index_all.html.twig', [
+            'stigs'          => $stigs,
+            'title_count'    => count($stigs),
+            'version_count'  => $version_count,
+        ]);
+    }
+
     #[Route('/stig/feed.atom', name: 'stig_feed')]
     public function stig_feed(StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder): Response
     {

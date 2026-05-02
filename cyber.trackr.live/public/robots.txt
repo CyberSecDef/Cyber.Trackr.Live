@@ -1,2 +1,11 @@
 User-agent: *
-Disallow:
+Disallow: /search/
+Disallow: /plans/*/preview
+Disallow: /plans/*/download
+Disallow: /plans/*/controls/
+Disallow: /stig/disa
+Disallow: /stig/disa_download
+Disallow: /scap/disa
+Disallow: /scap/disa_download
+
+Sitemap: https://cyber.trackr.live/sitemap.xml

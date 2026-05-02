@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}All STIGs &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}All STIGs — every title, every version{% endblock %}
+{% block og_description %}Flat A-to-Z directory of every Security Technical Implementation Guide DISA publishes — {{ title_count|number_format }} titles, {{ version_count|number_format }} version-instances, every release deep-linked.{% endblock %}
+{% block og_image_name %}stig{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="stig-all-title">
+        <div class="rule-text">&sect; Library &middot; STIGs &middot; All</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Full directory</span>
+            <h1 id="stig-all-title" class="lib-page__title-large">
+                Every STIG, <em>every version.</em>
+            </h1>
+            <p class="lib-page__lede">
+                {{ title_count|number_format }} STIG titles &middot; {{ version_count|number_format }} version-instances. One page, plain text, every link reachable. For the searchable / paginated experience, see <a href="{{ path('stig') }}">the main STIG library</a>.
+            </p>
+        </header>
+
+        <ul class="stig-index-all">
+            {% for title, entries in stigs %}
+                {% set latest = entries|first %}
+                {% set human_title = title|replace({'_': ' '}) %}
+                <li class="stig-index-all__title" id="t-{{ title }}">
+                    <h2 class="stig-index-all__title-name">
+                        <a href="{{ path('stig_view', {title: title, version: latest.version, release: latest.release}) }}">{{ human_title }}</a>
+                    </h2>
+                    <ul class="stig-index-all__versions">
+                        {% for e in entries %}
+                            <li>
+                                <a href="{{ path('stig_view', {title: title, version: e.version, release: e.release}) }}">
+                                    V{{ e.version }}R{{ e.release }}
+                                </a>{% if e.released %}<span class="stig-index-all__released"> &middot; {{ e.released }}</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}
