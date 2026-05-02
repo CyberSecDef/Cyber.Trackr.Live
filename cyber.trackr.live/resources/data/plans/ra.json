@@ -1,0 +1,625 @@
+{
+    "_comment": "Risk Assessment Plan generator. Authored at the Phase 2 assessability floor; pairs with SI (RA-5 vulnerability scans feed SI-2 flaw remediation), CM (RA-3 risk informs CM-3 change-impact), CA (RA-3 outputs are revisited at CA-2 / CA-7 cadence), and SR (RA-3(1) supply-chain risk is the entry point to the SR family). Smaller, methodology-heavy family — moderate baseline pulls 6 base controls plus 4 enhancements but the engineering work is process documentation, not tooling sprawl.",
+
+    "family": "RA",
+    "family_name": "Risk Assessment",
+    "title": "Risk Assessment Plan",
+    "description": "Documents how the system categorizes information, identifies threats and vulnerabilities, assesses likelihood and impact, responds to risk, performs criticality analysis, and conducts threat hunting. Covers the controls of the RA family in NIST SP 800-53 r5 and aligns with FIPS 199 (Categorization), FIPS 200 (Minimum Security Requirements), NIST SP 800-30 r1 (Risk Assessment Guide), NIST SP 800-37 r2 (RMF), NIST SP 800-39 (Managing Information Security Risk), and NIST SP 800-161 r1 (Supply Chain Risk Management).",
+
+    "intro_template": "This Risk Assessment Plan documents the risk-assessment approach for {system_name}. It establishes the methodology, tooling, cadences, and roles used to categorize information, identify threats and vulnerabilities, assess likelihood and impact, decide on risk response, perform criticality analysis on system components, and hunt for previously undetected threats.\n\nThe scope covers FIPS 199 / FIPS 200 categorization, system risk assessment per NIST SP 800-30 r1, vulnerability scanning per RA-5, organizational risk response per RA-7, supply-chain criticality per RA-9 and RA-3(1), and proactive threat hunting per RA-10 within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Risk Assessment family), NIST SP 800-30 r1 (Risk Assessment Guide), NIST SP 800-39 (Managing Information Security Risk), and NIST SP 800-161 r1 (Supply Chain Risk Management).",
+
+    "approach_section_title": "Risk Assessment Approach",
+    "approach_template": "{system_name} categorizes information per FIPS 199 using {categorization_method}. Risk assessment follows {risk_methodology} on the cadence in §4.3, with results recorded in {risk_register_location}. Vulnerability scanning is performed by {vuln_scan_tool} on the cadence in §4.5; findings flow into the SI-2 remediation queue. Threat-hunt activity is performed {threat_hunt_cadence} by {threat_hunt_role}.\n\nAdditional details on categorization, risk-assessment methodology, risk-register management, vulnerability scanning, risk response, criticality analysis, supply-chain risk, threat hunting, and privacy risk are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Risk-assessment performance for {system_name} is tracked through the metrics in §6.1 (open vs closed risks, mean time to risk decision, vulnerability scan coverage, KEV-affected scan-coverage rate, high-criticality component count, threat-hunt findings closed). The risk register is reviewed on the cadence in §6.2; new risks are entered as discovered (RA-3 baseline assumption is a continuous activity, not a one-time exercise). Risk-monitoring reports feed the CA-7 continuous-monitoring strategy and surface to the AO at the cadence required by RA-3.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Risk Assessment Plan does not stand alone. The SI family consumes RA-5 vulnerability data via SI-2 flaw remediation; the CM family consumes RA-3 outputs to inform CM-3 change-impact analysis and CM-4 security-impact analysis; the CA family revisits risk at CA-2 assessment and CA-7 continuous monitoring; the SR family extends RA-3(1) and RA-9 into formal supply-chain risk management; the IR family escalates incidents to revisit risk decisions; the AO consumes the risk register for the authorization decision. The following cross-references identify the specific artifacts and locations where RA-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "RA-1", "from": "Organizational risk-assessment policy" },
+        { "number": "RA-7", "from": "Organizational risk-management framework / risk-acceptance authority" },
+        { "number": "RA-10","from": "Enterprise threat-hunting program (when shared SOC / hunt team)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Methodology references and tooling that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "categorization_method",
+                    "label": "Categorization method (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "How information is categorized per FIPS 199 (e.g., 'FIPS 199 + CNSSI 1253 overlay', 'FIPS 199 with NIST SP 800-60 v2 information-type guide')."
+                },
+                {
+                    "id": "risk_methodology",
+                    "label": "Risk-assessment methodology",
+                    "type": "text",
+                    "required": true,
+                    "help": "Methodology used to assess risk (e.g., 'NIST SP 800-30 r1 likelihood × impact', 'OCTAVE Allegro', 'FAIR (quantitative)')."
+                },
+                {
+                    "id": "risk_register_location",
+                    "label": "Risk register location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the risk register is maintained (e.g., 'GRC tool — Archer / ServiceNow GRC', 'eMASS', 'Spreadsheet under /repo/risk/register.xlsx with version control')."
+                },
+                {
+                    "id": "vuln_scan_tool",
+                    "label": "Vulnerability scanning tool",
+                    "type": "text",
+                    "required": true,
+                    "help": "Primary scanner (typically the same tool referenced in the SI plan: e.g., 'Tenable.sc', 'Qualys VMDR', 'Rapid7 InsightVM')."
+                },
+                {
+                    "id": "threat_hunt_cadence",
+                    "label": "Threat-hunt cadence",
+                    "type": "text",
+                    "help": "How often proactive hunts are conducted (e.g., 'Quarterly hypothesis-driven hunts; continuous SOAR-assisted micro-hunts')."
+                },
+                {
+                    "id": "threat_hunt_role",
+                    "label": "Threat-hunt role",
+                    "type": "text",
+                    "help": "Role that performs hunts (e.g., 'Enterprise SOC Threat Intelligence Team', 'External MDR retainer + internal IR lead')."
+                }
+            ]
+        },
+
+        {
+            "id": "categorization_methodology",
+            "type": "group",
+            "section": "approach",
+            "label": "Security Categorization (RA-2)",
+            "description": "FIPS 199 process and information-type analysis.",
+            "questions": [
+                { "id": "cat_fips199_levels",       "label": "FIPS 199 categorization (CIA triad)", "type": "textarea", "rows": 3,
+                  "help": "The Confidentiality / Integrity / Availability impact levels (Low / Moderate / High) and how they were determined. Reference NIST SP 800-60 v2 information-type guide for the rationale." },
+                { "id": "cat_high_water_mark",      "label": "High-water-mark rationale",         "type": "textarea", "rows": 3,
+                  "help": "Per FIPS 199, system categorization is the high-water mark across information types. Document the deciding information type and any moderation per CNSSI 1253 if applicable." },
+                { "id": "cat_information_types",    "label": "Information types in scope",         "type": "list",
+                  "suggestions": [
+                      "C.2.8.1 Personnel Management",
+                      "C.3.5.1 System Development",
+                      "C.3.5.5 IT Infrastructure Maintenance",
+                      "C.3.5.7 Information Security",
+                      "D.10 General Government",
+                      "D.13 Law Enforcement",
+                      "D.14 Regulatory Compliance"
+                  ] },
+                { "id": "cat_impact_prioritization","label": "Impact-level prioritization (RA-2(1))", "type": "textarea", "rows": 3,
+                  "help": "Per RA-2(1), how individual data elements within an information type are prioritized when impact varies. Often required at moderate / high baselines." },
+                { "id": "cat_review_trigger",       "label": "Re-categorization triggers",         "type": "textarea", "rows": 3,
+                  "help": "What events cause categorization to be revisited (e.g., 'Significant change per CM-4', 'New information type onboarded', 'Annual ATO review')." }
+            ]
+        },
+
+        {
+            "id": "risk_methodology",
+            "type": "group",
+            "section": "approach",
+            "label": "Risk-Assessment Methodology (RA-3)",
+            "description": "How likelihood, impact, and risk are computed.",
+            "questions": [
+                { "id": "ra3_threat_sources",      "label": "Threat-source taxonomy",            "type": "multi_select",
+                  "options": ["Adversarial — Nation-state", "Adversarial — Cybercriminal", "Adversarial — Insider (malicious)", "Adversarial — Hacktivist", "Adversarial — Unknown / opportunistic", "Accidental — Insider (unintentional)", "Structural — IT failure / aging hardware", "Environmental — Natural disaster / power / cooling", "Supply chain — Third-party compromise"] },
+                { "id": "ra3_likelihood_scale",    "label": "Likelihood scale",                   "type": "select",
+                  "options": ["Qualitative 5-tier (Very Low / Low / Moderate / High / Very High)", "Qualitative 3-tier (Low / Moderate / High)", "Quantitative (annualized rate of occurrence)", "Hybrid (qualitative for unknown, quantitative for measured)"] },
+                { "id": "ra3_impact_scale",        "label": "Impact scale",                       "type": "select",
+                  "options": ["Qualitative 5-tier (Very Low / Low / Moderate / High / Very High)", "Qualitative 3-tier (Low / Moderate / High)", "Quantitative ($ loss range)", "Hybrid"] },
+                { "id": "ra3_assessment_cadence", "label": "Risk-assessment cadence (RA-3 ODV)", "type": "text",
+                  "help": "How often the system risk assessment is refreshed. RA-3 ODV — common values: 'Annually + on significant change', 'Every 3 years + on significant change'." },
+                { "id": "ra3_results_distribution","label": "Risk-assessment results distribution (RA-3 ODV)", "type": "textarea", "rows": 3,
+                  "help": "Roles / personnel to whom risk-assessment results are distributed (System Owner, ISSO, ISSM, AO, ITRM committee, etc.)." },
+                { "id": "ra3_documentation_format","label": "Risk-assessment documentation format", "type": "textarea", "rows": 3,
+                  "help": "Format / template used (e.g., 'NIST SP 800-30 r1 Appendix L worksheets', 'Internal Risk Assessment Report template', 'eMASS-generated Security Assessment Report')." }
+            ]
+        },
+
+        {
+            "id": "risk_register",
+            "type": "group",
+            "section": "approach",
+            "label": "Risk Register Management",
+            "description": "How identified risks are tracked, prioritized, and aged.",
+            "questions": [
+                { "id": "register_required_fields",  "label": "Required fields per risk entry",   "type": "multi_select",
+                  "options": ["Unique risk ID", "Risk statement", "Threat source", "Vulnerability or weakness", "Affected components", "Likelihood rating", "Impact rating", "Inherent risk score", "Residual risk score (post-mitigation)", "Risk owner", "Mitigation strategy", "Decision (accept / mitigate / transfer / avoid)", "Decision authority + date", "Review date", "Linked POA&M ID"] },
+                { "id": "register_aging_policy",     "label": "Risk aging policy",                 "type": "textarea", "rows": 3,
+                  "help": "How long risks may sit at each status before re-evaluation (e.g., 'Open risks reviewed quarterly; accepted risks re-validated annually; mitigated risks closed when controls verified')." },
+                { "id": "register_escalation",       "label": "Escalation thresholds",             "type": "textarea", "rows": 3,
+                  "help": "Thresholds at which risks escalate beyond System Owner (e.g., 'High residual → ISSM brief; Very High residual → AO immediate notification')." }
+            ]
+        },
+
+        {
+            "id": "vulnerability_scanning",
+            "type": "group",
+            "section": "approach",
+            "label": "Vulnerability Scanning (RA-5)",
+            "description": "Scan scope, cadence, and coordination with SI-2 remediation.",
+            "questions": [
+                { "id": "ra5_scan_scope",           "label": "Scan scope (RA-5)",                 "type": "multi_select",
+                  "options": ["All hosts in authorization boundary", "External-facing (DMZ + public)", "Container images at build", "Container runtime", "Cloud configuration (CSPM)", "Web application (DAST)", "Source code (SAST)", "Software composition (SCA)", "Database configuration", "Network appliances", "Mobile applications", "API endpoints"] },
+                { "id": "ra5_scan_cadence",         "label": "Scan cadence",                       "type": "textarea", "rows": 3,
+                  "help": "Cadence by scope (e.g., 'External: continuous; Internal authenticated: weekly; Container images: on build; Web app DAST: monthly'). RA-5 ODV." },
+                { "id": "ra5_authenticated_scans",  "label": "Authenticated vs unauthenticated",   "type": "textarea", "rows": 2,
+                  "help": "Posture on authenticated scans (preferred for accuracy). Service-account credential management." },
+                { "id": "ra5_update_information",   "label": "Vulnerability information update mechanism (RA-5(2))", "type": "textarea", "rows": 3,
+                  "help": "How scanner signatures are kept current (auto-update, daily plugin pulls). Required by RA-5(2) — system is scanned with current information." },
+                { "id": "ra5_findings_routing",     "label": "Findings routing",                   "type": "textarea", "rows": 3,
+                  "help": "Where scan findings land. Typically a remediation queue feeding SI-2. Severity classification mapping." },
+                { "id": "ra5_information_sharing",  "label": "Information sharing (RA-5(11))",     "type": "textarea", "rows": 3,
+                  "help": "Per RA-5(11), how vulnerability information is shared with stakeholders (System Owner, ISSO, ISSM, downstream consumers, partner systems)." },
+                { "id": "ra5_privileged_access",    "label": "Privileged-access controls for scanners (RA-5(5))", "type": "textarea", "rows": 3,
+                  "help": "Per RA-5(5), how scanner privileged access is controlled. Service-account vault, JIT credential, MFA on scanner console." }
+            ]
+        },
+
+        {
+            "id": "risk_response",
+            "type": "group",
+            "section": "approach",
+            "label": "Risk Response (RA-7)",
+            "description": "Decision framework and authority for risk disposition.",
+            "questions": [
+                { "id": "ra7_response_options",     "label": "Risk-response options offered",     "type": "multi_select",
+                  "options": ["Accept (formal acceptance with rationale)", "Mitigate (additional controls)", "Transfer (insurance, cyber-insurance, contractual)", "Avoid (eliminate the activity / system feature)", "Share (distribute to multiple parties)"] },
+                { "id": "ra7_acceptance_authority", "label": "Risk-acceptance authority by tier",  "type": "textarea", "rows": 4,
+                  "help": "Who can accept risk at each level (e.g., 'Low: System Owner; Moderate: ISSM; High: AO; Very High: AO with CIO concurrence'). Reference any organizational risk-tolerance statement." },
+                { "id": "ra7_acceptance_evidence",  "label": "Risk-acceptance evidence required",  "type": "textarea", "rows": 3,
+                  "help": "Documentation required for risk acceptance (e.g., 'Signed risk-acceptance memo + entry in risk register + POA&M for periodic re-validation')." },
+                { "id": "ra7_revisit_cadence",      "label": "Accepted-risk revisit cadence",      "type": "text",
+                  "help": "How often accepted risks are re-validated to ensure conditions haven't changed." }
+            ]
+        },
+
+        {
+            "id": "criticality_analysis",
+            "type": "group",
+            "section": "approach",
+            "label": "Criticality Analysis (RA-9)",
+            "description": "Identification of critical components for prioritized protection.",
+            "questions": [
+                { "id": "ra9_methodology",          "label": "Criticality-analysis methodology",  "type": "textarea", "rows": 4,
+                  "help": "Approach to identifying critical components (e.g., 'NIST SP 800-161 r1 § 2.4 supply-chain criticality; NIST SP 800-30 r1 Appendix F asset value; FMEA for failure-impact analysis')." },
+                { "id": "ra9_critical_categories",  "label": "Critical-component categories",     "type": "multi_select",
+                  "options": ["Mission-essential functions (per CNSSI 4009)", "Cryptographic modules / HSMs", "Authentication / IdP infrastructure", "Network boundary devices", "Database servers holding CUI / PII / PHI", "Logging / audit infrastructure (AU)", "Backup / recovery infrastructure (CP)", "Supply-chain critical items (per RA-3(1))", "Single-source / single-vendor components"] },
+                { "id": "ra9_review_cadence",       "label": "Criticality-analysis review cadence", "type": "text",
+                  "help": "How often the analysis is refreshed (e.g., 'Annual + on architecture change')." },
+                { "id": "ra9_use_in_decisions",     "label": "How criticality informs decisions",  "type": "textarea", "rows": 3,
+                  "help": "How criticality drives architecture choices, redundancy investments, monitoring prioritization, supplier vetting depth." }
+            ]
+        },
+
+        {
+            "id": "supply_chain_risk",
+            "type": "group",
+            "section": "approach",
+            "label": "Supply Chain Risk (RA-3(1))",
+            "description": "Supply-chain-specific risk assessment, separate from generic RA-3.",
+            "questions": [
+                { "id": "scrm_assessment_trigger",  "label": "Supply-chain assessment triggers",  "type": "multi_select",
+                  "options": ["New vendor onboarding (initial)", "Annual vendor review", "Major version / contract change", "Vendor incident / breach", "Geopolitical change affecting vendor location", "M&A activity affecting vendor ownership"] },
+                { "id": "scrm_critical_dependencies","label": "Critical supply-chain dependencies", "type": "textarea", "rows": 4,
+                  "help": "Vendors / components whose compromise would disable the system. Single-source items, foreign-sourced components per FAR / DFARS, key open-source projects." },
+                { "id": "scrm_assessment_inputs",   "label": "Assessment inputs used",            "type": "multi_select",
+                  "options": ["Vendor SOC 2 Type II reports", "Vendor FedRAMP authorization", "Vendor cyber-insurance + financial health", "ICT-SCRM (NIST SP 800-161 r1) self-attestation", "SBOM analysis (per EO 14028 / OMB M-22-18)", "Vendor security questionnaire (CAIQ / SIG)", "Open-source project health (commits, maintainers, vulnerability history)", "Third-party risk-rating service (BitSight / SecurityScorecard)"] },
+                { "id": "scrm_handoff_to_sr",       "label": "Handoff to SR (Supply Chain Risk Management) family", "type": "textarea", "rows": 3,
+                  "help": "How RA-3(1) outputs feed the SR family controls. If SR plan exists, reference its location." }
+            ]
+        },
+
+        {
+            "id": "threat_hunting",
+            "type": "group",
+            "section": "approach",
+            "label": "Threat Hunting (RA-10)",
+            "description": "Proactive search for previously undetected threats.",
+            "questions": [
+                { "id": "ra10_hunt_methodology",    "label": "Hunt methodology",                  "type": "textarea", "rows": 4,
+                  "help": "Hypothesis-driven hunts based on threat intelligence, MITRE ATT&CK techniques, anomaly-driven hunts. Tooling (SIEM, EDR query, custom queries)." },
+                { "id": "ra10_intel_sources",       "label": "Threat-intelligence sources used",  "type": "multi_select",
+                  "options": ["MITRE ATT&CK", "CISA Cyber Threat Bulletins", "Sector ISAC threat reports", "Vendor threat-intel feeds", "Open-source intel (OSINT)", "Government classified intel feeds (federal)", "Commercial TIP (Recorded Future / Mandiant / etc.)", "Internal red-team / purple-team reports"] },
+                { "id": "ra10_finding_handling",    "label": "Hunt-finding handling",             "type": "textarea", "rows": 3,
+                  "help": "What happens when a hunt finds something (incident escalation per IR plan, control gap → POA&M, detection-rule creation feeding SI-4)." }
+            ]
+        },
+
+        {
+            "id": "privacy_risk",
+            "type": "group",
+            "section": "approach",
+            "label": "Privacy Risk Assessment (RA-8)",
+            "description": "Privacy Impact Assessment if applicable to information categorization.",
+            "questions": [
+                { "id": "ra8_pia_required",         "label": "PIA required by categorization",    "type": "select",
+                  "options": ["Yes — system handles PII (PIA required + published)", "Yes — PIA required + not published (operational sensitivity)", "No — system does not handle PII", "Pending — PII handling under review"] },
+                { "id": "ra8_pia_methodology",      "label": "PIA methodology",                   "type": "textarea", "rows": 3,
+                  "help": "Methodology used (e.g., 'NIST IR 8062 privacy risk model', 'OMB M-03-22 PIA template', 'Internal privacy-impact framework based on FIPPs')." },
+                { "id": "ra8_pia_review_cadence",   "label": "PIA review cadence",                 "type": "text",
+                  "help": "When PIA is refreshed (e.g., 'Annually; on significant change to information collection or use'). Reference PT family if authored." }
+            ]
+        },
+
+        {
+            "id": "ra_assessment_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Risk-Assessment Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_open_risk_count",    "label": "Open risks in register (approximate)", "type": "text",
+                  "help": "Order-of-magnitude count to anchor the metric tracking." },
+                { "id": "scope_components_in_scope","label": "System components in scope of RA-5", "type": "text",
+                  "help": "Approximate count of hosts / containers / images covered by vulnerability scans." },
+                { "id": "scope_critical_components","label": "Critical components per RA-9 analysis", "type": "text",
+                  "help": "Count of components classified as critical." },
+                { "id": "scope_third_parties",      "label": "Third-party / supply-chain dependencies tracked", "type": "text",
+                  "help": "Count of vendors / open-source projects in the supply-chain register." }
+            ]
+        },
+
+        {
+            "id": "ra_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Risk-Assessment Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate RA control effectiveness.",
+            "questions": [
+                { "id": "ra_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Open risks by severity (current + trend)",
+                      "Mean time to risk decision (Identified → Decision)",
+                      "% Accepted risks reviewed within revisit cadence",
+                      "Vulnerability scan coverage rate (% of in-scope assets scanned)",
+                      "% Critical / High vulnerabilities patched within SLA (overlaps SI-2)",
+                      "KEV-affected scan-coverage rate",
+                      "Threat-hunt findings closed per quarter",
+                      "Threat-hunt findings escalated to incident",
+                      "Critical-component coverage of monitoring + redundancy",
+                      "Supply-chain assessments completed within trigger cadence",
+                      "Open POA&M items linked to RA controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "scan_coverage_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Scan Coverage Verification",
+            "description": "How the org continuously verifies RA-5 scanning is correctly deployed.",
+            "questions": [
+                { "id": "scan_coverage_reconciliation","label": "Scan-coverage reconciliation cadence", "type": "text",
+                  "help": "How often the asset inventory (CMDB) is reconciled against scanned-asset roster. Detects shadow / unscanned hosts." },
+                { "id": "scan_signature_currency",     "label": "Scanner signature-currency verification", "type": "text",
+                  "help": "How the org verifies scan signatures are current (e.g., 'Daily plugin-update verification report'). Required by RA-5(2)." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the RA control implementations are summarized (e.g., 'SSP §13.11')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for RA findings", "type": "text",
+                  "help": "Convention for RA-related POA&M items (e.g., 'POAM-RA-' for general; 'POAM-RA5-' for vuln-specific)." },
+                { "id": "si2_consumer_handoff",         "label": "SI-2 flaw-remediation consumer handoff", "type": "textarea", "rows": 2,
+                  "help": "How RA-5 findings flow into the SI-2 remediation queue. Tooling, ticket-creation automation, owner assignment." },
+                { "id": "cm4_security_impact_handoff",  "label": "CM-4 security-impact analysis handoff", "type": "textarea", "rows": 2,
+                  "help": "How RA-3 outputs inform CM-4 / CM-3 change-impact analysis. Reference the CM Plan." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying RA continuous-monitoring metrics to the broader ConMon plan." },
+                { "id": "ir_escalation_handoff",        "label": "IR escalation handoff",         "type": "textarea", "rows": 2,
+                  "help": "How incidents trigger risk-register revisits. Closed incidents that introduced new risk get entries in the register." },
+                { "id": "sr_supply_chain_link",         "label": "SR family pointer",             "type": "textarea", "rows": 2,
+                  "help": "Pointer to the SR (Supply Chain Risk Management) plan if authored. RA-3(1) is the gateway control; SR formalizes the program." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "RA-2": {
+            "prompts": [
+                "Reference §4.2 — FIPS 199 levels with rationale.",
+                "Document the high-water mark across information types and the deciding type.",
+                "Address re-categorization triggers (significant change, new info type, ATO renewal).",
+                "Reference RA-2(1) impact-level prioritization where information-type impacts vary.",
+                "Reference RA-2(1) impact-level prioritization."
+            ],
+            "evidence_suggestions": [
+                "FIPS 199 categorization memo",
+                "Information-type analysis worksheet (per NIST SP 800-60 v2)",
+                "Categorization-approval signature page",
+                "CNSSI 1253 overlay determination (federal national-security systems)"
+            ],
+            "extra_fields": [
+                { "id": "ra2_categorization_authority","label": "Categorization-approval authority", "type": "text",
+                  "help": "Role that approved the FIPS 199 categorization (typically System Owner with AO concurrence)." },
+                { "id": "ra2_overlays_applied",      "label": "Overlays applied (if any)",        "type": "textarea", "rows": 3,
+                  "help": "Any overlays applied to baseline (CNSSI 1253 classified, FedRAMP, DoD CC SRG, agency-specific)." }
+            ]
+        },
+
+        "RA-3": {
+            "prompts": [
+                "Reference §4.3 — methodology, threat sources, likelihood / impact scales.",
+                "Document the cadence (RA-3 ODV) — annually + on significant change is common.",
+                "Address how environmental, structural, and adversarial threats are all considered.",
+                "Document distribution of results to specified roles (RA-3 ODV).",
+                "Reference RA-3(1) supply-chain risk assessment, RA-3(2) use of all-source intelligence, RA-3(3) dynamic threat awareness, RA-3(4) predictive cyber analytics."
+            ],
+            "evidence_suggestions": [
+                "Risk Assessment Report (latest)",
+                "Threat-source taxonomy reference",
+                "Likelihood × impact matrix",
+                "Risk-assessment cadence schedule",
+                "Sample completed risk-register entry"
+            ],
+            "extra_fields": [
+                { "id": "ra3_methodology_reference",  "label": "Methodology document reference",  "type": "text",
+                  "help": "Pointer to the organizational risk-assessment methodology (e.g., 'Org Risk Methodology v3.2 at /repo/risk/methodology.md')." },
+                { "id": "ra3_assumptions",            "label": "Documented risk-assessment assumptions", "type": "textarea", "rows": 4,
+                  "help": "Per NIST SP 800-30 r1, assumptions made in the assessment (system-state assumptions, threat-environment assumptions, control-effectiveness assumptions). Important for assessor traceability." }
+            ]
+        },
+
+        "RA-3(1)": {
+            "prompts": [
+                "Reference §4.7 — supply-chain assessment triggers, critical dependencies, inputs used.",
+                "Address SBOM-based vulnerability matching for software supply chain.",
+                "Document handoff to SR family if authored.",
+                "Reference NIST SP 800-161 r1 for supply-chain risk-management practices."
+            ],
+            "evidence_suggestions": [
+                "Supply-chain risk assessment (latest)",
+                "Vendor SBOM exports + analysis",
+                "Vendor SOC 2 / FedRAMP authorization on file",
+                "Critical-vendor register",
+                "Vendor risk-rating dashboard export"
+            ],
+            "extra_fields": [
+                { "id": "ra3_1_critical_vendor_count","label": "Critical vendor count", "type": "text",
+                  "help": "Approximate count of vendors classified as critical to system operation." },
+                { "id": "ra3_1_sbom_practice",        "label": "SBOM practice maturity",         "type": "select",
+                  "options": ["Full — SBOMs collected, ingested, vulnerability-matched continuously", "Partial — SBOMs collected for critical components only", "Manual — SBOMs requested but not systematically analyzed", "Not implemented (with POA&M)"] }
+            ]
+        },
+
+        "RA-5": {
+            "prompts": [
+                "Reference §4.5 — scan scope, cadence, authenticated vs unauthenticated.",
+                "Address signature-update mechanism (RA-5(2)).",
+                "Document privileged-access controls for the scanner (RA-5(5)).",
+                "Document information sharing with stakeholders (RA-5(11)).",
+                "Reference RA-5(1) update vulnerabilities to be scanned (withdrawn — incorporated into RA-5), RA-5(2) update vulnerabilities to be scanned, RA-5(3) breadth and depth of coverage, RA-5(4) discoverable information, RA-5(5) privileged access, RA-5(6) automated trend analyses, RA-5(8) review historic audit logs, RA-5(10) correlate scanning information, RA-5(11) public disclosure program."
+            ],
+            "evidence_suggestions": [
+                "Scanner configuration export",
+                "Scan schedule + sample scan output (sanitized)",
+                "Plugin-update verification report (RA-5(2))",
+                "Scanner privileged-account vault entry",
+                "Information-sharing distribution list (RA-5(11))",
+                "Authenticated-scan service-account inventory"
+            ],
+            "extra_fields": [
+                { "id": "ra5_scanner_protection",   "label": "Scanner-tooling protection",      "type": "textarea", "rows": 3,
+                  "help": "How the scanner itself is protected from compromise. RBAC on console, MFA, isolation from scan targets, audit logging of scanner activity." },
+                { "id": "ra5_disclosure_program",   "label": "Public disclosure program (RA-5(11))", "type": "textarea", "rows": 3,
+                  "help": "Whether a vulnerability disclosure program (VDP) exists for external researchers. Reference CISA BOD 20-01 for federal systems." }
+            ]
+        },
+
+        "RA-7": {
+            "prompts": [
+                "Reference §4.4 — response options, acceptance authority by tier, evidence required.",
+                "Document the revisit cadence for accepted risks.",
+                "Address how risk-acceptance decisions are tied to POA&M for compensating controls.",
+                "Reference any organizational risk-tolerance statement that anchors acceptance authority.",
+                "Reference NIST SP 800-39 risk-management hierarchy (organization, mission, system tiers)."
+            ],
+            "evidence_suggestions": [
+                "Risk-tolerance statement (org-level)",
+                "Sample risk-acceptance memo",
+                "Risk register showing decision history for closed risks",
+                "POA&M items linked to risk decisions"
+            ],
+            "extra_fields": [
+                { "id": "ra7_tolerance_statement",   "label": "Org risk-tolerance statement reference", "type": "text",
+                  "help": "Pointer to the organizational risk-tolerance / risk-appetite statement that anchors RA-7 decisions." },
+                { "id": "ra7_acceptance_template",   "label": "Risk-acceptance template reference", "type": "text",
+                  "help": "Where the formal risk-acceptance memo template lives." }
+            ]
+        },
+
+        "RA-8": {
+            "prompts": [
+                "Reference §4.10 — PIA-required determination, methodology, review cadence.",
+                "Address whether the PIA is publicly published per OMB M-03-22.",
+                "Document handoff to PT family if authored.",
+                "Reference NIST IR 8062 privacy risk model and FIPPs (Fair Information Practice Principles)."
+            ],
+            "evidence_suggestions": [
+                "Privacy Impact Assessment (latest version)",
+                "PIA review schedule",
+                "PII inventory (data-element-level)",
+                "Privacy-officer signoff record"
+            ],
+            "extra_fields": [
+                { "id": "ra8_privacy_officer",        "label": "Privacy-officer / SAOP role",     "type": "text",
+                  "help": "Senior Agency Official for Privacy (federal) or designated Privacy Officer responsible for PIA approval." },
+                { "id": "ra8_data_element_inventory", "label": "PII data-element inventory location", "type": "text",
+                  "help": "Where PII data elements are inventoried (often in the SSP appendix or a dedicated privacy-data-inventory tool)." }
+            ]
+        },
+
+        "RA-9": {
+            "prompts": [
+                "Reference §4.6 — methodology, critical-component categories, review cadence.",
+                "Address how criticality drives architecture / monitoring / supplier-vetting decisions.",
+                "Document mission-essential-function (MEF) mapping if applicable (CNSSI 4009).",
+                "Reference NIST SP 800-161 r1 § 2.4 supply-chain criticality criteria."
+            ],
+            "evidence_suggestions": [
+                "Criticality-analysis report (latest)",
+                "Mission-essential-function register",
+                "FMEA / failure-impact analysis",
+                "Critical-component register linked to RA-3(1) supply-chain assessment"
+            ],
+            "extra_fields": [
+                { "id": "ra9_mef_register",          "label": "Mission-essential-function register location", "type": "text",
+                  "help": "Where MEFs are documented if applicable (continuity-of-operations plan, BIA in the CP plan)." }
+            ]
+        },
+
+        "RA-10": {
+            "prompts": [
+                "Reference §4.9 — methodology, intel sources, finding handling.",
+                "Address coordination with SI-4 monitoring (hunt findings → new detection rules).",
+                "Document hunt-team RBAC (broad read access without write privileges).",
+                "Address handling of incidental findings outside hunt scope (privacy data, HR concerns).",
+                "Reference RA-10 ODV — frequency or events triggering threat hunts."
+            ],
+            "evidence_suggestions": [
+                "Threat-hunt program charter",
+                "Sample hunt report (sanitized)",
+                "Hunt-finding-to-detection-rule conversion log",
+                "Hunt-team RBAC export"
+            ],
+            "extra_fields": [
+                { "id": "ra10_hunt_attck_coverage",  "label": "MITRE ATT&CK coverage tracked",     "type": "textarea", "rows": 3,
+                  "help": "How the hunt program tracks ATT&CK technique coverage. Hunt-coverage matrix, detection-engineering backlog." },
+                { "id": "ra10_purple_team_cadence",  "label": "Purple-team / hunt-validation cadence", "type": "text",
+                  "help": "How often hunt findings / detections are validated through purple-team exercises." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Accepted Risk",          "definition": "A risk that the organization has formally chosen not to mitigate, having documented the rationale and approval. Subject to RA-7 revisit cadence." },
+        { "term": "ALE",                    "definition": "Annualized Loss Expectancy — quantitative risk metric: ALE = SLE × ARO. Used in quantitative risk-assessment methodologies." },
+        { "term": "ARO",                    "definition": "Annualized Rate of Occurrence — expected frequency of a threat event per year." },
+        { "term": "Categorization",         "definition": "Per FIPS 199, the assignment of Low / Moderate / High impact ratings to a system based on the worst-case impact for confidentiality, integrity, and availability." },
+        { "term": "CIA Triad",              "definition": "Confidentiality, Integrity, Availability — the three security objectives evaluated for impact in FIPS 199 categorization." },
+        { "term": "Criticality Analysis",    "definition": "Per RA-9, the process of identifying components whose failure or compromise would have the greatest mission impact, used to prioritize protective measures." },
+        { "term": "FAIR",                   "definition": "Factor Analysis of Information Risk — a quantitative risk-assessment methodology based on probabilistic loss-magnitude estimation." },
+        { "term": "FMEA",                   "definition": "Failure Mode and Effects Analysis — engineering technique for analyzing how a component can fail and the resulting impact." },
+        { "term": "High-Water Mark",        "definition": "Per FIPS 199, the highest impact level across all information types within a system. The system inherits this level as its overall categorization." },
+        { "term": "Hunt Hypothesis",         "definition": "A theory of attacker behavior that drives a threat hunt (e.g., 'an attacker with our recently-disclosed credentials would attempt lateral movement to our database tier')." },
+        { "term": "Impact",                 "definition": "Per NIST SP 800-30 r1, the magnitude of harm from a threat event. Combined with likelihood to produce risk." },
+        { "term": "Information Type",       "definition": "A category of information for FIPS 199 categorization (e.g., 'Personnel Management', 'System Development'). Per NIST SP 800-60 v2." },
+        { "term": "Inherent Risk",          "definition": "The level of risk before any controls / mitigations are applied. Compare with residual risk." },
+        { "term": "KEV",                    "definition": "Known Exploited Vulnerabilities — CISA's catalog of CVEs known to be actively exploited; subject to BOD 22-01 federal remediation timelines." },
+        { "term": "Likelihood",             "definition": "Per NIST SP 800-30 r1, the probability that a threat event will occur and result in adverse impact. Combined with impact to produce risk." },
+        { "term": "MITRE ATT&CK",           "definition": "A knowledge base of adversary tactics and techniques based on real-world observations. Used to organize threat-hunting and detection-engineering programs." },
+        { "term": "OCTAVE",                 "definition": "Operationally Critical Threat, Asset, and Vulnerability Evaluation — a risk-assessment methodology developed at CMU SEI." },
+        { "term": "PIA",                    "definition": "Privacy Impact Assessment — per RA-8, an analysis of how PII is collected, used, shared, maintained, and disposed of." },
+        { "term": "Residual Risk",          "definition": "The risk that remains after controls and mitigations are applied. Subject to risk-response decisions per RA-7." },
+        { "term": "Risk",                   "definition": "Per NIST SP 800-30 r1, a measure of the extent to which an entity is threatened by a potential circumstance, expressed as a function of likelihood and impact." },
+        { "term": "Risk Register",          "definition": "A document or system tracking identified risks, their assessment, treatment decisions, owners, and review cadence." },
+        { "term": "Risk Response",          "definition": "Per RA-7, the chosen action for each identified risk: accept, mitigate, transfer, avoid, or share." },
+        { "term": "SBOM",                   "definition": "Software Bill of Materials — formal record of components in software. Used in supply-chain risk assessment per RA-3(1)." },
+        { "term": "SLE",                    "definition": "Single Loss Expectancy — quantitative loss from a single occurrence of a threat event. SLE × ARO = ALE." },
+        { "term": "Threat Hunting",         "definition": "Per RA-10, the proactive search through environments for adversary activity that has evaded existing detection. Driven by hypothesis or anomaly." },
+        { "term": "Threat Source",          "definition": "An entity or condition with the potential to cause harm. NIST SP 800-30 r1 categorizes them as adversarial, accidental, structural, or environmental." },
+        { "term": "Vulnerability",          "definition": "Per NIST SP 800-30 r1, a weakness in a system, control, or implementation that could be exploited by a threat source." }
+    ],
+
+    "acronyms": [
+        { "abbr": "ALE",     "expansion": "Annualized Loss Expectancy" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ARO",     "expansion": "Annualized Rate of Occurrence" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "ATT&CK",  "expansion": "Adversarial Tactics, Techniques, and Common Knowledge (MITRE)" },
+        { "abbr": "BIA",     "expansion": "Business Impact Analysis" },
+        { "abbr": "BOD",     "expansion": "Binding Operational Directive (CISA)" },
+        { "abbr": "CAIQ",    "expansion": "Consensus Assessments Initiative Questionnaire (Cloud Security Alliance)" },
+        { "abbr": "CIA",     "expansion": "Confidentiality, Integrity, Availability" },
+        { "abbr": "CISA",    "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CMDB",    "expansion": "Configuration Management Database" },
+        { "abbr": "CNSSI",   "expansion": "Committee on National Security Systems Instruction" },
+        { "abbr": "CSPM",    "expansion": "Cloud Security Posture Management" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "CVE",     "expansion": "Common Vulnerabilities and Exposures" },
+        { "abbr": "DAST",    "expansion": "Dynamic Application Security Testing" },
+        { "abbr": "DFARS",   "expansion": "Defense Federal Acquisition Regulation Supplement" },
+        { "abbr": "EDR",     "expansion": "Endpoint Detection and Response" },
+        { "abbr": "EO",      "expansion": "Executive Order" },
+        { "abbr": "FAIR",    "expansion": "Factor Analysis of Information Risk" },
+        { "abbr": "FAR",     "expansion": "Federal Acquisition Regulation" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "FIPPs",   "expansion": "Fair Information Practice Principles" },
+        { "abbr": "FMEA",    "expansion": "Failure Mode and Effects Analysis" },
+        { "abbr": "GRC",     "expansion": "Governance, Risk, and Compliance" },
+        { "abbr": "ICT-SCRM","expansion": "Information and Communications Technology Supply Chain Risk Management" },
+        { "abbr": "IR",      "expansion": "Incident Response" },
+        { "abbr": "ISAC",    "expansion": "Information Sharing and Analysis Center" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "ITRM",    "expansion": "IT Risk Management (committee)" },
+        { "abbr": "JIT",     "expansion": "Just-in-Time (credential)" },
+        { "abbr": "KEV",     "expansion": "Known Exploited Vulnerabilities (CISA catalog)" },
+        { "abbr": "MDR",     "expansion": "Managed Detection and Response" },
+        { "abbr": "MEF",     "expansion": "Mission-Essential Function" },
+        { "abbr": "MFA",     "expansion": "Multi-Factor Authentication" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "NVD",     "expansion": "National Vulnerability Database" },
+        { "abbr": "OCTAVE",  "expansion": "Operationally Critical Threat, Asset, and Vulnerability Evaluation" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OMB",     "expansion": "Office of Management and Budget" },
+        { "abbr": "OSINT",   "expansion": "Open-Source Intelligence" },
+        { "abbr": "PIA",     "expansion": "Privacy Impact Assessment" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PT",      "expansion": "PII Processing and Transparency (NIST 800-53 family)" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RBAC",    "expansion": "Role-Based Access Control" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SAOP",    "expansion": "Senior Agency Official for Privacy" },
+        { "abbr": "SAR",     "expansion": "Security Assessment Report" },
+        { "abbr": "SAST",    "expansion": "Static Application Security Testing" },
+        { "abbr": "SBOM",    "expansion": "Software Bill of Materials" },
+        { "abbr": "SCA",     "expansion": "Software Composition Analysis" },
+        { "abbr": "SCRM",    "expansion": "Supply Chain Risk Management" },
+        { "abbr": "SIEM",    "expansion": "Security Information and Event Management" },
+        { "abbr": "SIG",     "expansion": "Standardized Information Gathering (questionnaire)" },
+        { "abbr": "SLE",     "expansion": "Single Loss Expectancy" },
+        { "abbr": "SOAR",    "expansion": "Security Orchestration, Automation, and Response" },
+        { "abbr": "SOC",     "expansion": "Security Operations Center" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SR",      "expansion": "Supply Chain Risk Management (NIST 800-53 family)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TIP",     "expansion": "Threat Intelligence Platform" },
+        { "abbr": "VDP",     "expansion": "Vulnerability Disclosure Program" },
+        { "abbr": "VMDR",    "expansion": "Vulnerability Management, Detection, and Response" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-30 r1 — Guide for Conducting Risk Assessments",   "url": "https://csrc.nist.gov/pubs/sp/800/30/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-39 — Managing Information Security Risk",          "url": "https://csrc.nist.gov/pubs/sp/800/39/final" },
+        { "label": "NIST SP 800-60 v2 r1 — Guide for Mapping Types of Information and Information Systems to Security Categories", "url": "https://csrc.nist.gov/pubs/sp/800/60/v2/r1/final" },
+        { "label": "NIST SP 800-161 r1 — Cybersecurity Supply Chain Risk Management Practices", "url": "https://csrc.nist.gov/pubs/sp/800/161/r1/final" },
+        { "label": "NIST IR 8062 — Privacy Risk Management Framework",             "url": "https://csrc.nist.gov/pubs/ir/8062/final" },
+        { "label": "FIPS 199 — Standards for Security Categorization of Federal Information and Information Systems", "url": "https://csrc.nist.gov/pubs/fips/199/final" },
+        { "label": "FIPS 200 — Minimum Security Requirements for Federal Information and Information Systems", "url": "https://csrc.nist.gov/pubs/fips/200/final" },
+        { "label": "MITRE ATT&CK Framework",                                       "url": "https://attack.mitre.org/" },
+        { "label": "CISA BOD 20-01 — Develop and Publish a Vulnerability Disclosure Policy", "url": "https://www.cisa.gov/news-events/directives/bod-20-01" },
+        { "label": "OMB M-03-22 — OMB Guidance for Implementing the Privacy Provisions of the E-Government Act of 2002", "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/memoranda/2003/m03_22.pdf" }
+    ]
+}

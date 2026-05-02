@@ -760,7 +760,7 @@ Tiered by impact + natural pairings to plans already authored.
 **Tier 2 — broad technical scope**
 
 - [x] SC — System and Communications Protection Plan (authored at Phase 2 floor; 15 family-question groups, 8 guided controls — SC-7/8/12/13/18/21/23/28 — with 16 extra fields, 23 glossary entries, 70 acronyms, 11 references; renders 91 cards at nist-moderate — 18 bases + 73 enhancements — with 74 ODV inputs and 73 disposition pickers)
-- [ ] RA — Risk Assessment Plan *(vulnerability scanning, threat modeling, risk register, supply chain risk)*
+- [x] RA — Risk Assessment Plan (authored at Phase 2 floor; 14 family-question groups, 8 guided controls — RA-2 / RA-3 / RA-3(1) / RA-5 / RA-7 / RA-8 / RA-9 / RA-10 — with 11 extra fields, 27 glossary entries, 67 acronyms, 12 references; renders 22 cards at nist-moderate — 6 bases + 16 enhancements)
 - [ ] SA — System and Services Acquisition Plan *(SDLC, supply chain, vendor management, dev/test environments)*
 
 **Tier 3 — physical, personnel, operational**
