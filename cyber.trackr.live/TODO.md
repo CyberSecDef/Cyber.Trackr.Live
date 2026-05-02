@@ -745,7 +745,7 @@ the assessability floor) for prose templates, family questions,
 per-control guidance, glossary, acronyms, references. Order suggested
 by RMF priority, but reorderable based on demand.
 
-- [ ] AC — Access Control Plan
+- [x] AC — Access Control Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls with 22 extra fields, 25 glossary entries, 39 acronyms, 7 references)
 - [ ] AU — Audit and Accountability Plan
 - [ ] AT — Awareness and Training Plan
 - [ ] CP — Contingency Plan (intersection with COOP/DR)

@@ -1,0 +1,529 @@
+{
+    "_comment": "Access Control Plan generator. Authored at the Phase 2 assessability floor — mirrors cm.json structure with AC-domain content. Add new families by copying this file (or cm.json) and replacing the family-specific fields.",
+
+    "family": "AC",
+    "family_name": "Access Control",
+    "title": "Access Control Plan",
+    "description": "Documents how the organization controls who can access the system, what they can do once authenticated, and how that access is reviewed and revoked. Covers the controls of the AC family in NIST SP 800-53 r5 and aligns with NIST SP 800-63 (Digital Identity Guidelines) and NIST SP 800-162 (ABAC).",
+
+    "intro_template": "This Access Control Plan documents the access-control approach for {system_name}. It establishes the practices, roles, and technical mechanisms used to enforce who may access the system and at what level of privilege.\n\nThe scope covers identity sources, account lifecycle, access enforcement, privileged access, session management, remote and wireless access, and external system connections within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Access Control family), NIST SP 800-63 (Digital Identity Guidelines), and where applicable NIST SP 800-162 (Attribute-Based Access Control).",
+
+    "approach_section_title": "Access Control Approach",
+    "approach_template": "{system_name} relies on {iam_tool} as the identity and access management system of record. Access decisions are enforced via {access_enforcement_model}. The account lifecycle (joiner / mover / leaver) is processed via {account_workflow}. Privileged access is governed through {pam_approach}.\n\nAdditional details on identity management, access enforcement, privileged access, session management, remote / wireless access, and external system connections are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Account inventories, privilege assignments, and active sessions for {system_name} are reviewed on a defined cadence and reconciled against authoritative HR / personnel records. Dormant accounts are identified and either disabled or removed per the account-review process. Privileged access is recertified periodically and just-in-time grants are logged for audit. Remote-access usage and authentication failures feed the SIEM. Continuous-monitoring metrics related to AC controls are documented in the sub-sections below.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Access Control Plan does not stand alone. Control implementations described herein are referenced from the System Security Plan (SSP); identity-related findings flow into the Plan of Action and Milestones (POA&M); authentication failures and unauthorized-access events are logged for AU-2 / AU-12 audit collection and inform CA-7 continuous monitoring. The following cross-references identify the specific artifacts and locations where AC-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "AC-1",  "from": "Organizational access control policy" },
+        { "number": "AC-2",  "from": "Enterprise identity / IAM service (when authoritative)" },
+        { "number": "AC-7",  "from": "Enterprise endpoint management policy (lockout thresholds)" },
+        { "number": "AC-8",  "from": "Enterprise endpoint management policy (system-use notification)" },
+        { "number": "AC-11", "from": "Enterprise endpoint management policy (device lock)" },
+        { "number": "AC-12", "from": "Enterprise endpoint management policy (session termination)" },
+        { "number": "AC-17", "from": "Enterprise VPN / remote-access service" },
+        { "number": "AC-18", "from": "Enterprise wireless infrastructure" },
+        { "number": "AC-19", "from": "Enterprise mobile device management policy" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Identity tooling, access-enforcement model, and the account lifecycle that everything else hangs off.",
+            "questions": [
+                {
+                    "id": "iam_tool",
+                    "label": "Identity and access management system of record",
+                    "type": "text",
+                    "required": true,
+                    "help": "Authoritative identity source / IAM platform (e.g., Active Directory + Azure AD, Okta, AWS IAM, Keycloak)."
+                },
+                {
+                    "id": "access_enforcement_model",
+                    "label": "Access-enforcement model",
+                    "type": "select",
+                    "options": ["RBAC (Role-Based)", "ABAC (Attribute-Based)", "RBAC with ABAC overlay", "DAC (Discretionary)", "MAC (Mandatory)", "Hybrid (specify in narrative)"],
+                    "help": "Primary access decision model. Most modern systems use RBAC or RBAC+ABAC."
+                },
+                {
+                    "id": "account_workflow",
+                    "label": "Account lifecycle workflow (joiner / mover / leaver)",
+                    "type": "textarea",
+                    "rows": 4,
+                    "help": "End-to-end JML workflow: how new accounts are requested, approved, provisioned, modified on role change, and deprovisioned on departure. Mention tooling (ServiceNow, ITSM, Okta workflows) and approval thresholds."
+                },
+                {
+                    "id": "pam_approach",
+                    "label": "Privileged access management (PAM) approach",
+                    "type": "textarea",
+                    "rows": 3,
+                    "help": "How privileged access is governed: standing privileges vs just-in-time, vault-based credential checkout, session recording, etc. Tooling (CyberArk, BeyondTrust, AWS SSO with permission sets, Teleport)."
+                }
+            ]
+        },
+
+        {
+            "id": "identity_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Identity Management",
+            "description": "Identity sources, lifecycle, federation, and authoritative records.",
+            "questions": [
+                { "id": "identity_authoritative_source", "label": "Authoritative identity source",         "type": "text",
+                  "help": "System of record for identity (e.g., 'Workday HR feeds Active Directory nightly')." },
+                { "id": "identity_federation_partners", "label": "Federation partners (if any)",          "type": "list",
+                  "suggestions": ["Internal SSO (SAML / OIDC)", "Login.gov", "ID.me", "DoD CAC (PIV)", "Partner federation"],
+                  "help": "External identity providers federated with the system. Add each via the Add button or pick from suggestions." },
+                { "id": "identity_user_populations",    "label": "User populations served",                "type": "multi_select",
+                  "options": ["Federal employees", "Contractors", "Privileged administrators", "Non-privileged users", "Service / machine accounts", "External partners", "Public / unauthenticated"],
+                  "help": "Distinct populations the system authenticates. Each may have different controls applied." },
+                { "id": "identity_proofing_level",      "label": "Identity proofing level (NIST SP 800-63A)", "type": "select",
+                  "options": ["IAL1 (self-asserted)", "IAL2 (in-person or remote with verifiable evidence)", "IAL3 (in-person with biometric)"],
+                  "help": "Per NIST SP 800-63A. Most federal systems require IAL2; CUI/Secret often require IAL3." },
+                { "id": "identity_authenticator_level", "label": "Authenticator assurance level (NIST SP 800-63B)", "type": "select",
+                  "options": ["AAL1 (single factor)", "AAL2 (two factor)", "AAL3 (hardware-bound multi-factor)"],
+                  "help": "Per NIST SP 800-63B. Federal systems handling CUI typically require AAL2; privileged or classified often AAL3." }
+            ]
+        },
+
+        {
+            "id": "access_enforcement",
+            "type": "group",
+            "section": "approach",
+            "label": "Access Enforcement",
+            "description": "How access decisions are made and enforced at the policy decision and enforcement points.",
+            "questions": [
+                { "id": "access_pdp",            "label": "Policy decision point (PDP)",            "type": "text",
+                  "help": "Component that evaluates access requests against policy (e.g., 'AWS IAM', 'OPA + Rego policies', 'Application authorization layer')." },
+                { "id": "access_pep",            "label": "Policy enforcement points (PEPs)",       "type": "textarea", "rows": 3,
+                  "help": "Where decisions are enforced — load balancer, application middleware, OS-level (sudo / RBAC), database row-level security, etc." },
+                { "id": "access_role_definitions", "label": "Role definitions / catalog",           "type": "textarea", "rows": 3,
+                  "help": "Where roles are defined and reviewed (e.g., 'Roles documented in iam-roles repo; reviewed quarterly by ISSO + Engineering Lead')." },
+                { "id": "access_attribute_sources","label": "Attribute sources (for ABAC)",          "type": "textarea", "rows": 3,
+                  "help": "If ABAC is in use, where attributes come from (HR system, IdP claims, classification labels) and how they're refreshed." }
+            ]
+        },
+
+        {
+            "id": "privileged_access",
+            "type": "group",
+            "section": "approach",
+            "label": "Privileged Access",
+            "description": "PAM tooling, just-in-time access, separation of duties, and recertification.",
+            "questions": [
+                { "id": "priv_pam_tooling",          "label": "PAM tooling",                          "type": "text",
+                  "help": "Privileged access management product / approach (e.g., CyberArk, BeyondTrust, AWS SSO permission sets, HashiCorp Vault, Teleport)." },
+                { "id": "priv_jit_approach",         "label": "Just-in-time access approach",         "type": "textarea", "rows": 3,
+                  "help": "How elevated privileges are requested and time-bound. Standing-privilege exceptions, if any." },
+                { "id": "priv_separation_of_duties", "label": "Separation-of-duties enforcement",     "type": "textarea", "rows": 3,
+                  "help": "How conflicting role pairs are prevented (e.g., 'Auditor and Production Deploy roles are mutually exclusive; enforced via Okta access policies')." },
+                { "id": "priv_recertification",      "label": "Privileged access recertification cadence", "type": "text",
+                  "help": "How often privileged role membership is reviewed and recertified by the role owner." }
+            ]
+        },
+
+        {
+            "id": "session_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Session Management",
+            "description": "Idle timeouts, device locking, concurrent session limits.",
+            "questions": [
+                { "id": "session_idle_timeout",         "label": "Idle timeout before lock", "type": "text",
+                  "help": "Time of inactivity before automatic device lock or session termination (e.g., '15 minutes for non-privileged; 5 minutes for privileged')." },
+                { "id": "session_lock_mechanism",       "label": "Lock mechanism",            "type": "textarea", "rows": 2,
+                  "help": "How the lock is implemented (OS screen lock + session unlock requires re-authentication; web-app session timeout)." },
+                { "id": "session_termination",          "label": "Session termination triggers", "type": "textarea", "rows": 3,
+                  "help": "Conditions that terminate (not just lock) a session: idle threshold, explicit logout, security event detection, account disable." },
+                { "id": "session_concurrent_limits",    "label": "Concurrent session limits", "type": "text",
+                  "help": "Whether and how concurrent sessions per account are limited (per role / per account-type)." }
+            ]
+        },
+
+        {
+            "id": "remote_wireless_mobile",
+            "type": "group",
+            "section": "approach",
+            "label": "Remote, Wireless, and Mobile Access",
+            "description": "VPN / remote-access mechanisms, wireless policy, mobile device approach.",
+            "questions": [
+                { "id": "remote_access_mechanisms",  "label": "Remote-access mechanisms",       "type": "textarea", "rows": 3,
+                  "help": "How remote users connect (VPN, ZTNA, bastion host, SSH jump host) and what authentication is required (MFA, certificate, hardware token)." },
+                { "id": "remote_monitoring",         "label": "Remote-access monitoring",       "type": "textarea", "rows": 2,
+                  "help": "How remote-access sessions are logged and monitored (SIEM rule, anomaly detection)." },
+                { "id": "wireless_policy",           "label": "Wireless access policy",         "type": "textarea", "rows": 2,
+                  "help": "Whether the system supports wireless access; if so, encryption requirements (WPA3 Enterprise), authentication, and segmentation." },
+                { "id": "mobile_device_approach",    "label": "Mobile device approach",         "type": "select",
+                  "options": ["Corporate-owned, fully managed (MDM)", "Corporate-owned, MDM with app containerization", "BYOD with MAM only (app-level)", "BYOD with full MDM consent", "Mobile access not permitted"] },
+                { "id": "mobile_mdm_tooling",        "label": "MDM / MAM tooling",              "type": "text",
+                  "help": "Tool managing mobile device policies (e.g., Intune, Workspace ONE, Jamf, Google MDM)." }
+            ]
+        },
+
+        {
+            "id": "external_systems",
+            "type": "group",
+            "section": "approach",
+            "label": "External System Connections",
+            "description": "Inventory of external systems, terms of use, and information-sharing controls.",
+            "questions": [
+                { "id": "external_inventory",          "label": "External system connection inventory location", "type": "text",
+                  "help": "Where the inventory of external connections is maintained (e.g., 'Boundary diagram in SSP §4.2 + ISA register in Confluence')." },
+                { "id": "external_terms_of_use",       "label": "Terms-of-use mechanism",                 "type": "textarea", "rows": 3,
+                  "help": "How users acknowledge terms of use (banner / login click-through / signed AUP). References AC-8 (System Use Notification)." },
+                { "id": "external_info_sharing_controls","label": "Information-sharing controls",          "type": "textarea", "rows": 3,
+                  "help": "How information shared with external parties is controlled (DLP, watermarking, attribute-based release, ISA scope)." }
+            ]
+        },
+
+        {
+            "id": "identity_population",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Identity Populations & Scopes",
+            "description": "Numerical and categorical scope of who accesses this system.",
+            "questions": [
+                { "id": "pop_total_account_count",  "label": "Total account count (approximate)", "type": "text",
+                  "help": "Order of magnitude is fine (e.g., '~250 active accounts')." },
+                { "id": "pop_privileged_count",     "label": "Privileged account count",          "type": "text",
+                  "help": "Number of privileged / administrative accounts." },
+                { "id": "pop_external_count",       "label": "External (non-employee) account count", "type": "text",
+                  "help": "Contractor / partner / federated user counts." },
+                { "id": "pop_service_count",        "label": "Service / machine account count",   "type": "text",
+                  "help": "Non-human accounts used by automation, applications, or services." }
+            ]
+        },
+
+        {
+            "id": "account_review",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Account Review & Recertification",
+            "description": "Cadence and process for reviewing account inventories and privilege assignments.",
+            "questions": [
+                { "id": "account_review_cadence",       "label": "Account-inventory review cadence", "type": "select",
+                  "options": ["Continuous (event-driven)", "Weekly", "Monthly", "Quarterly", "Annually"] },
+                { "id": "dormant_account_threshold",    "label": "Dormant-account threshold",        "type": "text",
+                  "help": "Inactivity duration that triggers disable / removal review (e.g., '30 days for privileged; 90 days for standard')." },
+                { "id": "recertification_process",      "label": "Privilege recertification process","type": "textarea", "rows": 3,
+                  "help": "How role / privilege owners review and re-attest their members. Tooling and cadence." },
+                { "id": "account_review_evidence_path", "label": "Evidence-of-review storage location", "type": "text",
+                  "help": "Where the signed / completed review records are stored." }
+            ]
+        },
+
+        {
+            "id": "access_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Access Control Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate AC control effectiveness over time.",
+            "questions": [
+                { "id": "ac_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "% accounts reviewed within cadence",
+                      "Mean time to deprovision (MTTD) on departure",
+                      "% privileged accounts using MFA",
+                      "Privileged account count (trend)",
+                      "Dormant account count (trend)",
+                      "Failed-authentication rate (trend)",
+                      "% sessions terminated by idle timeout",
+                      "Just-in-time elevation requests per quarter"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the AC control implementations are summarized (e.g., 'SSP §13.1')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for AC findings", "type": "text",
+                  "help": "Convention for AC-related POA&M items (e.g., 'POAM-AC-')." },
+                { "id": "au_log_correlation",           "label": "Audit-log correlation (AU-2 / AU-12)", "type": "textarea", "rows": 2,
+                  "help": "How authentication / access events are captured for the audit family. Specify SIEM index, log sources, retention." },
+                { "id": "ia_reference",                 "label": "IA family interaction",         "type": "textarea", "rows": 2,
+                  "help": "AC depends on IA (Identification and Authentication) for the underlying identity proofing and authenticator strength. Reference how the two plans interact." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying AC continuous monitoring (account reviews, privileged-access metrics) to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "AC-2": {
+            "prompts": [
+                "Enumerate the account types in scope (individual, group, system, application, guest, anonymous, temporary, emergency).",
+                "Identify the account managers (role) for each account type.",
+                "State the conditions for group / role membership.",
+                "Document approvals required for new account creation and modification.",
+                "Describe the monitoring of account usage (logs, anomaly detection).",
+                "Address dormant-account detection and disabling — see §6.1 for cadence.",
+                "Reference the AC-2 enhancements selected (especially AC-2(1) automated mgmt, AC-2(3) disable inactive, AC-2(4) audit, AC-2(12) account monitoring atypical usage)."
+            ],
+            "evidence_suggestions": [
+                "Account-management procedure document",
+                "IAM tool account inventory export",
+                "Sample account-creation approval ticket",
+                "Quarterly account review records",
+                "Dormant-account disable log",
+                "Account-monitoring SIEM rule export"
+            ],
+            "extra_fields": [
+                { "id": "ac2_account_types",         "label": "Account types in scope", "type": "multi_select",
+                  "options": ["Individual user", "Group / role", "System / service", "Application", "Privileged / admin", "Guest / temporary", "Emergency / break-glass", "Anonymous / public", "Shared (non-recommended; document if used)"] },
+                { "id": "ac2_account_manager_role",  "label": "Account manager role",   "type": "text",
+                  "help": "Role responsible for account administration (e.g., 'Identity Operations team')." },
+                { "id": "ac2_creation_approvals",    "label": "Account-creation approvals",   "type": "textarea", "rows": 3,
+                  "help": "Who must approve a new account by type. Supervisor + ISSO is common for privileged." },
+                { "id": "ac2_monitoring_mechanism",  "label": "Account monitoring mechanism", "type": "textarea", "rows": 3,
+                  "help": "How account usage is monitored (SIEM rules, UEBA, manual review)." }
+            ]
+        },
+
+        "AC-3": {
+            "prompts": [
+                "State the access enforcement model (matches §4.3 — RBAC / ABAC / hybrid).",
+                "Identify the policy decision point (PDP) and policy enforcement points (PEPs) — see §4.3.",
+                "For RBAC: describe the role catalog and how new roles are authorized.",
+                "For ABAC: describe the attribute set, attribute sources, and refresh cadence.",
+                "Address bypass mechanisms (none / break-glass) and their controls."
+            ],
+            "evidence_suggestions": [
+                "Role / permission catalog document",
+                "PDP configuration export (IAM policies, OPA bundle, etc.)",
+                "Sample access-denied audit log entries",
+                "Break-glass / emergency access procedure"
+            ],
+            "extra_fields": [
+                { "id": "ac3_enforcement_model_detail", "label": "Enforcement model details", "type": "textarea", "rows": 3,
+                  "help": "Specifics of the model in use, including any application-specific policy engines." },
+                { "id": "ac3_break_glass_procedure",    "label": "Break-glass / emergency access", "type": "textarea", "rows": 3,
+                  "help": "Whether break-glass is allowed; if so, who can invoke, what's logged, retroactive review window." }
+            ]
+        },
+
+        "AC-5": {
+            "prompts": [
+                "Identify the conflict-of-interest role pairs that must be enforced as separate.",
+                "Describe how separation is technically enforced (IAM policies, role-incompatibility rules).",
+                "Address the review cadence to detect SoD violations (someone holding incompatible roles).",
+                "Cross-reference AC-6 (Least Privilege) and AC-2(7) (Privileged User Accounts)."
+            ],
+            "evidence_suggestions": [
+                "Separation-of-duties matrix document",
+                "Sample SoD violation report (zero violations preferred)",
+                "IAM rule preventing incompatible role assignment"
+            ],
+            "extra_fields": [
+                { "id": "ac5_conflict_pairs",  "label": "Conflict-of-interest role pairs", "type": "textarea", "rows": 4,
+                  "help": "Pairs of roles that must not be held by the same individual (e.g., 'Auditor / Production Deploy', 'AppDev / Production DBA')." },
+                { "id": "ac5_enforcement",     "label": "Technical enforcement",           "type": "textarea", "rows": 3,
+                  "help": "How the conflict is prevented at policy assignment time, plus periodic detection of any drift." }
+            ]
+        },
+
+        "AC-6": {
+            "prompts": [
+                "Describe how access is granted at the minimum necessary level for each role.",
+                "Identify all privileged roles and their justified scope.",
+                "Address just-in-time elevation (AC-6(2)) — see §4.4 for the JIT approach.",
+                "Document privilege recertification — see §6.1.",
+                "Reference AC-2(7), AC-5, and AU-9(4) (audit log access restrictions)."
+            ],
+            "evidence_suggestions": [
+                "Privileged role inventory + scope documentation",
+                "JIT elevation procedure",
+                "Privilege recertification records (last cycle)",
+                "Sample reduction-of-privilege ticket"
+            ],
+            "extra_fields": [
+                { "id": "ac6_privileged_roles_list", "label": "Privileged roles inventory", "type": "list",
+                  "suggestions": ["System Administrator", "Database Administrator", "Network Administrator", "Security Operations", "ISSO", "Cloud Account Administrator", "Code-deploy operator"],
+                  "help": "Each privileged role in the system, with a one-line scope. Suggestions are common picks; customize." },
+                { "id": "ac6_jit_elevation",         "label": "JIT elevation mechanism",  "type": "textarea", "rows": 3,
+                  "help": "How standing privileges are minimized via time-bound elevation. References AC-6(2) and §4.4." }
+            ]
+        },
+
+        "AC-7": {
+            "prompts": [
+                "State the unsuccessful-logon threshold (count over period).",
+                "State the lockout duration / behavior (account lock vs delay vs admin reset).",
+                "Document the account-recovery / unlock process.",
+                "Address whether the threshold differs for privileged vs standard accounts."
+            ],
+            "evidence_suggestions": [
+                "IAM / OS authentication policy export showing the threshold",
+                "Account-recovery procedure document",
+                "Sample lockout audit-log entry"
+            ],
+            "extra_fields": [
+                { "id": "ac7_threshold",         "label": "Unsuccessful logon threshold", "type": "text",
+                  "help": "e.g., '5 attempts in 15 minutes'." },
+                { "id": "ac7_lockout_duration",  "label": "Lockout duration / behavior",  "type": "text",
+                  "help": "e.g., '30 minutes auto-unlock', 'admin-only unlock'." },
+                { "id": "ac7_recovery_process",  "label": "Account-recovery process",     "type": "textarea", "rows": 3,
+                  "help": "Steps an end user takes to recover from lockout, including identity verification." }
+            ]
+        },
+
+        "AC-11": {
+            "prompts": [
+                "State the idle period that triggers session lock.",
+                "Describe the lock mechanism (OS screen lock, application logout, both).",
+                "Address re-authentication requirements after lock (password, MFA, biometric).",
+                "Document any per-role variation (privileged users may have shorter timeouts)."
+            ],
+            "evidence_suggestions": [
+                "GPO / Intune / MDM policy export showing idle timeout",
+                "Application session-timeout configuration",
+                "Sample audit log showing lock event"
+            ],
+            "extra_fields": [
+                { "id": "ac11_idle_duration",     "label": "Idle duration before lock",  "type": "text",
+                  "help": "Duration of inactivity (e.g., '15 minutes')." },
+                { "id": "ac11_reauth_requirement","label": "Re-authentication requirement", "type": "text",
+                  "help": "What's required to unlock (password / PIN / MFA / biometric)." }
+            ]
+        },
+
+        "AC-17": {
+            "prompts": [
+                "Describe the remote-access mechanisms in use — see §4.6.",
+                "State the authentication requirements for remote access (MFA, certificate-based, hardware token).",
+                "Address split-tunneling — whether allowed, and if so under what conditions.",
+                "Document the monitoring of remote-access sessions (logging, anomaly detection).",
+                "Reference AC-17(2) (cryptographic protection), AC-17(3) (managed access control points), AC-17(4) (privileged commands and access)."
+            ],
+            "evidence_suggestions": [
+                "VPN / ZTNA configuration export",
+                "Remote-access policy document",
+                "Sample remote-access audit log",
+                "Split-tunneling decision documentation"
+            ],
+            "extra_fields": [
+                { "id": "ac17_mechanisms",       "label": "Remote-access mechanisms",    "type": "textarea", "rows": 3,
+                  "help": "VPN client, ZTNA, bastion host, SSH jump host, etc." },
+                { "id": "ac17_mfa_requirement",  "label": "MFA requirement for remote access", "type": "select",
+                  "options": ["Always required", "Required for privileged only", "Required after first day / new device", "Not required (document why)"] },
+                { "id": "ac17_split_tunneling",  "label": "Split tunneling",             "type": "select",
+                  "options": ["Not permitted (all traffic through VPN)", "Permitted with restrictions", "Permitted (full split tunnel)"] },
+                { "id": "ac17_monitoring",       "label": "Remote-access monitoring",    "type": "textarea", "rows": 3 }
+            ]
+        },
+
+        "AC-19": {
+            "prompts": [
+                "Identify the mobile-device populations served (corp-owned vs BYOD) — see §4.6.",
+                "State the MDM / MAM tooling and the policies enforced.",
+                "Address encryption requirements for data at rest on mobile devices.",
+                "Document the wipe / containerization approach for lost or stolen devices.",
+                "Reference AC-19(5) (full device or container encryption)."
+            ],
+            "evidence_suggestions": [
+                "MDM policy export (Intune / Workspace ONE / Jamf)",
+                "Mobile device acceptable-use policy",
+                "Sample lost-device wipe record",
+                "Encryption-at-rest verification report"
+            ],
+            "extra_fields": [
+                { "id": "ac19_mdm_tooling",        "label": "MDM / MAM tooling and policies", "type": "textarea", "rows": 3 },
+                { "id": "ac19_encryption",         "label": "Mobile encryption-at-rest approach", "type": "textarea", "rows": 2,
+                  "help": "Full-device, container-only, or app-level. Cite AC-19(5) and SC-28 alignment." },
+                { "id": "ac19_wipe_procedure",     "label": "Wipe / containerization procedure", "type": "textarea", "rows": 3 }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Access Control",            "definition": "The selective restriction of access to a place or resource. AC controls determine which subjects (users, processes) may perform which actions on which objects." },
+        { "term": "Account",                   "definition": "A representation of an authorized user, group, system, or process within an information system, with associated identifiers, credentials, attributes, and authorizations." },
+        { "term": "Attribute-Based Access Control (ABAC)", "definition": "An access-control model where decisions are made by evaluating attributes of the subject, object, action, and environment against a policy." },
+        { "term": "Authentication",            "definition": "Verifying the identity of a user, process, or device, typically as a prerequisite to allowing access." },
+        { "term": "Authentication Assurance Level (AAL)", "definition": "Per NIST SP 800-63B, a measure of the strength of authentication (AAL1 single-factor, AAL2 multi-factor, AAL3 hardware-bound multi-factor)." },
+        { "term": "Authorization",             "definition": "Granting or denying specific privileges (rights to use resources) based on an authenticated identity's attributes and the access policy." },
+        { "term": "Break-Glass Access",        "definition": "Emergency access mechanism that grants elevated privileges outside the normal workflow for time-critical incident response, with mandatory retroactive review." },
+        { "term": "Federation",                "definition": "An arrangement allowing identities from one trust domain to be accepted by another, typically via SAML or OIDC." },
+        { "term": "Identity Assurance Level (IAL)", "definition": "Per NIST SP 800-63A, a measure of the rigor with which a real-world identity is bound to an account (IAL1 self-asserted, IAL2 verified evidence, IAL3 in-person with biometric)." },
+        { "term": "Joiner / Mover / Leaver (JML)", "definition": "The three principal events in an account lifecycle: account creation when a person joins, modification on role change, and removal on departure." },
+        { "term": "Just-in-Time (JIT) Access", "definition": "An access-management practice where elevated privileges are granted on demand for a bounded time period and automatically revoked on expiration." },
+        { "term": "Least Privilege",           "definition": "The principle of granting users only the minimum access necessary to perform their assigned duties." },
+        { "term": "Multi-Factor Authentication (MFA)", "definition": "Authentication using at least two factors from distinct categories (something you know, have, or are)." },
+        { "term": "Need to Know",              "definition": "A principle stating that access to information should be limited to those who require it to perform official duties." },
+        { "term": "Policy Decision Point (PDP)", "definition": "The system component that evaluates access requests against access-control policy and produces a permit or deny decision." },
+        { "term": "Policy Enforcement Point (PEP)", "definition": "The system component that intercepts access requests and enforces the PDP's decision (e.g., a load balancer, API gateway, or OS-level access check)." },
+        { "term": "Privileged Account",        "definition": "An account with permissions beyond those of a standard user, such as the ability to modify configurations, access security-relevant data, or grant access to others." },
+        { "term": "Privileged Access Management (PAM)", "definition": "A category of cybersecurity tooling and processes that manage and monitor privileged accounts and sessions." },
+        { "term": "Role-Based Access Control (RBAC)", "definition": "An access-control model where permissions are associated with roles, and users are assigned to one or more roles." },
+        { "term": "Separation of Duties",      "definition": "Distributing tasks and associated privileges among multiple individuals so no single person can compromise a process or system." },
+        { "term": "Service / Machine Account", "definition": "A non-human account used by automation, applications, or services. Subject to additional rotation and isolation requirements." },
+        { "term": "Session",                   "definition": "An active interaction between a user (or process) and the system, typically authenticated and bounded by login and logout events." },
+        { "term": "Session Lock",              "definition": "Temporary suspension of an active session that requires re-authentication to resume, while preserving session state." },
+        { "term": "Session Termination",      "definition": "The conclusive ending of a session that requires full re-authentication and creation of a new session to resume." },
+        { "term": "Zero Trust Architecture (ZTA)", "definition": "An access model that assumes no implicit trust based on network location and continuously evaluates trust at every access decision. Per NIST SP 800-207." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AAL",   "expansion": "Authenticator Assurance Level (NIST SP 800-63B)" },
+        { "abbr": "ABAC",  "expansion": "Attribute-Based Access Control" },
+        { "abbr": "AO",    "expansion": "Authorizing Official" },
+        { "abbr": "ATO",   "expansion": "Authority to Operate" },
+        { "abbr": "AUP",   "expansion": "Acceptable Use Policy" },
+        { "abbr": "BYOD",  "expansion": "Bring Your Own Device" },
+        { "abbr": "CAC",   "expansion": "Common Access Card (DoD PIV)" },
+        { "abbr": "DAC",   "expansion": "Discretionary Access Control" },
+        { "abbr": "FIDO",  "expansion": "Fast IDentity Online" },
+        { "abbr": "IAL",   "expansion": "Identity Assurance Level (NIST SP 800-63A)" },
+        { "abbr": "IAM",   "expansion": "Identity and Access Management" },
+        { "abbr": "IdP",   "expansion": "Identity Provider" },
+        { "abbr": "ISA",   "expansion": "Interconnection Security Agreement" },
+        { "abbr": "ISSM",  "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",  "expansion": "Information System Security Officer" },
+        { "abbr": "JIT",   "expansion": "Just-in-Time" },
+        { "abbr": "JML",   "expansion": "Joiner / Mover / Leaver" },
+        { "abbr": "MAC",   "expansion": "Mandatory Access Control" },
+        { "abbr": "MAM",   "expansion": "Mobile Application Management" },
+        { "abbr": "MDM",   "expansion": "Mobile Device Management" },
+        { "abbr": "MFA",   "expansion": "Multi-Factor Authentication" },
+        { "abbr": "NIST",  "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",   "expansion": "Organization-Defined Value" },
+        { "abbr": "OIDC",  "expansion": "OpenID Connect" },
+        { "abbr": "PAM",   "expansion": "Privileged Access Management" },
+        { "abbr": "PDP",   "expansion": "Policy Decision Point" },
+        { "abbr": "PEP",   "expansion": "Policy Enforcement Point" },
+        { "abbr": "PIV",   "expansion": "Personal Identity Verification" },
+        { "abbr": "POAM",  "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RBAC",  "expansion": "Role-Based Access Control" },
+        { "abbr": "RMF",   "expansion": "Risk Management Framework" },
+        { "abbr": "SAML",  "expansion": "Security Assertion Markup Language" },
+        { "abbr": "SoD",   "expansion": "Separation of Duties" },
+        { "abbr": "SP",    "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSO",   "expansion": "Single Sign-On" },
+        { "abbr": "SSP",   "expansion": "System Security Plan" },
+        { "abbr": "UEBA",  "expansion": "User and Entity Behavior Analytics" },
+        { "abbr": "VPN",   "expansion": "Virtual Private Network" },
+        { "abbr": "ZTA",   "expansion": "Zero Trust Architecture" },
+        { "abbr": "ZTNA",  "expansion": "Zero Trust Network Access" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",                   "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-63-3 — Digital Identity Guidelines (suite)",              "url": "https://pages.nist.gov/800-63-3/" },
+        { "label": "NIST SP 800-162 — Guide to Attribute Based Access Control",           "url": "https://csrc.nist.gov/pubs/sp/800/162/final" },
+        { "label": "NIST SP 800-46 r2 — Guide to Enterprise Telework, Remote Access, and BYOD", "url": "https://csrc.nist.gov/pubs/sp/800/46/r2/final" },
+        { "label": "NIST SP 800-124 r2 — Guidelines for Managing the Security of Mobile Devices", "url": "https://csrc.nist.gov/pubs/sp/800/124/r2/final" },
+        { "label": "NIST SP 800-207 — Zero Trust Architecture",                            "url": "https://csrc.nist.gov/pubs/sp/800/207/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                        "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" }
+    ]
+}
