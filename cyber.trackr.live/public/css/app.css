@@ -2249,6 +2249,107 @@ a:hover {
     }
 }
 
+/* Disclosure menu (e.g., 800-53 dropdown). <details> + <summary> for
+   keyboard/no-JS accessibility; positioning differs by breakpoint. */
+.site-nav__menu {
+    position: relative;
+}
+.site-nav__menu-trigger {
+    list-style: none;          /* hide default <summary> marker */
+    cursor: pointer;
+    color: var(--text);
+    transition: color 0.15s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.site-nav__menu-trigger::-webkit-details-marker {
+    display: none;             /* Safari */
+}
+.site-nav__menu-trigger:hover {
+    color: var(--accent);
+}
+.site-nav__menu[open] .site-nav__menu-trigger {
+    color: var(--accent);
+}
+.site-nav__menu-chevron {
+    font-size: 12px;
+    transition: transform 0.15s ease;
+}
+.site-nav__menu[open] .site-nav__menu-chevron {
+    transform: rotate(180deg);
+}
+
+.site-nav__submenu {
+    display: flex;
+    flex-direction: column;
+}
+.site-nav__submenu a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+}
+
+@media (min-width: 992px) {
+    /* Desktop: floating popup under the trigger. */
+    .site-nav__submenu {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: var(--space-2);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-2);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        min-width: 200px;
+        z-index: 100;
+    }
+    .site-nav__submenu a {
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm, 4px);
+        font-size: 14px;
+    }
+    .site-nav__submenu a:hover {
+        color: var(--accent) !important;
+        background: var(--bg);
+    }
+}
+
+@media (max-width: 991.98px) {
+    /* Mobile: inline expansion below the trigger; aligns with the surrounding
+       column-flex links. */
+    .site-nav.is-open .site-nav__menu {
+        width: 100%;
+    }
+    .site-nav.is-open .site-nav__menu-trigger {
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 16px;
+        min-height: 44px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .site-nav.is-open .site-nav__submenu {
+        padding-left: var(--space-4);
+        border-bottom: 1px solid var(--border);
+    }
+    .site-nav.is-open .site-nav__submenu a {
+        padding: var(--space-3) 0;
+        font-size: 15px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+    }
+    .site-nav.is-open .site-nav__submenu a:last-child {
+        border-bottom: 0;
+    }
+}
+
 /* Hamburger toggle — visible only below lg where the inline nav hides. */
 .nav-toggle {
     /* uses .icon-btn structure from §2e */

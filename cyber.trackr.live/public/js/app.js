@@ -38,6 +38,21 @@ window.app = {
             }
         });
 
+        // Click outside the 800-53 nav dropdown closes it. Uses the native
+        // <details> 'open' attribute so no extra state to reconcile.
+        $(document).on("click.siteNavMenu", function (e) {
+            $(".site-nav__menu[open]").each(function () {
+                if (!$(e.target).closest(this).length) {
+                    this.removeAttribute("open");
+                }
+            });
+        });
+        $(document).on("keydown.siteNavMenu", function (e) {
+            if (e.key === "Escape") {
+                $(".site-nav__menu[open]").each(function () { this.removeAttribute("open"); });
+            }
+        });
+
         // Cmd/Ctrl + K — focus the header search input from anywhere on the page.
         $(document).on("keydown", function (e) {
             if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
