@@ -58,7 +58,7 @@
                             <td>{{ r.family }}</td>
                             <td>
                                 {% if r.r4 %}
-                                    <a class="ident ident--link" href="{{ path('rmf_v4_view') }}#rmf_{{ r.r4 }}" title="View {{ r.r4 }} on the 800-53 Rev 4 page">{{ r.r4 }}</a>
+                                    <a class="ident ident--link" href="{{ path('rmf_v4_view') }}#rmf_{{ r.r4_display }}" title="View {{ r.r4_display }} on the 800-53 Rev 4 page">{{ r.r4_display }}</a>
                                 {% else %}
                                     <span class="r4r5-cell-empty">&mdash;</span>
                                 {% endif %}
@@ -66,8 +66,12 @@
                             <td class="r4r5-title">{{ r.r4_title|default('') }}</td>
                             <td><span class="r4r5-badge r4r5-badge--{{ r.kind }}">{{ r.kind|replace({'-': ' ' })|title }}</span></td>
                             <td>
-                                {% if r.r5 %}
-                                    <a class="ident ident--link" href="{{ path('rmf_v5_view') }}#rmf_{{ r.r5 }}" title="View {{ r.r5 }} on the 800-53 Rev 5 page">{{ r.r5 }}</a>
+                                {% if r.r5_targets is defined and r.r5_targets|length > 1 %}
+                                    {% for t in r.r5_targets %}
+                                        <a class="ident ident--link" href="{{ path('rmf_v5_view') }}#rmf_{{ t }}" title="View {{ t }} on the 800-53 Rev 5 page">{{ t }}</a>{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% elseif r.r5 %}
+                                    <a class="ident ident--link" href="{{ path('rmf_v5_view') }}#rmf_{{ r.r5_display }}" title="View {{ r.r5_display }} on the 800-53 Rev 5 page">{{ r.r5_display }}</a>
                                 {% else %}
                                     <span class="r4r5-cell-empty">&mdash;</span>
                                 {% endif %}

@@ -9,6 +9,11 @@ class R4ToR5Mapper
 
     public function map(): array
     {
+        // Catalogs are keyed by CANONICAL form (no space before parens) so
+        // r4's "AC-2 (1)" and r5's "AC-2(1)" pair correctly. Each entry
+        // also carries 'display' — the original on-disk format, used for
+        // deep-link anchors (the existing r4 / r5 view pages anchor on the
+        // catalog's stored form, which differs between revisions).
         $r4 = $this->loadCatalog(self::R4_XML, true);
         $r5 = $this->loadCatalog(self::R5_XML, false);
         $curated = $this->loadCurated();
@@ -18,63 +23,126 @@ class R4ToR5Mapper
         $seen_r5 = [];
 
         foreach ($curated as $c) {
+            $r4key = isset($c['r4']) ? $this->normalize($c['r4']) : null;
+            $r5key = isset($c['r5']) ? $this->normalize($c['r5']) : null;
             $row = [
-                'r4'        => $c['r4'] ?? null,
-                'r5'        => $c['r5'] ?? null,
-                'kind'      => $c['kind'] ?? 'unchanged',
-                'rationale' => $c['rationale'] ?? '',
-                'source'    => 'curated',
-                'r4_title'  => isset($c['r4']) && isset($r4[$c['r4']]) ? $r4[$c['r4']]['title'] : null,
-                'r5_title'  => isset($c['r5']) && isset($r5[$c['r5']]) ? $r5[$c['r5']]['title'] : null,
-                'family'    => $this->family($c['r4'] ?? $c['r5'] ?? ''),
+                'r4'         => $r4key,
+                'r4_display' => $r4key && isset($r4[$r4key]) ? $r4[$r4key]['display'] : $r4key,
+                'r5'         => $r5key,
+                'r5_display' => $r5key && isset($r5[$r5key]) ? $r5[$r5key]['display'] : $r5key,
+                'kind'       => $c['kind'] ?? 'unchanged',
+                'rationale'  => $c['rationale'] ?? '',
+                'source'     => 'curated',
+                'r4_title'   => $r4key && isset($r4[$r4key]) ? $r4[$r4key]['title'] : null,
+                'r5_title'   => $r5key && isset($r5[$r5key]) ? $r5[$r5key]['title'] : null,
+                'family'     => $this->family($r4key ?? $r5key ?? ''),
             ];
             $rows[] = $row;
-            if (!empty($c['r4'])) $seen_r4[$c['r4']] = true;
-            if (!empty($c['r5'])) $seen_r5[$c['r5']] = true;
+            if ($r4key) $seen_r4[$r4key] = true;
+            if ($r5key) $seen_r5[$r5key] = true;
         }
 
-        // Mechanical: every r4 number not yet covered.
+        // Mechanical: every r4 number not yet covered. Three cases:
+        //   1. r5 has a live entry with the same canonical number → unchanged
+        //   2. r5 has a withdrawn placeholder pointing elsewhere → incorporated-into
+        //      (use the r5 entry's <incorporated-into> targets as authoritative)
+        //   3. r5 has no entry at all → truly withdrawn (rare — usually r5 keeps
+        //      a withdrawn placeholder for traceability)
         foreach ($r4 as $num => $info) {
             if (isset($seen_r4[$num])) continue;
-            if (isset($r5[$num])) {
+            $r5entry = $r5[$num] ?? null;
+
+            if ($r5entry && ($r5entry['status'] ?? 'active') === 'active') {
                 $rows[] = [
-                    'r4'        => $num,
-                    'r5'        => $num,
-                    'kind'      => 'unchanged',
-                    'rationale' => '',
-                    'source'    => 'mechanical',
-                    'r4_title'  => $info['title'],
-                    'r5_title'  => $r5[$num]['title'],
-                    'family'    => $this->family($num),
+                    'r4'         => $num,
+                    'r4_display' => $info['display'],
+                    'r5'         => $num,
+                    'r5_display' => $r5entry['display'],
+                    'kind'       => 'unchanged',
+                    'rationale'  => '',
+                    'source'     => 'mechanical',
+                    'r4_title'   => $info['title'],
+                    'r5_title'   => $r5entry['title'],
+                    'family'     => $this->family($num),
+                ];
+                $seen_r5[$num] = true;
+            } elseif ($r5entry && !empty($r5entry['incorporated_into'])) {
+                $targets        = $r5entry['incorporated_into'];
+                $targetDisplays = [];
+                foreach ($targets as $tnum) {
+                    $targetDisplays[] = $r5[$tnum]['display'] ?? $tnum;
+                }
+                $rows[] = [
+                    'r4'           => $num,
+                    'r4_display'   => $info['display'],
+                    'r5'           => $targets[0],                 // primary target for sort + single href
+                    'r5_display'   => $targetDisplays[0],
+                    'r5_targets'   => $targetDisplays,              // all targets for the cell
+                    'kind'         => 'incorporated-into',
+                    'rationale'    => $r5entry['withdrawn_desc'] !== ''
+                        ? $r5entry['withdrawn_desc']
+                        : 'Incorporated into ' . implode(', ', $targetDisplays),
+                    'source'       => 'mechanical',
+                    'r4_title'     => $info['title'],
+                    'r5_title'     => null,
+                    'family'       => $this->family($num),
+                ];
+                // Mark the withdrawn r5 placeholder as seen so we don't
+                // emit it as new-in-r5 below; targets stay live (they are
+                // separately rendered as their own r5 rows).
+                $seen_r5[$num] = true;
+            } elseif ($r5entry) {
+                // r5 has a withdrawn placeholder but no <incorporated-into>;
+                // treat as withdrawn-without-replacement.
+                $rows[] = [
+                    'r4'         => $num,
+                    'r4_display' => $info['display'],
+                    'r5'         => null,
+                    'r5_display' => null,
+                    'kind'       => 'withdrawn',
+                    'rationale'  => $r5entry['withdrawn_desc'] ?: '',
+                    'source'     => 'mechanical',
+                    'r4_title'   => $info['title'],
+                    'r5_title'   => null,
+                    'family'     => $this->family($num),
                 ];
                 $seen_r5[$num] = true;
             } else {
+                // No r5 entry at all — truly gone, no traceability record.
                 $rows[] = [
-                    'r4'        => $num,
-                    'r5'        => null,
-                    'kind'      => 'withdrawn',
-                    'rationale' => '',
-                    'source'    => 'mechanical',
-                    'r4_title'  => $info['title'],
-                    'r5_title'  => null,
-                    'family'    => $this->family($num),
+                    'r4'         => $num,
+                    'r4_display' => $info['display'],
+                    'r5'         => null,
+                    'r5_display' => null,
+                    'kind'       => 'withdrawn',
+                    'rationale'  => '',
+                    'source'     => 'mechanical',
+                    'r4_title'   => $info['title'],
+                    'r5_title'   => null,
+                    'family'     => $this->family($num),
                 ];
             }
             $seen_r4[$num] = true;
         }
 
-        // Mechanical: every r5 number not yet covered → new-in-r5.
+        // Mechanical: every LIVE r5 number not yet covered → new-in-r5.
+        // Withdrawn r5 placeholders that weren't paired above (orphan
+        // withdrawals not present in r4) are skipped — they don't
+        // represent a meaningful change for the diff view.
         foreach ($r5 as $num => $info) {
             if (isset($seen_r5[$num])) continue;
+            if (($info['status'] ?? 'active') !== 'active') continue;
             $rows[] = [
-                'r4'        => null,
-                'r5'        => $num,
-                'kind'      => 'new-in-r5',
-                'rationale' => '',
-                'source'    => 'mechanical',
-                'r4_title'  => null,
-                'r5_title'  => $info['title'],
-                'family'    => $this->family($num),
+                'r4'         => null,
+                'r4_display' => null,
+                'r5'         => $num,
+                'r5_display' => $info['display'],
+                'kind'       => 'new-in-r5',
+                'rationale'  => '',
+                'source'     => 'mechanical',
+                'r4_title'   => null,
+                'r5_title'   => $info['title'],
+                'family'     => $this->family($num),
             ];
             $seen_r5[$num] = true;
         }
@@ -118,28 +186,15 @@ class R4ToR5Mapper
         $defaultNs = 'http://scap.nist.gov/schema/sp800-53/2.0';
 
         foreach ($xml->xpath('//f:control') as $cnode) {
-            $kids  = $cnode->children($defaultNs);
-            $num   = trim((string) $kids->number);
-            if ($num === '') continue;
-            $title = trim((string) $kids->title);
-
-            $controls[$num] = [
-                'number' => $num,
-                'title'  => $title !== '' ? $title : '(no title)',
-            ];
+            $controls += $this->extractEntry($cnode, $defaultNs);
         }
 
-        // Enhancements: <control-enhancement> in the default 2.0 ns.
+        // Enhancements: <control-enhancement> in the default 2.0 ns. r4 stores
+        // these as "AC-2 (1)" with a space; r5 stores them as "AC-2(1)" without.
+        // Canonical key removes the space so cross-revision matching works;
+        // 'display' preserves the original for deep-linking.
         foreach ($xml->xpath('//d:control-enhancement') as $enode) {
-            $kids   = $enode->children($defaultNs);
-            $enum   = trim((string) $kids->number);
-            if ($enum === '') continue;
-            $etitle = trim((string) $kids->title);
-
-            $controls[$enum] = [
-                'number' => $enum,
-                'title'  => $etitle !== '' ? $etitle : '(no title)',
-            ];
+            $controls += $this->extractEntry($enode, $defaultNs);
         }
 
         return $controls;
@@ -152,6 +207,60 @@ class R4ToR5Mapper
 
         $raw = json_decode(file_get_contents($real), true);
         return $raw['curated'] ?? [];
+    }
+
+    /**
+     * Extract a single control / control-enhancement node into the catalog
+     * map shape. Captures number, title, withdrawal status, and any
+     * <incorporated-into> targets so the caller can use the catalog itself
+     * as the authoritative cross-revision mapping.
+     *
+     * @return array<string,array<string,mixed>> single-entry map keyed by canonical number
+     */
+    private function extractEntry(\SimpleXMLElement $node, string $ns): array
+    {
+        $kids    = $node->children($ns);
+        $display = trim((string) $kids->number);
+        if ($display === '') return [];
+        $key     = $this->normalize($display);
+        $title   = trim((string) $kids->title);
+        $status  = trim((string) $kids->status);
+
+        $incorporated = [];
+        $withdrawnDesc = '';
+        if ($kids->withdrawn) {
+            foreach ($kids->withdrawn->children($ns)->{'incorporated-into'} as $into) {
+                $t = $this->normalize(trim((string) $into));
+                if ($t !== '') $incorporated[] = $t;
+            }
+            // r5's <withdrawn> may also carry a <description>; fall back to
+            // statement/description if not present.
+            $wDesc = trim((string) $kids->withdrawn->children($ns)->description);
+            if ($wDesc !== '') $withdrawnDesc = $wDesc;
+        }
+
+        return [$key => [
+            'number'           => $key,
+            'display'          => $display,
+            'title'            => $title !== '' ? $title : '(no title)',
+            'status'           => $status !== '' ? strtolower($status) : 'active',
+            'incorporated_into'=> $incorporated,
+            'withdrawn_desc'   => $withdrawnDesc,
+        ]];
+    }
+
+    /**
+     * Canonical form of a control number for cross-revision matching.
+     * Strips whitespace before/around the enhancement parentheses so r4's
+     * "AC-2 (1)" and r5's "AC-2(1)" both reduce to "AC-2(1)".
+     */
+    private function normalize(?string $num): string
+    {
+        if ($num === null || $num === '') return '';
+        // Remove all whitespace adjacent to "(" anywhere in the string.
+        $s = preg_replace('/\s*\(\s*/', '(', trim($num));
+        $s = preg_replace('/\s*\)\s*/', ')', $s);
+        return $s;
     }
 
     private function family(string $num): string
