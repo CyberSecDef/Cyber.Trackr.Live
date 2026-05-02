@@ -1,0 +1,551 @@
+{
+    "_comment": "Supply Chain Risk Management Plan generator. Authored at the Phase 2 assessability floor; r5-only family (no r4 predecessor). Pairs with RA (RA-3(1) supply-chain risk assessment is the trigger for the SR program), SA (SA-4 acquisition clauses are the contract vehicle for SR program requirements; SA-9 external-services governance overlaps with SR-3 / SR-5; SA-15(3) criticality echoes SR-3), and CM (SR-10 inspection of components feeds CM-2 baseline integrity). The SR family formalizes what was scattered across r4 — the practitioner shorthand: 'r4 had SCRM bolted into SA + SI + RA; r5 extracted it into its own family.'",
+
+    "family": "SR",
+    "family_name": "Supply Chain Risk Management",
+    "title": "Supply Chain Risk Management Plan",
+    "description": "Documents how supply-chain risk is identified, assessed, and mitigated across the system's lifecycle. Covers SCRM plan governance, processes for managing supply-chain risk, acquisition strategies that select trustworthy suppliers, supplier assessments and reviews, notification agreements, inspection of received components, anti-counterfeit / authenticity controls, and component disposal. Covers the controls of the SR family in NIST SP 800-53 r5 and aligns with NIST SP 800-161 r1 (Cybersecurity Supply Chain Risk Management Practices), NIST SP 800-53A r5 (Assessment), Executive Order 14028, OMB M-22-18 / M-23-16 (software supply chain), Section 889 of the FY2019 NDAA (covered telecommunications), CISA ICT-SCRM Task Force guidance, and FedRAMP Continuous Monitoring requirements.",
+
+    "intro_template": "This Supply Chain Risk Management Plan documents the SCRM approach for {system_name}. It establishes the practices, criteria, cadences, and roles used to maintain a SCRM Plan, govern supply-chain risk processes, develop acquisition strategies that select trustworthy suppliers, assess supplier risk, establish notification agreements, inspect received components, protect against counterfeit components, and manage component disposal across the supply chain.\n\nThe scope covers SCRM plan governance per SR-2, supply-chain processes / controls per SR-3, acquisition strategies per SR-5, supplier assessments per SR-6, notification agreements per SR-8, component inspection per SR-10, authenticity (anti-counterfeit) per SR-11, and component disposal per SR-12 within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Supply Chain Risk Management family), NIST SP 800-161 r1 (Cybersecurity Supply Chain Risk Management Practices), and EO 14028 / OMB M-22-18 software-supply-chain guidance.",
+
+    "approach_section_title": "Supply Chain Risk Management Approach",
+    "approach_template": "{system_name} SCRM is governed by {scrm_team_role} who maintains the SCRM Plan at {scrm_plan_location}. Vendor risk is assessed through {vendor_risk_management_system}, with assessments performed on the cadence in §4.5. Acquisition strategies select trustworthy suppliers per the criteria in §4.4, with contractual notification obligations per §4.6. Components are inspected upon receipt per §4.7, with anti-counterfeit controls per §4.8 and disposal per §4.9.\n\nAdditional details on SCRM plan governance, processes and controls, acquisition strategies, supplier assessments, notification agreements, inspection, authenticity, and component disposal are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Supply-chain-risk performance for {system_name} is tracked through the metrics in §6.1 (SCRM Plan currency, supplier-assessment completion rate, vendor-incident notification timeliness, counterfeit-component detections, SBOM-completeness rate, single-source-component count, Section 889 / 889A attestation currency, vendor-EOL anticipation lead time). Vendor-incident notifications received are processed against the IR plan workflow within the SLA negotiated in SR-8 agreements. SBOMs received from suppliers are matched against vulnerability data on the cadence required by RA-5 / SI-2.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Supply Chain Risk Management Plan does not stand alone. The RA family supplies RA-3(1) supply-chain risk assessment that triggers SR program activity; the SA family supplies SA-4 acquisition clauses that contractually impose SR requirements, SA-9 external-services governance overlapping SR-3 / SR-5, and SA-15(3) criticality echoing SR-3; the CM family receives SR-10 inspection results into CM-2 baseline integrity; the IR family processes vendor-incident notifications received per SR-8; the SI family verifies authenticity of artifacts produced by suppliers per SI-7. The following cross-references identify the specific artifacts and locations where SR-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "SR-1", "from": "Organizational supply-chain risk-management policy" },
+        { "number": "SR-2", "from": "Organizational SCRM Plan (when shared org-wide vs system-specific)" },
+        { "number": "SR-3", "from": "Organizational SCRM processes (when ICT-SCRM Task Force aligned)" },
+        { "number": "SR-5", "from": "Organizational acquisition strategy / standard contract clauses" },
+        { "number": "SR-6", "from": "Organizational supplier-risk-rating service / review process" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Roles and tooling that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "scrm_team_role",
+                    "label": "SCRM-team role (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role / team accountable for SCRM (e.g., 'Agency C-SCRM Office', 'Internal SCRM Working Group chaired by CISO + Procurement Lead', 'ISSO with quarterly review by ITRM committee')."
+                },
+                {
+                    "id": "scrm_plan_location",
+                    "label": "SCRM Plan location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the SCRM Plan itself is maintained (typically alongside the SSP — e.g., 'eMASS package PKG-12345 SCRM annex', '/repo/compliance/scrm-plan.md')."
+                },
+                {
+                    "id": "vendor_risk_management_system",
+                    "label": "Vendor risk-management system (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where vendor-risk-rating is conducted (e.g., 'Internal review + BitSight + SecurityScorecard', 'Archer Vendor Risk module', 'CISO-led annual vendor review with Procurement support')."
+                },
+                {
+                    "id": "sbom_processing_tool",
+                    "label": "SBOM processing tooling",
+                    "type": "text",
+                    "help": "Tool that ingests and analyzes received SBOMs (e.g., 'OWASP Dependency-Track', 'Anchore Enterprise', 'Mend SCA + custom ingestion')."
+                },
+                {
+                    "id": "scrm_methodology_alignment",
+                    "label": "Methodology alignment",
+                    "type": "select",
+                    "options": ["NIST SP 800-161 r1 fully aligned", "NIST SP 800-161 r1 partial — major-vendor scope only", "NIST SP 800-161 r1 partial — software-supply-chain only", "Internal methodology (cross-walked to SP 800-161 r1)", "Not formally aligned"]
+                }
+            ]
+        },
+
+        {
+            "id": "scrm_plan",
+            "type": "group",
+            "section": "approach",
+            "label": "SCRM Plan (SR-2)",
+            "description": "How the SCRM Plan itself is governed.",
+            "questions": [
+                { "id": "sr2_plan_scope",           "label": "SCRM Plan scope summary",            "type": "textarea", "rows": 4,
+                  "help": "What the SCRM Plan covers (organizational responsibilities, in-scope suppliers / categories, risk methodology cross-reference to RA-3(1), incident protocols, plan revision schedule). Reference NIST SP 800-161 r1 Appendix B." },
+                { "id": "sr2_review_cadence",       "label": "Plan-review cadence (SR-2 ODV)",    "type": "text",
+                  "help": "How often the SCRM Plan is reviewed and updated (typical: 'Annually + on significant change to supplier mix or threat environment'). SR-2 ODV." },
+                { "id": "sr2_dedicated_processes",  "label": "Dedicated SCRM processes (SR-2(1))", "type": "textarea", "rows": 3,
+                  "help": "Per SR-2(1) — establish a dedicated supply-chain risk-management team. Document team membership, charter, decision authority." },
+                { "id": "sr2_supplier_categories",   "label": "Supplier categories in scope",       "type": "multi_select",
+                  "options": ["Hardware vendors (servers, network, endpoints)", "Software vendors (commercial off-the-shelf)", "Cloud-service providers", "Open-source software dependencies", "System-integration / development partners", "Maintenance / service vendors", "Subcontractors / second-tier suppliers", "Cryptographic-module vendors", "Logistics / shipping providers", "Logistics / cleared couriers"] }
+            ]
+        },
+
+        {
+            "id": "processes_controls",
+            "type": "group",
+            "section": "approach",
+            "label": "Supply Chain Controls and Processes (SR-3)",
+            "description": "Risk-mitigation processes applied across the supply chain.",
+            "questions": [
+                { "id": "sr3_risk_categories",      "label": "Risk categories addressed",          "type": "multi_select",
+                  "options": ["Counterfeit components", "Maliciously modified components", "Foreign-influence / foreign-ownership concerns", "Single-source / single-vendor supplier failure", "Quality / defect risk from supplier process", "Geopolitical disruption", "Embedded vulnerabilities (CVE / unpatched)", "Insider risk at supplier", "Subcontractor-tier opacity", "Section 889 prohibited equipment"] },
+                { "id": "sr3_mitigation_strategies","label": "Mitigation strategies",              "type": "multi_select",
+                  "options": ["Source diversification (multiple suppliers per critical category)", "Trusted-supplier program (curated approved list)", "SBOM analysis pipeline", "Component testing on receipt", "Tamper-evident packaging requirements in contracts", "Tracked custody from manufacture", "FedRAMP / SOC 2 attestation requirements", "ICT-SCRM Task Force best-practices alignment", "Section 889 attestation collection"] },
+                { "id": "sr3_information_sharing", "label": "Information-sharing participation", "type": "multi_select",
+                  "options": ["CISA ICT-SCRM Task Force", "Defense Industrial Base (DIB) Cybersecurity Program", "Sector ISAC", "Inter-agency SCRM working groups", "Bilateral with key suppliers", "Open-source threat intel platforms (TIP)"] }
+            ]
+        },
+
+        {
+            "id": "acquisition_strategies",
+            "type": "group",
+            "section": "approach",
+            "label": "Acquisition Strategies (SR-5)",
+            "description": "Selection of trustworthy suppliers.",
+            "questions": [
+                { "id": "sr5_pre_award_criteria",   "label": "Pre-award screening criteria",       "type": "multi_select",
+                  "options": ["FedRAMP authorization (cloud)", "SOC 2 Type II report", "ISO 27001 certification", "CMMC certification (DoD)", "Vendor cyber-insurance + financial health", "Past performance review", "ICT-SCRM self-attestation (NIST SP 800-161 r1)", "Section 889 attestation", "Country-of-origin disclosure", "Foreign-ownership-control-and-influence (FOCI) disclosure"] },
+                { "id": "sr5_evaluation_methodology","label": "Evaluation methodology",            "type": "textarea", "rows": 4,
+                  "help": "How candidate suppliers are evaluated. Scoring matrix, weight per criterion, decision authority. Reference NIST SP 800-161 r1 Appendix C." },
+                { "id": "sr5_trusted_supplier_list", "label": "Trusted-supplier list reference",   "type": "text",
+                  "help": "Where the approved-supplier / trusted-supplier list is maintained." },
+                { "id": "sr5_diversity_requirement","label": "Source-diversity requirement",        "type": "textarea", "rows": 3,
+                  "help": "When source-diversity (multiple suppliers per critical component class) is required vs allowed-single-source. Risk-acceptance pathway for unavoidable single-source dependencies." }
+            ]
+        },
+
+        {
+            "id": "supplier_assessments",
+            "type": "group",
+            "section": "approach",
+            "label": "Supplier Assessments and Reviews (SR-6)",
+            "description": "Ongoing supplier-risk monitoring.",
+            "questions": [
+                { "id": "sr6_assessment_inputs",    "label": "Assessment inputs",                  "type": "multi_select",
+                  "options": ["Annual SOC 2 / FedRAMP report receipt", "Cybersecurity questionnaire (CAIQ / SIG)", "Third-party risk-rating service (BitSight / SecurityScorecard / Black Kite)", "Public-incident-disclosure tracking", "Financial-health monitoring", "M&A activity tracking", "Geopolitical-risk monitoring", "Vendor SBOM analysis", "Vulnerability-disclosure-program participation", "On-site assessment (high-risk suppliers)"] },
+                { "id": "sr6_assessment_cadence",   "label": "Assessment cadence (SR-6 ODV)",      "type": "text",
+                  "help": "How often suppliers are reassessed. Tier-based (e.g., 'Critical suppliers: continuous + quarterly formal; high-risk: semi-annual; standard: annual')." },
+                { "id": "sr6_finding_handling",     "label": "Adverse-finding handling",           "type": "textarea", "rows": 3,
+                  "help": "Workflow when a supplier assessment identifies elevated risk. Acceptable-risk pathway, mitigation requirements, exit / replacement consideration." },
+                { "id": "sr6_critical_supplier_register","label": "Critical-supplier register",   "type": "textarea", "rows": 3,
+                  "help": "Who is on the critical-supplier register and why. Reference RA-9 criticality analysis." }
+            ]
+        },
+
+        {
+            "id": "notification_agreements",
+            "type": "group",
+            "section": "approach",
+            "label": "Notification Agreements (SR-8)",
+            "description": "Contractual obligations for supplier disclosure.",
+            "questions": [
+                { "id": "sr8_required_notifications","label": "Required notifications",             "type": "multi_select",
+                  "options": ["Cybersecurity incidents affecting customer data / systems", "Vulnerabilities discovered in supplied products", "Personnel changes affecting customer-dedicated staff", "Subcontractor changes", "M&A activity affecting ownership", "Foreign-investment disclosures (CFIUS-relevant)", "Government investigations / subpoenas affecting customer data", "Supply-chain compromises (upstream from supplier)"] },
+                { "id": "sr8_notification_sla",     "label": "Notification SLA",                   "type": "textarea", "rows": 3,
+                  "help": "Time-to-notify by event class. Common: 'Cyber incidents: 24-72h per CISA / DFARS guidelines'; 'Vulnerabilities: per coordinated disclosure timeline'." },
+                { "id": "sr8_contract_clause_reference","label": "Contract clause reference",      "type": "text",
+                  "help": "Pointer to the standard contract-clause language that imposes notification obligations." },
+                { "id": "sr8_internal_routing",     "label": "Internal-routing of received notifications", "type": "textarea", "rows": 3,
+                  "help": "Where notifications received from suppliers are routed internally (typically: SOC + ISSO + IR team). Reference IR plan." }
+            ]
+        },
+
+        {
+            "id": "inspection",
+            "type": "group",
+            "section": "approach",
+            "label": "Component Inspection (SR-10)",
+            "description": "Inspection of components upon receipt.",
+            "questions": [
+                { "id": "sr10_inspection_triggers", "label": "Inspection triggers",                "type": "multi_select",
+                  "options": ["Random sampling at receiving", "All-units inspection for critical components", "Tamper-evidence indicator on packaging", "Suspicious sourcing / unauthorized intermediary", "High-criticality classification (per RA-9 / SR-3)", "Indicator of compromise published for component class"] },
+                { "id": "sr10_inspection_methods",  "label": "Inspection methods",                  "type": "multi_select",
+                  "options": ["Visual inspection (physical tampering, label authenticity)", "Hash / digital-signature verification of firmware", "X-ray / non-destructive testing for embedded modifications", "Functional / performance testing", "JTAG / boundary-scan integrity testing", "Vendor-provided integrity attestation", "Supply-chain-provenance verification (in-toto / SLSA)"] },
+                { "id": "sr10_failure_handling",    "label": "Failure-handling procedure",          "type": "textarea", "rows": 3,
+                  "help": "What happens when inspection reveals a problem. Component quarantine, supplier escalation, IR activation. Coordination with CISA-DHS." }
+            ]
+        },
+
+        {
+            "id": "authenticity",
+            "type": "group",
+            "section": "approach",
+            "label": "Authenticity and Anti-Counterfeit (SR-11)",
+            "description": "Protection against counterfeit components.",
+            "questions": [
+                { "id": "sr11_anti_counterfeit_practices","label": "Anti-counterfeit practices", "type": "multi_select",
+                  "options": ["Genuine-source verification (SR-11(2)) — only authorized resellers", "Supplier authentication marks (holograms, watermarks)", "Serial-number registration with manufacturer", "Tamper-evident packaging requirements", "Component testing on receipt (SR-10)", "Anti-counterfeit training for personnel (SR-11(1))", "GIDEP (Government-Industry Data Exchange) participation", "ERAI (Electronic Resellers Association International) reporting"] },
+                { "id": "sr11_training_program",     "label": "Anti-counterfeit training program (SR-11(1))", "type": "textarea", "rows": 3,
+                  "help": "Per SR-11(1) — training for personnel involved in receipt / inspection / disposal of components. Reference AT-3 role-based training." },
+                { "id": "sr11_genuine_source_verification","label": "Genuine-source verification (SR-11(2))", "type": "textarea", "rows": 3,
+                  "help": "Per SR-11(2) — verifying components are obtained from authorized suppliers / authorized resellers. Maintaining the chain back to the OEM." },
+                { "id": "sr11_counterfeit_register","label": "Suspected-counterfeit register reference", "type": "text",
+                  "help": "Where suspected-counterfeit findings are recorded and tracked." }
+            ]
+        },
+
+        {
+            "id": "component_disposal",
+            "type": "group",
+            "section": "approach",
+            "label": "Component Disposal (SR-12)",
+            "description": "Lifecycle disposition of supply-chain components.",
+            "questions": [
+                { "id": "sr12_disposal_categories", "label": "Disposal categories tracked",        "type": "multi_select",
+                  "options": ["End-of-life replacement (vendor-driven)", "End-of-support replacement (SA-22)", "Decommissioning (system / service retirement)", "Failed-component RMA to vendor", "Legal / compliance (subpoena / discovery release)", "Donation / transfer (cleared organizations only)"] },
+                { "id": "sr12_disposal_procedures", "label": "Disposal procedures",                "type": "textarea", "rows": 3,
+                  "help": "How disposal is executed. Coordination with MP-6 sanitization (for media-bearing components), PE-16 removal, vendor RMA workflow with required sanitization. Reference NIST SP 800-88 r1." },
+                { "id": "sr12_chain_of_custody",     "label": "Chain-of-custody requirement",       "type": "textarea", "rows": 3,
+                  "help": "Whether and when chain-of-custody documentation is required for disposal. Especially relevant for cryptographic-module-bearing components and classified-system components." }
+            ]
+        },
+
+        {
+            "id": "sr_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Supply-Chain Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_active_suppliers",    "label": "Active suppliers",                  "type": "text",
+                  "help": "Approximate count of active suppliers in scope of SR program." },
+                { "id": "scope_critical_suppliers",  "label": "Critical suppliers",                 "type": "text",
+                  "help": "Approximate count of suppliers classified as critical (per SR-3 / RA-9)." },
+                { "id": "scope_open_source_dependencies","label": "Open-source dependencies tracked", "type": "text",
+                  "help": "Approximate count of OSS components tracked through SBOM analysis." },
+                { "id": "scope_quarterly_components_received","label": "Quarterly components received", "type": "text",
+                  "help": "Approximate count of components received per quarter (anchors SR-10 inspection effort)." }
+            ]
+        },
+
+        {
+            "id": "sr_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "SCRM Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate SR control effectiveness.",
+            "questions": [
+                { "id": "sr_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "SCRM Plan currency (last review date)",
+                      "Supplier-assessment completion rate (% of in-scope suppliers reassessed in cycle)",
+                      "Vendor-incident notification timeliness (mean time received vs SLA)",
+                      "Suspected-counterfeit detections per quarter",
+                      "SBOM-receipt completeness rate (% of contracts with SBOM delivered)",
+                      "SBOM-vulnerability-match findings per quarter",
+                      "Single-source-component count (target: minimize)",
+                      "Section 889 attestation currency rate",
+                      "Vendor-EOL anticipation lead time (mean days notice received)",
+                      "Trusted-supplier list currency (% reviewed in cycle)",
+                      "Open POA&M items linked to SR controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "vendor_incident_handling",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Vendor-Incident Notification Handling",
+            "description": "Continuous handling of supplier disclosures.",
+            "questions": [
+                { "id": "vendor_incident_intake",   "label": "Intake channels",                    "type": "multi_select",
+                  "options": ["Vendor-managed customer portal", "Email distribution list (security-disclosure)", "API / automated feed", "Phone (legal team)", "TIP / SOAR ingestion"] },
+                { "id": "vendor_incident_triage_role","label": "Triage role",                     "type": "text",
+                  "help": "Who triages received vendor notifications (typically SOC dispatcher or IR analyst-on-call)." },
+                { "id": "vendor_incident_to_ir_handoff","label": "IR-handoff workflow",           "type": "textarea", "rows": 3,
+                  "help": "How vendor-incident notifications become incidents in the IR plan workflow. Severity determination, escalation criteria." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the SR control implementations are summarized (e.g., 'SSP §13.16')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for SR findings", "type": "text",
+                  "help": "Convention for SR-related POA&M items (e.g., 'POAM-SR-' for general)." },
+                { "id": "ra_handoff",                   "label": "RA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How RA-3(1) supply-chain risk assessment triggers SR program activity. How RA-9 criticality classification feeds SR-3 critical-supplier register." },
+                { "id": "sa_handoff",                   "label": "SA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How SA-4 acquisition clauses contractually impose SR requirements; SA-9 external-services governance overlap with SR-3 / SR-5; SA-15(3) criticality echo with SR-3." },
+                { "id": "cm_handoff",                   "label": "CM handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How SR-10 inspection results feed CM-2 baseline integrity. Component-tampering finding triggers CM-4 / CM-5 review." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How vendor-incident notifications become IR-plan events. How counterfeit-component detection escalates." },
+                { "id": "si_handoff",                   "label": "SI handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How SR-supplied artifact authenticity (SBOM, signed packages, attestations) feeds SI-7 integrity verification." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying SR continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "SR-2": {
+            "prompts": [
+                "Reference §4.2 — plan scope, review cadence, dedicated processes, supplier categories.",
+                "Document the linkage with the SSP (PL-2) — SCRM Plan is a supporting plan.",
+                "Address how the SCRM Plan adapts when the supplier mix or threat environment changes.",
+                "Reference NIST SP 800-161 r1 Appendix B for SCRM Plan content guidance.",
+                "Reference SR-2(1) establish SCRM team."
+            ],
+            "evidence_suggestions": [
+                "Current SCRM Plan version with revision history",
+                "SCRM-team charter (SR-2(1))",
+                "Annual review attestation",
+                "Supplier-category mapping",
+                "Sample plan-update record after a significant change"
+            ],
+            "extra_fields": [
+                { "id": "sr2_team_members",         "label": "SCRM-team members",                "type": "textarea", "rows": 3,
+                  "help": "Roles on the SCRM team (e.g., 'CISO chair, Procurement Lead, Legal Counsel, ISSO, Engineering Lead'). Reference SR-2(1)." }
+            ]
+        },
+
+        "SR-3": {
+            "prompts": [
+                "Reference §4.3 — risk categories, mitigation strategies, information-sharing participation.",
+                "Document source-diversification posture for critical components.",
+                "Address coordination with CISA ICT-SCRM Task Force if applicable.",
+                "Reference NIST SP 800-161 r1 § 3 for SCRM controls.",
+                "Reference SR-3(1) diverse supply base, SR-3(2) limit harm from suppliers, SR-3(3) sub-tier flow down."
+            ],
+            "evidence_suggestions": [
+                "SCRM-process documentation",
+                "Trusted-supplier list",
+                "Source-diversity register (critical components)",
+                "Information-sharing memberships / agreements",
+                "Annual program-review report"
+            ],
+            "extra_fields": [
+                { "id": "sr3_subtier_visibility",   "label": "Sub-tier visibility approach",      "type": "textarea", "rows": 3,
+                  "help": "Per SR-3(3) — how visibility into supplier sub-tiers is achieved. Prime-flow-down clauses, vendor-supplied tier-2 disclosure, SBOM transitive analysis." }
+            ]
+        },
+
+        "SR-5": {
+            "prompts": [
+                "Reference §4.4 — pre-award screening criteria, evaluation methodology, trusted-supplier list, source-diversity requirement.",
+                "Document the integration with SA-4 contract clauses.",
+                "Address handling of incumbent suppliers vs new entrants in re-competition.",
+                "Reference NIST SP 800-161 r1 Appendix C for evaluation criteria.",
+                "Reference SR-5(1) adequate supply, SR-5(2) assessments prior to selection / acceptance / modification / update."
+            ],
+            "evidence_suggestions": [
+                "Acquisition strategy document",
+                "Pre-award scoring matrix",
+                "Sample award decision showing SCRM consideration",
+                "Trusted-supplier list export"
+            ],
+            "extra_fields": [
+                { "id": "sr5_pre_award_assessment_lead","label": "Pre-award assessment lead role", "type": "text",
+                  "help": "Role conducting pre-award SCRM assessment (often shared between SCRM team and Procurement)." }
+            ]
+        },
+
+        "SR-6": {
+            "prompts": [
+                "Reference §4.5 — assessment inputs, cadence, finding handling, critical-supplier register.",
+                "Document tier-based assessment cadences (critical / high-risk / standard).",
+                "Address how adverse findings escalate to risk-acceptance or supplier-replacement decisions.",
+                "Reference NIST SP 800-161 r1 § 4 for supplier review.",
+                "Reference SR-6(1) testing and analysis."
+            ],
+            "evidence_suggestions": [
+                "Last-cycle supplier assessment records (sanitized)",
+                "Critical-supplier register",
+                "Third-party risk-rating dashboard export",
+                "Adverse-finding-to-mitigation log"
+            ],
+            "extra_fields": [
+                { "id": "sr6_third_party_rating_service","label": "Third-party rating service",   "type": "text",
+                  "help": "Vendor risk-rating service in use (e.g., 'BitSight', 'SecurityScorecard', 'Black Kite')." }
+            ]
+        },
+
+        "SR-8": {
+            "prompts": [
+                "Reference §4.6 — required notifications, SLA, contract clause reference, internal routing.",
+                "Document handling of subcontractor-tier notifications (often missing without explicit clause).",
+                "Address legal-counsel involvement when notifications affect ATO conditions.",
+                "Reference NIST SP 800-161 r1 § 5 for notification practices.",
+                "Reference DFARS 252.204-7012 cyber-incident reporting requirements (DoD).",
+                "Reference CISA Cyber Incident Reporting for Critical Infrastructure Act (CIRCIA)."
+            ],
+            "evidence_suggestions": [
+                "Standard contract notification clause",
+                "Sample notification received from vendor",
+                "Internal-routing playbook",
+                "DFARS / CIRCIA reference if applicable"
+            ],
+            "extra_fields": [
+                { "id": "sr8_legal_counsel_role",    "label": "Legal-counsel coordination role",   "type": "text",
+                  "help": "Role coordinating legal review of high-impact vendor notifications." }
+            ]
+        },
+
+        "SR-10": {
+            "prompts": [
+                "Reference §4.7 — inspection triggers, inspection methods, failure-handling.",
+                "Document coordination with PE-16 receiving-dock workflow.",
+                "Address inspection of digital deliverables (SBOM authenticity, signed packages).",
+                "Reference NIST SP 800-161 r1 § 6 for inspection.",
+                "Reference SR-10 ODV — types of system or system component inspections."
+            ],
+            "evidence_suggestions": [
+                "Inspection SOP",
+                "Inspection-station configuration",
+                "Sample inspection record",
+                "GIDEP report (if applicable)",
+                "Failed-inspection-to-supplier-escalation log"
+            ],
+            "extra_fields": [
+                { "id": "sr10_inspection_lab_reference","label": "Inspection-lab reference",       "type": "text",
+                  "help": "If applicable: physical / digital inspection lab. Often a contractor for high-end inspections." }
+            ]
+        },
+
+        "SR-11": {
+            "prompts": [
+                "Reference §4.8 — anti-counterfeit practices, training program, genuine-source verification, suspected-counterfeit register.",
+                "Document training cadence per SR-11(1) and AT-3 cross-reference.",
+                "Address GIDEP / ERAI participation if applicable (federal context).",
+                "Reference NIST SP 800-161 r1 § 7 for anti-counterfeit.",
+                "Reference SR-11(1) anti-counterfeit training, SR-11(2) configuration control for component service / repair, SR-11(3) anti-counterfeit scanning."
+            ],
+            "evidence_suggestions": [
+                "Anti-counterfeit policy document",
+                "Sample SR-11(1) training-completion record",
+                "Genuine-source verification log",
+                "Suspected-counterfeit register",
+                "GIDEP report if applicable"
+            ],
+            "extra_fields": [
+                { "id": "sr11_gidep_participation", "label": "GIDEP participation status",        "type": "select",
+                  "options": ["Active GIDEP participant (federal)", "Receive GIDEP feeds without contributing", "Not participating (with rationale)", "Not applicable (commercial)"] },
+                { "id": "sr11_authorized_resellers_register","label": "Authorized-resellers register reference", "type": "text",
+                  "help": "Per SR-11(2) — pointer to the authorized-resellers list per OEM." }
+            ]
+        },
+
+        "SR-12": {
+            "prompts": [
+                "Reference §4.9 — disposal categories, procedures, chain-of-custody.",
+                "Document coordination with MP-6 sanitization for media-bearing components.",
+                "Address vendor RMA workflow with required sanitization before return.",
+                "Reference NIST SP 800-88 r1 for sanitization category selection.",
+                "Reference SR-12 ODV — types of system components disposed of."
+            ],
+            "evidence_suggestions": [
+                "Disposal-procedure document",
+                "Sample disposal record with chain-of-custody",
+                "Vendor-RMA policy showing sanitization requirement",
+                "MP-6 sanitization handoff record"
+            ],
+            "extra_fields": [
+                { "id": "sr12_rma_sanitization_policy","label": "RMA sanitization policy",         "type": "textarea", "rows": 3,
+                  "help": "Whether components are sanitized before return to vendor (RMA). Common posture: cryptographic-module / classified-component RMAs require Purge or Destroy first; commodity RMAs require Clear." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "C-SCRM",                  "definition": "Cyber Supply Chain Risk Management — practice covering the full set of activities to manage cybersecurity risks throughout the supply chain. Per NIST SP 800-161 r1." },
+        { "term": "CFIUS",                   "definition": "Committee on Foreign Investment in the United States — federal interagency committee reviewing foreign investments in US businesses for national-security concerns." },
+        { "term": "CIRCIA",                  "definition": "Cyber Incident Reporting for Critical Infrastructure Act — 2022 US law requiring critical-infrastructure entities to report cyber incidents to CISA. Drives SR-8 vendor-notification clauses." },
+        { "term": "CMMC",                    "definition": "Cybersecurity Maturity Model Certification — DoD's framework assessing contractor cybersecurity posture. Often required as SR-5 pre-award criterion." },
+        { "term": "Counterfeit Component",   "definition": "A component falsely represented as genuine (e.g., re-marked silicon, fake serial numbers, knock-off PCBs). SR-11 controls protect against." },
+        { "term": "ERAI",                    "definition": "Electronic Resellers Association International — industry organization providing counterfeit / non-conforming component reporting." },
+        { "term": "FOCI",                    "definition": "Foreign Ownership, Control, or Influence — disclosure required of suppliers in US national-security acquisitions." },
+        { "term": "GIDEP",                   "definition": "Government-Industry Data Exchange Program — federal information-sharing program for product-quality and counterfeit-component issues." },
+        { "term": "ICT-SCRM Task Force",     "definition": "Information and Communications Technology Supply Chain Risk Management Task Force — CISA-administered public-private partnership developing SCRM practices." },
+        { "term": "in-toto",                 "definition": "Framework for software-supply-chain integrity, providing cryptographic attestations for each step of the build process. Used in SR-10 inspection of digital deliverables." },
+        { "term": "OEM",                     "definition": "Original Equipment Manufacturer — the producer of a component as opposed to a reseller. SR-11(2) genuine-source verification traces back to the OEM." },
+        { "term": "RMA",                     "definition": "Return Merchandise Authorization — a vendor process for returning failed components. Subject to SR-12 / MP-6 sanitization requirements before return." },
+        { "term": "SBOM",                    "definition": "Software Bill of Materials — formal record of components in software. Required by SR / SA-4(10) per EO 14028 / OMB M-22-18." },
+        { "term": "SCRM Plan",               "definition": "Per SR-2, a documented plan describing how supply-chain risk management is performed. Reference NIST SP 800-161 r1 Appendix B." },
+        { "term": "Section 889",             "definition": "Section 889 of the FY2019 NDAA — prohibition on US government use of certain Chinese telecom and surveillance equipment (Huawei, ZTE, Hikvision, Dahua, Hytera). Drives SR-5 pre-award attestation." },
+        { "term": "Single-Source Risk",       "definition": "Risk arising from dependence on one supplier for a critical component. Mitigated by source diversification per SR-3." },
+        { "term": "SLSA",                    "definition": "Supply-chain Levels for Software Artifacts — a security framework specifying levels of supply-chain integrity guarantees. SLSA Level 3+ provides build-pipeline protection." },
+        { "term": "Tampering",                "definition": "Unauthorized modification of a component. Per SR-10 / SR-11, inspection on receipt detects tampering; tamper-evident packaging surfaces it." },
+        { "term": "Trusted Supplier",         "definition": "A supplier that has been vetted and approved per the organization's SCRM criteria. Maintained on the trusted-supplier list referenced by SR-5." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "BDA",     "expansion": "Bilateral Data Agreement" },
+        { "abbr": "CAIQ",    "expansion": "Consensus Assessments Initiative Questionnaire (Cloud Security Alliance)" },
+        { "abbr": "CFIUS",   "expansion": "Committee on Foreign Investment in the United States" },
+        { "abbr": "CIRCIA",  "expansion": "Cyber Incident Reporting for Critical Infrastructure Act" },
+        { "abbr": "CISA",    "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CISO",    "expansion": "Chief Information Security Officer" },
+        { "abbr": "CMMC",    "expansion": "Cybersecurity Maturity Model Certification (DoD)" },
+        { "abbr": "C-SCRM",  "expansion": "Cyber Supply Chain Risk Management" },
+        { "abbr": "DFARS",   "expansion": "Defense Federal Acquisition Regulation Supplement" },
+        { "abbr": "DIB",     "expansion": "Defense Industrial Base" },
+        { "abbr": "EO",      "expansion": "Executive Order" },
+        { "abbr": "ERAI",    "expansion": "Electronic Resellers Association International" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FOCI",    "expansion": "Foreign Ownership, Control, or Influence" },
+        { "abbr": "GIDEP",   "expansion": "Government-Industry Data Exchange Program" },
+        { "abbr": "ICT-SCRM","expansion": "Information and Communications Technology Supply Chain Risk Management" },
+        { "abbr": "IR",      "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "ITRM",    "expansion": "IT Risk Management (committee)" },
+        { "abbr": "JTAG",    "expansion": "Joint Test Action Group (boundary-scan testing)" },
+        { "abbr": "M&A",     "expansion": "Mergers and Acquisitions" },
+        { "abbr": "NDAA",    "expansion": "National Defense Authorization Act" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OEM",     "expansion": "Original Equipment Manufacturer" },
+        { "abbr": "OMB",     "expansion": "Office of Management and Budget" },
+        { "abbr": "OSS",     "expansion": "Open-Source Software" },
+        { "abbr": "PCB",     "expansion": "Printed Circuit Board" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RMA",     "expansion": "Return Merchandise Authorization" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SA",      "expansion": "System and Services Acquisition (NIST 800-53 family)" },
+        { "abbr": "SBOM",    "expansion": "Software Bill of Materials" },
+        { "abbr": "SCRM",    "expansion": "Supply Chain Risk Management" },
+        { "abbr": "SI",      "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SIG",     "expansion": "Standardized Information Gathering (questionnaire)" },
+        { "abbr": "SLA",     "expansion": "Service-Level Agreement" },
+        { "abbr": "SLSA",    "expansion": "Supply-chain Levels for Software Artifacts" },
+        { "abbr": "SOC",     "expansion": "System and Organization Controls (audit) / Security Operations Center" },
+        { "abbr": "SOAR",    "expansion": "Security Orchestration, Automation, and Response" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SR",      "expansion": "Supply Chain Risk Management (NIST 800-53 family)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TIP",     "expansion": "Threat Intelligence Platform" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-161 r1 — Cybersecurity Supply Chain Risk Management Practices", "url": "https://csrc.nist.gov/pubs/sp/800/161/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-88 r1 — Guidelines for Media Sanitization",         "url": "https://csrc.nist.gov/pubs/sp/800/88/r1/final" },
+        { "label": "Executive Order 14028 — Improving the Nation's Cybersecurity",  "url": "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/" },
+        { "label": "OMB M-22-18 — Enhancing the Security of the Software Supply Chain", "url": "https://www.whitehouse.gov/wp-content/uploads/2022/09/M-22-18.pdf" },
+        { "label": "OMB M-23-16 — Update to M-22-18",                                "url": "https://www.whitehouse.gov/wp-content/uploads/2023/06/M-23-16-Update-to-M-22-18-Enhancing-Software-Security.pdf" },
+        { "label": "Section 889 — FY2019 NDAA Prohibition on Covered Telecommunications", "url": "https://www.acquisition.gov/FAR-Case-2019-009" },
+        { "label": "CIRCIA — Cyber Incident Reporting for Critical Infrastructure Act of 2022", "url": "https://www.cisa.gov/topics/cyber-threats-and-advisories/information-sharing/cyber-incident-reporting-critical-infrastructure-act-2022-circia" },
+        { "label": "CISA ICT-SCRM Task Force",                                       "url": "https://www.cisa.gov/topics/risk-management/ict-supply-chain-risk-management" },
+        { "label": "GIDEP — Government-Industry Data Exchange Program",              "url": "https://www.gidep.org/" },
+        { "label": "SLSA — Supply-chain Levels for Software Artifacts",              "url": "https://slsa.dev/" }
+    ]
+}
