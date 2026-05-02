@@ -1,0 +1,673 @@
+{
+    "_comment": "Program Management Plan generator. Authored at the Phase 2 assessability floor. Structurally distinct from every other family plan: PM controls are organizational (not system-level) per NIST SP 800-53 r5 — they describe org-wide programs (Information Security Program Plan, Risk Management Strategy, Continuous Monitoring Strategy, etc.) rather than system-specific implementations. PM controls are NOT selected via LMH or privacy baselines — NIST treats them as always-required for organizations operating any federal information system, selected independently. This plan therefore documents how *this system* relates to and inherits from the *organization's* PM program. Most guided controls render with explicit inheritance posture (similar to PE / MA). Closes the 17-family Tier 1-4 plan rollout.",
+
+    "family": "PM",
+    "family_name": "Program Management",
+    "title": "Program Management Plan",
+    "description": "Documents how the organizational Program Management framework — Information Security Program Plan, Privacy Program Plan, Risk Management Strategy, Continuous Monitoring Strategy, POA&M process, system inventory, enterprise architecture, mission / business-process definition, insider-threat program, workforce program, testing / training / monitoring program, threat-awareness program, supply-chain-risk strategy, data governance, and complaint management — applies to this system. Covers the controls of the PM family in NIST SP 800-53 r5 and aligns with NIST SP 800-37 r2 (RMF), NIST SP 800-39 (Managing Information Security Risk), NIST SP 800-181 r1 (Workforce Framework), NIST IR 8062 (Privacy Risk Management Framework), and OMB Circular A-130 (Managing Information as a Strategic Resource).\n\nNote: PM controls are organizational rather than system-specific — most controls in this plan are documented as inherited from the organization's PM program with system-specific extensions where applicable.",
+
+    "intro_template": "This Program Management Plan documents the relationship between {system_name} and the organizational Program Management framework. It establishes how this system relies on, contributes to, and inherits from the organization's Information Security Program Plan, Privacy Program Plan, Risk Management Strategy, Continuous Monitoring Strategy, POA&M process, enterprise architecture, and other org-level program elements.\n\nThe scope covers the system's relationship with each PM control in NIST SP 800-53 r5. Note: PM controls are organizational, not system-specific — most are documented here as inherited from the organization's PM program, with system-specific extensions where applicable. The plan is consistent with NIST SP 800-53 r5 (Program Management family), NIST SP 800-37 r2 (Risk Management Framework), NIST SP 800-39 (Managing Information Security Risk), and OMB Circular A-130.",
+
+    "approach_section_title": "Program Management Approach",
+    "approach_template": "The {organization_name} information-security program is governed by {ispp_program_lead_role} per the Information Security Program Plan at {ispp_location}. The privacy program is governed by {privacy_program_lead_role} per the Privacy Program Plan at {privacy_program_plan_location}. The Risk Management Strategy is at {rms_location}; the Continuous Monitoring Strategy is at {conmon_strategy_location}. {system_name} is recorded in the system inventory at {system_inventory_location} as system identifier {system_inventory_id}; its POA&M items are tracked in {poam_system} under prefix {poam_id_prefix}.\n\nAdditional details on this system's relationship to each PM program area are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Program-management performance for {system_name} is tracked through the metrics in §6.1 (system-inventory currency, POA&M-item closure rate, ConMon strategy adherence, ISPP review-cycle currency, mission-process alignment currency). The organizational PM program is reviewed on the cadence in §6.2 — typically annually with quarterly check-ins; this system surfaces to the org PM program as a tracked entity in the system inventory and a contributor to org-wide metrics. Org-level reports (POA&M roll-up, system inventory delta, threat-environment briefings) are received by the system's PM-2 program lead role on the cadence required by the organizational PM program.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Program Management Plan is the meta-frame for every other family plan in this RMF package. The CA family relies on PM-31 ConMon strategy as its umbrella; the RA family relies on PM-9 / PM-28 risk-management strategy; the SR family relies on PM-30 supply-chain-risk strategy; the AC / AU / IR / etc. families rely on PM-3 resources, PM-13 workforce, and PM-14 testing / training / monitoring. The PT family overlaps with PM-18 / PM-19 / PM-20 / PM-21 / PM-22 / PM-25 / PM-26 / PM-27 privacy program elements. The following cross-references identify the specific artifacts and locations where PM-related content is exchanged with other RMF deliverables — though for PM, almost every other family plan inherits from PM rather than the reverse.",
+
+    "commonly_inheritable_controls": [
+        { "number": "PM-1", "from": "Organizational Information Security Program Plan (ISPP)" },
+        { "number": "PM-2", "from": "Organizational CISO / senior info-security officer" },
+        { "number": "PM-3", "from": "Organizational budget process / capital planning" },
+        { "number": "PM-4", "from": "Organizational POA&M process" },
+        { "number": "PM-5", "from": "Organizational system inventory (CMDB / FISMA inventory)" },
+        { "number": "PM-7", "from": "Organizational Enterprise Architecture (FEAF / DoDAF / agency EA)" },
+        { "number": "PM-9", "from": "Organizational Risk Management Strategy" },
+        { "number": "PM-12","from": "Organizational Insider Threat Program (CISA-aligned)" },
+        { "number": "PM-13","from": "Organizational cybersecurity workforce program" },
+        { "number": "PM-14","from": "Organizational testing / training / monitoring program" },
+        { "number": "PM-15","from": "Organizational external-engagements (FBCA, Federal CIO Council, ISAC memberships)" },
+        { "number": "PM-16","from": "Organizational threat-awareness program / TIP" },
+        { "number": "PM-18","from": "Organizational Privacy Program Plan" },
+        { "number": "PM-19","from": "Organizational SAOP / Chief Privacy Officer" },
+        { "number": "PM-23","from": "Organizational Data Governance Body (DGB)" },
+        { "number": "PM-24","from": "Organizational Data Integrity Board (Privacy Act § (u))" },
+        { "number": "PM-30","from": "Organizational Supply Chain Risk Management Strategy" },
+        { "number": "PM-31","from": "Organizational Continuous Monitoring Strategy" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Organizational program identifiers and locations.",
+            "questions": [
+                {
+                    "id": "organization_name",
+                    "label": "Organization name",
+                    "type": "text",
+                    "required": true,
+                    "help": "Name of the organization that operates the org-level PM program (e.g., 'Department of Acme', 'Federal Bureau X', 'Acme Corp')."
+                },
+                {
+                    "id": "ispp_location",
+                    "label": "Information Security Program Plan (PM-1) location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the organizational ISPP is maintained (e.g., 'eMASS Org-Level Package OL-001', '/repo/org-compliance/ispp.md')."
+                },
+                {
+                    "id": "ispp_program_lead_role",
+                    "label": "ISPP / PM-2 program lead role",
+                    "type": "text",
+                    "required": true,
+                    "help": "Senior info-security officer accountable for the ISPP (typically CISO or equivalent)."
+                },
+                {
+                    "id": "privacy_program_plan_location",
+                    "label": "Privacy Program Plan (PM-18) location",
+                    "type": "text",
+                    "help": "Where the org Privacy Program Plan is maintained."
+                },
+                {
+                    "id": "privacy_program_lead_role",
+                    "label": "Privacy program lead role (PM-19)",
+                    "type": "text",
+                    "help": "SAOP / Chief Privacy Officer."
+                },
+                {
+                    "id": "rms_location",
+                    "label": "Risk Management Strategy (PM-9) location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the org RMS is maintained."
+                },
+                {
+                    "id": "conmon_strategy_location",
+                    "label": "Continuous Monitoring Strategy (PM-31) location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the org CA-7 / PM-31 ConMon strategy is maintained."
+                },
+                {
+                    "id": "system_inventory_location",
+                    "label": "System inventory (PM-5) location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the org system inventory is maintained (e.g., 'CMDB', 'FISMA-Cybersecurity Performance Goals (CPG) reporting tool', 'eMASS')."
+                },
+                {
+                    "id": "system_inventory_id",
+                    "label": "This system's identifier in the inventory",
+                    "type": "text",
+                    "required": true,
+                    "help": "How this system is identified in the org PM-5 inventory."
+                },
+                {
+                    "id": "poam_system",
+                    "label": "POA&M system (PM-4)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Org POA&M tracking system (e.g., 'eMASS POA&M module', 'Archer POA&M', 'Internal GRC tool')."
+                },
+                {
+                    "id": "poam_id_prefix",
+                    "label": "POA&M ID prefix for this system",
+                    "type": "text",
+                    "required": true,
+                    "help": "Convention for this system's POA&M items (e.g., 'POAM-CTLS-')."
+                }
+            ]
+        },
+
+        {
+            "id": "ispp_inventory_pointers",
+            "type": "group",
+            "section": "approach",
+            "label": "ISPP / Inventory / Purpose (PM-1, PM-5, PM-32)",
+            "description": "Where this system fits in the organization's program plan and inventory.",
+            "questions": [
+                { "id": "pm1_system_listing",       "label": "How this system is listed in the ISPP", "type": "textarea", "rows": 3,
+                  "help": "Reference to the section / appendix / inventory entry that identifies this system in the org ISPP." },
+                { "id": "pm1_isso_role_per_ispp",   "label": "ISSO role per ISPP",                 "type": "text",
+                  "help": "ISSO / system-owner roles assigned to this system per the ISPP definitions." },
+                { "id": "pm5_inventory_attributes", "label": "Inventory attributes captured",      "type": "multi_select",
+                  "options": ["System identifier (FISMA / agency)", "FIPS 199 categorization", "ATO date + expiration", "AO name / role", "System owner / ISSO / ISSM", "Boundary description", "Information types processed", "Hosting / deployment model", "Interconnections registered", "Operational status (production / dev / decommissioned)", "Records-retention applicability"] },
+                { "id": "pm32_purpose_alignment",   "label": "Purpose alignment (PM-32)",          "type": "textarea", "rows": 3,
+                  "help": "Per PM-32 — how this system's purpose aligns with the org mission. Reference to mission / business-process documentation." },
+                { "id": "pm5_update_cadence",       "label": "Inventory-update cadence",            "type": "text",
+                  "help": "How often the inventory entry for this system is verified for currency." }
+            ]
+        },
+
+        {
+            "id": "resources_workforce",
+            "type": "group",
+            "section": "approach",
+            "label": "Resources and Workforce (PM-3, PM-13)",
+            "description": "Org budget and workforce program as they apply to this system.",
+            "questions": [
+                { "id": "pm3_resource_request_process","label": "Resource-request process",         "type": "textarea", "rows": 3,
+                  "help": "How this system requests resources from the org budget process. Reference org capital-planning workflow." },
+                { "id": "pm3_unfunded_handling",     "label": "Unfunded-requirements escalation",   "type": "textarea", "rows": 3,
+                  "help": "How unfunded requirements for this system are escalated through the org PM-3 process. Reference SA-2 system-level allocation." },
+                { "id": "pm13_workforce_role_mapping","label": "Workforce-role mapping",            "type": "textarea", "rows": 3,
+                  "help": "How roles supporting this system map to the org PM-13 workforce framework (NICE Framework / DoD 8140). Reference AT-3." }
+            ]
+        },
+
+        {
+            "id": "poam_management",
+            "type": "group",
+            "section": "approach",
+            "label": "POA&M Management (PM-4)",
+            "description": "How this system contributes to the org POA&M process.",
+            "questions": [
+                { "id": "pm4_routing",              "label": "POA&M routing for this system",     "type": "textarea", "rows": 3,
+                  "help": "How this system's POA&M items flow into the org PM-4 process (org-level dashboard, monthly roll-up, AO review cycle)." },
+                { "id": "pm4_review_cadence",       "label": "Review cadence at system level",     "type": "text",
+                  "help": "How often this system's POA&M is reviewed (e.g., 'Weekly system-internal review; monthly org submission'). Common." },
+                { "id": "pm4_closure_evidence",     "label": "Closure-evidence requirement",       "type": "textarea", "rows": 3,
+                  "help": "Evidence required to close a POA&M item. Test results, configuration verification, control-effectiveness attestation." },
+                { "id": "pm4_overdue_threshold",    "label": "Overdue-item escalation threshold", "type": "text",
+                  "help": "When overdue POA&M items escalate (e.g., '>30 days past due → ISSM brief; >60 days → AO awareness')." }
+            ]
+        },
+
+        {
+            "id": "enterprise_architecture",
+            "type": "group",
+            "section": "approach",
+            "label": "Enterprise Architecture and Business Processes (PM-7, PM-11)",
+            "description": "How this system fits the org architecture and supports mission processes.",
+            "questions": [
+                { "id": "pm7_ea_framework",         "label": "EA framework in use",                "type": "select",
+                  "options": ["Federal Enterprise Architecture Framework (FEAF)", "Department of Defense Architecture Framework (DoDAF)", "TOGAF", "Agency-specific framework", "No formal EA framework"] },
+                { "id": "pm7_ea_documentation",     "label": "EA-documentation reference",         "type": "text",
+                  "help": "Where this system is documented in the org EA (segment, capability, transition plan)." },
+                { "id": "pm11_supported_missions", "label": "Supported missions / business processes (PM-11)", "type": "list",
+                  "suggestions": [
+                      "Personnel administration",
+                      "Benefits delivery",
+                      "Tax administration",
+                      "Law enforcement",
+                      "Public-health surveillance",
+                      "Financial reporting",
+                      "Policy analysis"
+                  ] },
+                { "id": "pm11_mef_reference",       "label": "MEF reference (where applicable)",   "type": "text",
+                  "help": "If this system supports a Mission Essential Function: reference to the MEF. Reference RA-9 / CP-2." }
+            ]
+        },
+
+        {
+            "id": "risk_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Risk Management Strategy (PM-9, PM-28)",
+            "description": "Org RMS and this system's tier within it.",
+            "questions": [
+                { "id": "pm9_rms_tiers",            "label": "Org-tier-of-this-system",            "type": "select",
+                  "options": ["Tier 1 (Organization)", "Tier 2 (Mission / Business Process)", "Tier 3 (System) — most common", "Per NIST SP 800-39 / 800-37 r2"] },
+                { "id": "pm9_rms_review_cadence",   "label": "RMS review cadence",                 "type": "text",
+                  "help": "How often this system's risk posture surfaces to the org RMS (typical: quarterly + on significant change)." },
+                { "id": "pm28_risk_framing",        "label": "Risk framing (PM-28)",               "type": "textarea", "rows": 3,
+                  "help": "Per PM-28 — how this system contributes to / inherits from the org risk-framing inputs (assumptions, constraints, risk tolerance, priorities)." },
+                { "id": "pm9_risk_tolerance_ref",   "label": "Risk-tolerance statement reference", "type": "text",
+                  "help": "Pointer to the org risk-tolerance statement that anchors RA-7 decisions for this system." }
+            ]
+        },
+
+        {
+            "id": "monitoring_testing",
+            "type": "group",
+            "section": "approach",
+            "label": "Testing, Training, Monitoring (PM-14, PM-31)",
+            "description": "Org-wide assessment and ConMon strategy as applied here.",
+            "questions": [
+                { "id": "pm14_org_testing_program", "label": "Org PM-14 testing program reference","type": "textarea", "rows": 3,
+                  "help": "How org-wide testing (annual control assessments, periodic incident-response exercises, training programs) covers this system." },
+                { "id": "pm31_conmon_strategy_tier","label": "ConMon strategy tier for this system","type": "text",
+                  "help": "If org ConMon strategy uses tiered cadences: which tier this system is assigned to (e.g., 'Tier 2 — moderate-impact, monthly attestation cycle')." },
+                { "id": "pm31_metrics_supplied",    "label": "Metrics this system supplies to org ConMon", "type": "list",
+                  "suggestions": [
+                      "Vulnerability scan results (RA-5)",
+                      "Patch SLA compliance (SI-2)",
+                      "Boundary alarm volume (SC-7)",
+                      "Authentication failures (IA-2)",
+                      "Privileged-access changes (AC-2)",
+                      "ATO POA&M rollup",
+                      "Continuous-monitoring assessment results"
+                  ] },
+                { "id": "pm31_reporting_cadence",   "label": "Reporting cadence to org ConMon",    "type": "text",
+                  "help": "How often this system reports metrics to the org PM-31 program (typical: monthly automated + quarterly review)." }
+            ]
+        },
+
+        {
+            "id": "external_systems_cui",
+            "type": "group",
+            "section": "approach",
+            "label": "Protecting CUI on External Systems (PM-17)",
+            "description": "Per PM-17, controls when CUI extends beyond the system boundary.",
+            "questions": [
+                { "id": "pm17_cui_in_scope",        "label": "CUI on external systems in scope?", "type": "select",
+                  "options": ["Yes — CUI is processed by external system services", "Yes — CUI is shared with partner organizations", "Yes — both (cloud + partner)", "No — CUI does not extend beyond authorization boundary", "Not applicable (no CUI)"] },
+                { "id": "pm17_external_protections","label": "External-system protections required", "type": "textarea", "rows": 3,
+                  "help": "Per PM-17 — what protections are required of external systems / organizations handling CUI (NIST SP 800-171 r3 compliance, contract clauses, attestations). Reference SA-9 / SR-8." },
+                { "id": "pm17_attestation_handling","label": "External-attestation handling",       "type": "textarea", "rows": 3,
+                  "help": "How attestations of external compliance are received and validated." }
+            ]
+        },
+
+        {
+            "id": "insider_threat",
+            "type": "group",
+            "section": "approach",
+            "label": "Insider Threat Program (PM-12)",
+            "description": "How this system participates in the org insider-threat program.",
+            "questions": [
+                { "id": "pm12_program_scope",       "label": "System enrollment scope",            "type": "select",
+                  "options": ["Fully enrolled (full data sharing with org IT program)", "Partially enrolled (selected indicators only)", "Aware-and-coordinated (no automated data sharing)", "Not enrolled (with rationale)"] },
+                { "id": "pm12_data_shared",         "label": "Data shared with org IT program",   "type": "multi_select",
+                  "options": ["Audit logs (overlaps AU)", "Access-anomaly alerts", "DLP findings", "Behavioral analytics", "Termination-event triggers (overlaps PS-4)", "Personnel-screening status (overlaps PS-3)", "External-event correlation"] },
+                { "id": "pm12_indicator_response",  "label": "Indicator-response coordination",     "type": "textarea", "rows": 3,
+                  "help": "How org IT-program indicators relevant to this system are routed to system staff. Reference IR / PS-8." }
+            ]
+        },
+
+        {
+            "id": "threat_intelligence",
+            "type": "group",
+            "section": "approach",
+            "label": "Threat Awareness and External Engagement (PM-15, PM-16)",
+            "description": "How this system benefits from org threat intelligence and external engagements.",
+            "questions": [
+                { "id": "pm15_groups_associations", "label": "Groups / associations participated", "type": "multi_select",
+                  "options": ["Federal CIO Council", "Federal CISO Council", "Joint Task Force / interagency working groups", "Sector ISAC / ISAO", "DHS / CISA programs", "FBI InfraGard", "(ISC)² / SANS communities", "Vendor-specific user groups"] },
+                { "id": "pm16_threat_program",      "label": "Threat-awareness program reference (PM-16)", "type": "text",
+                  "help": "Pointer to the org PM-16 threat-awareness program / TIP." },
+                { "id": "pm16_intel_routing",        "label": "Intel-routing to this system",      "type": "textarea", "rows": 3,
+                  "help": "How org threat-intel feeds (TIP, advisories, sector-ISAC reports) reach this system's defenders. Reference SI-5 / RA-10." }
+            ]
+        },
+
+        {
+            "id": "privacy_program",
+            "type": "group",
+            "section": "approach",
+            "label": "Privacy Program (PM-18 through PM-27)",
+            "description": "Org privacy program as it applies to this system.",
+            "questions": [
+                { "id": "pm18_privacy_plan_review_cadence","label": "Privacy plan review cadence",  "type": "text",
+                  "help": "How often the org privacy plan is reviewed (typical: 'Annually + on significant change'). Reference PT plan." },
+                { "id": "pm21_disclosure_accounting","label": "Privacy Act § (c) disclosure accounting (PM-21)", "type": "textarea", "rows": 3,
+                  "help": "How this system contributes to the org disclosure-accounting record. Where the records live. Reference PT-6." },
+                { "id": "pm22_pii_quality_program",  "label": "PII quality program (PM-22)",       "type": "textarea", "rows": 3,
+                  "help": "How this system contributes to / inherits from the org PII quality-management program. Data-correction workflows, accuracy verification." },
+                { "id": "pm26_complaint_management","label": "Complaint-management program (PM-26)", "type": "textarea", "rows": 3,
+                  "help": "How privacy complaints affecting this system are handled. Routing to SAOP, response SLA." },
+                { "id": "pm27_privacy_reporting",    "label": "Privacy reporting (PM-27)",         "type": "textarea", "rows": 3,
+                  "help": "How this system contributes to org privacy-reporting requirements (FISMA Annual Report, OMB privacy reporting)." }
+            ]
+        },
+
+        {
+            "id": "data_governance",
+            "type": "group",
+            "section": "approach",
+            "label": "Data Governance (PM-23, PM-24)",
+            "description": "Data Governance Body and Data Integrity Board.",
+            "questions": [
+                { "id": "pm23_dgb_in_place",        "label": "Data Governance Body in place?",     "type": "select",
+                  "options": ["Yes — formal DGB chartered (PM-23)", "Yes — informal data-governance forum", "No — DGB role distributed among existing committees", "Pending establishment", "Not applicable"] },
+                { "id": "pm23_dgb_charter_reference","label": "DGB charter reference",              "type": "text",
+                  "help": "If DGB exists: pointer to charter / membership." },
+                { "id": "pm24_dib_required",         "label": "Data Integrity Board required?",     "type": "select",
+                  "options": ["Yes — DIB required for Privacy Act systems", "No — Privacy Act not applicable", "Pending review"] },
+                { "id": "pm24_dib_composition",     "label": "DIB composition (Privacy Act § (u))", "type": "textarea", "rows": 3,
+                  "help": "Members of the DIB if required. Reference PT-8 for matching agreements." }
+            ]
+        },
+
+        {
+            "id": "scrm_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Supply Chain Risk Management Strategy (PM-30)",
+            "description": "Org-level SCRM strategy and this system's place in it.",
+            "questions": [
+                { "id": "pm30_strategy_location",   "label": "Org SCRM strategy location",         "type": "text",
+                  "help": "Where the org SCRM strategy lives. Reference SR plan." },
+                { "id": "pm30_system_scope",        "label": "System scope in SCRM strategy",      "type": "textarea", "rows": 3,
+                  "help": "How this system is scoped in the org SCRM strategy (critical / standard tier; specific covered components)." },
+                { "id": "pm30_org_scrm_team_role",  "label": "Org SCRM team role",                 "type": "text",
+                  "help": "Role of the org SCRM team / how this system interacts with it. Reference SR-2(1)." }
+            ]
+        },
+
+        {
+            "id": "pm_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "PM Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_org_size",           "label": "Organization size (approximate)",    "type": "text",
+                  "help": "Order-of-magnitude personnel count for the organization. Anchors org-level program scope." },
+                { "id": "scope_systems_in_org",     "label": "Systems in org inventory (approximate)", "type": "text",
+                  "help": "Approximate count of systems in the org PM-5 inventory." },
+                { "id": "scope_active_poam_items",  "label": "Active POA&M items for this system", "type": "text",
+                  "help": "Approximate count of open POA&M items for this system." },
+                { "id": "scope_org_metrics_provided","label": "Metrics this system provides to org", "type": "text",
+                  "help": "Approximate count of distinct metrics this system reports to the org PM-31 ConMon program." }
+            ]
+        },
+
+        {
+            "id": "pm_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Program-Management Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate PM control effectiveness.",
+            "questions": [
+                { "id": "pm_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "System-inventory currency (last verification date)",
+                      "POA&M active-item count + closure rate",
+                      "Mean time from POA&M opening to closure",
+                      "ConMon strategy adherence rate (metrics submitted on schedule)",
+                      "ISPP review-cycle currency (last system-section review)",
+                      "Mission-process alignment review currency",
+                      "Org-program-participation completion rate (insider-threat enrollment, threat-awareness program)",
+                      "Open POA&M items linked to PM controls",
+                      "Significant-change notifications submitted on time"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the PM control implementations are summarized (e.g., 'SSP §13.18 — meta program')." },
+                { "id": "all_families_inheritance",    "label": "All-families inheritance summary", "type": "textarea", "rows": 3,
+                  "help": "Summary of how each family plan inherits from PM (CA from PM-31, RA from PM-9, SR from PM-30, etc.). High-level pointer table." },
+                { "id": "ca_handoff",                   "label": "CA handoff (PM-31)",            "type": "textarea", "rows": 2,
+                  "help": "How this system's PM-31 ConMon strategy reference appears in CA-7. Reference CA plan." },
+                { "id": "ra_handoff",                   "label": "RA handoff (PM-9, PM-28)",      "type": "textarea", "rows": 2,
+                  "help": "How this system's PM-9 / PM-28 RMS reference appears in RA-3 / RA-7. Reference RA plan." },
+                { "id": "sr_handoff",                   "label": "SR handoff (PM-30)",            "type": "textarea", "rows": 2,
+                  "help": "How this system's PM-30 SCRM strategy reference appears in SR-2. Reference SR plan." },
+                { "id": "pt_handoff",                   "label": "PT handoff (PM-18 / PM-19)",    "type": "textarea", "rows": 2,
+                  "help": "How this system's PM-18 / PM-19 privacy program reference appears in PT-2 / PT-5 / PT-6. Reference PT plan." },
+                { "id": "ir_handoff",                   "label": "IR handoff (PM-12)",            "type": "textarea", "rows": 2,
+                  "help": "How insider-threat indicators flow between this system's IR plan and the org PM-12 program." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "PM-1": {
+            "prompts": [
+                "Reference §4.2 — system listing in ISPP, ISSO role, inventory attributes.",
+                "Document the inheritance posture explicitly (PM-1 is almost always inherited).",
+                "Address ISPP-update routing if this system identifies a needed change.",
+                "Reference NIST SP 800-37 r2 § 1.4 for organizational ISPP guidance.",
+                "Reference PM-1(1) (withdrawn) — incorporated into PM-1."
+            ],
+            "evidence_suggestions": [
+                "Org ISPP cover page + system-listing section",
+                "Org ISPP review attestation (most recent)",
+                "System's ISPP-listing-update record (if changed in cycle)"
+            ],
+            "extra_fields": [
+                { "id": "pm1_inherited",            "label": "Inheritance posture",              "type": "select",
+                  "options": ["Fully inherited from organizational ISPP", "Hybrid — inherited core + system-specific extensions", "Fully implemented at system level (org has no ISPP — non-typical)", "Not applicable"] }
+            ]
+        },
+
+        "PM-4": {
+            "prompts": [
+                "Reference §4.4 — POA&M routing, review cadence, closure-evidence, overdue threshold.",
+                "Document this system's POA&M-ID convention within the org PM-4 system.",
+                "Address how org-level POA&M reports include this system's items.",
+                "Reference NIST SP 800-37 r2 § 5.6 for POA&M guidance.",
+                "Reference PM-4(1) automation support."
+            ],
+            "evidence_suggestions": [
+                "Org POA&M dashboard showing this system's items",
+                "Sample POA&M item with closure evidence",
+                "Monthly system-internal POA&M review record",
+                "Overdue-escalation log"
+            ],
+            "extra_fields": [
+                { "id": "pm4_inherited",            "label": "Inheritance posture",              "type": "select",
+                  "options": ["Inherited (org PM-4 process; this system follows it)", "Hybrid (org infrastructure; system-specific procedures)", "System-implemented (no org PM-4 process)", "Not applicable"] },
+                { "id": "pm4_automation_status",    "label": "Automation status (PM-4(1))",       "type": "select",
+                  "options": ["Yes — POA&M items auto-created from CA-7 findings, RA-5 scans, etc.", "Partial automation (some sources auto-feed)", "Manual entry", "Not applicable"] }
+            ]
+        },
+
+        "PM-5": {
+            "prompts": [
+                "Reference §4.2 — inventory attributes, system identifier, update cadence.",
+                "Document FISMA-inventory or agency-inventory ID.",
+                "Address how significant changes (CM-4 / SA-3) trigger inventory updates.",
+                "Reference OMB Circular A-130 for inventory requirements.",
+                "Reference PM-5(1) inventory of personally identifiable information."
+            ],
+            "evidence_suggestions": [
+                "Inventory entry export for this system",
+                "Last inventory-verification record",
+                "Sample significant-change-driven inventory update"
+            ],
+            "extra_fields": [
+                { "id": "pm5_inherited",            "label": "Inheritance posture",              "type": "select",
+                  "options": ["Inherited (org system inventory; this system is one entry)", "Hybrid (org inventory + agency-specific extensions)", "Not applicable"] },
+                { "id": "pm5_pii_inventory_link",   "label": "PII inventory link (PM-5(1))",      "type": "text",
+                  "help": "Per PM-5(1) — pointer to the PII data-element inventory if applicable. Reference PT-3." }
+            ]
+        },
+
+        "PM-7": {
+            "prompts": [
+                "Reference §4.5 — EA framework, EA documentation, this system's place in EA.",
+                "Document segment / capability mapping if applicable.",
+                "Address how transition-plan changes affect this system.",
+                "Reference NIST SP 800-37 r2 / OMB Circular A-130 for EA requirements.",
+                "Reference PM-7(1) offloading."
+            ],
+            "evidence_suggestions": [
+                "EA documentation showing this system",
+                "Transition-plan reference",
+                "Capability-map entry"
+            ],
+            "extra_fields": [
+                { "id": "pm7_inherited",            "label": "Inheritance posture",              "type": "select",
+                  "options": ["Inherited (org EA; this system mapped into it)", "Hybrid (org EA + system-specific architecture per PL-8)", "Not applicable (no formal EA)"] }
+            ]
+        },
+
+        "PM-9": {
+            "prompts": [
+                "Reference §4.6 — RMS tier, review cadence, risk-framing, risk-tolerance reference.",
+                "Document this system's contribution to org-tier risk reporting.",
+                "Address how org risk-framing changes propagate to this system.",
+                "Reference NIST SP 800-39 § 3.1 for risk-management hierarchy.",
+                "Reference PM-9(1) impact on system or operations."
+            ],
+            "evidence_suggestions": [
+                "Org RMS document",
+                "System's RMS-tier assignment record",
+                "Last RMS review showing this system",
+                "Risk-framing input record"
+            ],
+            "extra_fields": [
+                { "id": "pm9_inherited",            "label": "Inheritance posture",              "type": "select",
+                  "options": ["Fully inherited from organizational RMS", "Hybrid (inherited org-tier; system-tier supplemented per RA plan)", "System-implemented (no org RMS)", "Not applicable"] }
+            ]
+        },
+
+        "PM-14": {
+            "prompts": [
+                "Reference §4.7 — org testing program, ConMon strategy tier, metrics supplied, reporting cadence.",
+                "Document org-wide IR exercise participation.",
+                "Address org-wide control assessment cycles.",
+                "Reference NIST SP 800-53A r5 for assessment.",
+                "Reference NIST SP 800-137 for ConMon."
+            ],
+            "evidence_suggestions": [
+                "Org test-and-train calendar (current cycle)",
+                "Last assessment-cycle records for this system",
+                "ConMon metrics submission record",
+                "IR exercise participation record"
+            ],
+            "extra_fields": [
+                { "id": "pm14_inherited",           "label": "Inheritance posture",              "type": "select",
+                  "options": ["Fully inherited from organizational program", "Hybrid (inherited program + system-specific testing per CA-2 / IR-3)", "Not applicable"] }
+            ]
+        },
+
+        "PM-30": {
+            "prompts": [
+                "Reference §4.13 — strategy location, system scope, org SCRM team role.",
+                "Document this system's tier within the org SCRM strategy.",
+                "Address coordination between this system's SR plan and the org PM-30 strategy.",
+                "Reference NIST SP 800-161 r1 for SCRM strategy.",
+                "Reference PM-30(1) supply chain risk management team."
+            ],
+            "evidence_suggestions": [
+                "Org SCRM strategy document",
+                "System's SCRM-tier assignment record",
+                "Last SCRM-strategy review for this system",
+                "Cross-reference table to SR plan"
+            ],
+            "extra_fields": [
+                { "id": "pm30_inherited",           "label": "Inheritance posture",              "type": "select",
+                  "options": ["Fully inherited from org SCRM strategy", "Hybrid (org strategy + system SR plan)", "System-only (no org strategy)", "Not applicable"] }
+            ]
+        },
+
+        "PM-31": {
+            "prompts": [
+                "Reference §4.7 — ConMon strategy tier, metrics supplied, reporting cadence.",
+                "Document the linkage from this system's CA-7 to PM-31.",
+                "Address org-tier roll-up of this system's metrics.",
+                "Reference NIST SP 800-137 for ConMon strategy.",
+                "Reference NIST SP 800-37 r2 § 5.0 (Monitor step)."
+            ],
+            "evidence_suggestions": [
+                "Org ConMon strategy document",
+                "System's CA-7 plan (cross-reference CA plan)",
+                "Sample monthly metrics submission",
+                "ConMon dashboard view of this system"
+            ],
+            "extra_fields": [
+                { "id": "pm31_inherited",           "label": "Inheritance posture",              "type": "select",
+                  "options": ["Fully inherited from org ConMon strategy", "Hybrid (org strategy + system CA-7)", "System-only (no org strategy — non-typical)", "Not applicable"] }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "CA-7 / PM-31",            "definition": "Continuous Monitoring — CA-7 is the system-level Continuous Monitoring control; PM-31 is the org-level Continuous Monitoring Strategy. Most plans inherit from PM-31 and supplement at CA-7." },
+        { "term": "Data Governance Body (DGB)","definition": "Per PM-23, an organizational body that governs data-related policy, standards, and quality. Distinct from the DIB which is privacy-specific." },
+        { "term": "Data Integrity Board (DIB)","definition": "Per PM-24 and Privacy Act § (u), federal-agency board responsible for oversight of computer-matching agreements." },
+        { "term": "Enterprise Architecture (EA)","definition": "Per PM-7, the organization's framework documenting business capabilities, processes, data, applications, and infrastructure. Federal common frameworks: FEAF, DoDAF." },
+        { "term": "FEAF",                    "definition": "Federal Enterprise Architecture Framework — common federal EA framework. Reference OMB guidance." },
+        { "term": "Information Security Program Plan (ISPP)","definition": "Per PM-1, the organizational plan documenting the information-security program. Reference NIST SP 800-37 r2 § 1.4." },
+        { "term": "Inheritance",              "definition": "In RMF, the practice where a control's implementation is provided by an underlying entity (organization, hosting provider). PM controls are almost universally inherited from the organization." },
+        { "term": "MEF",                     "definition": "Mission Essential Function — per CNSSI 4009, a function whose loss would result in unacceptable mission impact. Mapped via PM-11 / RA-9." },
+        { "term": "NICE Framework",           "definition": "NIST SP 800-181 r1 — National Initiative for Cybersecurity Education Workforce Framework. Per PM-13." },
+        { "term": "OMB Circular A-130",      "definition": "Managing Information as a Strategic Resource — federal guidance establishing the umbrella policies for federal information management. Drives many PM controls." },
+        { "term": "PM Family",               "definition": "The Program Management family of NIST SP 800-53 r5 — controls that are organizational rather than system-specific. Not selected via LMH baselines; always required where applicable." },
+        { "term": "POA&M",                   "definition": "Plan of Action and Milestones — the recordkeeping for known security weaknesses with remediation plans. Per PM-4 (org-level) and CA-5 (system-level)." },
+        { "term": "Privacy Program Plan",     "definition": "Per PM-18, the organizational plan documenting the privacy program. Often distinct from the ISPP. Reference NIST IR 8062." },
+        { "term": "Risk Framing",             "definition": "Per NIST SP 800-39 / PM-28, the establishment of risk-management context: assumptions, constraints, risk tolerance, and priorities." },
+        { "term": "Risk Management Strategy (RMS)","definition": "Per PM-9, the organizational strategy describing how risk is identified, assessed, responded to, and monitored across the org. Reference NIST SP 800-39 § 3.1." },
+        { "term": "System Inventory",         "definition": "Per PM-5, the organizational record of all systems / information-systems within scope. Federal: FISMA inventory + agency CMDB." },
+        { "term": "Threat Awareness",         "definition": "Per PM-16, the organizational program for tracking and disseminating threat intelligence. Often paired with TIP and SI-5." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AC",      "expansion": "Access Control (NIST 800-53 family)" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "AT",      "expansion": "Awareness and Training (NIST 800-53 family)" },
+        { "abbr": "CA",      "expansion": "Assessment, Authorization, and Monitoring (NIST 800-53 family)" },
+        { "abbr": "CFR",     "expansion": "Code of Federal Regulations" },
+        { "abbr": "CIO",     "expansion": "Chief Information Officer" },
+        { "abbr": "CISA",    "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CISO",    "expansion": "Chief Information Security Officer" },
+        { "abbr": "CMDB",    "expansion": "Configuration Management Database" },
+        { "abbr": "CNSSI",   "expansion": "Committee on National Security Systems Instruction" },
+        { "abbr": "CPG",     "expansion": "Cybersecurity Performance Goals (CISA)" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "DGB",     "expansion": "Data Governance Body" },
+        { "abbr": "DHS",     "expansion": "Department of Homeland Security" },
+        { "abbr": "DIB",     "expansion": "Data Integrity Board / Defense Industrial Base" },
+        { "abbr": "DLP",     "expansion": "Data Loss Prevention" },
+        { "abbr": "DoDAF",   "expansion": "Department of Defense Architecture Framework" },
+        { "abbr": "DoDM",    "expansion": "Department of Defense Manual" },
+        { "abbr": "EA",      "expansion": "Enterprise Architecture" },
+        { "abbr": "FBI",     "expansion": "Federal Bureau of Investigation" },
+        { "abbr": "FBCA",    "expansion": "Federal Bridge Certification Authority" },
+        { "abbr": "FEAF",    "expansion": "Federal Enterprise Architecture Framework" },
+        { "abbr": "FISMA",   "expansion": "Federal Information Security Modernization Act" },
+        { "abbr": "GRC",     "expansion": "Governance, Risk, and Compliance" },
+        { "abbr": "IR",      "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "ISAC",    "expansion": "Information Sharing and Analysis Center" },
+        { "abbr": "ISAO",    "expansion": "Information Sharing and Analysis Organization" },
+        { "abbr": "ISPP",    "expansion": "Information Security Program Plan" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "MEF",     "expansion": "Mission Essential Function" },
+        { "abbr": "NICE",    "expansion": "National Initiative for Cybersecurity Education" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OMB",     "expansion": "Office of Management and Budget" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "PL",      "expansion": "Planning (NIST 800-53 family)" },
+        { "abbr": "PM",      "expansion": "Program Management (NIST 800-53 family)" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "PT",      "expansion": "PII Processing and Transparency (NIST 800-53 family)" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "RMS",     "expansion": "Risk Management Strategy" },
+        { "abbr": "SA",      "expansion": "System and Services Acquisition (NIST 800-53 family)" },
+        { "abbr": "SAOP",    "expansion": "Senior Agency Official for Privacy" },
+        { "abbr": "SC",      "expansion": "System and Communications Protection (NIST 800-53 family)" },
+        { "abbr": "SCRM",    "expansion": "Supply Chain Risk Management" },
+        { "abbr": "SI",      "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SR",      "expansion": "Supply Chain Risk Management (NIST 800-53 family)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TIP",     "expansion": "Threat Intelligence Platform" },
+        { "abbr": "TOGAF",   "expansion": "The Open Group Architecture Framework" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-39 — Managing Information Security Risk",          "url": "https://csrc.nist.gov/pubs/sp/800/39/final" },
+        { "label": "NIST SP 800-137 — Information Security Continuous Monitoring", "url": "https://csrc.nist.gov/pubs/sp/800/137/final" },
+        { "label": "NIST SP 800-181 r1 — Workforce Framework for Cybersecurity",   "url": "https://csrc.nist.gov/pubs/sp/800/181/r1/final" },
+        { "label": "NIST SP 800-161 r1 — Cybersecurity Supply Chain Risk Management", "url": "https://csrc.nist.gov/pubs/sp/800/161/r1/final" },
+        { "label": "NIST IR 8062 — Privacy Risk Management Framework",              "url": "https://csrc.nist.gov/pubs/ir/8062/final" },
+        { "label": "OMB Circular A-130 — Managing Information as a Strategic Resource", "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/circulars/A130/a130revised.pdf" },
+        { "label": "Privacy Act of 1974 (5 U.S.C. § 552a)",                         "url": "https://www.justice.gov/opcl/privacy-act-1974" },
+        { "label": "FISMA — Federal Information Security Modernization Act",        "url": "https://www.cisa.gov/topics/cyber-threats-and-advisories/federal-information-security-modernization-act" },
+        { "label": "CISA Cybersecurity Performance Goals (CPGs)",                   "url": "https://www.cisa.gov/cross-sector-cybersecurity-performance-goals" }
+    ]
+}
