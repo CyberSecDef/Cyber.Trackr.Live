@@ -1,6 +1,15 @@
 {
-    "frozen_at": "2026-05-02T19:17:21+00:00",
+    "frozen_at": "2026-05-02T19:18:49+00:00",
     "entries": [
+        {
+            "hash": "5e0d91f4d5dcbf2265f5162a3f4e6e00e7252588",
+            "short_hash": "5e0d91f",
+            "subject": "fix(changelog): freeze command + JSON fallback for rsync deploys",
+            "summary": "Production is rsynced from dev — no .git directory survives the copy — so the original Changelog service that shelled out to git log fell back to the empty state on prod. /changelog showed only the \"check the GitHub history instead\" message instead of any real entries.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T15:17:57-04:00",
+            "date_human": "May 02, 2026 · 15:17"
+        },
         {
             "hash": "15cd8483555c5cc356553e02ae847f152da60997",
             "short_hash": "15cd848",
