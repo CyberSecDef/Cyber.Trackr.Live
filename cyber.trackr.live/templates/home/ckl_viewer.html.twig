@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}CKL Viewer &mdash; Cyber Trackr{% endblock %}
+
+{% block body %}
+    <section class="lib-page ckl-page" aria-labelledby="ckl-page-title">
+        <div class="rule-text">&sect; Tools &middot; CKL / CKLB Viewer</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Browser-only checklist editor</span>
+            <h1 id="ckl-page-title" class="lib-page__title-large">
+                CKL / CKLB <em>Viewer.</em>
+            </h1>
+            <p class="lib-page__lede">
+                Drop a STIG checklist (.ckl or .cklb) to read, edit, and re-export. Optionally drop a SCAP XCCDF result to auto-update statuses against your scan. Everything runs in your browser &mdash; nothing is uploaded.
+            </p>
+            <div class="plans-data-banner" role="alert">
+                <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                <div>
+                    <strong>Public site &mdash; unclassified data only.</strong>
+                    All parsing, editing, and export happens in your browser; no checklist data is transmitted to this server. Even so, do not load checklists containing classified information or CUI &mdash; handle those on an authorized system within the appropriate enclave.
+                </div>
+            </div>
+        </header>
+
+        {# Stage 1: empty state — drop zones to load a checklist. #}
+        <div id="ckl-empty" class="ckl-empty">
+            <div class="ckl-drop ckl-drop--primary" id="ckl-drop-primary">
+                <input type="file" id="ckl-file-primary" class="ckl-drop__input" accept=".ckl,.cklb,.xml,.json,application/json,application/xml,text/xml" />
+                <label for="ckl-file-primary" class="ckl-drop__label">
+                    <i class="bi bi-cloud-arrow-up ckl-drop__icon" aria-hidden="true"></i>
+                    <strong class="ckl-drop__title">Drop a CKL or CKLB file</strong>
+                    <span class="ckl-drop__hint">or click to choose &middot; .ckl (XML) and .cklb (JSON) both work</span>
+                </label>
+            </div>
+
+            <div class="ckl-empty__hints">
+                <div class="ckl-empty__hint">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                    <strong>Edit inline</strong>
+                    <span>Status, finding details, comments, severity override, host info &mdash; everything an assessor touches.</span>
+                </div>
+                <div class="ckl-empty__hint">
+                    <i class="bi bi-radar" aria-hidden="true"></i>
+                    <strong>Apply scan results</strong>
+                    <span>Drop a SCAP XCCDF result after loading a checklist and auto-update statuses by rule version.</span>
+                </div>
+                <div class="ckl-empty__hint">
+                    <i class="bi bi-download" aria-hidden="true"></i>
+                    <strong>Export CKLB</strong>
+                    <span>Save your changes back as the modern CKLB JSON format DISA STIG Viewer 3.x reads natively.</span>
+                </div>
+            </div>
+        </div>
+
+        {# Stage 2: loaded view — populated by JS. Hidden until a file is dropped. #}
+        <div id="ckl-loaded" class="ckl-loaded" hidden>
+
+            <div class="ckl-toolbar">
+                <div class="ckl-toolbar__left">
+                    <strong class="ckl-toolbar__filename" data-bind="filename">checklist.cklb</strong>
+                    <span class="ckl-toolbar__source" data-bind="source-format">CKLB</span>
+                    <span class="ckl-toolbar__dirty" data-bind="dirty-flag" hidden>
+                        <i class="bi bi-circle-fill" aria-hidden="true"></i> Unsaved changes
+                    </span>
+                </div>
+                <div class="ckl-toolbar__right">
+                    <button type="button" class="cta-secondary" onclick="cklViewer.openScap()">
+                        <i class="bi bi-radar" aria-hidden="true"></i>
+                        Apply SCAP results
+                    </button>
+                    <input type="file" id="ckl-file-scap" class="ckl-drop__input" accept=".xml,application/xml,text/xml" />
+
+                    <button type="button" class="cta-secondary" onclick="cklViewer.exportCklb()">
+                        <i class="bi bi-download" aria-hidden="true"></i>
+                        Export CKLB
+                    </button>
+                    <button type="button" class="cta-tertiary" onclick="cklViewer.reset()">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+
+            {# Asset / target metadata — editable. #}
+            <details class="ckl-asset" open>
+                <summary class="ckl-asset__summary">
+                    <span class="ckl-asset__summary-label">
+                        <i class="bi bi-pc-display" aria-hidden="true"></i>
+                        Target asset
+                    </span>
+                    <span class="ckl-asset__summary-meta" data-bind="asset-summary">&mdash;</span>
+                </summary>
+                <div class="ckl-asset__grid" id="ckl-asset-grid">
+                    {# Field templates are populated by JS so we can drive them off the unified model. #}
+                </div>
+            </details>
+
+            {# Dashboard: stat cards + status donut + severity x status bars. #}
+            <section class="ckl-dashboard" aria-label="Overview">
+                <div class="ckl-statcards">
+                    <div class="ckl-statcard ckl-statcard--total">
+                        <span class="ckl-statcard__label">Total rules</span>
+                        <span class="ckl-statcard__value" data-bind="total">0</span>
+                    </div>
+                    <div class="ckl-statcard ckl-statcard--high">
+                        <span class="ckl-statcard__label">CAT I (High)</span>
+                        <span class="ckl-statcard__value" data-bind="sev-high">0</span>
+                    </div>
+                    <div class="ckl-statcard ckl-statcard--medium">
+                        <span class="ckl-statcard__label">CAT II (Medium)</span>
+                        <span class="ckl-statcard__value" data-bind="sev-medium">0</span>
+                    </div>
+                    <div class="ckl-statcard ckl-statcard--low">
+                        <span class="ckl-statcard__label">CAT III (Low)</span>
+                        <span class="ckl-statcard__value" data-bind="sev-low">0</span>
+                    </div>
+                </div>
+
+                <div class="ckl-charts">
+                    <figure class="ckl-chart">
+                        <figcaption class="ckl-chart__caption">Status distribution</figcaption>
+                        <div class="ckl-chart__body">
+                            <svg class="ckl-donut" viewBox="0 0 200 200" aria-hidden="true" id="ckl-donut"></svg>
+                            <ul class="ckl-legend" id="ckl-donut-legend"></ul>
+                        </div>
+                    </figure>
+
+                    <figure class="ckl-chart">
+                        <figcaption class="ckl-chart__caption">Severity &times; status</figcaption>
+                        <div class="ckl-chart__body">
+                            <svg class="ckl-bars" viewBox="0 0 360 180" aria-hidden="true" id="ckl-bars"></svg>
+                        </div>
+                    </figure>
+                </div>
+            </section>
+
+            {# Filter / sort / search controls. #}
+            <div class="ckl-controls">
+                <div class="ckl-controls__group">
+                    <input id="ckl-search" type="search" placeholder="Filter by Vuln ID, rule title, finding text&hellip;"
+                           aria-label="Filter rules" oninput="cklViewer.filter()" />
+                </div>
+                <div class="ckl-controls__group">
+                    <span class="eyebrow">Severity</span>
+                    <button type="button" class="chip active" data-sev="high"   onclick="cklViewer.toggleSev(this)">High</button>
+                    <button type="button" class="chip active" data-sev="medium" onclick="cklViewer.toggleSev(this)">Medium</button>
+                    <button type="button" class="chip active" data-sev="low"    onclick="cklViewer.toggleSev(this)">Low</button>
+                </div>
+                <div class="ckl-controls__group">
+                    <span class="eyebrow">Status</span>
+                    <button type="button" class="chip active" data-status="Open"            onclick="cklViewer.toggleStatus(this)">Open</button>
+                    <button type="button" class="chip active" data-status="NotAFinding"     onclick="cklViewer.toggleStatus(this)">Not a Finding</button>
+                    <button type="button" class="chip active" data-status="Not_Applicable"  onclick="cklViewer.toggleStatus(this)">Not Applicable</button>
+                    <button type="button" class="chip active" data-status="Not_Reviewed"    onclick="cklViewer.toggleStatus(this)">Not Reviewed</button>
+                </div>
+                <div class="ckl-controls__group">
+                    <span class="eyebrow">Sort</span>
+                    <select id="ckl-sort" onchange="cklViewer.sort()">
+                        <option value="vuln">Vuln ID</option>
+                        <option value="severity">Severity</option>
+                        <option value="status">Status</option>
+                        <option value="title">Title</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ckl-rules" id="ckl-rules" data-bind="rules"></div>
+
+            {# Rule card template — cloned per rule. #}
+            <template id="ckl-rule-template">
+                <article class="ckl-rule" data-vuln-id="">
+                    <header class="ckl-rule__head" onclick="cklViewer.toggleRule(this)">
+                        <span class="ckl-rule__sev"></span>
+                        <span class="ckl-rule__id" data-bind="vuln-id"></span>
+                        <span class="ckl-rule__title" data-bind="title"></span>
+                        <span class="ckl-rule__status" data-bind="status-pill"></span>
+                        <span class="ckl-rule__changed" data-bind="changed-flag" hidden title="Edited from original">&middot;</span>
+                        <i class="bi bi-chevron-down ckl-rule__chevron" aria-hidden="true"></i>
+                    </header>
+                    <div class="ckl-rule__body">
+                        <div class="ckl-rule__meta">
+                            <div><strong>Rule ID</strong><span data-bind="rule-id"></span></div>
+                            <div><strong>STIG ID</strong><span data-bind="group-id"></span></div>
+                            <div><strong>CCI</strong><span data-bind="cci"></span></div>
+                            <div><strong>Severity</strong><span data-bind="severity"></span></div>
+                        </div>
+
+                        <div class="ckl-rule__section">
+                            <h4>Discussion</h4>
+                            <div class="ckl-rule__readonly" data-bind="discussion"></div>
+                        </div>
+                        <div class="ckl-rule__section">
+                            <h4>Check</h4>
+                            <div class="ckl-rule__readonly" data-bind="check"></div>
+                        </div>
+                        <div class="ckl-rule__section">
+                            <h4>Fix</h4>
+                            <div class="ckl-rule__readonly" data-bind="fix"></div>
+                        </div>
+
+                        <div class="ckl-rule__editor">
+                            <div class="ckl-rule__editor-row">
+                                <label>
+                                    <span class="eyebrow">Status</span>
+                                    <select data-edit="status" onchange="cklViewer.editRule(this)">
+                                        <option value="Not_Reviewed">Not Reviewed</option>
+                                        <option value="Open">Open</option>
+                                        <option value="NotAFinding">Not a Finding</option>
+                                        <option value="Not_Applicable">Not Applicable</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    <span class="eyebrow">Severity override</span>
+                                    <select data-edit="severity_override" onchange="cklViewer.editRule(this)">
+                                        <option value="">— none —</option>
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <label>
+                                <span class="eyebrow">Severity-override justification</span>
+                                <textarea rows="2" data-edit="severity_justification" oninput="cklViewer.editRule(this)" placeholder="Required when overriding severity."></textarea>
+                            </label>
+                            <label>
+                                <span class="eyebrow">Finding details</span>
+                                <textarea rows="4" data-edit="finding_details" oninput="cklViewer.editRule(this)" placeholder="Observed configuration, evidence, scan output."></textarea>
+                            </label>
+                            <label>
+                                <span class="eyebrow">Comments</span>
+                                <textarea rows="3" data-edit="comments" oninput="cklViewer.editRule(this)" placeholder="Mitigations, justification, residual risk discussion."></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </article>
+            </template>
+        </div>
+
+        <p id="ckl-empty-after-filter" class="ckl-empty-after-filter" hidden>
+            No rules match the current filter. Adjust severity, status, or search to widen the result.
+        </p>
+    </section>
+
+    <script src="/js/ckl_viewer.js"></script>
+{% endblock %}

@@ -87,4 +87,12 @@ class HomeController extends AbstractController
             'controller_name' => 'HomeController'
         ]);
     }
+
+    #[Route('/ckl-viewer', name: 'ckl_viewer')]
+    public function ckl_viewer(): Response
+    {
+        return $this->render('home/ckl_viewer.html.twig', [
+            'controller_name' => 'HomeController'
+        ]);
+    }
 }
