@@ -1,0 +1,497 @@
+{
+    "_comment": "Media Protection Plan generator. Authored at the Phase 2 assessability floor; pairs with PE (PE-16 delivery / removal is the gating workflow for MP-5 transport), MA (MA-3(2) media inspection echoes MP scanning practice; MA-2 sanitization-before-maintenance overlaps MP-6), SC (MP-4 / MP-5 cryptographic protection of stored / transported media uses SC-12 / SC-28 keys), and SI (SI-12 information management overlaps MP-6 / MP-7 lifecycle). Compact family — 7 base controls and no enhancements at moderate; the rigor is in classification-driven handling and sanitization evidence.",
+
+    "family": "MP",
+    "family_name": "Media Protection",
+    "title": "Media Protection Plan",
+    "description": "Documents how the system's storage media — both digital and non-digital — are governed across access, marking, storage, transport, sanitization, and use. Covers the controls of the MP family in NIST SP 800-53 r5 and aligns with NIST SP 800-88 r1 (Sanitization Guidelines), CNSSI 1253 (Categorization and Control Selection for National Security Systems), 32 CFR Part 2002 (CUI Marking), and FIPS 199 / FIPS 200 categorization frameworks.",
+
+    "intro_template": "This Media Protection Plan documents the media-protection approach for {system_name}. It establishes the practices, tooling, cadences, and roles used to control access to system media, mark media according to classification and handling requirements, store media in protected locations, transport media outside controlled areas, sanitize media before reuse or disposal, and govern the use of removable and portable media.\n\nThe scope covers media access per MP-2, media marking per MP-3, media storage per MP-4, media transport per MP-5, media sanitization per MP-6, and media use per MP-7 within the {system_name} authorization boundary. Both digital media (drives, tapes, removable media) and non-digital media (printed reports, written notes containing CUI) are in scope where applicable. The plan is consistent with NIST SP 800-53 r5 (Media Protection family), NIST SP 800-88 r1 (Sanitization Guidelines), and 32 CFR Part 2002 (CUI Marking).",
+
+    "approach_section_title": "Media Protection Approach",
+    "approach_template": "{system_name} tracks media through {media_inventory_system} with the role responsibilities documented in §3 (Roles and Responsibilities). Sanitization is performed by {sanitization_service} per NIST SP 800-88 r1, with destruction certificates retained at {destruction_certificate_storage}. Media transport outside controlled areas follows {transport_custody_workflow}. Removable media use is governed by {removable_media_policy_summary}.\n\nAdditional details on media access, marking, storage, transport, sanitization, and use are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Media-protection performance for {system_name} is tracked through the metrics in §6.1 (media-inventory currency rate, sanitization-certificate completeness, MP-5 transport SLA compliance, removable-media policy violations, marking-audit findings, lost / unaccounted media count). Media inventory is reconciled on the cadence in §6.2; lost-media incidents (target: zero) feed the IR plan workflow. Sanitization certificates are audited annually for completeness against the corresponding decommission events.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Media Protection Plan does not stand alone. The PE family supplies the PE-16 delivery / removal workflow that gates MP-5 transport; the MA family inspects media via MA-3(2) and sanitizes via MA-2 before vendor maintenance, both echoing MP-6; the SC family supplies the cryptographic protection (SC-28) and key management (SC-12) underwriting MP-4 / MP-5 protection of media at rest and in transit; the SI family's SI-12 information-lifecycle management overlaps with MP-6 / MP-7. The following cross-references identify the specific artifacts and locations where MP-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "MP-1", "from": "Organizational media-protection policy" },
+        { "number": "MP-6", "from": "Organizational sanitization service / contract (when shared sanitization vendor)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Tooling and roles that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "media_inventory_system",
+                    "label": "Media inventory system (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where storage media are inventoried (e.g., 'CMDB media-asset module', 'Dedicated media-tracker spreadsheet under version control', 'Inherited from cloud — no system-managed physical media')."
+                },
+                {
+                    "id": "sanitization_service",
+                    "label": "Sanitization service / vendor",
+                    "type": "text",
+                    "required": true,
+                    "help": "Who performs media sanitization (e.g., 'Internal IT Operations using Blancco Drive Eraser', 'NSA-listed vendor for Purge / Destroy', 'GSA-schedule contract destruction vendor')."
+                },
+                {
+                    "id": "destruction_certificate_storage",
+                    "label": "Destruction-certificate storage location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where certificates of destruction are retained (records-management system, GRC tool, secure file share)."
+                },
+                {
+                    "id": "transport_custody_workflow",
+                    "label": "Transport chain-of-custody workflow",
+                    "type": "text",
+                    "help": "Brief phrase summarizing transport workflow (e.g., 'GSA-bonded courier with sealed tamper-evident container; chain-of-custody form per shipment', 'Encrypted transport via FedEx with signature-required tracking + post-transit verification')."
+                },
+                {
+                    "id": "removable_media_policy_summary",
+                    "label": "Removable-media policy summary (one-liner)",
+                    "type": "text",
+                    "help": "Brief phrase summarizing the removable-media posture (e.g., 'USB ports disabled by GPO with allowlist for org-issued encrypted drives', 'Read-only USB enforcement via DLP', 'Physical port blockers on all hosts; allowlist enforcement at endpoint')."
+                }
+            ]
+        },
+
+        {
+            "id": "media_inventory",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Media Inventory",
+            "description": "Categories of media in scope and how they are tracked.",
+            "questions": [
+                { "id": "digital_media_categories", "label": "Digital media categories",           "type": "multi_select",
+                  "options": ["Internal hard drives (HDD / SSD) in servers / workstations / laptops", "Removable hard drives", "USB flash drives", "Optical media (CD / DVD / Blu-ray)", "Magnetic tapes (LTO, etc.)", "Memory cards (SD, microSD, CF)", "Solid-state media (M.2, NVMe)", "Smartphone / tablet internal storage", "Embedded firmware media (printers, MFPs)", "Cloud-provider object / block storage (logical, but governance applies)"] },
+                { "id": "non_digital_media_categories","label": "Non-digital media categories",   "type": "multi_select",
+                  "options": ["Printed reports / hardcopy CUI", "Handwritten notes containing system data", "Whiteboard captures (digital photos)", "Microfilm / microfiche (legacy archives)", "Paper forms (PII)", "Not in scope (digital-only)"] },
+                { "id": "inventory_tracking_attributes","label": "Inventory-tracked attributes",   "type": "multi_select",
+                  "options": ["Asset tag / serial", "Media type", "Encryption status", "Classification / handling marking", "Owner role", "Storage location", "Issued to (current user)", "Lifecycle state (in-use / sanitized / destroyed / lost)", "Sanitization method applied", "Destruction-certificate reference"] },
+                { "id": "inventory_reconciliation_cadence","label": "Media-inventory reconciliation cadence", "type": "text",
+                  "help": "How often the media inventory is reconciled with physical reality (e.g., 'Quarterly with annual full audit')." }
+            ]
+        },
+
+        {
+            "id": "media_access",
+            "type": "group",
+            "section": "approach",
+            "label": "Media Access (MP-2)",
+            "description": "Who can access media and on what basis.",
+            "questions": [
+                { "id": "mp2_access_categories",    "label": "Access-controlled media categories", "type": "multi_select",
+                  "options": ["Backup tapes", "Removable hard drives", "Encrypted USB drives", "Optical media containing CUI", "Hardcopy printouts containing CUI", "Cryptographic-key media", "Privileged-utility media (recovery USBs)"] },
+                { "id": "mp2_authorization_criteria","label": "Authorization criteria",            "type": "textarea", "rows": 3,
+                  "help": "What entitles a person to access controlled media (need-to-know, role-based, screening level — reference PS-3)." },
+                { "id": "mp2_access_logging",       "label": "Access-logging requirement",         "type": "textarea", "rows": 3,
+                  "help": "When access events to controlled media are logged. Sign-in / sign-out for physical media; system audit for digital media access (overlaps with AU-2)." },
+                { "id": "mp2_review_cadence",       "label": "Authorization-list review cadence",  "type": "text",
+                  "help": "How often the authorized-access list is reviewed (typical: 'Annually + on personnel change'). MP-2 ODV." }
+            ]
+        },
+
+        {
+            "id": "media_marking",
+            "type": "group",
+            "section": "approach",
+            "label": "Media Marking (MP-3)",
+            "description": "Classification labels and handling markings.",
+            "questions": [
+                { "id": "mp3_marking_systems",      "label": "Marking systems in use",             "type": "multi_select",
+                  "options": ["CUI marking per 32 CFR Part 2002 (CUI Basic / Specified)", "Classified marking per ISOO (Confidential / Secret / Top Secret)", "FIPS 199 categorization labels", "Internal classification (Public / Internal / Confidential / Restricted)", "PII / PHI / PCI / FTI handling labels", "Export-controlled (ITAR / EAR) labels"] },
+                { "id": "mp3_marking_method",       "label": "Marking method by media type",       "type": "textarea", "rows": 4,
+                  "help": "How each media type is marked. Example: 'Backup tapes: serialized adhesive label with classification + asset tag; portable drives: laser-engraved housing + register entry; hardcopy: top-and-bottom-of-each-page banner per 32 CFR Part 2002.'" },
+                { "id": "mp3_exemptions",           "label": "Marking exemptions (MP-3 ODV)",      "type": "textarea", "rows": 3,
+                  "help": "Per MP-3 ODV, types of media exempted from marking requirements (e.g., 'Public-information media in a controlled facility'). Document rationale." },
+                { "id": "mp3_marking_audit",        "label": "Marking-audit cadence",              "type": "text",
+                  "help": "How often the marking is audited (e.g., 'Quarterly random sample of media items'). Captures markings degraded by wear or improperly applied at issue." }
+            ]
+        },
+
+        {
+            "id": "media_storage",
+            "type": "group",
+            "section": "approach",
+            "label": "Media Storage (MP-4)",
+            "description": "Where and how media at rest is physically protected.",
+            "questions": [
+                { "id": "mp4_storage_location_types","label": "Storage location types",            "type": "multi_select",
+                  "options": ["GSA-approved security container (classified)", "Locked cabinet with key control", "Locked room with PIV / CAC access", "Tape library with encryption + access control", "Off-site provider storage (Iron Mountain etc.)", "Cloud-provider managed storage (logical, but inventory tracked)", "Personal-issue secure container (laptop, encrypted drive)"] },
+                { "id": "mp4_cryptographic_protection","label": "Cryptographic protection of stored media (MP-4)", "type": "textarea", "rows": 3,
+                  "help": "How stored media is cryptographically protected. SED + LUKS + BitLocker / FileVault for portable media. Reference SC-12 / SC-28 for keys + at-rest encryption." },
+                { "id": "mp4_environmental_protection","label": "Environmental protection",        "type": "textarea", "rows": 3,
+                  "help": "Temperature, humidity, EMI / magnetic-field protection where applicable (especially for tape archives). Reference PE-14 for facility environmental." },
+                { "id": "mp4_offsite_arrangement", "label": "Off-site media-storage arrangement",  "type": "textarea", "rows": 3,
+                  "help": "If applicable: off-site provider name, contract, access-control posture, audit cadence. Reference SA-9." }
+            ]
+        },
+
+        {
+            "id": "media_transport",
+            "type": "group",
+            "section": "approach",
+            "label": "Media Transport (MP-5)",
+            "description": "Movement of media outside controlled areas.",
+            "questions": [
+                { "id": "mp5_transport_scenarios",  "label": "Transport scenarios in scope",       "type": "multi_select",
+                  "options": ["Backup-tape rotation to off-site storage", "Decommissioned-drive shipment to sanitization vendor", "Portable-drive courier between facilities", "Laptop + external drive transport for telework", "Vendor-maintenance-component shipment", "Hardcopy shipment for review / signature"] },
+                { "id": "mp5_chain_of_custody",     "label": "Chain-of-custody requirements",      "type": "multi_select",
+                  "options": ["Sealed tamper-evident container", "Signature-tracked courier", "Two-person hand-off at each transfer", "GPS / RFID tracking", "Pre-transport encryption verification", "Post-transport integrity verification", "Time-stamped log entries", "Signed COC form retained per shipment"] },
+                { "id": "mp5_authorized_couriers",  "label": "Authorized couriers (MP-5 ODV)",     "type": "textarea", "rows": 3,
+                  "help": "Couriers authorized to transport media outside controlled areas. Cleared employees, GSA-bonded carriers, vendor-cleared personnel. MP-5 ODV." },
+                { "id": "mp5_encryption_requirement","label": "Transport-encryption requirement",  "type": "select",
+                  "options": ["Mandatory for all media leaving facility (FIPS 140-3 validated)", "Mandatory for CUI / classified; exempt for public", "Mandatory for digital media; physical sealing for non-digital", "Best-effort (with documented rationale)"] }
+            ]
+        },
+
+        {
+            "id": "media_sanitization",
+            "type": "group",
+            "section": "approach",
+            "label": "Media Sanitization (MP-6)",
+            "description": "Sanitization methods, certificates, and decision criteria.",
+            "questions": [
+                { "id": "mp6_sanitization_categories","label": "Sanitization categories applied (NIST SP 800-88 r1)", "type": "multi_select",
+                  "options": ["Clear (logical erasure — overwrite or factory reset)", "Purge (cryptographic erase, degauss for magnetic, NVMe sanitize, ATA secure-erase)", "Destroy (physical destruction — shred / incinerate / pulverize)", "Per data classification — Clear for Low; Purge for Moderate; Destroy for High / Classified"] },
+                { "id": "mp6_decision_matrix",     "label": "Sanitization-decision matrix",       "type": "textarea", "rows": 5,
+                  "help": "How the sanitization category is chosen. Reference NIST SP 800-88 r1 Decision Tree (Reuse vs Recycle, Internal vs External, Sensitivity)." },
+                { "id": "mp6_validation_requirement","label": "Sanitization-validation requirement", "type": "textarea", "rows": 3,
+                  "help": "How sanitization is validated. Tooling logs (Blancco / Killdisk certificate), random-sample re-read tests, vendor-provided certificate of destruction with serial-number match." },
+                { "id": "mp6_destruction_techniques","label": "Destruction techniques per media type", "type": "textarea", "rows": 4,
+                  "help": "How each media type is physically destroyed when destroy is required (e.g., 'HDDs: degauss + shred; SSDs: cryptographic erase + shred; tapes: shred; optical: shred')." },
+                { "id": "mp6_witness_requirement",  "label": "Witness requirement",               "type": "select",
+                  "options": ["Required for classified / high-sensitivity destruction", "Required for all destruction events", "Documented but not actively witnessed (vendor self-attestation)", "Not formally required"] },
+                { "id": "mp6_sanitization_review_cadence","label": "Sanitization-process review cadence", "type": "text",
+                  "help": "How often the sanitization process / equipment is reviewed for effectiveness. MP-6 ODV." }
+            ]
+        },
+
+        {
+            "id": "media_use",
+            "type": "group",
+            "section": "approach",
+            "label": "Media Use (MP-7)",
+            "description": "Restrictions on removable and portable media use.",
+            "questions": [
+                { "id": "mp7_prohibited_media",     "label": "Prohibited media types",             "type": "multi_select",
+                  "options": ["Personal USB drives", "Personal optical media", "Personal external hard drives", "Personal smartphones (data sync)", "Smart cards from non-trusted issuers", "Wireless storage (WiFi-enabled drives)", "Promotional / unsolicited media (received in mail)"] },
+                { "id": "mp7_authorized_media",     "label": "Authorized media types",             "type": "multi_select",
+                  "options": ["Org-issued encrypted USB drives", "Org-issued external hard drives (encrypted)", "Optical media for software installation (read-only)", "Removable backup tapes for backup workflow", "Privileged recovery USBs (for IT staff)", "PIV / CAC smart cards"] },
+                { "id": "mp7_enforcement_mechanism","label": "Enforcement mechanism",              "type": "textarea", "rows": 3,
+                  "help": "How media-use policy is enforced (DLP, GPO, MDM port restrictions, physical port blockers, BIOS password)." },
+                { "id": "mp7_exception_process",    "label": "Exception process",                  "type": "textarea", "rows": 3,
+                  "help": "Workflow for granting exceptions to media-use policy (e.g., for vendor-supplied installation media). Time-limited exception with retroactive review." },
+                { "id": "mp7_media_origin_restriction","label": "Media-origin restriction (MP-7)", "type": "textarea", "rows": 3,
+                  "help": "Per MP-7 ODV, restriction on media without identifiable owner (anonymous origin). Common posture: prohibited for non-public information." }
+            ]
+        },
+
+        {
+            "id": "mp_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Media Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_active_media_count",  "label": "Active media items in inventory",   "type": "text",
+                  "help": "Approximate count of media items currently in the inventory. Anchors the inventory-reconciliation effort." },
+                { "id": "scope_quarterly_decommissions","label": "Quarterly decommission volume", "type": "text",
+                  "help": "Approximate count of media items sanitized / destroyed per quarter." },
+                { "id": "scope_quarterly_transports","label": "Quarterly transport events",        "type": "text",
+                  "help": "Approximate count of MP-5 transport events per quarter." },
+                { "id": "scope_authorized_accessors","label": "Authorized-access list size (MP-2)","type": "text",
+                  "help": "Count of personnel on the authorized-media-access list." }
+            ]
+        },
+
+        {
+            "id": "mp_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Media-Protection Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate MP control effectiveness.",
+            "questions": [
+                { "id": "mp_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Media-inventory currency rate (% items reconciled in last cycle)",
+                      "Sanitization-certificate completeness rate (% decommissions with cert on file)",
+                      "MP-5 transport SLA compliance rate",
+                      "Lost / unaccounted media items (target: 0)",
+                      "Removable-media policy violations per quarter",
+                      "Marking-audit findings per cycle",
+                      "Mean time from decommission decision to sanitization-certificate filed",
+                      "MP-7 enforcement-tool coverage rate",
+                      "Open POA&M items linked to MP controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "lost_media_response",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Lost-Media Incident Response",
+            "description": "How lost-media events are detected and handled.",
+            "questions": [
+                { "id": "lost_media_detection",   "label": "Lost-media detection signals",         "type": "multi_select",
+                  "options": ["Inventory reconciliation gap", "Self-report from custodian", "Audit finding", "Failed return after off-site use", "Failed delivery / transport tracking", "Random-spot-check finding"] },
+                { "id": "lost_media_response_workflow","label": "Response workflow",               "type": "textarea", "rows": 4,
+                  "help": "Workflow when media is reported lost. Immediate: spinning up IR investigation, assessing data exposure (encrypted vs cleartext), notification obligations (per legal counsel + privacy officer if PII)." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the MP control implementations are summarized (e.g., 'SSP §13.8')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for MP findings", "type": "text",
+                  "help": "Convention for MP-related POA&M items (e.g., 'POAM-MP-' for general)." },
+                { "id": "pe_handoff",                   "label": "PE handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MP-5 transport events route through the PE-16 delivery / removal workflow." },
+                { "id": "ma_handoff",                   "label": "MA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MP-6 sanitization is invoked before vendor maintenance per MA-2; how MA-3(2) media-inspection echoes MP scanning practice." },
+                { "id": "sc_handoff",                   "label": "SC handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MP-4 / MP-5 cryptographic protection uses SC-12 keys and SC-28 at-rest encryption mechanisms." },
+                { "id": "si_handoff",                   "label": "SI handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How MP-6 / MP-7 lifecycle aligns with SI-12 information management." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How lost-media incidents trigger the IR plan workflow." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying MP continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "MP-2": {
+            "prompts": [
+                "Reference §4.2 — access-controlled categories, authorization criteria, logging, review cadence.",
+                "Document the linkage to PS-3 screening for personnel handling sensitive media.",
+                "Address handling of media containing cryptographic keys (overlaps SC-12 escrow).",
+                "Reference MP-2 ODV — access list review frequency."
+            ],
+            "evidence_suggestions": [
+                "Authorized-media-access list (sanitized export)",
+                "Media-access log sample",
+                "Sample sign-in / sign-out for physical-media area",
+                "Annual review attestation for the authorized list"
+            ],
+            "extra_fields": [
+                { "id": "mp2_access_register",   "label": "Authorized-access register location", "type": "text",
+                  "help": "Where the authorized-access list is maintained (HRMS field, dedicated register, GRC tool)." }
+            ]
+        },
+
+        "MP-3": {
+            "prompts": [
+                "Reference §4.3 — marking systems, marking method by media type, exemptions, audit cadence.",
+                "Address CUI marking per 32 CFR Part 2002 (CUI Basic / Specified, banner / portion marking).",
+                "Document handling of legacy / inherited markings (Confidential / FOUO etc.).",
+                "Reference MP-3 ODV — types of media exempted."
+            ],
+            "evidence_suggestions": [
+                "Marking standard / job aid",
+                "Sample marked-media item (photograph)",
+                "Marking-audit report",
+                "CUI registry entry for system data categories"
+            ],
+            "extra_fields": [
+                { "id": "mp3_cui_registry_link", "label": "CUI registry / category list reference", "type": "text",
+                  "help": "Pointer to the CUI category registry applicable to system data. Reference 32 CFR Part 2002 / CUI EO 13556." },
+                { "id": "mp3_legacy_marking_handling","label": "Legacy-marking handling",        "type": "textarea", "rows": 3,
+                  "help": "How pre-CUI markings (FOUO, SBU, Sensitive) are converted or retained per agency CUI implementation." }
+            ]
+        },
+
+        "MP-4": {
+            "prompts": [
+                "Reference §4.4 — storage locations, cryptographic protection, environmental protection, off-site arrangements.",
+                "Document the SC-12 / SC-28 key-management dependency for cryptographic protection.",
+                "Address off-site storage agreements (SOC 2 / FedRAMP for cloud-style, SLA for physical).",
+                "Reference MP-4 ODV — types of digital and non-digital media controlled."
+            ],
+            "evidence_suggestions": [
+                "Storage-area access controls (PE-3 cross-reference)",
+                "Encryption-at-rest configuration for managed storage",
+                "Off-site-storage contract / SLA",
+                "Sample storage-area inventory + reconciliation record"
+            ],
+            "extra_fields": [
+                { "id": "mp4_offsite_provider",    "label": "Off-site provider name",           "type": "text",
+                  "help": "Name of off-site media-storage provider if applicable (e.g., 'Iron Mountain', 'Recall')." },
+                { "id": "mp4_offsite_audit_evidence","label": "Off-site audit evidence reference", "type": "text",
+                  "help": "Where provider SOC 2 / similar evidence is filed." }
+            ]
+        },
+
+        "MP-5": {
+            "prompts": [
+                "Reference §4.5 — transport scenarios, chain-of-custody requirements, authorized couriers, encryption requirement.",
+                "Document the integration with PE-16 delivery / removal workflow.",
+                "Address transport during incidents (rapid-response evidence handling).",
+                "Reference MP-5 ODV — types of system media transported.",
+                "Reference MP-5(1) protection outside controlled areas (withdrawn — incorporated into MP-5), MP-5(2) documentation of activities (withdrawn), MP-5(3) custodians, MP-5(4) cryptographic protection."
+            ],
+            "evidence_suggestions": [
+                "Transport policy / SOP",
+                "Sample chain-of-custody form (completed)",
+                "Authorized-courier list",
+                "Transport-encryption verification log",
+                "Off-site arrival-confirmation log"
+            ],
+            "extra_fields": [
+                { "id": "mp5_courier_provider",   "label": "Courier provider",                  "type": "text",
+                  "help": "Name of courier provider if applicable (e.g., 'GSA-bonded courier under contract X', 'In-house cleared driver pool')." },
+                { "id": "mp5_coc_template_location","label": "COC template location",            "type": "text",
+                  "help": "Where the chain-of-custody form template lives." }
+            ]
+        },
+
+        "MP-6": {
+            "prompts": [
+                "Reference §4.6 — sanitization categories, decision matrix, validation requirement, destruction techniques, witness requirement.",
+                "Document NIST SP 800-88 r1 Decision Tree alignment.",
+                "Address handling of SSDs (cryptographic erase preferred over physical destruction since data is encrypted; verify per drive).",
+                "Reference MP-6 ODV — sanitization mechanisms, sanitization-process review frequency.",
+                "Reference MP-6(1) review / approve / track / document / verify (withdrawn — incorporated into MP-6), MP-6(2) equipment testing (withdrawn — incorporated into MP-6), MP-6(3) nondestructive techniques (withdrawn), MP-6(4)-(7) deprecated, MP-6(8) remote purging / wiping of information."
+            ],
+            "evidence_suggestions": [
+                "Sanitization SOP",
+                "Sample certificate of destruction",
+                "Blancco / Killdisk drive-erasure log sample",
+                "Sanitization-equipment validation report",
+                "Witness-attestation form",
+                "NIST SP 800-88 r1 Decision Tree applied to system",
+                "Chain-of-custody from decommission to sanitization completion"
+            ],
+            "extra_fields": [
+                { "id": "mp6_remote_wipe_capability","label": "Remote wipe capability (MP-6(8))",  "type": "select",
+                  "options": ["Yes — MDM-enforced remote wipe for mobile + laptop", "Yes — for laptops only", "Yes — for mobile only", "No (with rationale + POA&M)", "Not applicable"] },
+                { "id": "mp6_classified_destruction_partner","label": "Classified-destruction partner (if applicable)", "type": "text",
+                  "help": "If classified data in scope: NSA-listed destruction vendor or in-house equipment (degausser model + NSA evaluation)." }
+            ]
+        },
+
+        "MP-7": {
+            "prompts": [
+                "Reference §4.7 — prohibited media, authorized media, enforcement mechanism, exception process, media-origin restriction.",
+                "Document the integration with DLP enforcement.",
+                "Address vendor-supplied installation media handling.",
+                "Reference MP-7 ODV — types of system media restricted, restrictions on use, defined controls.",
+                "Reference MP-7(1) prohibit use without owner identification."
+            ],
+            "evidence_suggestions": [
+                "Removable-media policy document",
+                "GPO / MDM enforcement export",
+                "DLP rule export showing port restrictions",
+                "Sample media-use exception request",
+                "User-signed acceptance of removable-media policy (cross-reference PS-6)"
+            ],
+            "extra_fields": [
+                { "id": "mp7_dlp_tool",         "label": "DLP enforcement tool",                "type": "text",
+                  "help": "Tool enforcing media-use policy at the endpoint (e.g., 'Defender for Endpoint Data Loss Prevention', 'Forcepoint DLP', 'Symantec DLP')." },
+                { "id": "mp7_anonymous_origin_handling","label": "Anonymous-origin handling (MP-7(1))", "type": "textarea", "rows": 3,
+                  "help": "How media without identifiable owner is handled. Typical posture: prohibited for any non-public information; air-gapped scan station for unsolicited received media." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Chain of Custody",         "definition": "Documented sequence of transfers of an asset from one custodian to another, supporting accountability and forensic admissibility. Required by MP-5 for media transport." },
+        { "term": "Clear",                    "definition": "Per NIST SP 800-88 r1, sanitization category that uses logical techniques (overwrite, factory reset) appropriate when the media will be reused within the same organizational sensitivity context." },
+        { "term": "Cryptographic Erase",       "definition": "Per NIST SP 800-88 r1 Purge category, sanitization by destroying the cryptographic keys protecting encrypted data, leaving the data unrecoverable. Particularly effective for SED drives and self-encrypted storage." },
+        { "term": "CUI",                      "definition": "Controlled Unclassified Information — federal information requiring safeguarding controls per 32 CFR Part 2002 / EO 13556. Drives MP-3 marking and MP-4 / MP-5 / MP-6 protection requirements." },
+        { "term": "Degauss",                   "definition": "Per NIST SP 800-88 r1 Purge category, sanitization of magnetic media by exposure to a strong magnetic field that randomizes the media's magnetic alignment. Not applicable to SSDs." },
+        { "term": "Destroy",                  "definition": "Per NIST SP 800-88 r1, sanitization category that physically destroys the media to a state where data recovery is infeasible (shred, incinerate, pulverize). Required for high-sensitivity disposal." },
+        { "term": "FIPS 140-3",               "definition": "Federal Information Processing Standard validating cryptographic modules. MP-4 / MP-5 cryptographic protection of media uses FIPS-validated modules per agency policy." },
+        { "term": "GPO",                      "definition": "Group Policy Object — Windows mechanism for centrally enforcing endpoint configuration, including USB-port restrictions for MP-7 enforcement." },
+        { "term": "MDM",                      "definition": "Mobile Device Management — platform enforcing policy on mobile devices and laptops, including media-port restrictions and remote-wipe capability for MP-6(8)." },
+        { "term": "Non-Digital Media",         "definition": "Per MP family, media that does not store data in digital form: printed reports, handwritten notes, hardcopy. Subject to marking (MP-3) and sanitization (typically shredding for MP-6)." },
+        { "term": "NIST SP 800-88 r1",        "definition": "NIST Special Publication 800-88 Revision 1 — Guidelines for Media Sanitization. The authoritative reference for MP-6 sanitization category selection." },
+        { "term": "Purge",                     "definition": "Per NIST SP 800-88 r1, sanitization category appropriate when the media will be reused outside the original sensitivity context. Techniques include cryptographic erase, degauss for magnetic, ATA Secure Erase / NVMe Sanitize for solid-state." },
+        { "term": "Removable Media",           "definition": "Media designed for portability (USB drives, optical disks, removable hard drives, memory cards). Subject to MP-4 storage and MP-5 transport, plus MP-7 use restrictions." },
+        { "term": "Sanitization",             "definition": "Per MP-6, the process of removing data from media to prevent recovery. Categorized as Clear, Purge, or Destroy per NIST SP 800-88 r1." },
+        { "term": "SED",                      "definition": "Self-Encrypting Drive — storage device with built-in hardware encryption. Allows efficient cryptographic erase by destroying the embedded encryption key." },
+        { "term": "Tamper-Evident Container",  "definition": "Packaging that displays visible evidence if opened. Required by MP-5 chain-of-custody for sensitive transport." },
+        { "term": "Witness",                   "definition": "Per MP-6, a second qualified person observing and attesting to media destruction. Required for high-sensitivity destruction events." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "BIOS",    "expansion": "Basic Input/Output System" },
+        { "abbr": "CAC",     "expansion": "Common Access Card (DoD)" },
+        { "abbr": "CMDB",    "expansion": "Configuration Management Database" },
+        { "abbr": "CFR",     "expansion": "Code of Federal Regulations" },
+        { "abbr": "CNSSI",   "expansion": "Committee on National Security Systems Instruction" },
+        { "abbr": "COC",     "expansion": "Chain of Custody" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "DLP",     "expansion": "Data Loss Prevention" },
+        { "abbr": "EAR",     "expansion": "Export Administration Regulations" },
+        { "abbr": "EO",      "expansion": "Executive Order" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "FOUO",    "expansion": "For Official Use Only (legacy CUI predecessor)" },
+        { "abbr": "FTI",     "expansion": "Federal Tax Information" },
+        { "abbr": "GPO",     "expansion": "Group Policy Object" },
+        { "abbr": "GSA",     "expansion": "General Services Administration" },
+        { "abbr": "HDD",     "expansion": "Hard Disk Drive" },
+        { "abbr": "ISOO",    "expansion": "Information Security Oversight Office" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "ITAR",    "expansion": "International Traffic in Arms Regulations" },
+        { "abbr": "LTO",     "expansion": "Linear Tape-Open" },
+        { "abbr": "MA",      "expansion": "Maintenance (NIST 800-53 family)" },
+        { "abbr": "MDM",     "expansion": "Mobile Device Management" },
+        { "abbr": "MFP",     "expansion": "Multi-Function Printer" },
+        { "abbr": "MP",      "expansion": "Media Protection (NIST 800-53 family)" },
+        { "abbr": "NARA",    "expansion": "National Archives and Records Administration" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "NVMe",    "expansion": "Non-Volatile Memory Express" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "PCI",     "expansion": "Payment Card Industry (data security standard)" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PHI",     "expansion": "Protected Health Information" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "RFID",    "expansion": "Radio-Frequency Identification" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SBU",     "expansion": "Sensitive But Unclassified (legacy CUI predecessor)" },
+        { "abbr": "SC",      "expansion": "System and Communications Protection (NIST 800-53 family)" },
+        { "abbr": "SED",     "expansion": "Self-Encrypting Drive" },
+        { "abbr": "SI",      "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SOP",     "expansion": "Standard Operating Procedure" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSD",     "expansion": "Solid-State Drive" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-88 r1 — Guidelines for Media Sanitization",         "url": "https://csrc.nist.gov/pubs/sp/800/88/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "32 CFR Part 2002 — Controlled Unclassified Information",        "url": "https://www.ecfr.gov/current/title-32/subtitle-B/chapter-XX/part-2002" },
+        { "label": "Executive Order 13556 — Controlled Unclassified Information",  "url": "https://www.archives.gov/cui/about/eo-13556" },
+        { "label": "ISOO CUI Marking Handbook",                                     "url": "https://www.archives.gov/cui/registry/category-marking-list" },
+        { "label": "NSA / CSS Storage Device Sanitization Manual",                  "url": "https://www.nsa.gov/Cybersecurity/" }
+    ]
+}
