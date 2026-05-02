@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}Changelog &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}Changelog — every commit{% endblock %}
+{% block og_description %}A reverse-chronological log of every change shipped to Cyber Trackr, sourced directly from the project's git history.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="changelog-page-title">
+        <div class="rule-text">&sect; About &middot; Changelog</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Project history</span>
+            <h1 id="changelog-page-title" class="lib-page__title-large">
+                Every change, <em>shipped.</em>
+            </h1>
+            <p class="lib-page__lede">
+                Reverse-chronological log of all {{ entries|length|number_format }} commits in the project's history. Sourced directly from <code>git log</code> — what shipped is what's here.
+            </p>
+        </header>
+
+        {% if entries|length %}
+            <ol class="changelog-list" reversed>
+                {% for e in entries %}
+                    <li class="changelog-entry">
+                        <div class="changelog-entry__meta">
+                            <time class="changelog-entry__date" datetime="{{ e.date_iso }}">{{ e.date_human }}</time>
+                            <span class="changelog-entry__hash" title="Commit {{ e.hash }}">{{ e.short_hash }}</span>
+                        </div>
+                        <div class="changelog-entry__content">
+                            <h2 class="changelog-entry__subject">{{ e.subject }}</h2>
+                            {% if e.summary %}
+                                <p class="changelog-entry__summary">{{ e.summary }}</p>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <p class="changelog-empty">
+                The git log isn't available in this environment. Check the
+                <a href="https://github.com/CyberSecDef/Cyber.Trackr.Live/commits/master" target="_blank" rel="noopener noreferrer">project history on GitHub</a> instead.
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}

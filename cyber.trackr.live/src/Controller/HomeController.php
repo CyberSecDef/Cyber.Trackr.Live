@@ -95,4 +95,12 @@ class HomeController extends AbstractController
             'controller_name' => 'HomeController'
         ]);
     }
+
+    #[Route('/changelog', name: 'changelog')]
+    public function changelog(\App\Service\Changelog $changelog): Response
+    {
+        return $this->render('home/changelog.html.twig', [
+            'entries' => $changelog->getEntries(),
+        ]);
+    }
 }

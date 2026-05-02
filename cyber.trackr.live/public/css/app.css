@@ -6628,3 +6628,85 @@ del {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================
+   Changelog (/changelog) — reverse-chronological list of every
+   commit. Two-column layout: left rail carries the date + hash,
+   right column carries the subject + body summary.
+   ============================================================ */
+
+.changelog-list {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--border);
+}
+
+.changelog-entry {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--border);
+}
+@media (max-width: 720px) {
+    .changelog-entry {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+}
+
+.changelog-entry__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.changelog-entry__date {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+}
+.changelog-entry__hash {
+    font-family: 'Inconsolata', 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm, 4px);
+    align-self: flex-start;
+    letter-spacing: 0.4px;
+}
+
+.changelog-entry__content {
+    min-width: 0;
+}
+.changelog-entry__subject {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.35;
+    margin: 0 0 4px;
+    color: var(--text);
+    word-wrap: break-word;
+}
+.changelog-entry__summary {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.changelog-empty {
+    margin: var(--space-5) 0;
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+}
