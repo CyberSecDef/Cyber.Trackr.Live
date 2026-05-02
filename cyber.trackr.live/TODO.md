@@ -737,32 +737,44 @@ amortizes across all 17+ families.
 
 ---
 
-### Future: additional family plans
+### Future: additional family plans — ordered execution plan
 
 Each family below is a schema-only effort once Phase 2 ships.
-Expected effort: ~12–18 h per family (was 4–8 h before Phase 2 raised
-the assessability floor) for prose templates, family questions,
-per-control guidance, glossary, acronyms, references. Order suggested
-by RMF priority, but reorderable based on demand.
+Expected effort: ~12–18 h per family for prose templates, family
+questions, per-control guidance, glossary, acronyms, references.
+Tiered by impact + natural pairings to plans already authored.
 
-- [x] AC — Access Control Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls with 22 extra fields, 25 glossary entries, 39 acronyms, 7 references)
-- [x] AU — Audit and Accountability Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls — AU-2/3/5/6/8/9/11/12 — with 18 extra fields, 20 glossary entries, 41 acronyms, 6 references)
-- [ ] AT — Awareness and Training Plan
-- [ ] CP — Contingency Plan (intersection with COOP/DR)
-- [ ] IA — Identification and Authentication Plan
-- [ ] IR — Incident Response Plan
-- [ ] MA — Maintenance Plan
-- [ ] MP — Media Protection Plan
-- [ ] PE — Physical and Environmental Protection Plan
-- [ ] PL — Planning (lightweight; mostly meta-plan)
-- [ ] PM — Program Management (org-wide, may not fit single-system pattern)
-- [ ] PS — Personnel Security Plan
-- [ ] RA — Risk Assessment Plan
-- [ ] SA — System and Services Acquisition Plan
-- [ ] SC — System and Communications Protection Plan
-- [ ] SI — System and Information Integrity Plan
-- [ ] SR — Supply Chain Risk Management Plan (r5 only)
-- [ ] PT — PII Processing and Transparency Plan (r5 only)
+**Tier 1 — high impact, natural pairs to completed work**
+
+- [x] CM — Configuration Management Plan (Phase 1 + 2)
+- [x] AC — Access Control Plan
+- [x] AU — Audit and Accountability Plan
+- [x] IA — Identification and Authentication Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls — IA-2/3/4/5/7/8/11/12 — with 14 extra fields, 26 glossary entries, 40 acronyms, 8 references)
+- [ ] IR — Incident Response Plan *(pairs with AU; detection → triage → containment → recovery → lessons learned)*
+- [ ] CP — Contingency Plan *(extends CM backup; RTO/RPO, BCP/DR, exercises, alternate sites)*
+- [ ] SI — System and Information Integrity Plan *(vulnerability management, malware protection, SI-4 monitoring)*
+- [ ] CA — Assessment, Authorization, and Monitoring Plan *(meta-process; CA-7 continuous monitoring is heavily cross-referenced from every plan's §7)*
+
+**Tier 2 — broad technical scope**
+
+- [ ] SC — System and Communications Protection Plan *(boundary defenses, encryption, segmentation; largest technical family ~50+ controls)*
+- [ ] RA — Risk Assessment Plan *(vulnerability scanning, threat modeling, risk register, supply chain risk)*
+- [ ] SA — System and Services Acquisition Plan *(SDLC, supply chain, vendor management, dev/test environments)*
+
+**Tier 3 — physical, personnel, operational**
+
+- [ ] PE — Physical and Environmental Protection Plan *(facility access, fire / flood / power, environmental monitoring)*
+- [ ] PS — Personnel Security Plan *(screening, termination, access agreements, third-party personnel)*
+- [ ] MA — Maintenance Plan *(scheduled maintenance, vendor maintenance, remote maintenance, sanitization before service)*
+- [ ] MP — Media Protection Plan *(media handling, storage, transport, sanitization, marking)*
+- [ ] AT — Awareness and Training Plan *(role-based training, security awareness, phishing exercises)*
+
+**Tier 4 — specialized / meta**
+
+- [ ] PL — Planning Plan *(meta-plan; SSP, rules of behavior, baseline tailoring documentation)*
+- [ ] SR — Supply Chain Risk Management Plan *(r5-only; pairs with SA. SBOM, vendor assurance, anti-counterfeit)*
+- [ ] PT — PII Processing and Transparency Plan *(r5-only; privacy-focused. PII, consent, data subject rights)*
+- [ ] PM — Program Management Plan *(org-wide; may not fit single-system pattern. Consider intent before authoring)*
 
 ### Stretch / nice-to-have (post-MVP)
 

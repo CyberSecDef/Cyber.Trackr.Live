@@ -152,9 +152,12 @@ class PlanBuilder
     }
 
     /**
-     * Naive {placeholder} substitution — replaces each {key} with $answers[key]
+     * {placeholder} substitution — replaces each {key} with $answers[key]
      * if present, leaves it bracketed as [TO BE COMPLETED: key] otherwise so
-     * gaps are visible in the rendered plan rather than silent.
+     * gaps are visible in the rendered plan rather than silent. Multi-select
+     * arrays are joined with ", " so a template like "{authenticator_types}"
+     * renders as "FIDO2 key, TOTP app" rather than triggering an
+     * Array-to-string warning.
      */
     private function renderTemplate(string $template, array $answers): string
     {
@@ -162,8 +165,11 @@ class PlanBuilder
         return preg_replace_callback('/\{([a-z_]+)\}/i', function ($m) use ($answers) {
             $key = $m[1];
             $val = $answers[$key] ?? null;
-            if ($val === null || $val === '') {
+            if ($val === null || $val === '' || $val === []) {
                 return '[TO BE COMPLETED: ' . $key . ']';
+            }
+            if (is_array($val)) {
+                return implode(', ', array_map('strval', $val));
             }
             return (string) $val;
         }, $template) ?? $template;

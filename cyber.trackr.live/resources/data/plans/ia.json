@@ -1,0 +1,549 @@
+{
+    "_comment": "Identification and Authentication Plan generator. Authored at the Phase 2 assessability floor; pairs naturally with the AC plan since AC delegates the underlying identity proofing and authenticator strength to IA.",
+
+    "family": "IA",
+    "family_name": "Identification and Authentication",
+    "title": "Identification and Authentication Plan",
+    "description": "Documents how the system identifies users, devices, and services and verifies their authenticators. Covers the controls of the IA family in NIST SP 800-53 r5 and aligns with NIST SP 800-63 (Digital Identity Guidelines) and FIPS 140 (cryptographic modules).",
+
+    "intro_template": "This Identification and Authentication Plan documents the I&A approach for {system_name}. It establishes the practices, technical mechanisms, and credential lifecycle that prove who a user, device, or service is before access decisions in the AC family take effect.\n\nThe scope covers identifier management, authenticator management, multi-factor authentication, identity proofing, federation with external identity providers, and re-authentication policies within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Identification and Authentication family), NIST SP 800-63 (Digital Identity Guidelines), and FIPS 140-3 (Security Requirements for Cryptographic Modules) where applicable.",
+
+    "approach_section_title": "Identification and Authentication Approach",
+    "approach_template": "{system_name} authenticates users via {idp_platform} and enforces multi-factor authentication for {mfa_scope}. The system supports {authenticator_types} as authenticator types. Identity proofing is performed at {ial_target} (per NIST SP 800-63A) and authenticator assurance at {aal_target} (per NIST SP 800-63B). Identifier management follows {identifier_strategy}.\n\nAdditional details on identifier management, authenticator management, MFA strategy, device authentication, service authentication, non-organizational users, and adaptive / re-authentication are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Authenticator-related metrics for {system_name} are monitored continuously: failed-authentication rate, authenticator-rotation compliance, expired authenticator counts, and federation outage / lag are reviewed at the cadence in §6.1. Authenticator inventories are reconciled against the authoritative identity store on the cadence below. Continuous-monitoring metrics related to IA controls are documented in the sub-sections below.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Identification and Authentication Plan does not stand alone. The AC family relies on the identities and authenticators established here for its access-control decisions; the AU family records authentication events; and CA-7 (Continuous Monitoring) consumes the authentication-related metrics defined herein. The following cross-references identify the specific artifacts and locations where IA-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "IA-1",  "from": "Organizational identification and authentication policy" },
+        { "number": "IA-2",  "from": "Enterprise IAM / MFA service" },
+        { "number": "IA-5",  "from": "Enterprise authenticator-management policy (rotation cadences, complexity)" },
+        { "number": "IA-7",  "from": "Enterprise FIPS 140-validated cryptographic modules" },
+        { "number": "IA-8",  "from": "Enterprise federation service (Login.gov / ID.me / SAML federation)" },
+        { "number": "IA-12", "from": "Enterprise identity-proofing service (when used)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Identity provider, supported authenticators, and target assurance levels.",
+            "questions": [
+                {
+                    "id": "idp_platform",
+                    "label": "Primary identity provider (IdP)",
+                    "type": "text",
+                    "required": true,
+                    "help": "The platform that authenticates users and issues identity assertions (e.g., Azure AD / Entra ID, Okta, Ping, Keycloak, AWS IAM Identity Center, ADFS)."
+                },
+                {
+                    "id": "mfa_scope",
+                    "label": "Scope of MFA enforcement",
+                    "type": "select",
+                    "options": ["All users", "All users except service accounts", "Privileged users only", "Privileged + remote users", "Risk-based (adaptive)"],
+                    "help": "Population required to use MFA. Federal systems handling CUI require AAL2+; privileged often AAL3."
+                },
+                {
+                    "id": "authenticator_types",
+                    "label": "Authenticator types supported",
+                    "type": "multi_select",
+                    "options": [
+                        "PIV / CAC (X.509 hardware certificate)",
+                        "FIDO2 / WebAuthn security key",
+                        "TOTP / HOTP soft token (Authenticator app)",
+                        "Push-based mobile authenticator",
+                        "SMS OTP (deprecated for AAL2+ but documented)",
+                        "Voice OTP (deprecated)",
+                        "Biometric (with hardware-bound keys)",
+                        "Password (memorized secret)",
+                        "Single-factor cryptographic device",
+                        "Single-factor cryptographic software"
+                    ],
+                    "help": "Authenticator types supported by this system. NIST SP 800-63B classifies each. Avoid SMS / voice OTP as primary factors at AAL2+."
+                },
+                {
+                    "id": "ial_target",
+                    "label": "Target Identity Assurance Level (IAL)",
+                    "type": "select",
+                    "options": ["IAL1 (self-asserted)", "IAL2 (verified evidence; in-person or remote)", "IAL3 (in-person + biometric)"],
+                    "help": "Per NIST SP 800-63A. Federal systems handling CUI typically require IAL2; classified often IAL3."
+                },
+                {
+                    "id": "aal_target",
+                    "label": "Target Authenticator Assurance Level (AAL)",
+                    "type": "select",
+                    "options": ["AAL1 (single-factor)", "AAL2 (multi-factor; replay-resistant)", "AAL3 (hardware-bound multi-factor; verifier-impersonation-resistant)"],
+                    "help": "Per NIST SP 800-63B. Federal CUI typically AAL2; privileged or classified AAL3."
+                },
+                {
+                    "id": "identifier_strategy",
+                    "label": "Identifier management strategy (one-line)",
+                    "type": "text",
+                    "help": "Brief phrase summarizing how identifiers are issued and reused. Detail goes in the dedicated sub-section."
+                }
+            ]
+        },
+
+        {
+            "id": "identifier_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Identifier Management",
+            "description": "How identifiers are assigned, formatted, reused, and disabled (IA-4).",
+            "questions": [
+                { "id": "identifier_format",            "label": "User identifier format",             "type": "textarea", "rows": 3,
+                  "help": "Format / convention for usernames (e.g., 'firstname.lastname@org', 'EDIPI for DoD', 'email address from authoritative source')." },
+                { "id": "identifier_uniqueness",        "label": "Uniqueness enforcement",              "type": "textarea", "rows": 2,
+                  "help": "How identifier collisions are prevented across the user lifecycle, and what disambiguates two people with the same name." },
+                { "id": "identifier_reuse_policy",      "label": "Identifier reuse policy",            "type": "select",
+                  "options": ["Identifiers are never reused", "Reused only after a defined dormant period (specify)", "Reused after explicit security review"],
+                  "help": "Best practice: never reuse. Federal systems often require minimum 1-2 years of dormancy before reuse, if any." },
+                { "id": "identifier_disable_cadence",   "label": "Identifier disable cadence on departure", "type": "text",
+                  "help": "How quickly an identifier is disabled after the user leaves (e.g., '24 hours after HR notification'; 'immediate for involuntary terminations')." },
+                { "id": "device_identifier_strategy",   "label": "Device identifier strategy",         "type": "textarea", "rows": 3,
+                  "help": "How devices are assigned identifiers (e.g., 'Hostname format <env>-<role>-<n>; X.509 cert with hostname in CN; AD computer object with FQDN matching cert')." },
+                { "id": "service_identifier_strategy",  "label": "Service / machine account identifier strategy", "type": "textarea", "rows": 3,
+                  "help": "How service accounts are named (svc- prefix, app-svc-<name>, managed identity, etc.) and how they're distinguished from human users in logs." }
+            ]
+        },
+
+        {
+            "id": "authenticator_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Authenticator Management",
+            "description": "Issuance, distribution, rotation, revocation of authenticators (IA-5).",
+            "questions": [
+                { "id": "auth_issuance_process",     "label": "Initial authenticator issuance process", "type": "textarea", "rows": 3,
+                  "help": "How a new user receives their first authenticator. In-person handoff for hardware tokens, signed package for PIV cards, etc." },
+                { "id": "auth_distribution_method",  "label": "Authenticator distribution method",       "type": "textarea", "rows": 2,
+                  "help": "Secure channel used to deliver authenticators (encrypted email with separate password, in-person, registered mail)." },
+                { "id": "auth_rotation_cadence",     "label": "Rotation / re-issuance cadence",          "type": "textarea", "rows": 3,
+                  "help": "By authenticator type (e.g., 'PIV cards every 6 years per FIPS 201; service-account passwords every 60 days; FIDO2 keys lifetime')." },
+                { "id": "auth_revocation_workflow",  "label": "Revocation workflow",                     "type": "textarea", "rows": 3,
+                  "help": "How a compromised or surrendered authenticator is revoked across all systems. Time bound (e.g., 'within 4 hours of report')." },
+                { "id": "auth_password_complexity",  "label": "Password / passphrase complexity",        "type": "textarea", "rows": 3,
+                  "help": "Length, allowed character classes, breach-list checking, anti-pattern rules. Per NIST SP 800-63B, length matters more than complexity rules." },
+                { "id": "auth_password_storage",     "label": "Password storage method",                 "type": "select",
+                  "options": ["Salted hash (Argon2 / bcrypt / scrypt)", "Salted hash (PBKDF2)", "Stored only in HSM / hardware credential vault", "Not applicable (passwords not used)"],
+                  "help": "Per NIST SP 800-63B, memorized secrets must be salted and hashed using a memory-hard function." }
+            ]
+        },
+
+        {
+            "id": "mfa_strategy",
+            "type": "group",
+            "section": "approach",
+            "label": "Multi-Factor Authentication Strategy",
+            "description": "When MFA is required, methods preferred, and exception handling.",
+            "questions": [
+                { "id": "mfa_scope_detail",        "label": "MFA scope details",            "type": "textarea", "rows": 3,
+                  "help": "Specific scenarios / actions / populations requiring MFA beyond the high-level scope in §4.1." },
+                { "id": "mfa_preferred_method",    "label": "Preferred MFA method",         "type": "select",
+                  "options": ["Hardware key (FIDO2 / WebAuthn / PIV)", "Push-based mobile authenticator", "TOTP / HOTP authenticator app", "SMS / voice (deprecated)"],
+                  "help": "Method recommended to users by default. Federal systems should default to hardware-key when feasible (per OMB M-22-09 zero-trust guidance)." },
+                { "id": "mfa_phishing_resistant",  "label": "Phishing-resistance level",    "type": "select",
+                  "options": ["Phishing-resistant only (FIDO2 / PIV)", "Mixed (some methods phishing-resistant, some not)", "Not phishing-resistant (e.g., TOTP only)"],
+                  "help": "Per OMB M-22-09, federal systems should adopt phishing-resistant MFA. Document where you stand on the journey." },
+                { "id": "mfa_fallback",             "label": "MFA fallback / recovery method", "type": "textarea", "rows": 3,
+                  "help": "What happens when a user loses their primary authenticator. Help-desk verification process, backup codes, or in-person re-issuance." },
+                { "id": "mfa_exceptions",           "label": "MFA exceptions process",       "type": "textarea", "rows": 3,
+                  "help": "Rare scenarios where MFA cannot be enforced (legacy system, embedded service). Time-bound exception register; cross-reference §4.5 of CM Plan if relevant." }
+            ]
+        },
+
+        {
+            "id": "device_authentication",
+            "type": "group",
+            "section": "approach",
+            "label": "Device Identification and Authentication",
+            "description": "How devices authenticate to the system (IA-3).",
+            "questions": [
+                { "id": "device_auth_mechanism",  "label": "Device authentication mechanism", "type": "textarea", "rows": 3,
+                  "help": "How devices identify themselves: X.509 client certificates, MDM-issued certs, EAP-TLS, MAC binding (last resort), MFA-bound device identity." },
+                { "id": "device_cert_authority",  "label": "Device certificate authority / issuer",   "type": "text",
+                  "help": "PKI / CA that issues device certificates (e.g., 'Internal CA on enterprise PKI', 'Microsoft Intune-issued device cert')." },
+                { "id": "device_revocation",      "label": "Device revocation mechanism",            "type": "textarea", "rows": 3,
+                  "help": "How a lost / decommissioned device is removed from authentication. CRL / OCSP / cert-bound short-lifetime tokens." }
+            ]
+        },
+
+        {
+            "id": "service_authentication",
+            "type": "group",
+            "section": "approach",
+            "label": "Service / Machine Authentication",
+            "description": "How services and automated processes authenticate (IA-9).",
+            "questions": [
+                { "id": "service_auth_mechanism",   "label": "Service authentication mechanism",   "type": "textarea", "rows": 3,
+                  "help": "Mechanism: managed identity (cloud-native), workload identity federation, mTLS, signed JWT, API key (last resort), service principal." },
+                { "id": "service_credential_storage","label": "Service-credential storage / vaulting", "type": "text",
+                  "help": "Where service credentials live (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, CyberArk)." },
+                { "id": "service_credential_rotation","label": "Service-credential rotation",        "type": "textarea", "rows": 3,
+                  "help": "Cadence + automation for rotating service credentials. Short-lived ephemeral credentials (workload identity) are best practice." },
+                { "id": "service_account_ownership","label": "Service account ownership model",      "type": "textarea", "rows": 3,
+                  "help": "How each service account is assigned to a human owner / role for accountability. Quarterly review against ownership register." }
+            ]
+        },
+
+        {
+            "id": "non_org_users",
+            "type": "group",
+            "section": "approach",
+            "label": "Non-Organizational Users",
+            "description": "Federation, external partner identities, and public users (IA-8).",
+            "questions": [
+                { "id": "external_user_populations","label": "External user populations served",     "type": "multi_select",
+                  "options": ["Federal employees (other agency)", "Contractors", "Industry partners (federation)", "Citizens (public)", "Vendor support staff", "None — internal only"] },
+                { "id": "federation_partners",      "label": "Federation partners",                  "type": "list",
+                  "suggestions": ["Login.gov", "ID.me", "DoD CAC (PIV)", "Enterprise SAML federation", "Azure AD B2B / Cross-tenant"],
+                  "help": "External identity providers federated with the system." },
+                { "id": "external_ial_aal",         "label": "IAL/AAL required for external users",  "type": "textarea", "rows": 3,
+                  "help": "Assurance levels enforced for non-organizational users — often differ from internal scope." },
+                { "id": "external_attribute_release","label": "Attribute release policy (federation)","type": "textarea", "rows": 3,
+                  "help": "Which attributes the external IdP must assert for the user to be authenticated (subject, email, group memberships, MFA satisfied claim)." }
+            ]
+        },
+
+        {
+            "id": "adaptive_re_auth",
+            "type": "group",
+            "section": "approach",
+            "label": "Adaptive and Re-authentication",
+            "description": "Risk-based authentication and re-authentication triggers (IA-10, IA-11).",
+            "questions": [
+                { "id": "adaptive_risk_signals",     "label": "Risk signals informing adaptive auth", "type": "multi_select",
+                  "options": ["IP / geo anomaly", "New device", "Impossible travel", "Threat intelligence match", "Behavior anomaly (UEBA)", "Time-of-day deviation", "MFA fatigue pattern detected", "Compromised credential indicator"],
+                  "help": "Signals that elevate authentication strength (step-up MFA) when a risk threshold is crossed." },
+                { "id": "adaptive_engine",            "label": "Adaptive authentication engine",      "type": "text",
+                  "help": "Tool / service evaluating risk signals (e.g., 'Okta Adaptive MFA', 'Azure AD Conditional Access', 'custom risk engine')." },
+                { "id": "reauth_triggers",            "label": "Re-authentication triggers",          "type": "multi_select",
+                  "options": ["Time-bound (after N hours)", "Privilege elevation request", "Sensitive operation (delete / export)", "Cross-tenant or external system access", "Risk score threshold crossed", "Cryptographic re-handshake"] },
+                { "id": "reauth_session_duration",    "label": "Maximum session duration before forced re-auth", "type": "text",
+                  "help": "Hard cap on session length before user must re-authenticate (per AAL2: 12h interactive / 30 days non-interactive; per AAL3: 12h / 18h)." }
+            ]
+        },
+
+        {
+            "id": "identity_population_supported",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Identity Populations Supported",
+            "description": "Numerical scope of who authenticates to this system.",
+            "questions": [
+                { "id": "pop_internal_user_count",  "label": "Internal user count (approximate)", "type": "text" },
+                { "id": "pop_external_user_count",  "label": "External user count (federated / public)", "type": "text" },
+                { "id": "pop_device_count",         "label": "Authenticated device count",         "type": "text" },
+                { "id": "pop_service_account_count","label": "Service / machine identity count",   "type": "text" }
+            ]
+        },
+
+        {
+            "id": "ia_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Authentication Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate IA control effectiveness over time.",
+            "questions": [
+                { "id": "ia_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Authentication failure rate (%)",
+                      "MFA satisfaction rate (target: 100% in scope)",
+                      "% authentications using phishing-resistant MFA",
+                      "Authenticator-rotation compliance (%)",
+                      "Expired authenticator count (trend)",
+                      "Service-credential rotation lag (hours past target)",
+                      "Federation partner availability (uptime)",
+                      "Adaptive step-up trigger rate",
+                      "Account lockout rate"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the IA control implementations are summarized (e.g., 'SSP §13.4')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for IA findings", "type": "text",
+                  "help": "Convention for IA-related POA&M items (e.g., 'POAM-IA-')." },
+                { "id": "ac_plan_reference",            "label": "AC plan cross-reference",       "type": "textarea", "rows": 2,
+                  "help": "Where the AC plan consumes IA outputs. AC delegates the underlying authenticator strength and identity proofing to IA." },
+                { "id": "au_event_handoff",             "label": "AU event handoff",              "type": "textarea", "rows": 2,
+                  "help": "How authentication events (success / failure / step-up) flow into the AU pipeline. SIEM index, log source, retention." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying IA continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "IA-2": {
+            "prompts": [
+                "Reference §4.1 — IdP platform, MFA scope, AAL target.",
+                "State the MFA enforcement mechanism and what populations it covers.",
+                "Address phishing-resistant MFA per OMB M-22-09 — see §4.4.",
+                "Document the AAL achieved per population (privileged often AAL3, standard AAL2).",
+                "Reference IA-2(1) MFA for privileged accounts, IA-2(2) MFA for non-privileged, IA-2(8) replay-resistant, IA-2(12) PIV credentials acceptance."
+            ],
+            "evidence_suggestions": [
+                "IdP MFA enforcement policy export",
+                "Conditional Access / Sign-in Policy configuration",
+                "Sample authentication audit log showing MFA success",
+                "FIDO2 / PIV registration roster",
+                "OMB M-22-09 compliance attestation"
+            ],
+            "extra_fields": [
+                { "id": "ia2_aal_per_population", "label": "AAL achieved per user population", "type": "textarea", "rows": 3,
+                  "help": "Map each user type to its actual AAL (e.g., 'Privileged: AAL3 hardware key only; Standard internal: AAL2 push or TOTP; External federated: AAL2 via partner attestation')." },
+                { "id": "ia2_phishing_resistant_status", "label": "Phishing-resistant MFA status", "type": "textarea", "rows": 3,
+                  "help": "Where the system is on the OMB M-22-09 journey: full coverage, partial, planned. Link to the implementation roadmap if applicable." }
+            ]
+        },
+
+        "IA-3": {
+            "prompts": [
+                "Identify the device authentication mechanism — see §4.5.",
+                "Describe the device certificate or token issuance authority.",
+                "Document how device identity is bound to user identity for combined access decisions.",
+                "Address device authentication for IoT / OT / embedded devices if any.",
+                "Reference IA-3(1) cryptographic bidirectional authentication, IA-3(4) device attestation."
+            ],
+            "evidence_suggestions": [
+                "PKI / CA configuration export",
+                "MDM device-cert deployment policy",
+                "Sample device authentication audit log",
+                "Certificate revocation list sample",
+                "IoT / OT device-onboarding procedure"
+            ],
+            "extra_fields": [
+                { "id": "ia3_device_classes", "label": "Device classes authenticated", "type": "multi_select",
+                  "options": ["Workstations / laptops", "Servers", "Mobile devices (BYOD)", "Mobile devices (corp-owned)", "IoT sensors", "OT / SCADA", "Network appliances", "Containers / serverless"] },
+                { "id": "ia3_attestation_used", "label": "Hardware attestation used?", "type": "select",
+                  "options": ["Yes — TPM-based attestation required", "Yes — for privileged / high-risk only", "No — not currently"] }
+            ]
+        },
+
+        "IA-4": {
+            "prompts": [
+                "Describe the identifier format and uniqueness enforcement — see §4.2.",
+                "Document the identifier reuse policy and disable cadence.",
+                "Address identifier issuance for service / machine accounts.",
+                "Reference IA-4(4) identify status of individuals (e.g., contractor vs employee marker)."
+            ],
+            "evidence_suggestions": [
+                "Identifier-issuance procedure document",
+                "Sample identifier provisioning ticket",
+                "Identifier-disable workflow on departure",
+                "Identifier conflict-detection rule"
+            ],
+            "extra_fields": [
+                { "id": "ia4_identify_status_method", "label": "User-status identification method", "type": "textarea", "rows": 3,
+                  "help": "How the system distinguishes employees, contractors, vendors, partners in their identifiers (prefix / suffix / attribute / OU). References IA-4(4)." }
+            ]
+        },
+
+        "IA-5": {
+            "prompts": [
+                "Reference §4.3 — issuance, rotation, revocation processes.",
+                "Document password complexity, storage method, and breach-list checking — see §4.3.",
+                "Address authenticator-strength requirements per type.",
+                "Describe initial-authenticator-content protection (sealed envelope, MFA-protected reveal).",
+                "Reference IA-5(1) password-based, IA-5(2) public-key based, IA-5(6) authenticator protection, IA-5(7) no embedded unencrypted authenticators."
+            ],
+            "evidence_suggestions": [
+                "Authenticator-management procedure document",
+                "Password-policy configuration export",
+                "PKI certificate-issuance procedure",
+                "Authenticator-revocation log sample",
+                "Service-credential rotation report"
+            ],
+            "extra_fields": [
+                { "id": "ia5_breach_list_checking", "label": "Breach-list checking for passwords", "type": "select",
+                  "options": ["Yes — checked against curated breach corpus on every set / change", "Yes — checked at creation only", "No"],
+                  "help": "Per NIST SP 800-63B, memorized secrets should be screened against breached corpora." },
+                { "id": "ia5_no_embedded_creds", "label": "Verification that no unencrypted authenticators are embedded in code / config", "type": "textarea", "rows": 3,
+                  "help": "How the org verifies IA-5(7) — secret scanning in CI, pre-commit hooks, periodic codebase scan, attestation." }
+            ]
+        },
+
+        "IA-7": {
+            "prompts": [
+                "Identify the cryptographic modules used for authentication.",
+                "State the FIPS 140-2 or 140-3 validation level (140-2 Level 1/2/3/4 or 140-3 equivalent).",
+                "Reference the CMVP certificate number for each module.",
+                "Address how non-validated modules are prevented from being used in authentication paths."
+            ],
+            "evidence_suggestions": [
+                "FIPS 140 module inventory with CMVP cert numbers",
+                "Cryptographic-module configuration showing FIPS mode enabled",
+                "Vendor attestation of FIPS validation",
+                "Procedure restricting non-validated module use"
+            ],
+            "extra_fields": [
+                { "id": "ia7_module_inventory", "label": "FIPS 140-validated modules in use", "type": "textarea", "rows": 4,
+                  "help": "Each module + its CMVP certificate number (e.g., 'OpenSSL FIPS Provider cert #4282; Microsoft CNG cert #4536')." },
+                { "id": "ia7_fips_140_version", "label": "FIPS 140 version targeted", "type": "select",
+                  "options": ["FIPS 140-2 (legacy; 140-2 modules accepted through their sunset)", "FIPS 140-3", "Mixed (transitioning)"],
+                  "help": "FIPS 140-2 is sunsetting; new validations are FIPS 140-3. Document which version each module holds." }
+            ]
+        },
+
+        "IA-8": {
+            "prompts": [
+                "Reference §4.7 — federation partners and IAL/AAL for external users.",
+                "Describe the trust establishment with each federation partner.",
+                "Document the attribute release policy for incoming federated assertions.",
+                "Address de-provisioning when a federation partner removes a user.",
+                "Reference IA-8(1) PIV credentials accepted, IA-8(2) approved IdP services, IA-8(4) discovery / federation services."
+            ],
+            "evidence_suggestions": [
+                "Federation metadata exchange records",
+                "Federation-partner approval documentation",
+                "Sample federated authentication audit log",
+                "Federation-partner deprovisioning workflow"
+            ],
+            "extra_fields": [
+                { "id": "ia8_partner_assurance_level", "label": "Per-partner IAL/AAL accepted", "type": "textarea", "rows": 3,
+                  "help": "Map each federation partner to the highest IAL / AAL the system accepts from them. Some partners may only assert IAL1; constrain access accordingly." },
+                { "id": "ia8_attribute_validation",     "label": "Attribute validation on inbound assertion", "type": "textarea", "rows": 3,
+                  "help": "How asserted attributes are validated (signature verification, attribute-source whitelist, freshness checks)." }
+            ]
+        },
+
+        "IA-11": {
+            "prompts": [
+                "Document re-authentication triggers — see §4.8.",
+                "State the maximum session duration before forced re-auth (per AAL).",
+                "Address re-authentication for privilege elevation, sensitive operations, and risk events.",
+                "Document any user-friendly mechanisms (silent re-auth where possible vs intrusive).",
+                "Reference IA-11 ODV: organization-defined circumstances or situations."
+            ],
+            "evidence_suggestions": [
+                "Re-authentication policy configuration export",
+                "Conditional-access policy showing re-auth triggers",
+                "Sample audit log showing forced re-auth event"
+            ],
+            "extra_fields": [
+                { "id": "ia11_session_duration_per_role", "label": "Session duration per role", "type": "textarea", "rows": 4,
+                  "help": "Map roles to their max session length and re-auth interval (e.g., 'Privileged: 4h interactive; Standard: 8h; Public users: per-request stateless')." }
+            ]
+        },
+
+        "IA-12": {
+            "prompts": [
+                "Reference §4.1 IAL target.",
+                "Describe the identity-proofing process used.",
+                "Document evidence collected and retained per IAL — see NIST SP 800-63A Table 5-1 / 5-2.",
+                "Address remote vs in-person proofing pathways.",
+                "Reference IA-12(1) supervisor authorization, IA-12(2) identity evidence, IA-12(3) identity evidence validation, IA-12(4) in-person validation, IA-12(5) address confirmation."
+            ],
+            "evidence_suggestions": [
+                "Identity-proofing procedure document",
+                "Sample evidence-of-identity package (redacted)",
+                "Supervisor-authorization record",
+                "Address-confirmation record",
+                "Vendor identity-proofing attestation (Login.gov / ID.me)"
+            ],
+            "extra_fields": [
+                { "id": "ia12_proofing_method",     "label": "Proofing method",       "type": "select",
+                  "options": ["In-person (HR onboarding)", "Remote with verifiable evidence (NIST SP 800-63A IAL2)", "In-person with biometric (IAL3)", "Inherited from federation partner (Login.gov / ID.me / CAC)"] },
+                { "id": "ia12_evidence_retention",  "label": "Evidence retention period", "type": "text",
+                  "help": "How long identity-proofing evidence is retained (per NIST SP 800-63A and organizational records-retention policy)." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Authentication",          "definition": "Verifying that a claimed identity is the actual identity of the entity making the claim, typically by demonstrating control over an authenticator." },
+        { "term": "Authenticator",            "definition": "A means used to confirm an identity, such as a password, hardware token, biometric, or cryptographic key." },
+        { "term": "Authenticator Assurance Level (AAL)", "definition": "Per NIST SP 800-63B, a measure of the strength of authentication: AAL1 single-factor, AAL2 multi-factor, AAL3 hardware-bound multi-factor verifier-impersonation-resistant." },
+        { "term": "Biometric Authentication","definition": "Authentication based on physiological or behavioral characteristics, typically used as one factor with a hardware-bound key." },
+        { "term": "Certificate Authority (CA)", "definition": "An entity that issues digital certificates binding identifiers to public keys. Note: shares acronym with the CA control family." },
+        { "term": "Cryptographic Module",    "definition": "Hardware or software that implements cryptographic operations. FIPS 140 governs module validation for federal use." },
+        { "term": "Federation",              "definition": "An arrangement where identity assertions issued by one trust domain are accepted by another, typically via SAML or OIDC." },
+        { "term": "FIDO2 / WebAuthn",        "definition": "An open standard for phishing-resistant MFA using hardware-bound public-key cryptography. Recommended for high-assurance scenarios." },
+        { "term": "FIPS 140",                "definition": "Federal Information Processing Standard for cryptographic modules. FIPS 140-2 is sunsetting; FIPS 140-3 is current." },
+        { "term": "Identifier",              "definition": "A unique label assigned to a user, device, or service to distinguish it from others within a system." },
+        { "term": "Identity Assurance Level (IAL)", "definition": "Per NIST SP 800-63A, a measure of how rigorously a real-world identity is bound to a digital account: IAL1 self-asserted, IAL2 verified evidence, IAL3 in-person with biometric." },
+        { "term": "Identity Proofing",       "definition": "The process of collecting and verifying evidence that a person is who they claim to be, performed before issuing a credential." },
+        { "term": "Knowledge-Based Authentication (KBA)", "definition": "Authentication using questions only the legitimate user should be able to answer. Considered weak by current NIST guidance." },
+        { "term": "Multi-Factor Authentication (MFA)", "definition": "Authentication using at least two factors from distinct categories (something you know, have, or are)." },
+        { "term": "Non-Repudiation",         "definition": "Assurance that the originator of an action cannot later deny performing it. Achieved via digital signatures and tamper-evident audit." },
+        { "term": "OTP (One-Time Password)", "definition": "A single-use password, typically generated by an authenticator app (TOTP / HOTP) or hardware token." },
+        { "term": "PIV / CAC",               "definition": "Personal Identity Verification (federal civilian) / Common Access Card (DoD) — hardware tokens carrying X.509 certificates for authentication." },
+        { "term": "Phishing-Resistant MFA",  "definition": "MFA that cannot be defeated by an attacker who tricks the user into entering credentials on a fake site. FIDO2 / WebAuthn and PIV / CAC are phishing-resistant." },
+        { "term": "Public Key Infrastructure (PKI)", "definition": "The system of CAs, certificates, revocation lists, and procedures that issues and manages certificates binding identities to keys." },
+        { "term": "Re-authentication",       "definition": "Repeating the authentication process after the initial sign-in, typically triggered by elevated risk, sensitive operations, or session aging." },
+        { "term": "Replay Resistance",       "definition": "Property of an authentication exchange that prevents an attacker who captures the exchange from replaying it later. Required for AAL2+." },
+        { "term": "Service Account",         "definition": "An account used by automation, applications, or services rather than humans. Subject to additional rotation, isolation, and ownership requirements." },
+        { "term": "Session",                 "definition": "An active authenticated interaction between a user (or process) and the system. Bounded by sign-in and sign-out / timeout." },
+        { "term": "TOTP / HOTP",             "definition": "Time-based / HMAC-based One-Time Password algorithms (RFC 6238 / RFC 4226), typically delivered via authenticator apps." },
+        { "term": "Verifier-Impersonation Resistance", "definition": "Property of an authenticator that prevents a man-in-the-middle from impersonating the verifier and capturing the authentication. Required for AAL3." },
+        { "term": "Zero Trust",               "definition": "Access model that does not implicitly trust any subject or device based on network location and continuously evaluates trust at each access decision." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AAL",     "expansion": "Authenticator Assurance Level (NIST SP 800-63B)" },
+        { "abbr": "ABAC",    "expansion": "Attribute-Based Access Control" },
+        { "abbr": "ADFS",    "expansion": "Active Directory Federation Services" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "CA",      "expansion": "Certificate Authority (PKI) — note: shares acronym with the CA control family" },
+        { "abbr": "CAC",     "expansion": "Common Access Card (DoD)" },
+        { "abbr": "CMVP",    "expansion": "Cryptographic Module Validation Program (FIPS 140)" },
+        { "abbr": "CRL",     "expansion": "Certificate Revocation List" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "EAP",     "expansion": "Extensible Authentication Protocol" },
+        { "abbr": "EDIPI",   "expansion": "Electronic Data Interchange Personal Identifier (DoD)" },
+        { "abbr": "FIDO",    "expansion": "Fast IDentity Online" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "HOTP",    "expansion": "HMAC-Based One-Time Password (RFC 4226)" },
+        { "abbr": "HSM",     "expansion": "Hardware Security Module" },
+        { "abbr": "IAL",     "expansion": "Identity Assurance Level (NIST SP 800-63A)" },
+        { "abbr": "IAM",     "expansion": "Identity and Access Management" },
+        { "abbr": "IdP",     "expansion": "Identity Provider" },
+        { "abbr": "JWT",     "expansion": "JSON Web Token (RFC 7519)" },
+        { "abbr": "KBA",     "expansion": "Knowledge-Based Authentication" },
+        { "abbr": "MFA",     "expansion": "Multi-Factor Authentication" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "OCSP",    "expansion": "Online Certificate Status Protocol" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OIDC",    "expansion": "OpenID Connect" },
+        { "abbr": "OMB",     "expansion": "Office of Management and Budget" },
+        { "abbr": "OTP",     "expansion": "One-Time Password" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification (federal civilian)" },
+        { "abbr": "PKCS",    "expansion": "Public-Key Cryptography Standards" },
+        { "abbr": "PKI",     "expansion": "Public Key Infrastructure" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RBAC",    "expansion": "Role-Based Access Control" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SAML",    "expansion": "Security Assertion Markup Language" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSO",     "expansion": "Single Sign-On" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TOTP",    "expansion": "Time-Based One-Time Password (RFC 6238)" },
+        { "abbr": "TPM",     "expansion": "Trusted Platform Module" },
+        { "abbr": "WebAuthn","expansion": "Web Authentication (W3C standard, FIDO2 web component)" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-63A — Enrollment and Identity Proofing",     "url": "https://pages.nist.gov/800-63-3/sp800-63a.html" },
+        { "label": "NIST SP 800-63B — Authentication and Lifecycle Management", "url": "https://pages.nist.gov/800-63-3/sp800-63b.html" },
+        { "label": "NIST SP 800-63C — Federation and Assertions",            "url": "https://pages.nist.gov/800-63-3/sp800-63c.html" },
+        { "label": "FIPS 140-3 — Security Requirements for Cryptographic Modules", "url": "https://csrc.nist.gov/pubs/fips/140-3/final" },
+        { "label": "FIPS 201-3 — Personal Identity Verification of Federal Employees and Contractors", "url": "https://csrc.nist.gov/pubs/fips/201-3/final" },
+        { "label": "OMB M-22-09 — Moving the U.S. Government Toward Zero Trust", "url": "https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",          "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" }
+    ]
+}
