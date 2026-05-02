@@ -1,0 +1,677 @@
+{
+    "_comment": "System and Services Acquisition Plan generator. Authored at the Phase 2 assessability floor; pairs with CM (SA-10 developer CM is the upstream of CM-2 / CM-3), RA (SA-11 testing produces vuln data into RA-5 / SI-2; SA-15(3) criticality echoes RA-9), SR (SA-4 acquisition requirements are the SR vehicle for federal SCRM), and SI (SA-15 secure tooling produces the SBOM / signed artifacts SI-7 verifies). Closes Tier 2 alongside SC and RA.",
+
+    "family": "SA",
+    "family_name": "System and Services Acquisition",
+    "title": "System and Services Acquisition Plan",
+    "description": "Documents how the system is acquired, developed, documented, engineered, and maintained across the SDLC. Covers resource allocation, acquisition contract language, security-engineering principles, external system services, developer configuration management, developer testing, development process / tooling / standards, system documentation, and the lifecycle treatment of unsupported components. Covers the controls of the SA family in NIST SP 800-53 r5 and aligns with NIST SP 800-160 v1 r1 (Engineering Trustworthy Secure Systems), NIST SP 800-218 (Secure Software Development Framework — SSDF), NIST SP 800-64 r2 (SDLC integration — withdrawn but historically informative), NIST SP 800-161 r1 (SCRM), EO 14028, and OMB M-22-18.",
+
+    "intro_template": "This System and Services Acquisition Plan documents the acquisition, development, engineering, and lifecycle approach for {system_name}. It establishes the practices, tooling, cadences, and roles used to plan resources for security, integrate security into the SDLC, write security requirements into acquisition vehicles, evaluate external service providers, govern developer configuration management and testing, apply secure-engineering principles, maintain authoritative system documentation, and manage components reaching end of vendor support.\n\nThe scope covers SA-2 resource allocation, SA-3 SDLC integration, SA-4 acquisition, SA-5 documentation, SA-8 secure-engineering principles, SA-9 external system services, SA-10 developer configuration management, SA-11 developer testing, SA-15 secure development process / tooling, and SA-22 unsupported components within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (System and Services Acquisition family), NIST SP 800-218 (SSDF), NIST SP 800-160 v1 r1 (Engineering Trustworthy Secure Systems), and NIST SP 800-161 r1 (SCRM).",
+
+    "approach_section_title": "System and Services Acquisition Approach",
+    "approach_template": "{system_name} follows {sdlc_framework} as its system development life cycle, integrating security activities at every phase. Acquisition vehicles include {acquisition_vehicles}; security requirements in solicitations are derived from {requirements_source}. External system services in scope are evaluated under {external_service_framework}. Developer configuration management uses {dev_cm_tool}; developer testing is performed by {dev_test_tooling}.\n\nAdditional details on resource allocation, SDLC integration, acquisition requirements, system documentation, secure-engineering principles, external services, developer configuration management, developer testing, secure-development process, and unsupported-component lifecycle are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Acquisition-and-development performance for {system_name} is tracked through the metrics in §6.1 (security-requirement coverage in solicitations, SBOM completeness rate, SAST / DAST / IAST findings closed within SLA, external-service authorization currency, unsupported-component count + remediation SLA, developer-CM adherence rate). The acquisition pipeline is reviewed on the cadence in §6.2; vendor end-of-life notices are monitored continuously and trigger SA-22 lifecycle actions before unsupported state is reached.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This System and Services Acquisition Plan does not stand alone. The CM family inherits SA-10 developer configuration management as upstream of CM-2 / CM-3; the RA family consumes SA-11 testing outputs into RA-5 vulnerability data and revisits SA-15(3) criticality; the SR family extends SA-4 / SA-9 / SA-15(3) into formal supply-chain risk-management; the SI family verifies the integrity of artifacts produced by SA-15 secure tooling (SBOMs, signed packages); the AT family delivers SA-3-mandated developer / acquisition-staff training. The following cross-references identify the specific artifacts and locations where SA-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "SA-1",  "from": "Organizational system-and-services-acquisition policy" },
+        { "number": "SA-2",  "from": "Organizational capital-planning + budget process (when shared)" },
+        { "number": "SA-3",  "from": "Organizational SDLC framework / SSDF mandate" },
+        { "number": "SA-4",  "from": "Organizational contract language repository (FAR / DFARS clauses, security requirements)" },
+        { "number": "SA-5",  "from": "Enterprise documentation standards / asset library" },
+        { "number": "SA-8",  "from": "Organizational secure-engineering policy / principles register" },
+        { "number": "SA-22", "from": "Organizational unsupported-component / EOL governance" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Frameworks, vehicles, and tooling that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "sdlc_framework",
+                    "label": "SDLC framework (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "SDLC methodology in use (e.g., 'DevSecOps with NIST SSDF integration', 'Agile (Scrum) + SSDF', 'Waterfall with security gates at each phase')."
+                },
+                {
+                    "id": "acquisition_vehicles",
+                    "label": "Acquisition vehicles",
+                    "type": "text",
+                    "required": true,
+                    "help": "Primary contract vehicles (e.g., 'GSA Schedule 70 + GWAC + agency-specific BPA', 'Open-market FAR Part 12 commercial-item acquisitions', 'CRADAs with academic partners')."
+                },
+                {
+                    "id": "requirements_source",
+                    "label": "Security-requirements source",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where contract security requirements originate (e.g., 'Org standard contract language at /contracts/security-clauses.md derived from FAR 52.204-21 + DFARS 252.204-7012 + NIST 800-171')."
+                },
+                {
+                    "id": "external_service_framework",
+                    "label": "External-service evaluation framework",
+                    "type": "text",
+                    "required": true,
+                    "help": "How external services are vetted (e.g., 'FedRAMP authorization required for cloud services; SOC 2 Type II for non-FedRAMP SaaS; org SCRM review for partner integrations')."
+                },
+                {
+                    "id": "dev_cm_tool",
+                    "label": "Developer CM tool (one-liner)",
+                    "type": "text",
+                    "help": "Repository / pipeline tooling (e.g., 'GitHub Enterprise + GitHub Actions; protected main branch; signed commits required'). Reference the CM Plan for system-side CM."
+                },
+                {
+                    "id": "dev_test_tooling",
+                    "label": "Developer testing tooling",
+                    "type": "text",
+                    "help": "SAST / DAST / SCA / IAST tools (e.g., 'GitHub CodeQL (SAST) + OWASP ZAP (DAST) + Snyk (SCA); Burp Suite for manual review')."
+                }
+            ]
+        },
+
+        {
+            "id": "resource_allocation",
+            "type": "group",
+            "section": "approach",
+            "label": "Resource Allocation (SA-2)",
+            "description": "Security funding and staffing in capital planning.",
+            "questions": [
+                { "id": "sa2_capital_planning",     "label": "Capital-planning integration",       "type": "textarea", "rows": 4,
+                  "help": "How security resource needs are captured in capital planning (Exhibit 53 / 300 for federal). Investment-class line items, justification, multi-year planning." },
+                { "id": "sa2_staffing_model",       "label": "Security staffing model",            "type": "textarea", "rows": 3,
+                  "help": "Roles + FTE allocation for security on this system (System Owner, ISSO, ISSM, security engineer, dev-security liaison, etc.)." },
+                { "id": "sa2_budget_review_cadence","label": "Budget-review cadence",              "type": "text",
+                  "help": "How often security budget is reviewed against actuals (typically tied to org budget cycle, e.g., 'Quarterly')." },
+                { "id": "sa2_unfunded_register",    "label": "Unfunded-requirements register",     "type": "textarea", "rows": 3,
+                  "help": "Where unfunded security requirements are tracked (so they don't get lost). Often surfaces in the POA&M as risks pending funding." }
+            ]
+        },
+
+        {
+            "id": "sdlc_integration",
+            "type": "group",
+            "section": "approach",
+            "label": "SDLC Integration (SA-3)",
+            "description": "Where in the SDLC security activities are integrated.",
+            "questions": [
+                { "id": "sa3_sdlc_phases",          "label": "SDLC phases recognized",             "type": "multi_select",
+                  "options": ["Initiation / requirements", "Acquisition / development", "Implementation / deployment", "Operations / maintenance", "Disposal / decommission"] },
+                { "id": "sa3_security_activities",  "label": "Security activities by phase",       "type": "textarea", "rows": 6,
+                  "help": "What security activity happens at each phase. Initiation: categorization + risk assessment. Development: threat modeling, secure coding, testing. Deployment: ATO. Operations: continuous monitoring. Disposal: sanitization + records retention." },
+                { "id": "sa3_threat_modeling",      "label": "Threat-modeling approach",           "type": "select",
+                  "options": ["STRIDE per design / per architecture-significant change", "PASTA full process", "Attack trees", "Quick / lightweight (data flow + risk identification)", "Not formally performed (with POA&M)"] },
+                { "id": "sa3_developer_training",   "label": "Developer-security training cadence", "type": "text",
+                  "help": "Required training cadence for developers (e.g., 'Annual secure-coding training with role-based modules'). Reference AT plan if authored." },
+                { "id": "sa3_governance_role",      "label": "SDLC-governance role",               "type": "text",
+                  "help": "Role accountable for SDLC-security adherence (e.g., 'Application Security Lead', 'CISO delegate')." }
+            ]
+        },
+
+        {
+            "id": "acquisition_requirements",
+            "type": "group",
+            "section": "approach",
+            "label": "Acquisition Requirements (SA-4)",
+            "description": "Security clauses and deliverables required in contracts.",
+            "questions": [
+                { "id": "sa4_required_clauses",     "label": "Required security clauses",          "type": "multi_select",
+                  "options": ["FAR 52.204-21 — Basic Safeguarding of Covered Contractor Information", "DFARS 252.204-7012 — Safeguarding CDI / Cyber Incident Reporting", "DFARS 252.204-7019 / 7020 / 7021 — CMMC", "FedRAMP authorization required (if cloud service)", "NIST SP 800-171 compliance attestation", "EO 14028 SSDF self-attestation", "Section 889 — Prohibition on Certain Telecommunications Equipment", "Section 508 — Accessibility", "Privacy clauses for PII handling"] },
+                { "id": "sa4_required_deliverables","label": "Required security deliverables",     "type": "multi_select",
+                  "options": ["SBOM in CycloneDX or SPDX format (SA-4(10))", "Functional security requirements (SA-4(1))", "Security implementation information (SA-4(2))", "Source-code escrow (high-impact systems)", "Penetration-test attestation (SA-4(9))", "Security-architecture diagram", "Cryptographic-module list with FIPS 140-3 numbers", "Privacy threshold analysis", "Continuous-monitoring requirements (FedRAMP)"] },
+                { "id": "sa4_continuous_monitoring_clause", "label": "Continuous-monitoring contract clause (SA-4(7))", "type": "textarea", "rows": 3,
+                  "help": "How ongoing monitoring is required of vendors. ConMon deliverables, security-event reporting, vulnerability-disclosure obligations." },
+                { "id": "sa4_sbom_acceptance_criteria", "label": "SBOM acceptance criteria (SA-4(10))", "type": "textarea", "rows": 3,
+                  "help": "What an acceptable SBOM looks like (format, depth — direct vs transitive, machine-readable, signing). Reference EO 14028 / OMB M-22-18." },
+                { "id": "sa4_section_889_attestation","label": "Section 889 attestation evidence",  "type": "textarea", "rows": 3,
+                  "help": "How vendor compliance with Section 889 (no Huawei / ZTE / Hikvision / Dahua / Hytera covered telecom) is collected and recorded." }
+            ]
+        },
+
+        {
+            "id": "system_documentation",
+            "type": "group",
+            "section": "approach",
+            "label": "System Documentation (SA-5)",
+            "description": "Admin docs, user docs, and architecture documentation.",
+            "questions": [
+                { "id": "sa5_admin_docs",           "label": "Administrator documentation scope",  "type": "multi_select",
+                  "options": ["Installation / configuration guides", "Operational runbooks", "Security configuration baselines (cross-reference CM-6)", "Backup + restore procedures (cross-reference CP)", "Incident-response playbooks (cross-reference IR)", "Disaster-recovery runbook (cross-reference CP)", "Change-management procedures"] },
+                { "id": "sa5_user_docs",            "label": "User documentation scope",           "type": "multi_select",
+                  "options": ["End-user functional guides", "Security-awareness reminders embedded in UX", "Acceptable-use policies", "Account-recovery instructions", "Reporting-suspected-incidents instructions"] },
+                { "id": "sa5_doc_storage",          "label": "Documentation storage location",     "type": "text",
+                  "help": "Authoritative location for system documentation (e.g., 'Confluence space CTLS at /docs.acme/CTLS', '/repo/docs in version control')." },
+                { "id": "sa5_doc_currency_review",  "label": "Documentation currency-review cadence", "type": "text",
+                  "help": "How often documentation is reviewed for currency (e.g., 'Annual + on significant change to architecture / configuration')." }
+            ]
+        },
+
+        {
+            "id": "secure_engineering",
+            "type": "group",
+            "section": "approach",
+            "label": "Security and Privacy Engineering Principles (SA-8)",
+            "description": "Principles applied during engineering decisions.",
+            "questions": [
+                { "id": "sa8_principles_applied",   "label": "Principles applied",                 "type": "multi_select",
+                  "options": ["Least privilege (SA-8(2))", "Layered defense / defense-in-depth (SA-8(3))", "Secure default configuration (SA-8(11))", "Fail securely (SA-8(13))", "Economy of mechanism / simplicity (SA-8(7))", "Complete mediation (SA-8(8))", "Open design — no security through obscurity (SA-8(9))", "Separation of duties (SA-8(4))", "Least common mechanism (SA-8(5))", "Reduce trust dependency / minimize TCB (SA-8(6))", "Explicitly trusted components (SA-8(14))", "Trusted communications channels (SA-8(18))"] },
+                { "id": "sa8_application_evidence", "label": "Evidence of application",            "type": "textarea", "rows": 4,
+                  "help": "How application of these principles is evidenced (e.g., 'Architecture Decision Records (ADRs) in /repo/adr cite which principle each decision aligns with'; 'Threat model captures principle-violation findings')." },
+                { "id": "sa8_review_role",          "label": "Architecture-review role",            "type": "text",
+                  "help": "Role accountable for security-architecture review (e.g., 'Application Security Lead'; 'Security Architecture Review Board')." }
+            ]
+        },
+
+        {
+            "id": "external_services",
+            "type": "group",
+            "section": "approach",
+            "label": "External System Services (SA-9)",
+            "description": "Cloud services, SaaS, partner integrations.",
+            "questions": [
+                { "id": "sa9_service_inventory",    "label": "External-service inventory location", "type": "text",
+                  "help": "Where the inventory of external services in scope is maintained (CMDB section, dedicated SaaS-management tool, /repo/external-services.md)." },
+                { "id": "sa9_authorization_types",  "label": "Authorization types accepted",       "type": "multi_select",
+                  "options": ["FedRAMP Moderate / High / Tailored", "DoD Cloud Computing SRG IL2 / IL4 / IL5 / IL6", "StateRAMP", "Vendor SOC 2 Type II", "ISO 27001", "PCI-DSS (where payment data flows)", "HIPAA BAA + audit", "Internal SCRM review"] },
+                { "id": "sa9_data_flow_documentation","label": "Data-flow documentation requirement", "type": "textarea", "rows": 3,
+                  "help": "How data flows between the system and each external service are documented (data classification labels exchanged, encryption-in-transit requirements, retention obligations)." },
+                { "id": "sa9_authorization_currency","label": "Authorization-currency tracking",   "type": "textarea", "rows": 3,
+                  "help": "How authorization status is tracked through expiration (FedRAMP ATO sunset, SOC 2 report annual cadence). Renewal tickler process." },
+                { "id": "sa9_identification_of_functions", "label": "Identification of functions / ports / protocols (SA-9(2))", "type": "textarea", "rows": 3,
+                  "help": "Per SA-9(2), the org identifies external service functions, ports, protocols, and other services for each external service in use." },
+                { "id": "sa9_termination_procedure", "label": "Service-termination procedure",      "type": "textarea", "rows": 3,
+                  "help": "What happens when an external service contract ends (data return, sanitization attestation per MP / SC-28)." }
+            ]
+        },
+
+        {
+            "id": "developer_cm",
+            "type": "group",
+            "section": "approach",
+            "label": "Developer Configuration Management (SA-10)",
+            "description": "How developer-side configuration management is governed.",
+            "questions": [
+                { "id": "sa10_repo_protections",    "label": "Repository protections",             "type": "multi_select",
+                  "options": ["Protected main branch (no direct push)", "Required pull-request review (≥1 approver)", "Required PR review (≥2 approvers for security-sensitive paths)", "Signed commits required", "Branch protection on release branches", "CODEOWNERS gating security-sensitive paths", "Status-check gating (CI passing, SAST clean)"] },
+                { "id": "sa10_change_classification","label": "Developer-change classification",   "type": "textarea", "rows": 3,
+                  "help": "How developer changes are classified (security-sensitive, normal, hotfix). Mapping to system-side CM-3 change classes." },
+                { "id": "sa10_release_process",     "label": "Release process",                    "type": "textarea", "rows": 3,
+                  "help": "From merge → release. Tagged releases, build artifacts, signing, deployment promotion through environments. Reference SI-7 for code authentication." },
+                { "id": "sa10_baseline_tracking",   "label": "Developer-baseline tracking (SA-10(1))", "type": "textarea", "rows": 3,
+                  "help": "How developer-side baselines (build configurations, dependency lockfiles, container base images) are tracked. Reference CM-2 system-side baselines." },
+                { "id": "sa10_integrity_protection","label": "Integrity protection of build pipeline (SA-10(5))", "type": "textarea", "rows": 3,
+                  "help": "How the build pipeline itself is protected (RBAC on CI, secrets management, ephemeral runners, attestation per SLSA)." }
+            ]
+        },
+
+        {
+            "id": "developer_testing",
+            "type": "group",
+            "section": "approach",
+            "label": "Developer Testing and Evaluation (SA-11)",
+            "description": "SAST, DAST, SCA, IAST, fuzzing, code review.",
+            "questions": [
+                { "id": "sa11_test_types",          "label": "Testing types",                      "type": "multi_select",
+                  "options": ["Static analysis (SAST) — SA-11(1)", "Dynamic analysis (DAST)", "Interactive analysis (IAST)", "Software composition analysis (SCA)", "Manual code review (security-sensitive paths)", "Fuzzing", "Penetration testing — SA-11(5)", "Threat modeling and vulnerability analyses — SA-11(2)", "Independent verification of correctness", "Attack-surface analysis — SA-11(6)"] },
+                { "id": "sa11_test_cadence",        "label": "Testing cadence by type",            "type": "textarea", "rows": 4,
+                  "help": "How often each test type runs. Example: 'SAST + SCA on every PR; DAST nightly against staging; fuzz-testing of parsing libraries weekly; manual pen-test annually + on significant change'." },
+                { "id": "sa11_finding_severity_slas","label": "Finding-severity SLAs",             "type": "textarea", "rows": 3,
+                  "help": "How developer-test findings are triaged. Severity-to-fix-time mapping (e.g., 'Critical SAST: blocks merge; High SAST: 7 days; Medium: next sprint')." },
+                { "id": "sa11_results_distribution","label": "Results distribution",                "type": "textarea", "rows": 3,
+                  "help": "Where developer-test results are recorded and who reviews them. Trends, regressions, exceptions." },
+                { "id": "sa11_independent_review",  "label": "Independent review (SA-11(3))",      "type": "textarea", "rows": 3,
+                  "help": "Per SA-11(3), independent verification of developer-test results. By a separate team within the org or by an external assessor." }
+            ]
+        },
+
+        {
+            "id": "development_process",
+            "type": "group",
+            "section": "approach",
+            "label": "Secure Development Process / Standards / Tools (SA-15)",
+            "description": "The development process itself, the tooling chain, and standards.",
+            "questions": [
+                { "id": "sa15_ssdf_alignment",      "label": "SSDF (NIST SP 800-218) alignment",   "type": "select",
+                  "options": ["Fully aligned (all four practice groups)", "Partial — Prepare + Protect", "Partial — Produce + Respond", "Self-attesting per EO 14028 / OMB M-23-16", "Not formally aligned"] },
+                { "id": "sa15_secure_tools",        "label": "Secure-development tooling chain",   "type": "textarea", "rows": 4,
+                  "help": "End-to-end tooling: IDE security plugins, version control with branch protection, CI with security gates, artifact signing, attestation generation. Reference SLSA levels if used." },
+                { "id": "sa15_coding_standards",    "label": "Secure coding standards followed",   "type": "multi_select",
+                  "options": ["OWASP ASVS Level 1 / 2 / 3", "OWASP Top 10", "OWASP API Security Top 10", "OWASP Mobile Top 10", "CWE Top 25", "CERT Secure Coding Standards (C / C++ / Java)", "SEI CERT", "MISRA (safety-critical)"] },
+                { "id": "sa15_criticality_analysis","label": "Criticality analysis in development (SA-15(3))", "type": "textarea", "rows": 3,
+                  "help": "Per SA-15(3), criticality analysis applied during development. Reference RA-9 for system-level. SBOM-based dependency criticality, mission-essential-function tracing." },
+                { "id": "sa15_developer_screening", "label": "Developer screening (SA-15(8))",      "type": "select",
+                  "options": ["All developers in scope of org background investigation (typical for federal)", "Background-checked for sensitive paths only", "Vendor staff screened per contract clause", "Screening not formally required (with rationale)"] }
+            ]
+        },
+
+        {
+            "id": "unsupported_components",
+            "type": "group",
+            "section": "approach",
+            "label": "Unsupported System Components (SA-22)",
+            "description": "Components past vendor support — replacement, alternative-source, or compensating control.",
+            "questions": [
+                { "id": "sa22_inventory_location",  "label": "Unsupported-component inventory location", "type": "text",
+                  "help": "Where unsupported components are tracked (CMDB flag, dedicated EOL register). Linked to vendor product life-cycle calendars." },
+                { "id": "sa22_remediation_options", "label": "Allowed remediation paths",          "type": "multi_select",
+                  "options": ["Replace with supported component", "Source extended support from vendor (paid)", "Source alternative support from third party", "Develop in-house support / fork", "Apply compensating controls (isolate + monitor) with formal risk acceptance", "Decommission the component"] },
+                { "id": "sa22_lead_time_target",    "label": "Pre-EOL lead time target",           "type": "text",
+                  "help": "Time before vendor EOL by which remediation should be planned (e.g., '12 months')." },
+                { "id": "sa22_compensating_controls","label": "Compensating-controls inventory if isolation chosen", "type": "textarea", "rows": 4,
+                  "help": "Examples: network isolation, restricted access, increased monitoring, virtual patching via WAF / IPS rules. Reference RA-7 risk acceptance for the formal decision record." }
+            ]
+        },
+
+        {
+            "id": "sa_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Acquisition / Development Scope",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_external_services_count","label": "External services in scope",     "type": "text",
+                  "help": "Approximate count of external system services (cloud, SaaS, partner) in scope of SA-9." },
+                { "id": "scope_active_contracts",     "label": "Active acquisition vehicles",       "type": "text",
+                  "help": "Approximate count of active acquisition vehicles supporting the system." },
+                { "id": "scope_developers_in_scope",  "label": "Developers in scope of SA-3 / SA-11", "type": "text",
+                  "help": "Approximate count of in-scope developers (gov, contractor, vendor staff)." },
+                { "id": "scope_unsupported_components","label": "Unsupported / approaching-EOL components", "type": "text",
+                  "help": "Current count of unsupported or pre-EOL components in the SA-22 register." }
+            ]
+        },
+
+        {
+            "id": "sa_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Acquisition / Development Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate SA control effectiveness.",
+            "questions": [
+                { "id": "sa_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "% Solicitations including required security clauses",
+                      "% Deliverables including SBOM at acceptance",
+                      "SAST critical findings per release (target: 0)",
+                      "DAST critical findings per release (target: 0)",
+                      "SCA findings remediated within SLA",
+                      "% Developers current on annual security training",
+                      "External-service authorization currency rate (% with valid auth)",
+                      "Unsupported-component count",
+                      "Unsupported-component remediation SLA compliance",
+                      "Developer-CM adherence rate (% PRs meeting protection gates)",
+                      "Open POA&M items linked to SA controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "external_service_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "External-Service Posture Verification",
+            "description": "How the org continuously verifies external services remain authorized.",
+            "questions": [
+                { "id": "ext_authorization_check_cadence","label": "Authorization-status check cadence", "type": "text",
+                  "help": "How often external-service authorization status is checked (FedRAMP marketplace, SOC 2 receipt, ISO certificate currency)." },
+                { "id": "ext_unauthorized_action",    "label": "Action on lapsed authorization",     "type": "textarea", "rows": 3,
+                  "help": "What happens when an external service falls out of authorization (immediate suspension, grace-period processing, alternate-service fallback)." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the SA control implementations are summarized (e.g., 'SSP §13.12')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for SA findings", "type": "text",
+                  "help": "Convention for SA-related POA&M items (e.g., 'POAM-SA-' for general; 'POAM-SA22-' for unsupported-component-specific)." },
+                { "id": "cm_handoff",                   "label": "CM family handoff",             "type": "textarea", "rows": 2,
+                  "help": "How SA-10 developer CM feeds CM-2 system baselines and CM-3 change control. Where the handoff line sits (build → release → deploy)." },
+                { "id": "ra_handoff",                   "label": "RA family handoff",             "type": "textarea", "rows": 2,
+                  "help": "How SA-11 testing outputs feed RA-5 vulnerability data. SA-15(3) criticality echo with RA-9 system-level criticality." },
+                { "id": "sr_supply_chain_link",         "label": "SR family pointer",             "type": "textarea", "rows": 2,
+                  "help": "Pointer to the SR plan if authored. SA-4 / SA-9 / SA-15(3) are the primary SA-side hooks into SR." },
+                { "id": "si_handoff",                   "label": "SI family handoff",             "type": "textarea", "rows": 2,
+                  "help": "How artifacts produced by SA-15 secure tooling (SBOMs, signed packages, attestations) feed SI-7 integrity verification." },
+                { "id": "at_handoff",                   "label": "AT family handoff",             "type": "textarea", "rows": 2,
+                  "help": "How SA-3-mandated developer / acquisition-staff training is delivered through the AT-3 role-based training program." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying SA continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "SA-3": {
+            "prompts": [
+                "Reference §4.3 — SDLC phases, security activities at each phase, threat-modeling approach.",
+                "Document the SDLC document or framework cited (NIST SSDF, organizational SDLC standard).",
+                "Address developer-training requirements — cite AT plan if authored.",
+                "Identify the role accountable for SDLC-security adherence.",
+                "Reference NIST SP 800-218 SSDF for SDLC integration practices."
+            ],
+            "evidence_suggestions": [
+                "Organizational SDLC framework / SSDF mapping document",
+                "Sample threat model from a recent design",
+                "Developer-training completion roster",
+                "Security-gate evidence at each SDLC phase",
+                "ATO record showing security activity at deployment"
+            ],
+            "extra_fields": [
+                { "id": "sa3_ssdf_mapping_location", "label": "SSDF practice mapping location", "type": "text",
+                  "help": "Where the org's mapping to NIST SP 800-218 SSDF practices (PO / PS / PW / RV) is maintained." },
+                { "id": "sa3_threat_model_review_role","label": "Threat-model review role", "type": "text",
+                  "help": "Role that reviews and approves threat models during design (Security Architect, AppSec Lead)." }
+            ]
+        },
+
+        "SA-4": {
+            "prompts": [
+                "Reference §4.4 — required clauses, required deliverables, SBOM acceptance criteria.",
+                "Document Section 889 attestation handling (federal contracts).",
+                "Address SA-4(7) continuous-monitoring contract clause.",
+                "Address SA-4(10) SBOM requirement per EO 14028 / OMB M-22-18.",
+                "Reference SA-4(1) functional properties of controls, SA-4(2) design / implementation information for controls, SA-4(7) NIAP-approved Protection Profiles, SA-4(9) functions / ports / protocols / services in use, SA-4(10) use of approved PIV products, SA-4(11) System of records, SA-4(12) data ownership."
+            ],
+            "evidence_suggestions": [
+                "Standard security-clause library / contract template",
+                "Sample contract showing required clauses",
+                "Sample SBOM received from vendor",
+                "Section 889 attestation register",
+                "Continuous-monitoring contract appendix template"
+            ],
+            "extra_fields": [
+                { "id": "sa4_clause_library_location","label": "Standard security-clause library location", "type": "text",
+                  "help": "Where the org's standard security-clause library lives." },
+                { "id": "sa4_sbom_validation_tooling","label": "SBOM validation tooling",        "type": "textarea", "rows": 3,
+                  "help": "How received SBOMs are validated (format, completeness, signing, vulnerability scan via tools like Anchore Grype, OWASP Dependency-Track)." }
+            ]
+        },
+
+        "SA-5": {
+            "prompts": [
+                "Reference §4.5 — admin docs, user docs, storage, currency review.",
+                "Address documentation availability to authorized roles only.",
+                "Document handling of vendor-supplied documentation that contains sensitive details.",
+                "Reference SA-5(1) functional properties, SA-5(2) design / implementation information, SA-5(3) high-level design, SA-5(4) low-level design, SA-5(5) source code (high-impact)."
+            ],
+            "evidence_suggestions": [
+                "Documentation index / table of contents",
+                "Sample admin documentation",
+                "Sample user documentation",
+                "Documentation-currency review attestation"
+            ],
+            "extra_fields": [
+                { "id": "sa5_doc_access_controls",  "label": "Documentation access-control posture", "type": "textarea", "rows": 3,
+                  "help": "How sensitive documentation (admin runbooks, security architecture) is access-controlled. RBAC, classification labels, separation from public docs." }
+            ]
+        },
+
+        "SA-8": {
+            "prompts": [
+                "Reference §4.6 — principles applied, evidence of application, review role.",
+                "Address how trade-offs between principles are documented (security vs usability, etc.).",
+                "Document where principle violations / exceptions are tracked.",
+                "Reference NIST SP 800-160 v1 r1 for engineering trustworthy secure systems.",
+                "Reference SA-8(1)-(33) — over thirty individual principle enhancements; cite the ones the org explicitly tracks."
+            ],
+            "evidence_suggestions": [
+                "Architecture Decision Records (ADRs)",
+                "Threat models showing principle alignment",
+                "Security-architecture review records",
+                "Principle-violation register"
+            ],
+            "extra_fields": [
+                { "id": "sa8_adr_location",          "label": "Architecture Decision Records location", "type": "text",
+                  "help": "Where ADRs live (e.g., '/repo/adr/' or 'Confluence space ADR'). ADRs that cite SA-8 principles are the primary evidence trail." },
+                { "id": "sa8_review_cadence",        "label": "Architecture-review cadence",        "type": "text",
+                  "help": "When security-architecture review occurs (e.g., 'Per design / per architecture-significant change; quarterly recap')." }
+            ]
+        },
+
+        "SA-9": {
+            "prompts": [
+                "Reference §4.7 — service inventory location, accepted authorizations, data-flow documentation.",
+                "Document how the org identifies external functions, ports, protocols (SA-9(2)).",
+                "Address service-termination data-handling.",
+                "Address authorization-currency tracking through contract life.",
+                "Reference SA-9(1) risk assessments / organizational approvals, SA-9(2) identification of functions / ports / protocols / services, SA-9(3) establish / maintain trust relationship with providers, SA-9(4) consistent interests of consumers and providers, SA-9(5) processing / storage / service location, SA-9(6) organization-controlled cryptographic keys, SA-9(7) organization-controlled integrity checking, SA-9(8) processing / storage / service location with US-based providers."
+            ],
+            "evidence_suggestions": [
+                "External-service inventory export",
+                "FedRAMP authorization snapshots",
+                "Vendor SOC 2 reports on file",
+                "Sample data-flow diagram for an external service",
+                "Service-termination procedure",
+                "Authorization-currency dashboard"
+            ],
+            "extra_fields": [
+                { "id": "sa9_data_location_constraint","label": "Data-location constraint (SA-9(5) / SA-9(8))", "type": "select",
+                  "options": ["US-based only (federal default)", "US + specified allied countries", "Within agency-approved geographic boundary", "No specific geographic constraint"] },
+                { "id": "sa9_offboarding_certification","label": "Vendor-offboarding sanitization certification", "type": "textarea", "rows": 3,
+                  "help": "Required certification on contract termination that data was sanitized per NIST SP 800-88 r1. Reference MP-6." }
+            ]
+        },
+
+        "SA-10": {
+            "prompts": [
+                "Reference §4.8 — repo protections, change classification, release process.",
+                "Document developer-baseline tracking (SA-10(1)) — lockfiles, container base images.",
+                "Address build-pipeline integrity protection (SA-10(5)) — RBAC on CI, secrets management, attestation.",
+                "Address handoff to system-side CM (CM-2 / CM-3).",
+                "Reference SA-10(1) software / firmware integrity verification, SA-10(2) alternative configuration management, SA-10(3) hardware integrity verification, SA-10(4) trusted generation, SA-10(5) mapping integrity for version control, SA-10(6) trusted distribution, SA-10(7) security and privacy representatives."
+            ],
+            "evidence_suggestions": [
+                "Repository protection settings export",
+                "CODEOWNERS file",
+                "Sample signed commit / signed release artifact",
+                "CI pipeline configuration",
+                "Build-attestation sample (SLSA / in-toto)",
+                "Developer-CM policy document"
+            ],
+            "extra_fields": [
+                { "id": "sa10_slsa_level",           "label": "SLSA level achieved (if any)",     "type": "select",
+                  "options": ["SLSA Level 1", "SLSA Level 2", "SLSA Level 3", "SLSA Level 4", "Not formally targeting SLSA"] },
+                { "id": "sa10_secrets_management",   "label": "Secrets management in pipeline",   "type": "textarea", "rows": 3,
+                  "help": "How CI / CD secrets are managed (HashiCorp Vault, GitHub Secrets, AWS Secrets Manager, ephemeral OIDC tokens). Reference SC-12 key management." }
+            ]
+        },
+
+        "SA-11": {
+            "prompts": [
+                "Reference §4.9 — test types, cadence, severity SLAs, results distribution, independent review.",
+                "Document each test type's tooling and signal quality.",
+                "Address penetration-testing cadence (SA-11(5)) — typically annual + significant change.",
+                "Address attack-surface analysis (SA-11(6)).",
+                "Reference SA-11(1) static code analysis, SA-11(2) threat modeling and vulnerability analyses, SA-11(3) independent verification of assessment plans / evidence, SA-11(4) manual code reviews, SA-11(5) penetration testing, SA-11(6) attack surface reviews, SA-11(7) verify scope of testing / evaluation, SA-11(8) dynamic code analysis, SA-11(9) interactive application security testing."
+            ],
+            "evidence_suggestions": [
+                "SAST tool dashboard / sample report",
+                "DAST tool report (sanitized)",
+                "SCA findings tracker",
+                "Pen-test report (latest, sanitized)",
+                "Threat-model review record",
+                "Independent verification record (SA-11(3))"
+            ],
+            "extra_fields": [
+                { "id": "sa11_pentest_cadence",      "label": "Penetration-test cadence",         "type": "text",
+                  "help": "How often pen tests run (e.g., 'Annual + on significant change'). External vs internal team." },
+                { "id": "sa11_pentest_provider",     "label": "Pen-test provider",                "type": "select",
+                  "options": ["External commercial pen-test firm (NIAP / NPA accredited)", "External MDR retainer", "Internal red team", "Mix (external annual + internal continuous)", "Bug bounty as primary"] }
+            ]
+        },
+
+        "SA-15": {
+            "prompts": [
+                "Reference §4.10 — SSDF alignment, secure tooling, coding standards, criticality analysis, developer screening.",
+                "Document the EO 14028 / OMB M-23-16 self-attestation if applicable.",
+                "Address SA-15(3) criticality analysis during development — echo with RA-9.",
+                "Address SA-15(8) reuse of threat / vulnerability information from prior projects.",
+                "Reference SA-15(1) quality metrics, SA-15(2) security and privacy tracking tools, SA-15(3) criticality analysis, SA-15(4) threat modeling and vulnerability analysis, SA-15(5) attack surface reduction, SA-15(6) continuous improvement, SA-15(7) automated vulnerability analysis, SA-15(8) reuse of threat / vulnerability information, SA-15(9) use of live data, SA-15(10) incident response plan, SA-15(11) archive system / component, SA-15(12) minimize personally identifiable information."
+            ],
+            "evidence_suggestions": [
+                "SSDF practice mapping document",
+                "Tooling-chain architecture diagram",
+                "Coding-standards reference",
+                "Developer screening policy",
+                "EO 14028 self-attestation"
+            ],
+            "extra_fields": [
+                { "id": "sa15_eo14028_attestation",  "label": "EO 14028 self-attestation status", "type": "select",
+                  "options": ["Submitted via CISA RSAA", "Pending submission", "Not yet required (non-federal use)", "Not applicable"] },
+                { "id": "sa15_quality_metrics",      "label": "Quality metrics tracked (SA-15(1))", "type": "textarea", "rows": 3,
+                  "help": "Per SA-15(1), quality metrics tracked during development (defect density, escaped defects, MTTR for security defects, dependency-age metrics)." }
+            ]
+        },
+
+        "SA-22": {
+            "prompts": [
+                "Reference §4.11 — inventory location, remediation paths, lead-time target, compensating controls.",
+                "Document the vendor-EOL monitoring source (vendor calendars, NIST NVD CPE-applicability dates).",
+                "Address how compensating-control choices route through RA-7 risk acceptance.",
+                "Reference SA-22 ODV — alternative sources for continued support."
+            ],
+            "evidence_suggestions": [
+                "Unsupported-component register export",
+                "Vendor EOL calendar reference",
+                "Sample remediation plan for an EOL component",
+                "Risk-acceptance memo for an isolated EOL component",
+                "Compensating-control inventory for EOL components"
+            ],
+            "extra_fields": [
+                { "id": "sa22_vendor_eol_source",    "label": "Vendor-EOL information source",   "type": "textarea", "rows": 3,
+                  "help": "How upcoming vendor EOLs are tracked. Vendor calendars, automated notifications, NIST NCP applicability dates, third-party trackers (endoflife.date)." },
+                { "id": "sa22_active_count",         "label": "Currently-unsupported component count", "type": "text",
+                  "help": "Current count of unsupported components in the system (target: 0)." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Acquisition Vehicle",     "definition": "A contract, ordering agreement, or purchase mechanism through which goods or services are acquired (e.g., GSA Schedule, GWAC, BPA, single-award contract)." },
+        { "term": "ADR",                    "definition": "Architecture Decision Record — a short document capturing an architecture-significant decision, its context, and consequences. Common evidence vehicle for SA-8 principle application." },
+        { "term": "Attack Surface",          "definition": "The set of points at which an unauthorized actor can attempt to interact with the system. Per SA-11(6), attack-surface reviews identify and reduce these points." },
+        { "term": "BAA",                    "definition": "Business Associate Agreement — a HIPAA-required contract between a covered entity and a business associate handling PHI." },
+        { "term": "Blue / Red / Purple Team","definition": "Defenders / attackers / collaborative-improvement teams. Purple team combines red and blue to drive defense improvement." },
+        { "term": "BPA",                    "definition": "Blanket Purchase Agreement — a federal procurement vehicle for repetitive needs from a single vendor." },
+        { "term": "CMMC",                   "definition": "Cybersecurity Maturity Model Certification — DoD framework assessing contractor cybersecurity posture against NIST SP 800-171." },
+        { "term": "Continuous Monitoring (Vendor)","definition": "Per SA-4(7), the practice of vendors continuously monitoring and reporting on their security posture during contract execution." },
+        { "term": "DAST",                   "definition": "Dynamic Application Security Testing — runtime testing of a deployed application by sending crafted inputs and observing behavior." },
+        { "term": "End of Life (EOL)",      "definition": "The point at which a vendor will no longer issue security updates, bug fixes, or technical support for a product. Triggers SA-22 lifecycle action." },
+        { "term": "FAR",                    "definition": "Federal Acquisition Regulation — the primary regulation for federal-government procurement." },
+        { "term": "FedRAMP",                "definition": "Federal Risk and Authorization Management Program — the federal program for assessing and authorizing cloud services." },
+        { "term": "GSA Schedule",           "definition": "General Services Administration multiple-award schedules — a contract vehicle for federal agencies to acquire IT goods and services." },
+        { "term": "GWAC",                   "definition": "Government-Wide Acquisition Contract — a federal contract vehicle administered by a single agency for use by all federal agencies." },
+        { "term": "IAST",                   "definition": "Interactive Application Security Testing — security testing performed inside a running application via instrumentation, combining SAST and DAST signals." },
+        { "term": "in-toto / SLSA",         "definition": "in-toto is a framework for software-supply-chain integrity attestations; SLSA (Supply-chain Levels for Software Artifacts) is a maturity model that uses such attestations. Common evidence for SA-10(5)." },
+        { "term": "ITAR / EAR",             "definition": "International Traffic in Arms Regulations / Export Administration Regulations — US export-control frameworks affecting acquisition of certain items." },
+        { "term": "Penetration Testing",     "definition": "Authorized simulated attack against a system to evaluate security. Per SA-11(5)." },
+        { "term": "PIA",                    "definition": "Privacy Impact Assessment — analysis of how PII is collected, used, shared, and disposed of. Required by RA-8 for systems handling PII." },
+        { "term": "SAST",                   "definition": "Static Application Security Testing — analysis of source or compiled code without executing it. Per SA-11(1)." },
+        { "term": "SBOM",                   "definition": "Software Bill of Materials — a formal record of components and dependencies in a piece of software. Required by SA-4(10) per EO 14028 / OMB M-22-18." },
+        { "term": "SCA",                    "definition": "Software Composition Analysis — examining third-party components for known vulnerabilities and license compliance." },
+        { "term": "SCRM",                   "definition": "Supply Chain Risk Management — the practice of identifying, assessing, and mitigating risks in the supply chain. Driven by RA-3(1) and the SR family." },
+        { "term": "SDLC",                   "definition": "System Development Life Cycle — the phases through which a system passes from initiation to disposal. Subject to SA-3 security integration." },
+        { "term": "Section 508",            "definition": "Section of the Rehabilitation Act of 1973 requiring federal agencies to make their IT accessible to people with disabilities." },
+        { "term": "Section 889",            "definition": "Section of the John S. McCain National Defense Authorization Act prohibiting use of certain Chinese telecom and surveillance equipment in federal acquisition." },
+        { "term": "SLSA",                   "definition": "Supply-chain Levels for Software Artifacts — a security framework specifying levels of supply-chain integrity guarantees." },
+        { "term": "SOC 2 Type II",          "definition": "Service Organization Controls audit attesting to operating effectiveness of controls over a period (typically 6+ months). Common SaaS-vendor authorization vehicle." },
+        { "term": "SSDF",                   "definition": "Secure Software Development Framework — NIST SP 800-218, which establishes practices for integrating security into the SDLC. Mandated by EO 14028 for federal-system suppliers." },
+        { "term": "Threat Modeling",         "definition": "The structured process of identifying threats, vulnerabilities, and countermeasures during system design. Per SA-11(2) and SA-15(4)." },
+        { "term": "Unsupported Component",  "definition": "A system component that no longer receives vendor security updates. Subject to SA-22 lifecycle treatment." }
+    ],
+
+    "acronyms": [
+        { "abbr": "ADR",     "expansion": "Architecture Decision Record" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "BAA",     "expansion": "Business Associate Agreement (HIPAA)" },
+        { "abbr": "BPA",     "expansion": "Blanket Purchase Agreement" },
+        { "abbr": "CDI",     "expansion": "Covered Defense Information" },
+        { "abbr": "CI",      "expansion": "Continuous Integration" },
+        { "abbr": "CISA",    "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CMMC",    "expansion": "Cybersecurity Maturity Model Certification (DoD)" },
+        { "abbr": "CODEOWNERS","expansion": "GitHub / GitLab feature defining file-path-based reviewers" },
+        { "abbr": "CRADA",   "expansion": "Cooperative Research and Development Agreement" },
+        { "abbr": "CWE",     "expansion": "Common Weakness Enumeration" },
+        { "abbr": "DAST",    "expansion": "Dynamic Application Security Testing" },
+        { "abbr": "DFARS",   "expansion": "Defense Federal Acquisition Regulation Supplement" },
+        { "abbr": "DoD CC SRG","expansion": "DoD Cloud Computing Security Requirements Guide" },
+        { "abbr": "EOL",     "expansion": "End of Life" },
+        { "abbr": "EO",      "expansion": "Executive Order" },
+        { "abbr": "FAR",     "expansion": "Federal Acquisition Regulation" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "FTE",     "expansion": "Full-Time Equivalent" },
+        { "abbr": "GSA",     "expansion": "General Services Administration" },
+        { "abbr": "GWAC",    "expansion": "Government-Wide Acquisition Contract" },
+        { "abbr": "HIPAA",   "expansion": "Health Insurance Portability and Accountability Act" },
+        { "abbr": "IAST",    "expansion": "Interactive Application Security Testing" },
+        { "abbr": "IDE",     "expansion": "Integrated Development Environment" },
+        { "abbr": "IL",      "expansion": "Impact Level (DoD CC SRG)" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "MDR",     "expansion": "Managed Detection and Response" },
+        { "abbr": "MISRA",   "expansion": "Motor Industry Software Reliability Association (coding standard)" },
+        { "abbr": "NIAP",    "expansion": "National Information Assurance Partnership" },
+        { "abbr": "NCP",     "expansion": "National Checklist Program (NIST)" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "NPA",     "expansion": "National Pentesting Alliance / NIAP-Accredited" },
+        { "abbr": "NVD",     "expansion": "National Vulnerability Database" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OIDC",    "expansion": "OpenID Connect" },
+        { "abbr": "OMB",     "expansion": "Office of Management and Budget" },
+        { "abbr": "OWASP",   "expansion": "Open Web Application Security Project" },
+        { "abbr": "PCI-DSS", "expansion": "Payment Card Industry Data Security Standard" },
+        { "abbr": "PHI",     "expansion": "Protected Health Information" },
+        { "abbr": "PIA",     "expansion": "Privacy Impact Assessment" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PR",      "expansion": "Pull Request" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RBAC",    "expansion": "Role-Based Access Control" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "RSAA",    "expansion": "Repository for Software Attestations and Artifacts (CISA)" },
+        { "abbr": "SA",      "expansion": "System and Services Acquisition (NIST 800-53 family)" },
+        { "abbr": "SAST",    "expansion": "Static Application Security Testing" },
+        { "abbr": "SBOM",    "expansion": "Software Bill of Materials" },
+        { "abbr": "SCA",     "expansion": "Software Composition Analysis" },
+        { "abbr": "SCRM",    "expansion": "Supply Chain Risk Management" },
+        { "abbr": "SDLC",    "expansion": "System Development Life Cycle" },
+        { "abbr": "SIG",     "expansion": "Standardized Information Gathering (questionnaire)" },
+        { "abbr": "SLA",     "expansion": "Service-Level Agreement" },
+        { "abbr": "SLSA",    "expansion": "Supply-chain Levels for Software Artifacts" },
+        { "abbr": "SOC",     "expansion": "System and Organization Controls (audit) / Security Operations Center" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SR",      "expansion": "Supply Chain Risk Management (NIST 800-53 family)" },
+        { "abbr": "SSDF",    "expansion": "Secure Software Development Framework (NIST SP 800-218)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-218 — Secure Software Development Framework (SSDF)", "url": "https://csrc.nist.gov/pubs/sp/800/218/final" },
+        { "label": "NIST SP 800-160 v1 r1 — Engineering Trustworthy Secure Systems", "url": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final" },
+        { "label": "NIST SP 800-161 r1 — Cybersecurity Supply Chain Risk Management Practices", "url": "https://csrc.nist.gov/pubs/sp/800/161/r1/final" },
+        { "label": "NIST SP 800-171 r3 — Protecting Controlled Unclassified Information in Nonfederal Systems", "url": "https://csrc.nist.gov/pubs/sp/800/171/r3/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "Executive Order 14028 — Improving the Nation's Cybersecurity",  "url": "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/" },
+        { "label": "OMB M-22-18 — Enhancing the Security of the Software Supply Chain", "url": "https://www.whitehouse.gov/wp-content/uploads/2022/09/M-22-18.pdf" },
+        { "label": "OMB M-23-16 — Update to M-22-18 Software Supply Chain Security", "url": "https://www.whitehouse.gov/wp-content/uploads/2023/06/M-23-16-Update-to-M-22-18-Enhancing-Software-Security.pdf" },
+        { "label": "OWASP Application Security Verification Standard (ASVS)",       "url": "https://owasp.org/www-project-application-security-verification-standard/" },
+        { "label": "SLSA — Supply-chain Levels for Software Artifacts",             "url": "https://slsa.dev/" },
+        { "label": "FedRAMP Marketplace",                                           "url": "https://marketplace.fedramp.gov/" }
+    ]
+}
