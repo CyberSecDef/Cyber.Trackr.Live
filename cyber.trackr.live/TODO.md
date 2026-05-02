@@ -777,7 +777,7 @@ Tiered by impact + natural pairings to plans already authored.
 
 **Tier 4 — specialized / meta**
 
-- [ ] PL — Planning Plan *(meta-plan; SSP, rules of behavior, baseline tailoring documentation)*
+- [x] PL — Planning Plan (authored at Phase 2 floor; 9 family-question groups, 5 guided controls — PL-2 / PL-4 / PL-8 / PL-10 / PL-11 — with 9 extra fields, 14 glossary entries, 43 acronyms, 9 references; renders 12 cards at nist-moderate — 6 bases + 6 enhancements; meta-family covering SSP / RoB / architecture / baseline-selection / tailoring)
 - [ ] SR — Supply Chain Risk Management Plan *(r5-only; pairs with SA. SBOM, vendor assurance, anti-counterfeit)*
 - [ ] PT — PII Processing and Transparency Plan *(r5-only; privacy-focused. PII, consent, data subject rights)*
 - [ ] PM — Program Management Plan *(org-wide; may not fit single-system pattern. Consider intent before authoring)*

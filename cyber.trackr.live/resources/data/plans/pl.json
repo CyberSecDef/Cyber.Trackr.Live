@@ -1,0 +1,447 @@
+{
+    "_comment": "Planning Plan generator. Authored at the Phase 2 assessability floor; meta-family that covers the SSP itself (PL-2), Rules of Behavior (PL-4), security / privacy architectures (PL-8), baseline selection (PL-10), and baseline tailoring (PL-11). Pairs with every other family — the SSP it documents is the umbrella that incorporates each family plan; pairs especially with CA (PL-2 SSP feeds CA-2 assessment + CA-6 authorization), RA (PL-10 / PL-11 baseline selection responds to RA-2 categorization), and PS (PL-4 RoB pairs with PS-6 access agreements).",
+
+    "family": "PL",
+    "family_name": "Planning",
+    "title": "Planning Plan",
+    "description": "Documents how the system's planning artifacts — System Security Plan (SSP), Rules of Behavior, security and privacy architectures, baseline selection, and baseline tailoring — are governed across creation, review, change-control, and integration with the broader RMF package. Covers the controls of the PL family in NIST SP 800-53 r5 and aligns with NIST SP 800-37 r2 (RMF), NIST SP 800-160 v1 r1 (Engineering Trustworthy Secure Systems), NIST SP 800-18 r1 (Guide for Developing Security Plans), FIPS 199 / 200 (baseline selection), and CNSSI 1253 (overlays for national-security systems).",
+
+    "intro_template": "This Planning Plan documents the planning approach for {system_name}. It establishes the practices, cadences, and roles used to author and maintain the SSP, draft and update Rules of Behavior, document security and privacy architectures, select control baselines per FIPS 199 / 200, and apply tailoring decisions through overlays and supplements.\n\nThe scope covers SSP management per PL-2, Rules of Behavior per PL-4, security and privacy architectures per PL-8, baseline selection per PL-10, and baseline tailoring per PL-11 within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Planning family), NIST SP 800-18 r1 (Guide for Developing Security Plans), and NIST SP 800-37 r2 (Risk Management Framework).",
+
+    "approach_section_title": "Planning Approach",
+    "approach_template": "{system_name} maintains its System Security Plan at {ssp_location} under the ownership of {ssp_owner_role}. The Rules of Behavior are at {rob_location} and are reaffirmed by personnel on the cadence in §4.3. The security and privacy architectures are at {architecture_location} with change-control routed through {architecture_governance_role}. The baseline selected per FIPS 199 / 200 categorization is {selected_baseline_summary}; tailoring decisions and overlays applied are documented at {tailoring_register_location}.\n\nAdditional details on SSP management, Rules of Behavior, security architecture, baseline selection, and baseline tailoring are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Planning-artifact currency for {system_name} is tracked through the metrics in §6.1 (SSP review cycle adherence, RoB acknowledgment-completion rate, architecture-currency rate, baseline-tailoring-decision currency, control-supplement / removal change rate). Planning artifacts are reviewed on the cadence in §6.2; significant changes (per CM-4) trigger immediate updates rather than waiting for the next periodic cycle. The SSP and supporting plans surface to the AO at the cadence required by the ATO conditions.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Planning Plan does not stand alone — it documents *how* the meta-artifacts that bind every other family plan are governed. The CA family consumes the SSP for CA-2 assessment and CA-6 authorization decisions; the RA family supplies the FIPS 199 categorization that drives PL-10 baseline selection; the CM family routes architecture / SSP changes through CM-3 change control; the PS family pairs PL-4 Rules of Behavior with PS-6 access agreements; every family plan referenced in this RMF package is itself a child artifact under the SSP. The following cross-references identify the specific artifacts and locations where PL-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "PL-1",  "from": "Organizational planning policy" },
+        { "number": "PL-4",  "from": "Organizational Rules of Behavior template (when shared)" },
+        { "number": "PL-10", "from": "Organizational baseline-selection guidance / overlay catalog" },
+        { "number": "PL-11", "from": "Organizational tailoring methodology" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Locations and roles that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "ssp_location",
+                    "label": "SSP authoritative location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the SSP is authoritatively maintained (e.g., 'eMASS package PKG-12345', 'GRC tool — Compliance section', '/repo/compliance/ssp.md under version control')."
+                },
+                {
+                    "id": "ssp_owner_role",
+                    "label": "SSP owner role",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role accountable for the SSP (typically System Owner with ISSO support)."
+                },
+                {
+                    "id": "rob_location",
+                    "label": "Rules of Behavior location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the Rules of Behavior are maintained. Often co-located with the access-agreement template (PS-6)."
+                },
+                {
+                    "id": "architecture_location",
+                    "label": "Security / privacy architecture document location",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the architecture document is maintained (e.g., 'Confluence space ARCH at /docs/CTLS-architecture', '/repo/architecture/security.drawio')."
+                },
+                {
+                    "id": "architecture_governance_role",
+                    "label": "Architecture-governance role",
+                    "type": "text",
+                    "help": "Role accountable for architecture changes (e.g., 'Security Architecture Review Board', 'Application Security Lead')."
+                },
+                {
+                    "id": "selected_baseline_summary",
+                    "label": "Selected baseline summary",
+                    "type": "text",
+                    "required": true,
+                    "help": "Brief phrase identifying the baseline (e.g., 'NIST SP 800-53 r5 Moderate + privacy overlay', 'FedRAMP Moderate baseline', 'CNSSI 1253 Moderate / Moderate / Moderate')."
+                },
+                {
+                    "id": "tailoring_register_location",
+                    "label": "Tailoring-register location",
+                    "type": "text",
+                    "help": "Where tailoring decisions, overlays applied, control supplements / removals are recorded."
+                }
+            ]
+        },
+
+        {
+            "id": "ssp_management",
+            "type": "group",
+            "section": "approach",
+            "label": "SSP Management (PL-2)",
+            "description": "How the System Security Plan is authored, reviewed, and updated.",
+            "questions": [
+                { "id": "pl2_ssp_scope",            "label": "SSP scope summary",                 "type": "textarea", "rows": 4,
+                  "help": "What the SSP covers (system description, boundary, categorization, baseline + tailoring, all 800-53 r5 controls + ODVs, supporting family plans, overlays). Reference NIST SP 800-18 r1." },
+                { "id": "pl2_review_cadence",       "label": "Review cadence (PL-2 ODV)",         "type": "text",
+                  "help": "How often the SSP is reviewed (typical: 'Annual + on significant change per CM-4')." },
+                { "id": "pl2_change_triggers",      "label": "Change-trigger events",              "type": "multi_select",
+                  "options": ["Significant change per CM-4 / SA-3", "New significant control added or removed", "Authorization-condition change", "Categorization-level change (RA-2)", "New significant external interconnection (CA-3)", "New significant supply-chain dependency (RA-3(1))", "Significant deficiency identified in CA-2 assessment", "Annual review cycle"] },
+                { "id": "pl2_change_workflow",      "label": "Change workflow",                    "type": "textarea", "rows": 3,
+                  "help": "From change identified → SSP updated → AO reviewed → re-issued. Reference CM-3." },
+                { "id": "pl2_distribution_list",    "label": "SSP distribution list",              "type": "textarea", "rows": 3,
+                  "help": "Roles to whom the SSP is distributed (System Owner, ISSO, ISSM, AO, designated assessors, contracting officer if applicable)." },
+                { "id": "pl2_supporting_plans_register","label": "Supporting-plans register",      "type": "textarea", "rows": 4,
+                  "help": "Inventory of supporting plans referenced by the SSP (CM, AC, AU, IA, IR, CP, SI, CA, SC, RA, SA, PE, PS, MA, MP, AT, PL, SR, PT, PM as applicable). Where each supporting plan lives." }
+            ]
+        },
+
+        {
+            "id": "rules_of_behavior",
+            "type": "group",
+            "section": "approach",
+            "label": "Rules of Behavior (PL-4)",
+            "description": "User obligations and acceptable use.",
+            "questions": [
+                { "id": "pl4_required_topics",     "label": "Required topics covered",            "type": "multi_select",
+                  "options": ["Acceptable use of system resources", "Password / credential responsibilities", "Reporting suspicious activity", "Removable media handling (cross-reference MP-7)", "Telework / mobile-device handling (cross-reference PE-17)", "Personal use of official equipment", "Social-media restrictions (cross-reference PL-4(1))", "External-information-system use (cross-reference AC-20)", "Privacy / PII handling", "AI / LLM tool use policy (newer)", "Sanctions for noncompliance (cross-reference PS-8)"] },
+                { "id": "pl4_acknowledgment_method","label": "Acknowledgment method",              "type": "select",
+                  "options": ["Electronic signature in HRMS / LMS", "Wet-ink signature on paper form", "Click-through on system login", "Annual reaffirmation in awareness training (AT-2)", "Mixed by personnel category"] },
+                { "id": "pl4_renewal_cadence",      "label": "Renewal cadence (PL-4 ODV)",        "type": "text",
+                  "help": "How often RoB is reaffirmed (typical: 'Annually + on significant policy change')." },
+                { "id": "pl4_storage_location",     "label": "Acknowledgment-record storage",      "type": "text",
+                  "help": "Where signed RoB acknowledgments are retained. Often co-located with PS-6 access-agreement records." },
+                { "id": "pl4_social_media_restrictions","label": "Social-media restrictions (PL-4(1))","type": "textarea", "rows": 4,
+                  "help": "Per PL-4(1) — restrictions on disclosing system / org information via social media. What may not be disclosed (system identifiers, technical details, project codes, classified or CUI material)." },
+                { "id": "pl4_revisions_log",        "label": "Revisions log",                      "type": "text",
+                  "help": "Where RoB revisions are logged (version, date, summary of change). Important when reaffirmation is triggered by a change." }
+            ]
+        },
+
+        {
+            "id": "security_architecture",
+            "type": "group",
+            "section": "approach",
+            "label": "Security and Privacy Architecture (PL-8)",
+            "description": "How architecture is documented and governed.",
+            "questions": [
+                { "id": "pl8_documentation_scope",  "label": "Architecture documentation scope",   "type": "multi_select",
+                  "options": ["Logical / data architecture", "Physical / deployment architecture", "Network architecture (boundary, segmentation)", "Identity architecture", "Cryptographic architecture", "Privacy-engineering architecture (PT family overlap)", "Backup / DR architecture (CP family overlap)", "Monitoring / telemetry architecture", "Trust boundaries + threat-model artifacts"] },
+                { "id": "pl8_review_cadence",      "label": "Architecture-review cadence",        "type": "text",
+                  "help": "How often the architecture document is reviewed for currency. Per NIST SP 800-160 v1 r1." },
+                { "id": "pl8_threat_model_status",  "label": "Threat-model maturity",             "type": "select",
+                  "options": ["Per design / per architecture-significant change (STRIDE / PASTA)", "Initial threat model maintained; updated on major change", "Lightweight / data-flow-only threat model", "Threat model not formally maintained (with POA&M)"] },
+                { "id": "pl8_supports_engineering", "label": "Engineering-decision integration",   "type": "textarea", "rows": 3,
+                  "help": "How the architecture document supports engineering decisions. ADRs cite architecture sections; design reviews reference architecture; change-control routes architecture-affecting changes through SARB." },
+                { "id": "pl8_privacy_architecture_status","label": "Privacy-architecture maturity", "type": "select",
+                  "options": ["Privacy architecture fully integrated (NIST IR 8062)", "Privacy elements documented as part of security architecture", "Privacy architecture maintained separately under PT family", "Privacy architecture not yet formalized (with POA&M)", "Not applicable (no PII)"] }
+            ]
+        },
+
+        {
+            "id": "baseline_selection",
+            "type": "group",
+            "section": "approach",
+            "label": "Baseline Selection (PL-10)",
+            "description": "Selection of the control baseline per categorization.",
+            "questions": [
+                { "id": "pl10_baseline_source",     "label": "Baseline source",                    "type": "select",
+                  "options": ["NIST SP 800-53B Low / Moderate / High baseline", "FedRAMP Low / Moderate / High baseline", "CNSSI 1253 Confidentiality / Integrity / Availability baseline (national-security systems)", "DoD CC SRG IL2 / IL4 / IL5 baseline", "Industry baseline (e.g., StateRAMP, agency-specific)", "Customized baseline (with rationale)"] },
+                { "id": "pl10_categorization_basis","label": "Categorization basis",              "type": "textarea", "rows": 3,
+                  "help": "How the categorization that drives the baseline was determined (FIPS 199 high-water mark per RA-2). Reference RA-2 documentation." },
+                { "id": "pl10_baseline_documentation","label": "Baseline-documentation location", "type": "text",
+                  "help": "Where the as-selected baseline (the list of in-scope controls) is documented." },
+                { "id": "pl10_overlays_applied",    "label": "Overlays applied",                  "type": "list",
+                  "suggestions": [
+                      "NIST 800-53 r5 Privacy overlay",
+                      "NIST 800-53 r5 Classified Information overlay",
+                      "CNSSI 1253 Classified overlay",
+                      "FedRAMP overlay",
+                      "Cross-domain solution (CDS) overlay",
+                      "Industrial control system (ICS) overlay (NIST SP 800-82 r3)",
+                      "Healthcare / HIPAA overlay (agency-specific)",
+                      "Tax-information overlay (FTI / IRS Pub 1075)"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "baseline_tailoring",
+            "type": "group",
+            "section": "approach",
+            "label": "Baseline Tailoring (PL-11)",
+            "description": "Decisions to add, remove, supplement, or restrict controls relative to baseline.",
+            "questions": [
+                { "id": "pl11_tailoring_methodology","label": "Tailoring methodology",            "type": "textarea", "rows": 4,
+                  "help": "Approach to tailoring per NIST SP 800-53B § 2.4 / NIST SP 800-37 r2 § 3.3 — applicability, scoping, parameter selection, control supplements, mitigation alternatives." },
+                { "id": "pl11_tailoring_register_fields","label": "Tailoring-register fields",     "type": "multi_select",
+                  "options": ["Control / enhancement number", "Tailoring action (Selected / Tailored Out / Supplemented)", "Rationale (organizational risk-tolerance, system-specific factor, compensating control)", "Approved-by role and date", "Linked POA&M (if compensating control)", "Re-evaluation cadence"] },
+                { "id": "pl11_approval_authority", "label": "Tailoring-approval authority",       "type": "textarea", "rows": 3,
+                  "help": "Who approves tailoring decisions. Typically: System Owner approves operational tailoring, AO approves overall baseline tailoring." },
+                { "id": "pl11_review_cadence",      "label": "Tailoring-review cadence",          "type": "text",
+                  "help": "How often the tailoring register is reviewed for continued validity (typical: 'Annual + on significant change')." }
+            ]
+        },
+
+        {
+            "id": "pl_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Planning-Artifact Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_supporting_plans",   "label": "Supporting plans referenced",       "type": "text",
+                  "help": "Approximate count of supporting plans the SSP references (one per applicable 800-53 family — typically 14-20)." },
+                { "id": "scope_tailored_controls",  "label": "Tailored controls / enhancements",  "type": "text",
+                  "help": "Approximate count of controls / enhancements with tailoring decisions documented." },
+                { "id": "scope_rob_acknowledgers",   "label": "RoB-acknowledger pool size",       "type": "text",
+                  "help": "Count of personnel required to acknowledge the RoB." },
+                { "id": "scope_architecture_versions","label": "Architecture document major versions", "type": "text",
+                  "help": "Count of architecture document major versions issued (anchors change-rate metric)." }
+            ]
+        },
+
+        {
+            "id": "pl_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Planning Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate PL control effectiveness.",
+            "questions": [
+                { "id": "pl_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "SSP review-cycle adherence (% reviews completed on schedule)",
+                      "Mean time from significant change → SSP updated",
+                      "RoB acknowledgment-completion rate (current cycle)",
+                      "Architecture-document currency rate",
+                      "Tailoring-register decision currency rate",
+                      "Control-supplement / removal change rate per cycle",
+                      "Mean time from threat-model change → architecture-doc update",
+                      "Open POA&M items linked to PL controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the PL control implementations are summarized (e.g., 'SSP §13.1 — meta')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for PL findings", "type": "text",
+                  "help": "Convention for PL-related POA&M items (e.g., 'POAM-PL-' for general)." },
+                { "id": "ca_handoff",                   "label": "CA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PL-2 SSP feeds CA-2 assessment and CA-6 authorization decisions. Where AO sees the SSP." },
+                { "id": "ra_handoff",                   "label": "RA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How RA-2 categorization drives PL-10 baseline selection. Trigger when categorization changes." },
+                { "id": "cm_handoff",                   "label": "CM handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How architecture / SSP changes route through CM-3 change control. CM-4 significant-change determination." },
+                { "id": "ps_handoff",                   "label": "PS handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PL-4 Rules of Behavior pair with PS-6 access agreements. Co-administered or separate?" },
+                { "id": "all_families_handoff",         "label": "All-families pointer",          "type": "textarea", "rows": 2,
+                  "help": "How each family plan references back to this PL plan (the SSP it documents). Reference the supporting-plans register." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying PL continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "PL-2": {
+            "prompts": [
+                "Reference §4.2 — SSP scope, review cadence, change triggers, change workflow, distribution list, supporting plans.",
+                "Document the supporting-plans register that maps each family to its plan artifact.",
+                "Address how the SSP and supporting plans are kept consistent (single source of truth for shared content).",
+                "Reference NIST SP 800-18 r1 for SSP guidance.",
+                "Reference PL-2(1)-(4) (withdrawn — incorporated into PL-2)."
+            ],
+            "evidence_suggestions": [
+                "Current SSP version with revision history",
+                "SSP-review attestation (most recent)",
+                "Supporting-plans register",
+                "Distribution-list signoff log",
+                "Sample change-driven SSP-update record"
+            ],
+            "extra_fields": [
+                { "id": "pl2_emass_package_id",     "label": "eMASS package ID (federal)",        "type": "text",
+                  "help": "If applicable: the eMASS package ID that holds the SSP. Federal-government systems." },
+                { "id": "pl2_consistency_strategy", "label": "Cross-document consistency strategy", "type": "textarea", "rows": 3,
+                  "help": "How shared content (system metadata, baseline, etc.) is kept consistent across the SSP and supporting plans. Single source of truth, schema-driven generators (such as this one)." }
+            ]
+        },
+
+        "PL-4": {
+            "prompts": [
+                "Reference §4.3 — required topics, acknowledgment method, renewal cadence, storage, social-media restrictions, revisions log.",
+                "Document the integration with PS-6 access agreements (often co-administered).",
+                "Address how access is conditioned on signed RoB (no acknowledgment → no access).",
+                "Reference PL-4 ODV — review and update frequency.",
+                "Reference PL-4(1) social media and external site / application usage restrictions."
+            ],
+            "evidence_suggestions": [
+                "Current Rules of Behavior document",
+                "Sample acknowledgment record",
+                "Annual completion-rate report",
+                "Revisions log",
+                "Social-media policy document (PL-4(1))"
+            ],
+            "extra_fields": [
+                { "id": "pl4_acknowledgment_dashboard","label": "Acknowledgment dashboard reference", "type": "text",
+                  "help": "Where current acknowledgment status is visible." },
+                { "id": "pl4_social_media_policy_reference","label": "Social-media policy reference", "type": "text",
+                  "help": "If separate from the RoB, where the social-media policy lives." }
+            ]
+        },
+
+        "PL-8": {
+            "prompts": [
+                "Reference §4.4 — documentation scope, review cadence, threat-model maturity, engineering integration, privacy-architecture status.",
+                "Document the integration with SA-8 secure-engineering principles.",
+                "Address how architecture-significant changes are recognized and routed.",
+                "Reference NIST SP 800-160 v1 r1 for engineering trustworthy secure systems.",
+                "Reference PL-8(1) defense in depth (withdrawn — incorporated into SC-7), PL-8(2) supplier diversity (withdrawn — incorporated into SR-3)."
+            ],
+            "evidence_suggestions": [
+                "Current architecture document",
+                "Most recent threat model",
+                "Architecture Decision Records (ADRs)",
+                "Architecture-review attestation",
+                "Privacy-architecture document (if separate)"
+            ],
+            "extra_fields": [
+                { "id": "pl8_sarb_charter_reference","label": "Security Architecture Review Board charter", "type": "text",
+                  "help": "If applicable: pointer to the SARB charter / membership / decision authority." },
+                { "id": "pl8_threat_model_storage", "label": "Threat-model storage location",     "type": "text",
+                  "help": "Where current threat models are maintained (often co-located with architecture docs)." }
+            ]
+        },
+
+        "PL-10": {
+            "prompts": [
+                "Reference §4.5 — baseline source, categorization basis, baseline documentation, overlays applied.",
+                "Document the linkage from RA-2 categorization to PL-10 baseline selection.",
+                "Address re-baselining triggers (change in categorization, change in overlay applicability).",
+                "Reference NIST SP 800-53B for the baseline catalog.",
+                "Reference NIST SP 800-37 r2 § 3.2 for categorization-driven baseline selection."
+            ],
+            "evidence_suggestions": [
+                "Baseline-selection decision record",
+                "FIPS 199 categorization (cross-reference RA-2)",
+                "Baseline list (sourced from authoritative reference)",
+                "Overlay-applicability determinations"
+            ],
+            "extra_fields": [
+                { "id": "pl10_baseline_export_location","label": "Baseline-list export location",  "type": "text",
+                  "help": "Where the as-selected baseline (the list of in-scope controls) is documented for assessor reference." }
+            ]
+        },
+
+        "PL-11": {
+            "prompts": [
+                "Reference §4.6 — methodology, register fields, approval authority, review cadence.",
+                "Document each tailoring action with rationale.",
+                "Address compensating-control documentation when tailoring out a control with risk acceptance (RA-7).",
+                "Reference NIST SP 800-53B § 2.4 for tailoring approach.",
+                "Reference NIST SP 800-37 r2 § 3.3 for tailoring within the RMF."
+            ],
+            "evidence_suggestions": [
+                "Tailoring register (current export)",
+                "Sample tailoring-action approval record",
+                "Compensating-control register",
+                "Annual tailoring-review attestation"
+            ],
+            "extra_fields": [
+                { "id": "pl11_tailoring_template_reference","label": "Tailoring-record template reference", "type": "text",
+                  "help": "Where the tailoring-record template lives." },
+                { "id": "pl11_tailoring_summary",    "label": "Tailoring summary (count by type)", "type": "textarea", "rows": 3,
+                  "help": "High-level summary (e.g., '142 controls baseline; 12 supplemented for FIPS-validated crypto requirement; 3 tailored out — IA-12 and AT-2(5) per scope; PT-2 / PT-3 not applicable per zero-PII determination')." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Architecture Decision Record (ADR)","definition": "A short document capturing an architecture-significant decision, its context, and consequences. Common evidence vehicle for PL-8 and SA-8 principle application." },
+        { "term": "Baseline",                "definition": "Per PL-10, the starting set of controls applicable to a system based on FIPS 199 categorization. Drawn from NIST SP 800-53B (Low / Moderate / High) or equivalent (FedRAMP, CNSSI 1253)." },
+        { "term": "Categorization",          "definition": "Per FIPS 199, the assignment of Low / Moderate / High impact ratings to a system based on confidentiality, integrity, and availability impacts. Drives PL-10 baseline selection. Reference RA-2." },
+        { "term": "CNSSI 1253",              "definition": "Committee on National Security Systems Instruction 1253 — categorization and control-selection guidance for national-security systems. Provides separate confidentiality / integrity / availability baselines plus classified overlays." },
+        { "term": "eMASS",                   "definition": "Enterprise Mission Assurance Support Service — DoD's authoritative tool for managing RMF packages including the SSP." },
+        { "term": "FIPS 199",                "definition": "Federal Information Processing Standard 199 — Standards for Security Categorization of Federal Information and Information Systems. Defines the C / I / A impact-level framework." },
+        { "term": "FIPS 200",                "definition": "Federal Information Processing Standard 200 — Minimum Security Requirements for Federal Information and Information Systems. Mandates categorization-driven baseline selection." },
+        { "term": "High-Water Mark",         "definition": "Per FIPS 199, the highest impact level across all information types within a system. The system inherits this level as its overall categorization." },
+        { "term": "Overlay",                 "definition": "Per NIST SP 800-53B § 2.4, a fully specified set of controls, control enhancements, and supplemental guidance derived from baseline controls and tailored to address specific protection needs (privacy, classified, ICS, etc.)." },
+        { "term": "Rules of Behavior (RoB)", "definition": "Per PL-4, a set of rules describing user obligations and acceptable use of system resources. Often co-administered with PS-6 access agreements." },
+        { "term": "Significant Change",       "definition": "Per NIST SP 800-37 r2 § 3.6 and CM-4, a change that, alone or in combination with other changes, is likely to affect the security state of the system. Triggers PL-2 SSP update." },
+        { "term": "SSP",                     "definition": "System Security Plan — the formal document that describes the system, its categorization, applicable controls, and how each control is implemented. Subject of PL-2." },
+        { "term": "Tailoring",               "definition": "Per NIST SP 800-37 r2 § 3.3 and PL-11, the process of modifying a baseline by applying overlays, scoping considerations, parameter selections, control supplements, and risk-based decisions to fit a specific system context." },
+        { "term": "Threat Model",            "definition": "A structured analysis of system threats, vulnerabilities, and countermeasures. Per PL-8 and SA-11(2). Common methodologies: STRIDE, PASTA, attack trees." }
+    ],
+
+    "acronyms": [
+        { "abbr": "ADR",     "expansion": "Architecture Decision Record" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "AT",      "expansion": "Awareness and Training (NIST 800-53 family)" },
+        { "abbr": "CA",      "expansion": "Assessment, Authorization, and Monitoring (NIST 800-53 family)" },
+        { "abbr": "CDS",     "expansion": "Cross-Domain Solution" },
+        { "abbr": "CM",      "expansion": "Configuration Management (NIST 800-53 family)" },
+        { "abbr": "CNSSI",   "expansion": "Committee on National Security Systems Instruction" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "DoD CC SRG","expansion": "DoD Cloud Computing Security Requirements Guide" },
+        { "abbr": "eMASS",   "expansion": "Enterprise Mission Assurance Support Service" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "FTI",     "expansion": "Federal Tax Information" },
+        { "abbr": "GRC",     "expansion": "Governance, Risk, and Compliance" },
+        { "abbr": "HRMS",    "expansion": "Human Resources Management System" },
+        { "abbr": "ICS",     "expansion": "Industrial Control System" },
+        { "abbr": "IL",      "expansion": "Impact Level (DoD CC SRG)" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "LMS",     "expansion": "Learning Management System" },
+        { "abbr": "LLM",     "expansion": "Large Language Model" },
+        { "abbr": "MP",      "expansion": "Media Protection (NIST 800-53 family)" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "PASTA",   "expansion": "Process for Attack Simulation and Threat Analysis" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "PL",      "expansion": "Planning (NIST 800-53 family)" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "PT",      "expansion": "PII Processing and Transparency (NIST 800-53 family)" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "RoB",     "expansion": "Rules of Behavior" },
+        { "abbr": "SA",      "expansion": "System and Services Acquisition (NIST 800-53 family)" },
+        { "abbr": "SARB",    "expansion": "Security Architecture Review Board" },
+        { "abbr": "SC",      "expansion": "System and Communications Protection (NIST 800-53 family)" },
+        { "abbr": "SI",      "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SR",      "expansion": "Supply Chain Risk Management (NIST 800-53 family)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "STRIDE",  "expansion": "Spoofing / Tampering / Repudiation / Information disclosure / DoS / Elevation of privilege" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-53B — Control Baselines for Information Systems and Organizations", "url": "https://csrc.nist.gov/pubs/sp/800/53/b/upd1/final" },
+        { "label": "NIST SP 800-18 r1 — Guide for Developing Security Plans for Federal Information Systems", "url": "https://csrc.nist.gov/pubs/sp/800/18/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NIST SP 800-160 v1 r1 — Engineering Trustworthy Secure Systems", "url": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final" },
+        { "label": "NIST IR 8062 — Privacy Risk Management Framework",              "url": "https://csrc.nist.gov/pubs/ir/8062/final" },
+        { "label": "FIPS 199 — Standards for Security Categorization",              "url": "https://csrc.nist.gov/pubs/fips/199/final" },
+        { "label": "FIPS 200 — Minimum Security Requirements",                      "url": "https://csrc.nist.gov/pubs/fips/200/final" },
+        { "label": "CNSSI 1253 — Security Categorization and Control Selection for National Security Systems", "url": "https://www.cnss.gov/CNSS/issuances/Instructions.cfm" }
+    ]
+}
