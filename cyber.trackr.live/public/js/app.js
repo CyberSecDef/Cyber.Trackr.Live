@@ -166,6 +166,65 @@ window.app = {
         window.location.href = window.routes.search.replace("REPLACE_THIS", encodeURIComponent(query));
     },
 
+    /**
+     * Share the current URL. Uses the native Web Share API where available
+     * (mobile, plus modern Safari/Chrome on macOS); falls back to clipboard
+     * copy elsewhere. Emits a tiny status bubble next to the button so the
+     * user gets feedback regardless of which path fired.
+     */
+    async share(btn) {
+        const fb = btn.querySelector("[data-share-feedback]");
+        const url = window.location.href;
+        const title = document.title;
+        // Pull the description meta if present — gives the share sheet a
+        // sentence to render alongside the URL on platforms that support it.
+        const descEl = document.querySelector('meta[name="description"]');
+        const text = descEl ? descEl.getAttribute("content") || "" : "";
+
+        if (navigator.share) {
+            try {
+                await navigator.share({ title, text, url });
+                return;  // The native sheet handles its own feedback.
+            } catch (e) {
+                // User canceled — silent. Anything else falls through to copy.
+                if (e && e.name === "AbortError") return;
+            }
+        }
+
+        // Clipboard fallback.
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(url);
+                window.app.shareFeedback(fb, "Link copied");
+                return;
+            }
+            // Older browsers — fall back to a hidden textarea + execCommand.
+            const ta = document.createElement("textarea");
+            ta.value = url;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            try { document.execCommand("copy"); } catch (e) { /* swallow */ }
+            document.body.removeChild(ta);
+            window.app.shareFeedback(fb, "Link copied");
+        } catch (e) {
+            window.app.shareFeedback(fb, "Could not copy", true);
+        }
+    },
+
+    shareFeedback(el, msg, isError) {
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.toggle("share-btn__feedback--error", !!isError);
+        el.hidden = false;
+        clearTimeout(window.app._shareFbTimer);
+        window.app._shareFbTimer = setTimeout(function () {
+            el.hidden = true;
+            el.classList.remove("share-btn__feedback--error");
+        }, 1800);
+    },
+
     /** Mobile nav hamburger — toggles the .is-open class on the nav panel. */
     navToggle(btn) {
         const $nav = $("#site-nav");

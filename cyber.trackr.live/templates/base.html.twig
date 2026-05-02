@@ -171,6 +171,15 @@
                         <input type="search" id="search_terms" class="site-search__input" placeholder="Search the library&hellip;" aria-label="Search the library" autocomplete="off">
                         <kbd class="site-search__kbd" title="Press Cmd/Ctrl + K to focus search">&#8984;K</kbd>
                     </div>
+                    <button type="button"
+                            id="share-btn"
+                            class="share-btn"
+                            onclick="window.app.share(this)"
+                            aria-label="Share this page"
+                            title="Share this page">
+                        <i class="bi bi-share" aria-hidden="true"></i>
+                        <span class="share-btn__feedback" data-share-feedback role="status" aria-live="polite" hidden></span>
+                    </button>
                     <div class="theme-menu">
                         <button type="button" class="theme-toggle" onclick="window.app.theme.menuToggle(this)"
                                 aria-label="Choose color theme" aria-haspopup="true" aria-expanded="false">

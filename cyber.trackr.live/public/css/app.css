@@ -6547,3 +6547,84 @@ del {
         width: auto;
     }
 }
+
+/* ============================================================
+   Share-this-page button — sticky nav, between search + theme.
+   Mirrors .theme-toggle sizing/behavior so the right-cluster
+   stays balanced. Tries navigator.share() first (mobile + modern
+   Safari/Chrome), falls back to clipboard with a small feedback
+   bubble that auto-dismisses.
+   ============================================================ */
+.share-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    font-size: 16px;
+    line-height: 1;
+    position: relative;
+}
+.share-btn:hover,
+.share-btn:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.share-btn__feedback {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    padding: 6px 12px;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: var(--radius-md, 6px);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 90;
+    animation: share-pop-in 0.18s ease-out;
+}
+.share-btn__feedback::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    right: 14px;
+    width: 8px;
+    height: 8px;
+    background: var(--text);
+    transform: rotate(45deg);
+}
+.share-btn__feedback--error {
+    background: #b91c1c;
+    color: #fff;
+}
+.share-btn__feedback--error::before {
+    background: #b91c1c;
+}
+[data-theme="ink"] .share-btn__feedback--error,
+[data-theme="dracula"] .share-btn__feedback--error,
+[data-theme="solarized-dark"] .share-btn__feedback--error {
+    background: #f87171;
+    color: #1a1612;
+}
+[data-theme="ink"] .share-btn__feedback--error::before,
+[data-theme="dracula"] .share-btn__feedback--error::before,
+[data-theme="solarized-dark"] .share-btn__feedback--error::before {
+    background: #f87171;
+}
+
+@keyframes share-pop-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
