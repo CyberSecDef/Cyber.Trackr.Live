@@ -6233,3 +6233,85 @@ del {
     font-style: italic;
     font-size: 13px;
 }
+
+/* ============================================================
+   Privacy-baseline UX surfaces — plan generator
+   ============================================================ */
+
+/* Plan-index card badge for PT and PM. */
+.plan-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: var(--space-2);
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid #8b5cf6;
+    color: #5b21b6;
+    background: rgba(139, 92, 246, 0.10);
+    text-transform: none;
+}
+.plan-card__badge > i {
+    font-size: 11px;
+}
+[data-theme="ink"] .plan-card__badge,
+[data-theme="dracula"] .plan-card__badge,
+[data-theme="solarized-dark"] .plan-card__badge,
+[data-theme="nord"] .plan-card__badge {
+    color: #c4b5fd;
+    background: rgba(167, 139, 250, 0.12);
+    border-color: #a78bfa;
+}
+.plan-card--privacy {
+    border-left: 3px solid #8b5cf6;
+}
+[data-theme="ink"] .plan-card--privacy,
+[data-theme="dracula"] .plan-card--privacy,
+[data-theme="solarized-dark"] .plan-card--privacy,
+[data-theme="nord"] .plan-card--privacy {
+    border-left-color: #a78bfa;
+}
+
+/* In-wizard privacy hint inside section 2 (Baseline). */
+.plan-wizard__hint {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-3);
+    align-items: start;
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+}
+.plan-wizard__hint > i {
+    font-size: 22px;
+    line-height: 1;
+    margin-top: 1px;
+}
+.plan-wizard__hint--privacy {
+    border-left: 4px solid #8b5cf6;
+    background: rgba(139, 92, 246, 0.06);
+}
+.plan-wizard__hint--privacy > i {
+    color: #8b5cf6;
+}
+[data-theme="ink"] .plan-wizard__hint--privacy,
+[data-theme="dracula"] .plan-wizard__hint--privacy,
+[data-theme="solarized-dark"] .plan-wizard__hint--privacy,
+[data-theme="nord"] .plan-wizard__hint--privacy {
+    border-left-color: #a78bfa;
+    background: rgba(167, 139, 250, 0.10);
+}
+[data-theme="ink"] .plan-wizard__hint--privacy > i,
+[data-theme="dracula"] .plan-wizard__hint--privacy > i,
+[data-theme="solarized-dark"] .plan-wizard__hint--privacy > i,
+[data-theme="nord"] .plan-wizard__hint--privacy > i {
+    color: #a78bfa;
+}

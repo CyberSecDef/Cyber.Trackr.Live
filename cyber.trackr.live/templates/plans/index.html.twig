@@ -25,11 +25,20 @@
 
         <div class="plan-grid">
             {% for code, p in plans %}
+                {% set is_privacy = code in ['pt', 'pm'] %}
                 <a href="{{ path('plans_wizard', {family: code}) }}"
-                   class="plan-card"
+                   class="plan-card{% if is_privacy %} plan-card--privacy{% endif %}"
                    data-plan-link
                    data-plan-name="{{ p.title }}">
-                    <span class="eyebrow">{{ p.family_name }}</span>
+                    <span class="eyebrow">
+                        {{ p.family_name }}
+                        {% if is_privacy %}
+                            <span class="plan-card__badge plan-card__badge--privacy" title="This family lives in the NIST Privacy baseline rather than the Low / Moderate / High security baselines.">
+                                <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+                                Privacy baseline
+                            </span>
+                        {% endif %}
+                    </span>
                     <h2 class="plan-card__title">{{ p.title }}</h2>
                     <p class="plan-card__description">{{ p.description }}</p>
                     <span class="plan-card__cta">

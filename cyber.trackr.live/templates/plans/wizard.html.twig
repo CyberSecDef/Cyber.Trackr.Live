@@ -66,12 +66,36 @@
                     <span class="plan-wizard__section-label">Baseline</span>
                 </summary>
                 <div class="plan-wizard__section-body">
+                    {% if schema.family in ['PT', 'PM'] %}
+                        <div class="plan-wizard__hint plan-wizard__hint--privacy" role="note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <div>
+                                <strong>{{ schema.family }} is a privacy-baseline family.</strong>
+                                {% if schema.family == 'PT' %}
+                                    Every PT control lives in the NIST Privacy baseline. Choose <em>NIST Privacy</em> below to populate this plan with in-baseline cards. Other baselines will render zero in-baseline rules — you can still mark individual enhancements <em>Selected</em> by hand if needed.
+                                {% else %}
+                                    PM controls are organizational (not in the LMH security baselines); the PII-related PM controls (PM-18 through PM-27) live in the NIST Privacy baseline. Choose <em>NIST Privacy</em> below for in-baseline coverage of those controls. The non-privacy PM controls render as out-of-baseline regardless.
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                     <div class="form-field">
                         <label for="baseline">Pick the baseline that controls system applicability</label>
                         <select name="baseline" id="baseline" data-answer-key="baseline">
                             <option value="">— Choose a baseline —</option>
+                            {% set grouped = {} %}
                             {% for id, o in overlays %}
-                                <option value="{{ id }}">{{ o.title }}</option>
+                                {% set src = o.source %}
+                                {% set list = grouped[src]|default([]) %}
+                                {% set list = list|merge([{'id': id, 'short_title': o.short_title, 'count': o.count}]) %}
+                                {% set grouped = grouped|merge({(src): list}) %}
+                            {% endfor %}
+                            {% for src, items in grouped %}
+                                <optgroup label="{% if src == 'nist' %}NIST 800-53{% elseif src == 'fedramp' %}FedRAMP{% elseif src == 'cnss' %}CNSSI 1253{% else %}{{ src|title }}{% endif %}">
+                                    {% for item in items %}
+                                        <option value="{{ item.id }}"{% if (schema.family in ['PT', 'PM']) and item.id == 'nist-privacy' %} data-recommended="1"{% endif %}>{{ item.short_title }}{% if item.id == 'nist-privacy' and schema.family in ['PT', 'PM'] %} — recommended{% endif %} ({{ item.count|number_format }} controls)</option>
+                                    {% endfor %}
+                                </optgroup>
                             {% endfor %}
                         </select>
                         <span class="form-field__hint">Determines which controls in this family appear in your plan.</span>
