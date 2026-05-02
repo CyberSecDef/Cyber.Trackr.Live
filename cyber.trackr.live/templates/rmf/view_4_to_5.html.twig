@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}800-53 r4 → r5 Mapping &mdash; Cyber Trackr{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="r4-r5-title">
+        <div class="rule-text">&sect; Library &middot; 800-53 r4 &rarr; r5</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Revision Mapping</span>
+            <h1 id="r4-r5-title" class="lib-page__title-large">
+                800-53 <em>r4 &rarr; r5</em> control mapping
+            </h1>
+            <p class="lib-page__lede">
+                Side-by-side view of every NIST SP 800-53 control across both revisions. The mechanical layer pairs identical numbers, flags withdrawn r4 entries, and surfaces new-in-r5 entries from the catalogs themselves; the curated layer adds rationale text from NIST&rsquo;s Rev 4 to Rev 5 mapping for context-rich rows.
+            </p>
+
+            <div class="r4r5-summary">
+                <div class="r4r5-summary__cell">
+                    <span class="r4r5-summary__label">r4 controls</span>
+                    <span class="r4r5-summary__value">{{ totals.r4_total|number_format }}</span>
+                </div>
+                <div class="r4r5-summary__cell">
+                    <span class="r4r5-summary__label">r5 controls</span>
+                    <span class="r4r5-summary__value">{{ totals.r5_total|number_format }}</span>
+                </div>
+                <div class="r4r5-summary__cell">
+                    <span class="r4r5-summary__label">Curated rows</span>
+                    <span class="r4r5-summary__value">{{ totals.curated_count|number_format }}</span>
+                </div>
+                {% for kind, count in kinds %}
+                    <div class="r4r5-summary__cell r4r5-summary__cell--{{ kind }}">
+                        <span class="r4r5-summary__label">{{ kind|replace({'-': ' '})|title }}</span>
+                        <span class="r4r5-summary__value">{{ count|number_format }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </header>
+
+        <div id="r4r5_container">
+            <table id="r4r5_table" class="r4r5-table compact w-100">
+                <thead>
+                    <tr>
+                        <th>Family</th>
+                        <th>r4</th>
+                        <th>r4 Title</th>
+                        <th>Change</th>
+                        <th>r5</th>
+                        <th>r5 Title</th>
+                        <th>Rationale</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rows %}
+                        <tr data-kind="{{ r.kind }}" data-family="{{ r.family }}">
+                            <td>{{ r.family }}</td>
+                            <td>
+                                {% if r.r4 %}
+                                    <a class="ident ident--link" href="{{ path('rmf_v4_view') }}#rmf_{{ r.r4 }}" title="View {{ r.r4 }} on the 800-53 Rev 4 page">{{ r.r4 }}</a>
+                                {% else %}
+                                    <span class="r4r5-cell-empty">&mdash;</span>
+                                {% endif %}
+                            </td>
+                            <td class="r4r5-title">{{ r.r4_title|default('') }}</td>
+                            <td><span class="r4r5-badge r4r5-badge--{{ r.kind }}">{{ r.kind|replace({'-': ' ' })|title }}</span></td>
+                            <td>
+                                {% if r.r5 %}
+                                    <a class="ident ident--link" href="{{ path('rmf_v5_view') }}#rmf_{{ r.r5 }}" title="View {{ r.r5 }} on the 800-53 Rev 5 page">{{ r.r5 }}</a>
+                                {% else %}
+                                    <span class="r4r5-cell-empty">&mdash;</span>
+                                {% endif %}
+                            </td>
+                            <td class="r4r5-title">{{ r.r5_title|default('') }}</td>
+                            <td class="r4r5-rationale">{{ r.rationale|default('') }}</td>
+                            <td><span class="r4r5-source r4r5-source--{{ r.source }}">{{ r.source }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script>
+        const r4r5_app = {
+            init(){
+                const dt = $('#r4r5_table').DataTable({
+                    dom: '<"cci-toolbar"<"cci-toolbar__left"f><"cci-toolbar__right"lB>>rt<"cci-foot"<"cci-foot__info"i>p>',
+                    pageLength: 25,
+                    order: [[ 0, 'asc' ], [ 1, 'asc' ]],
+                    colReorder: true,
+                    responsive: true,
+                    columnDefs: [
+                        { responsivePriority: 1,     targets: 1 },  // r4 number
+                        { responsivePriority: 2,     targets: 4 },  // r5 number
+                        { responsivePriority: 3,     targets: 3 },  // change kind
+                        { responsivePriority: 4,     targets: 0 },  // family
+                        { responsivePriority: 10001, targets: '_all' },
+                    ],
+                    buttons: [
+                        { extend: 'copyHtml5',  text: '<i class="bi bi-copy"></i>',          titleAttr: 'Copy'  },
+                        { extend: 'excelHtml5', text: '<i class="bi bi-file-excel"></i>',    titleAttr: 'Excel' },
+                        { extend: 'csvHtml5',   text: '<i class="bi bi-filetype-csv"></i>',  titleAttr: 'CSV'   },
+                        { extend: 'pdfHtml5',   text: '<i class="bi bi-file-pdf"></i>',      titleAttr: 'PDF',
+                          orientation: 'landscape', pageSize: 'LEGAL' },
+                        { extend: 'print',      text: '<i class="bi bi-printer"></i>',       titleAttr: 'Print' },
+                    ],
+                });
+
+                // Deep-link support: /rmf/4-to-5#kind=withdrawn or #family=SC pre-filters.
+                r4r5_app.applyHashFilter(dt);
+                $(window).on('hashchange', () => r4r5_app.applyHashFilter(dt));
+            },
+            applyHashFilter(dt) {
+                const hash = (window.location.hash || '').replace(/^#/, '').trim();
+                if (!hash) { dt.search('').columns().search('').draw(); return; }
+                const kindMatch = hash.match(/^kind=([\w-]+)$/i);
+                if (kindMatch) {
+                    dt.column(3).search(kindMatch[1].replace(/-/g, ' '), false, false).draw();
+                    return;
+                }
+                const famMatch = hash.match(/^family=([A-Z]{2})$/i);
+                if (famMatch) {
+                    dt.column(0).search('^' + famMatch[1] + '$', true, false).draw();
+                    return;
+                }
+                // Fallback: treat hash as a free-text query.
+                dt.search(hash).draw();
+            }
+        };
+
+        $(document).ready(() => r4r5_app.init());
+    </script>
+{% endblock %}

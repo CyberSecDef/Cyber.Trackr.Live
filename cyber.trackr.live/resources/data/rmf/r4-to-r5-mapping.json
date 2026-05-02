@@ -1,0 +1,22 @@
+{
+    "_comment": "Mapping of NIST SP 800-53 Rev 4 to Rev 5 controls. Schema supports N:M mappings — an r4 control may map to zero (withdrawn), one (renamed / unchanged), or many (split) r5 controls; an r5 control may incorporate from many r4 controls (merged). The page combines two sources: (1) MECHANICAL — auto-derived by R4ToR5Mapper at request time from identity match between the two XML catalogs (catches unchanged numbers, new-in-r5 entries, and withdrawn-from-r4 entries); (2) CURATED — hand-authored entries below. Curated entries override mechanical inferences and supply rationale text. Empty 'curated' is fine — the mechanical layer alone produces a useful diff. To enrich, paste entries from NIST SP 800-53 r5 Annex 4 (the official Rev 4 to Rev 5 mapping); each entry is independent and editing one does not affect others. The schema is forward-compatible: a future r5-to-r6 mapping would mirror this shape with `r5` and `r6` keys.",
+
+    "schema_version": 1,
+    "source_authoritative": "NIST SP 800-53 r5 Annex 4 (Rev 4 to Rev 5 mapping)",
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+
+    "_kind_values": {
+        "unchanged":         "Control number exists in both revisions; substantive content may have evolved.",
+        "evolved":           "Same number; content significantly revised (e.g., expanded enhancements, restructured statements).",
+        "renamed":           "Same intent, different number.",
+        "withdrawn":         "Removed in r5 with no direct replacement; r5 field null.",
+        "incorporated-into": "r4 content moved into one or more r5 controls; r5 field is the destination.",
+        "split-into":        "r4 control split across multiple r5 controls; use multiple curated entries with the same r4 number.",
+        "merged-from":       "r5 control combines content from multiple r4 controls; use multiple curated entries with the same r5 number.",
+        "new-in-r5":         "r5 control with no predecessor in r4; r4 field null."
+    },
+
+    "curated": [
+
+    ]
+}

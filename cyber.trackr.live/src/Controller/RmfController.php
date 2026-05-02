@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Service\OverlayLoader;
+use App\Service\R4ToR5Mapper;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -130,5 +131,9 @@ class RmfController extends AbstractController
         ]);
     }
 
-
+    #[Route('/rmf/4-to-5', name: 'rmf_4_to_5_view')]
+    public function rmf_4_to_5_view(R4ToR5Mapper $mapper): Response
+    {
+        return $this->render('rmf/view_4_to_5.html.twig', $mapper->map());
+    }
 }
