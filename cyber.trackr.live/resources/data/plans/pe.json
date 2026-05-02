@@ -1,0 +1,626 @@
+{
+    "_comment": "Physical and Environmental Protection Plan generator. Authored at the Phase 2 assessability floor; pairs with MA (PE-3 escort + maintenance overlap), MP (PE-16 delivery + removal echoes MP-5 transport), CP (PE-9/10/11/12/13/14 environmental safeguards underpin CP-2 contingency planning), and PS (PE-2 access authorization tracks personnel screening from PS-3). Often largely inherited when the system runs on FedRAMP-authorized cloud — the inheritance pattern is itself worth documenting clearly.",
+
+    "family": "PE",
+    "family_name": "Physical and Environmental Protection",
+    "title": "Physical and Environmental Protection Plan",
+    "description": "Documents how the facilities, environmental systems, and physical-access controls protecting the system are governed. Covers physical-access authorization, physical-access control, transmission and output-device protection, monitoring and visitor logging, emergency systems (power, lighting, fire suppression, water leak detection, HVAC), environmental protection, secure delivery and removal of assets, and alternate work-site protection. Covers the controls of the PE family in NIST SP 800-53 r5 and aligns with NFPA 75 (Fire Protection of Information Technology Equipment), TIA-942 (Data Center Standards), Uptime Institute Tier ratings, NIST SP 800-46 r2 (Telework Security), and FedRAMP physical-control inheritance models.",
+
+    "intro_template": "This Physical and Environmental Protection Plan documents the physical and environmental safeguards applied to {system_name}'s hosting facilities. It establishes the practices, controls, cadences, and roles used to authorize and control physical access, monitor activity at facility boundaries, log visitors, sustain emergency power and lighting, suppress fire, detect water leaks, control temperature and humidity, manage secure delivery and removal of assets, and protect alternate work sites where telework is performed.\n\nThe scope covers physical access authorization, physical access control, transmission and output-device protection, monitoring and visitor logging, emergency power / lighting / fire / water / HVAC, secure delivery and removal, and alternate work-site protections within the {system_name} authorization boundary. Where controls are inherited from an underlying provider (FedRAMP IaaS, hosting facility), the inheritance posture and provider-supplied evidence are explicitly cited. The plan is consistent with NIST SP 800-53 r5 (Physical and Environmental Protection family), NFPA 75 (Fire Protection of IT Equipment), and NIST SP 800-46 r2 (Telework Security).",
+
+    "approach_section_title": "Physical and Environmental Protection Approach",
+    "approach_template": "{system_name} is hosted in {hosting_model}. The primary facility is {primary_facility}; the alternate / disaster-recovery facility is {alternate_facility}. Physical access is governed by {access_governance_role} via {access_request_workflow}. Visitor logging is performed at {visitor_logging_location}. Environmental protections — fire suppression, power, HVAC, water-leak detection — are inherited from {environmental_inheritance_provider} where the system runs on a managed facility, with provider-supplied evidence at {provider_evidence_location}.\n\nAdditional details on facility inventory, physical access authorization, physical access control, transmission and output protections, monitoring and visitor management, emergency systems, environmental protection, asset disposition, and alternate work-site protection are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Physical-and-environmental performance for {system_name} is tracked through the metrics in §6.1 (badge-access denial rate, lost-badge incidents, environmental-alarm count by category, emergency-power test results, fire-suppression inspection currency, visitor-log completeness rate). The provider's continuous-monitoring posture is reviewed on the cadence in §6.2; for inherited controls, FedRAMP / SOC 2 audit reports are pulled annually to confirm provider control effectiveness. Environmental alarms (PE-13 fire, PE-14 HVAC, PE-15 water leak) feed the operations-monitoring pipeline and trigger the IR plan when impact warrants.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Physical and Environmental Protection Plan does not stand alone. The PS family supplies the personnel screening that underwrites PE-2 access authorization; the MA family coordinates with PE-3 escort requirements when vendor maintenance is performed on-site; the MP family follows PE-16 delivery / removal procedures when media is transported; the CP family relies on PE-9 / PE-10 / PE-11 / PE-12 / PE-13 / PE-14 environmental safeguards to underwrite contingency-plan assumptions about facility availability; the AT family delivers the visitor-escort and incident-response training PE-3 / PE-6 implicate. The following cross-references identify the specific artifacts and locations where PE-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "PE-1",  "from": "Organizational physical-and-environmental-protection policy" },
+        { "number": "PE-9",  "from": "Hosting provider (FedRAMP IaaS, colocation facility)" },
+        { "number": "PE-10", "from": "Hosting provider (emergency-shutoff capability)" },
+        { "number": "PE-11", "from": "Hosting provider (UPS / generator emergency power)" },
+        { "number": "PE-12", "from": "Hosting provider (emergency lighting)" },
+        { "number": "PE-13", "from": "Hosting provider (fire suppression and detection)" },
+        { "number": "PE-14", "from": "Hosting provider (temperature and humidity control)" },
+        { "number": "PE-15", "from": "Hosting provider (water-damage protection)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Hosting model and identifiers that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "hosting_model",
+                    "label": "Hosting model (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where the system runs (e.g., 'FedRAMP-Moderate-authorized AWS GovCloud (US)', 'Agency-operated data center at Site A', 'Hybrid: prod on AWS GovCloud + DR at agency Tier-III facility')."
+                },
+                {
+                    "id": "primary_facility",
+                    "label": "Primary facility identifier",
+                    "type": "text",
+                    "required": true,
+                    "help": "Name and location of the primary facility (e.g., 'AWS GovCloud US-Gov-West-1 region', 'Building 4 Data Center, Crystal City VA')."
+                },
+                {
+                    "id": "alternate_facility",
+                    "label": "Alternate / DR facility identifier",
+                    "type": "text",
+                    "help": "Name and location of the alternate / disaster-recovery facility. Reference CP plan for the activation criteria."
+                },
+                {
+                    "id": "access_governance_role",
+                    "label": "Physical-access governance role",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role responsible for physical-access decisions (e.g., 'Facility Security Officer (FSO)', 'ISSM / Physical Security delegate'). Reference PS-1 for the screening half of the workflow."
+                },
+                {
+                    "id": "access_request_workflow",
+                    "label": "Physical-access request workflow",
+                    "type": "text",
+                    "help": "Brief phrase summarizing the workflow (e.g., 'ServiceNow request → ISSM approval → badge office', 'AWS IAM does not apply — physical access is provider-inherited; agency-staff badge handled via OPM workflow')."
+                },
+                {
+                    "id": "visitor_logging_location",
+                    "label": "Visitor-logging location",
+                    "type": "text",
+                    "help": "Where visitors are logged (e.g., 'Lobby visitor-management kiosk + paper logbook', 'Guard post + Signed-in workflow in BadgePass')."
+                },
+                {
+                    "id": "environmental_inheritance_provider",
+                    "label": "Environmental controls inheritance provider",
+                    "type": "text",
+                    "help": "Provider supplying environmental controls (e.g., 'AWS — see FedRAMP package', 'Crystal City data-center operator — see SLA + SOC 2', 'Agency facility ops — internal')."
+                },
+                {
+                    "id": "provider_evidence_location",
+                    "label": "Provider-evidence location",
+                    "type": "text",
+                    "help": "Where provider-supplied evidence (FedRAMP CRM, SOC 2, SLA reports) is stored on file."
+                }
+            ]
+        },
+
+        {
+            "id": "facility_inventory",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Facility Inventory",
+            "description": "List of facilities in scope and their roles.",
+            "questions": [
+                { "id": "facility_list",            "label": "Facilities in scope",                "type": "list",
+                  "suggestions": [
+                      "Primary data-center facility",
+                      "DR / alternate facility",
+                      "Agency office buildings hosting workstations",
+                      "Telework / alternate work sites (PE-17)",
+                      "Field offices",
+                      "Mobile platforms (vehicles, ships, aircraft)",
+                      "Cloud-provider regions (logical, not staffed by org)"
+                  ] },
+                { "id": "facility_classification",  "label": "Facility classification",            "type": "select",
+                  "options": ["Federal-owned", "Leased federal-controlled", "Contractor-operated facility (cleared)", "Cloud-provider facility (FedRAMP Moderate)", "Cloud-provider facility (FedRAMP High)", "Cloud-provider facility (DoD CC SRG IL4 / IL5)", "Mixed (multiple types — document each)"] },
+                { "id": "facility_uptime_tier",     "label": "Facility availability classification", "type": "select",
+                  "options": ["Uptime Institute Tier I (~99.671%)", "Uptime Institute Tier II (~99.741%)", "Uptime Institute Tier III (~99.982%)", "Uptime Institute Tier IV (~99.995%)", "Cloud-provider region (high-availability across multiple AZs)", "Not formally rated"] }
+            ]
+        },
+
+        {
+            "id": "access_authorization",
+            "type": "group",
+            "section": "approach",
+            "label": "Physical Access Authorization (PE-2)",
+            "description": "Who is authorized to enter, on what basis, and how the list is maintained.",
+            "questions": [
+                { "id": "pe2_access_list_owner",    "label": "Access-list owner role",             "type": "text",
+                  "help": "Role accountable for maintaining the authorized-access list (e.g., 'Facility Security Officer with ISSO concurrence')." },
+                { "id": "pe2_authorization_criteria","label": "Authorization criteria",            "type": "textarea", "rows": 3,
+                  "help": "What entitles a person to physical access (e.g., 'Active background investigation completion (PS-3) + need-to-access justification + supervisor approval')." },
+                { "id": "pe2_review_cadence",       "label": "Access-list review cadence (PE-2 ODV)", "type": "text",
+                  "help": "How often the access list is reviewed (typical values: 'Quarterly', 'Annually'). PE-2 ODV." },
+                { "id": "pe2_revocation_triggers",  "label": "Access-revocation triggers",         "type": "multi_select",
+                  "options": ["Termination / separation", "Role / project change removing need", "Suspended clearance", "Failed annual re-investigation", "Change of facility", "Misuse / incident"] },
+                { "id": "pe2_emergency_grant",      "label": "Emergency / temporary access process", "type": "textarea", "rows": 3,
+                  "help": "How urgent / temporary access is granted (e.g., post-incident investigators, vendor maintenance crews) without bypassing core controls." }
+            ]
+        },
+
+        {
+            "id": "access_control",
+            "type": "group",
+            "section": "approach",
+            "label": "Physical Access Control (PE-3)",
+            "description": "How entry and egress are physically controlled.",
+            "questions": [
+                { "id": "pe3_entry_mechanisms",     "label": "Entry mechanisms",                   "type": "multi_select",
+                  "options": ["Smart-card badge readers (PIV / CAC)", "Biometric (fingerprint / iris / face)", "Keypad PIN (less preferred)", "Mantrap / interlock vestibule", "Physical key (legacy areas only)", "Reception / guard verification", "Mobile credential (Bluetooth / NFC)"] },
+                { "id": "pe3_egress_controls",      "label": "Egress controls",                    "type": "textarea", "rows": 3,
+                  "help": "How exit is controlled (free egress for safety + monitoring, anti-passback, exit interviews for sensitive areas)." },
+                { "id": "pe3_escort_policy",        "label": "Escort policy",                      "type": "textarea", "rows": 3,
+                  "help": "Who must be escorted (visitors, vendors without clearance, contractor staff). Escort-to-visitor ratio. Reference MA-5 for maintenance personnel." },
+                { "id": "pe3_intrusion_detection",  "label": "Intrusion-detection system",         "type": "textarea", "rows": 3,
+                  "help": "IDS at entry / boundary (door-sensor, motion, glass-break). Alarm routing to security operations + on-call." },
+                { "id": "pe3_lock_inventory",       "label": "Lock + key inventory tracking",      "type": "textarea", "rows": 3,
+                  "help": "How physical keys, electronic-credentials, and lock combinations are inventoried and rotated. Lost-key procedures." }
+            ]
+        },
+
+        {
+            "id": "transmission_protection",
+            "type": "group",
+            "section": "approach",
+            "label": "Transmission and Output (PE-4, PE-5)",
+            "description": "Protection of cabling, ports, and output devices.",
+            "questions": [
+                { "id": "pe4_cabling_protection",   "label": "Cabling protection (PE-4)",          "type": "textarea", "rows": 3,
+                  "help": "How transmission lines are protected from interception / damage (conduit, raceway, locked patch panels, fiber for sensitive runs)." },
+                { "id": "pe4_port_blocking",        "label": "Port-blocking posture",              "type": "textarea", "rows": 3,
+                  "help": "How unused network ports / USB ports are physically disabled (port-blockers, NAC enforcement). Coordinated with IA-3." },
+                { "id": "pe5_output_device_protection","label": "Output-device protection (PE-5)", "type": "textarea", "rows": 3,
+                  "help": "How printers, monitors, and copiers are positioned / shielded so output is not visible to unauthorized observers (privacy filters, secure-print release, no-monitor-facing-window policy)." }
+            ]
+        },
+
+        {
+            "id": "monitoring_visitors",
+            "type": "group",
+            "section": "approach",
+            "label": "Monitoring and Visitor Management (PE-6, PE-8)",
+            "description": "How activity at the boundary is monitored and visitors are tracked.",
+            "questions": [
+                { "id": "pe6_monitoring_capability","label": "Monitoring capability",              "type": "multi_select",
+                  "options": ["Manned guard posts", "CCTV with active monitoring", "CCTV with recording + retroactive review", "Door-position sensors", "Badge-reader-event monitoring", "Anomaly-based access-pattern detection", "Tailgating-detection sensors"] },
+                { "id": "pe6_recording_retention",  "label": "Recording retention period",         "type": "text",
+                  "help": "How long surveillance recordings are retained (e.g., '90 days for routine; longer for incident-tagged'). PE-6(1) ODV." },
+                { "id": "pe8_visitor_log_fields",   "label": "Visitor-log required fields",        "type": "multi_select",
+                  "options": ["Visitor name", "Visitor organization", "Government-issued ID type + number", "Time in / time out", "Person visited (sponsor)", "Purpose of visit", "Areas accessed", "Escort name", "Escort signature"] },
+                { "id": "pe8_log_retention",        "label": "Visitor-log retention (PE-8 ODV)",   "type": "text",
+                  "help": "How long visitor logs are retained. PE-8 ODV. Common: 'One year', 'Per NARA records-retention schedule'." },
+                { "id": "pe8_log_review_cadence",   "label": "Visitor-log review cadence",         "type": "text",
+                  "help": "How often visitor logs are reviewed for anomalies (escort gaps, off-hours visits)." }
+            ]
+        },
+
+        {
+            "id": "emergency_systems",
+            "type": "group",
+            "section": "approach",
+            "label": "Emergency Power, Lighting, and Shutoff (PE-9 through PE-12)",
+            "description": "Power resilience and life-safety.",
+            "questions": [
+                { "id": "pe9_power_topology",       "label": "Power topology (PE-9 / PE-9(1))",    "type": "textarea", "rows": 3,
+                  "help": "Redundancy of power: dual feeds, UPS, generator, transfer-switch behavior. Dual A+B power at rack level (PE-9(1))." },
+                { "id": "pe10_emergency_shutoff",   "label": "Emergency-shutoff capability (PE-10)","type": "textarea", "rows": 3,
+                  "help": "EPO (Emergency Power Off) location, activation criteria, blast-radius (rack vs row vs room). Whether EPO is hardware-disable / requires fire-marshal coordination." },
+                { "id": "pe11_emergency_power",     "label": "Emergency power posture (PE-11)",    "type": "textarea", "rows": 3,
+                  "help": "UPS runtime, generator capacity, fuel-supply duration, automated transfer-test cadence. PE-11(1) for graceful-shutdown automation." },
+                { "id": "pe12_emergency_lighting",  "label": "Emergency-lighting coverage (PE-12)","type": "textarea", "rows": 3,
+                  "help": "Battery-backed lighting in egress paths, IT areas. Inspection cadence. PE-12 ODV." }
+            ]
+        },
+
+        {
+            "id": "environmental",
+            "type": "group",
+            "section": "approach",
+            "label": "Environmental Protection (PE-13, PE-14, PE-15)",
+            "description": "Fire suppression, climate control, water-leak detection.",
+            "questions": [
+                { "id": "pe13_fire_suppression",    "label": "Fire-suppression system (PE-13)",    "type": "select",
+                  "options": ["Pre-action sprinkler (water-based, double-action)", "Wet-pipe sprinkler", "Dry-pipe sprinkler", "Clean-agent (FM-200 / Novec 1230)", "Inert-gas (IG-55 / IG-541)", "Mixed (clean-agent in IT areas; sprinkler perimeter)"] },
+                { "id": "pe13_detection_system",    "label": "Fire-detection system (PE-13(1))",   "type": "textarea", "rows": 3,
+                  "help": "VESDA / aspirating smoke detection, photoelectric, ionization. Notification routing (24/7 monitored alarm, fire-marshal direct line)." },
+                { "id": "pe13_inspection_cadence",  "label": "Suppression-inspection cadence",     "type": "text",
+                  "help": "How often fire suppression is inspected per NFPA 25 (typically annual + quarterly visual)." },
+                { "id": "pe14_temp_humidity_range", "label": "Operating temperature / humidity range (PE-14)", "type": "text",
+                  "help": "Allowable range (e.g., '64-81°F (18-27°C); 20-80% RH per ASHRAE TC9.9 Class A1'). Reference TIA-942." },
+                { "id": "pe14_monitoring_alerting", "label": "Environmental monitoring + alerting", "type": "textarea", "rows": 3,
+                  "help": "Sensor coverage, BMS / DCIM integration, alert thresholds, escalation paths." },
+                { "id": "pe15_water_leak_detection","label": "Water-leak detection (PE-15)",        "type": "textarea", "rows": 3,
+                  "help": "Leak-detection cable / sensor coverage, automatic shutoff, drainage paths. PE-15(1) for automated shutoff." }
+            ]
+        },
+
+        {
+            "id": "asset_disposition",
+            "type": "group",
+            "section": "approach",
+            "label": "Delivery and Removal (PE-16)",
+            "description": "How assets are checked in and removed.",
+            "questions": [
+                { "id": "pe16_authorized_in_scope", "label": "Asset categories in scope (PE-16 ODV)", "type": "multi_select",
+                  "options": ["Servers + network equipment", "Storage media (drives, tapes)", "Cryptographic modules / HSMs", "Workstations + laptops", "Mobile devices (tablets, phones)", "Removable media (USB, optical)", "Spare parts", "Decommissioned equipment"] },
+                { "id": "pe16_intake_procedure",    "label": "Intake procedure",                   "type": "textarea", "rows": 3,
+                  "help": "How new assets enter the facility (receiving-dock workflow, integrity inspection, asset-tag application, CMDB entry)." },
+                { "id": "pe16_removal_authorization","label": "Removal-authorization process",     "type": "textarea", "rows": 3,
+                  "help": "Who can authorize removal of assets, what paperwork is required, chain-of-custody. Reference MP-5 if media, SR-12 if supply-chain element." },
+                { "id": "pe16_logging_location",    "label": "Property-pass logging location",     "type": "text",
+                  "help": "Where intake / removal events are logged (CMDB, dedicated property-management tool, paper logbook + scanned)." }
+            ]
+        },
+
+        {
+            "id": "alternate_work_site",
+            "type": "group",
+            "section": "approach",
+            "label": "Alternate Work Site (PE-17)",
+            "description": "Telework and alternate-location protections.",
+            "questions": [
+                { "id": "pe17_in_scope",             "label": "Telework / alternate work-site in scope?", "type": "select",
+                  "options": ["Yes — telework is broadly authorized for system users", "Yes — limited to specific roles (e.g., admin staff only)", "Yes — emergency-continuity only (per CP plan)", "No — facility-only operation"] },
+                { "id": "pe17_required_safeguards", "label": "Required telework safeguards",       "type": "multi_select",
+                  "options": ["GFE laptop with FDE (FIPS 140-3 validated)", "VPN / ZTNA required for access", "MFA enforced", "PIV / CAC required", "Privacy screen on display", "Lockable storage for hardcopy", "Mandatory acceptable-use agreement signed", "No-VOIP / no-IoT in workspace policy", "Network-isolation at home (separate SSID)"] },
+                { "id": "pe17_training_reference",  "label": "Telework-training reference",        "type": "text",
+                  "help": "Pointer to telework-security training (often part of AT-2 awareness). Reference NIST SP 800-46 r2 for guidance." },
+                { "id": "pe17_assessment",          "label": "Periodic safeguard assessment",      "type": "textarea", "rows": 3,
+                  "help": "How telework-site safeguards are periodically assessed (self-attestation, sample audits, video walkthrough for sensitive roles)." }
+            ]
+        },
+
+        {
+            "id": "pe_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Physical Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_authorized_persons",  "label": "Authorized-access list size",        "type": "text",
+                  "help": "Approximate count of persons on the PE-2 access list." },
+                { "id": "scope_facilities_count",    "label": "Facilities count",                    "type": "text",
+                  "help": "Total number of in-scope facilities (primary + alternate + telework typical-locations if quantified)." },
+                { "id": "scope_visitor_volume",      "label": "Visitor volume (approximate)",        "type": "text",
+                  "help": "Order-of-magnitude visitors per month (anchors visitor-log review effort)." },
+                { "id": "scope_telework_users",      "label": "Telework users in scope",            "type": "text",
+                  "help": "Approximate count of users on telework arrangement (PE-17)." }
+            ]
+        },
+
+        {
+            "id": "pe_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Physical-and-Environmental Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate PE control effectiveness.",
+            "questions": [
+                { "id": "pe_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "Badge-access denial rate (target: 0 unauthorized attempts succeeding)",
+                      "Lost / stolen badge incidents per quarter (trend)",
+                      "Visitor-log completeness rate (% of entries with all required fields)",
+                      "Tailgating incidents detected per quarter",
+                      "Environmental alarm count by category (fire / temp / humidity / water)",
+                      "Generator test result (last cycle pass / fail)",
+                      "Fire-suppression inspection currency rate",
+                      "Telework-safeguard self-attestation completion rate",
+                      "Open POA&M items linked to PE controls",
+                      "Provider control-effectiveness review completion (FedRAMP / SOC 2)"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "provider_assurance",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Provider Assurance Verification",
+            "description": "How inherited controls are verified for systems hosted in cloud / colocation.",
+            "questions": [
+                { "id": "provider_audit_review_cadence","label": "Provider-audit review cadence",   "type": "text",
+                  "help": "How often the provider's FedRAMP package / SOC 2 report is reviewed for control effectiveness (typically annual at report receipt)." },
+                { "id": "provider_attack_surface_changes","label": "Provider-side change notification monitoring", "type": "textarea", "rows": 3,
+                  "help": "How significant changes to provider environment are tracked (FedRAMP CSP change notices, provider service-health channels, vendor-incident notifications)." },
+                { "id": "shared_responsibility_matrix","label": "Shared-responsibility matrix reference", "type": "text",
+                  "help": "Pointer to the shared-responsibility / customer-responsibility matrix for the provider (e.g., 'AWS GovCloud CRM rev 2025-Q1 at /repo/compliance/aws-crm.pdf')." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the PE control implementations are summarized (e.g., 'SSP §13.9')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for PE findings", "type": "text",
+                  "help": "Convention for PE-related POA&M items (e.g., 'POAM-PE-' for general)." },
+                { "id": "ps_handoff",                   "label": "PS handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PS-3 personnel screening underwrites PE-2 access authorization. Specifically the trigger that updates the PE-2 list when a screening lapses." },
+                { "id": "ma_handoff",                   "label": "MA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PE-3 escort policy applies to MA-5 maintenance personnel. Coordination of vendor-visit windows." },
+                { "id": "mp_handoff",                   "label": "MP handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PE-16 delivery / removal procedures apply to media transport (MP-5)." },
+                { "id": "cp_handoff",                   "label": "CP handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PE environmental controls underwrite CP-2 contingency-plan assumptions about facility availability. Where alternate-facility (PE primary's DR) lives in the CP plan." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How physical-access incidents (unauthorized entry, environmental alarms) escalate into the IR plan workflow." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying PE continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "PE-2": {
+            "prompts": [
+                "Reference §4.2 — access-list owner, authorization criteria, review cadence, revocation triggers.",
+                "Document the screening prerequisites (PS-3) before access can be granted.",
+                "Address the emergency / temporary access pathway.",
+                "Reference PE-2 ODV — review frequency for the access list.",
+                "Reference PE-2(1) access by position / role, PE-2(2) two forms of identification, PE-2(3) restrict unescorted access."
+            ],
+            "evidence_suggestions": [
+                "Authorized-access list (sanitized export)",
+                "Access-list quarterly review attestation",
+                "Sample access-request ticket showing approval workflow",
+                "Termination-checklist showing PE-2 removal step",
+                "Provider PE-2 inheritance evidence (FedRAMP CRM)"
+            ],
+            "extra_fields": [
+                { "id": "pe2_inherited",             "label": "Inherited posture",                 "type": "select",
+                  "options": ["Fully implemented by the system (system-managed facility)", "Fully inherited from provider (cloud / colo)", "Hybrid — agency staff + provider staff lists", "Not applicable"] },
+                { "id": "pe2_quarterly_review_evidence","label": "Last quarterly review date", "type": "text",
+                  "help": "Date of last review (or N/A if inherited). Captured in plan to demonstrate currency." }
+            ]
+        },
+
+        "PE-3": {
+            "prompts": [
+                "Reference §4.3 — entry mechanisms, egress controls, escort policy.",
+                "Address two-person integrity (TPI) / dual-control areas if applicable.",
+                "Document IDS coverage and alarm routing.",
+                "Address how visitor-area separation is enforced (lobbies vs sensitive zones).",
+                "Reference PE-3(1) system access points, PE-3(2) facility / system boundaries, PE-3(3) continuous guards / alarms / monitoring, PE-3(4) lockable casings, PE-3(5) tamper protection, PE-3(6) facility penetration testing, PE-3(7) physical barriers, PE-3(8) access control vestibules."
+            ],
+            "evidence_suggestions": [
+                "Floor plan with access-control zones",
+                "IDS configuration export",
+                "Sample badge-access audit log",
+                "Lock + key inventory",
+                "Provider PE-3 inheritance evidence"
+            ],
+            "extra_fields": [
+                { "id": "pe3_inherited",             "label": "Inherited posture",                 "type": "select",
+                  "options": ["Fully implemented by the system (system-managed facility)", "Fully inherited from provider", "Hybrid — provider perimeter + agency interior", "Not applicable"] },
+                { "id": "pe3_two_person_areas",     "label": "Two-person-integrity (TPI) areas", "type": "textarea", "rows": 3,
+                  "help": "Areas requiring dual occupancy (HSM rooms, classified safes, etc.). Reference SC-12 if cryptographic materials present." }
+            ]
+        },
+
+        "PE-4": {
+            "prompts": [
+                "Reference §4.4 — cabling protection and port-blocking posture.",
+                "Address protected distribution systems (PDS) for classified.",
+                "Document conduit / raceway use for sensitive runs.",
+                "Reference PE-4 ODV — system distribution and transmission lines."
+            ],
+            "evidence_suggestions": [
+                "Cabling diagram (sanitized)",
+                "PDS inspection report (classified)",
+                "Port-blocking inventory",
+                "Provider PE-4 inheritance evidence"
+            ],
+            "extra_fields": [
+                { "id": "pe4_pds_status",           "label": "Protected Distribution System status", "type": "select",
+                  "options": ["Hardened PDS (encrypted run with monitoring)", "Standard PDS (conduit + locked enclosures)", "Not applicable (no classified data)", "Inherited from facility provider"] }
+            ]
+        },
+
+        "PE-6": {
+            "prompts": [
+                "Reference §4.6 — monitoring capability, recording retention, log review cadence.",
+                "Address how anomalies in access patterns are detected.",
+                "Document the escalation when CCTV captures unauthorized activity.",
+                "Reference PE-6 ODV — frequency of review of physical-access logs.",
+                "Reference PE-6(1) intrusion alarms / surveillance equipment, PE-6(2) automated intrusion recognition / responses, PE-6(3) video surveillance, PE-6(4) monitoring physical access to systems."
+            ],
+            "evidence_suggestions": [
+                "CCTV footage retention configuration",
+                "Sample physical-access log review record",
+                "Anomaly-detection rule export (if automated)",
+                "Provider PE-6 inheritance evidence"
+            ],
+            "extra_fields": [
+                { "id": "pe6_log_review_role",      "label": "Log-review role",                  "type": "text",
+                  "help": "Role responsible for the periodic physical-access log review." },
+                { "id": "pe6_anomaly_examples",     "label": "Detected-anomaly examples",         "type": "textarea", "rows": 3,
+                  "help": "Examples of anomalies the review process targets (off-hours entry, repeated denials, badge use without screen lock, tailgating)." }
+            ]
+        },
+
+        "PE-8": {
+            "prompts": [
+                "Reference §4.6 — visitor-log fields, retention, review cadence.",
+                "Address how visitor information is protected (privacy considerations).",
+                "Document the workflow when a visitor must access a sensitive area.",
+                "Reference PE-8 ODV — visitor-log retention period.",
+                "Reference PE-8(1) automated records maintenance / review, PE-8(2) physical access records, PE-8(3) limit personally identifiable information elements."
+            ],
+            "evidence_suggestions": [
+                "Visitor-log sample (sanitized)",
+                "Visitor-management system configuration",
+                "Visitor-log retention policy",
+                "Privacy screening of visitor records"
+            ],
+            "extra_fields": [
+                { "id": "pe8_pii_minimization",     "label": "Visitor-record PII minimization (PE-8(3))", "type": "textarea", "rows": 3,
+                  "help": "How visitor records minimize PII collection / retention. Reference RA-8 PIA if visitor data is in scope." }
+            ]
+        },
+
+        "PE-13": {
+            "prompts": [
+                "Reference §4.8 — fire-suppression system, detection system, inspection cadence.",
+                "Document NFPA 75 (IT-equipment fire protection) applicability.",
+                "Address detection-to-suppression delay (pre-action vs immediate).",
+                "Reference PE-13(1) detection systems / automatic activation / notification, PE-13(2) suppression systems / automatic activation / notification, PE-13(3) automatic fire suppression, PE-13(4) inspections."
+            ],
+            "evidence_suggestions": [
+                "Fire-detection-system specification",
+                "Suppression-system inspection report (NFPA 25)",
+                "Annual fire-marshal inspection certificate",
+                "Provider PE-13 inheritance evidence"
+            ],
+            "extra_fields": [
+                { "id": "pe13_inherited",            "label": "Inherited posture",                 "type": "select",
+                  "options": ["Fully implemented by the system", "Fully inherited from provider", "Not applicable", "Hybrid"] },
+                { "id": "pe13_clean_agent_recharge_cadence","label": "Clean-agent recharge / inspection cadence", "type": "text",
+                  "help": "If clean-agent suppression: when the agent is weighed / recharged. Typically per manufacturer specification." }
+            ]
+        },
+
+        "PE-16": {
+            "prompts": [
+                "Reference §4.10 — asset categories in scope, intake / removal procedures, logging location.",
+                "Document chain-of-custody for sensitive items.",
+                "Address coordination with MP-5 for media transport and SR-12 for supply-chain elements.",
+                "Reference PE-16 ODV — types of system components controlled."
+            ],
+            "evidence_suggestions": [
+                "Property-pass log sample",
+                "Receiving-dock procedure document",
+                "Decommissioning workflow",
+                "Asset-tag inventory reconciliation",
+                "Sample MP-5 handoff record"
+            ],
+            "extra_fields": [
+                { "id": "pe16_chain_of_custody_template","label": "Chain-of-custody template location", "type": "text",
+                  "help": "Where the chain-of-custody form template lives." },
+                { "id": "pe16_secure_destruction_partner","label": "Secure-destruction partner",  "type": "textarea", "rows": 3,
+                  "help": "Vendor / process for secure destruction of decommissioned equipment. Reference NIST SP 800-88 r1 sanitization category (Clear / Purge / Destroy)." }
+            ]
+        },
+
+        "PE-17": {
+            "prompts": [
+                "Reference §4.11 — telework scope, required safeguards, training, assessment.",
+                "Document how non-GFE devices are restricted (BYOD posture).",
+                "Address handling of paper output and removable media in alternate work sites.",
+                "Reference NIST SP 800-46 r2 telework guidance.",
+                "Reference PE-17 ODV — security controls at alternate work sites."
+            ],
+            "evidence_suggestions": [
+                "Telework-authorization form template",
+                "Telework training-completion roster",
+                "Telework safeguard self-attestation form",
+                "Sample telework-site walkthrough report",
+                "GFE laptop FDE attestation (per laptop)"
+            ],
+            "extra_fields": [
+                { "id": "pe17_byod_posture",        "label": "BYOD posture",                      "type": "select",
+                  "options": ["GFE only — no personal devices", "GFE + MDM-managed personal devices for limited apps", "BYOD allowed for limited roles with MDM enforcement", "BYOD broadly allowed (typical commercial)", "Not applicable"] },
+                { "id": "pe17_attestation_cadence", "label": "Telework safeguard attestation cadence", "type": "text",
+                  "help": "How often telework users self-attest to safeguards being in place (e.g., 'Annual')." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Access Vestibule",        "definition": "An interlock space (also called mantrap) where an inner door cannot open until an outer door is closed and credentials are verified. Per PE-3(8)." },
+        { "term": "ASHRAE TC9.9",            "definition": "American Society of Heating, Refrigerating and Air-Conditioning Engineers Technical Committee 9.9 — publishes data-center thermal-environment guidelines (Class A1-A4)." },
+        { "term": "BMS / DCIM",              "definition": "Building Management System / Data Center Infrastructure Management — software systems monitoring environmental conditions, power, and occupancy." },
+        { "term": "Clean-Agent Suppression",  "definition": "A fire-suppression technique using gaseous agents (FM-200, Novec 1230, IG-55) that extinguish fire without water damage. Common in IT equipment areas." },
+        { "term": "EPO",                     "definition": "Emergency Power Off — a manually-activated control that immediately removes power from data center equipment. Per PE-10. Activation is generally restricted to fire-marshal authority." },
+        { "term": "FedRAMP",                 "definition": "Federal Risk and Authorization Management Program — federal program authorizing cloud services. Many PE controls are inherited from FedRAMP-authorized providers." },
+        { "term": "GFE",                     "definition": "Government-Furnished Equipment — equipment provided by the government for use by employees, contractors, or partners." },
+        { "term": "HVAC",                    "definition": "Heating, Ventilation, and Air Conditioning — systems that maintain temperature and humidity per PE-14." },
+        { "term": "Inheritance",             "definition": "In RMF, the practice where a control's implementation is provided by an underlying system (cloud, hosting facility, organizational policy). Documented via shared-responsibility / customer-responsibility matrices." },
+        { "term": "Mantrap",                 "definition": "Common name for an access vestibule (PE-3(8)). Two interlocked doors with credential verification between them." },
+        { "term": "NFPA 75",                 "definition": "National Fire Protection Association standard for the fire protection of information technology equipment." },
+        { "term": "NFPA 25",                 "definition": "NFPA standard for the inspection, testing, and maintenance of water-based fire-suppression systems." },
+        { "term": "PDS",                     "definition": "Protected Distribution System — secured pathway (conduit, monitored alarms) for transmission of classified information per CNSSI 7003. Per PE-4 for classified systems." },
+        { "term": "PIV / CAC",                "definition": "Personal Identity Verification card / Common Access Card — federal smart-card credentials. Used for both physical and logical access." },
+        { "term": "Pre-Action Sprinkler",    "definition": "A fire-suppression system where pipes are kept dry until a detection event opens a valve, reducing the risk of water damage from accidental discharge." },
+        { "term": "SOC 2 Type II",           "definition": "Service Organization Controls audit attesting to operating effectiveness of controls over a period (typically 6+ months). Common physical-controls inheritance evidence." },
+        { "term": "Tailgating",               "definition": "Physical-security violation where one person follows an authorized person through a controlled entry without independent credential verification." },
+        { "term": "Telework",                 "definition": "Work performed at an alternate work site, typically the employee's residence. Subject to PE-17. Reference NIST SP 800-46 r2." },
+        { "term": "TIA-942",                 "definition": "Telecommunications Industry Association data-center standard, including Tier ratings I through IV." },
+        { "term": "Two-Person Integrity (TPI)","definition": "Requirement that two authorized persons be present for access to a sensitive area or operation. Common for HSM rooms and classified safes." },
+        { "term": "Uptime Tier",              "definition": "Uptime Institute's data-center facility classification (Tier I-IV) reflecting redundancy and concurrent-maintainability." },
+        { "term": "UPS",                     "definition": "Uninterruptible Power Supply — battery / flywheel system bridging power loss until generators come online or graceful shutdown completes. Per PE-11." },
+        { "term": "VESDA",                   "definition": "Very Early Smoke Detection Apparatus — aspirating smoke-detection system that samples air continuously and detects smoke at concentrations far below conventional alarms." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "ASHRAE",  "expansion": "American Society of Heating, Refrigerating and Air-Conditioning Engineers" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "AZ",      "expansion": "Availability Zone (cloud)" },
+        { "abbr": "BMS",     "expansion": "Building Management System" },
+        { "abbr": "BYOD",    "expansion": "Bring Your Own Device" },
+        { "abbr": "CAC",     "expansion": "Common Access Card (DoD)" },
+        { "abbr": "CCTV",    "expansion": "Closed-Circuit Television" },
+        { "abbr": "CMDB",    "expansion": "Configuration Management Database" },
+        { "abbr": "CNSSI",   "expansion": "Committee on National Security Systems Instruction" },
+        { "abbr": "CRM",     "expansion": "Customer Responsibility Matrix" },
+        { "abbr": "CSP",     "expansion": "Cloud Service Provider" },
+        { "abbr": "DCIM",    "expansion": "Data Center Infrastructure Management" },
+        { "abbr": "DoD CC SRG","expansion": "DoD Cloud Computing Security Requirements Guide" },
+        { "abbr": "DR",      "expansion": "Disaster Recovery" },
+        { "abbr": "EPO",     "expansion": "Emergency Power Off" },
+        { "abbr": "FDE",     "expansion": "Full Disk Encryption" },
+        { "abbr": "FedRAMP", "expansion": "Federal Risk and Authorization Management Program" },
+        { "abbr": "FIPS",    "expansion": "Federal Information Processing Standard" },
+        { "abbr": "FSO",     "expansion": "Facility Security Officer" },
+        { "abbr": "GFE",     "expansion": "Government-Furnished Equipment" },
+        { "abbr": "HVAC",    "expansion": "Heating, Ventilation, and Air Conditioning" },
+        { "abbr": "IDS",     "expansion": "Intrusion Detection System (physical)" },
+        { "abbr": "IL",      "expansion": "Impact Level (DoD CC SRG)" },
+        { "abbr": "IoT",     "expansion": "Internet of Things" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "MA",      "expansion": "Maintenance (NIST 800-53 family)" },
+        { "abbr": "MDM",     "expansion": "Mobile Device Management" },
+        { "abbr": "MFA",     "expansion": "Multi-Factor Authentication" },
+        { "abbr": "MP",      "expansion": "Media Protection (NIST 800-53 family)" },
+        { "abbr": "NAC",     "expansion": "Network Access Control" },
+        { "abbr": "NARA",    "expansion": "National Archives and Records Administration" },
+        { "abbr": "NFC",     "expansion": "Near-Field Communication" },
+        { "abbr": "NFPA",    "expansion": "National Fire Protection Association" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OPM",     "expansion": "Office of Personnel Management" },
+        { "abbr": "PDS",     "expansion": "Protected Distribution System" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "PIV",     "expansion": "Personal Identity Verification" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "RH",      "expansion": "Relative Humidity" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SOC",     "expansion": "System and Organization Controls (audit)" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SR",      "expansion": "Supply Chain Risk Management (NIST 800-53 family)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "TIA",     "expansion": "Telecommunications Industry Association" },
+        { "abbr": "TPI",     "expansion": "Two-Person Integrity" },
+        { "abbr": "UPS",     "expansion": "Uninterruptible Power Supply" },
+        { "abbr": "VESDA",   "expansion": "Very Early Smoke Detection Apparatus" },
+        { "abbr": "VOIP",    "expansion": "Voice over Internet Protocol" },
+        { "abbr": "VPN",     "expansion": "Virtual Private Network" },
+        { "abbr": "ZTNA",    "expansion": "Zero Trust Network Access" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-46 r2 — Guide to Enterprise Telework, Remote Access, and Bring Your Own Device (BYOD) Security", "url": "https://csrc.nist.gov/pubs/sp/800/46/r2/final" },
+        { "label": "NIST SP 800-88 r1 — Guidelines for Media Sanitization",         "url": "https://csrc.nist.gov/pubs/sp/800/88/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "NFPA 75 — Standard for the Fire Protection of Information Technology Equipment", "url": "https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=75" },
+        { "label": "NFPA 25 — Standard for the Inspection, Testing, and Maintenance of Water-Based Fire Protection Systems", "url": "https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=25" },
+        { "label": "TIA-942 — Telecommunications Infrastructure Standard for Data Centers", "url": "https://global.ihs.com/doc_detail.cfm?document_name=TIA%2D942%2DC&item_s_key=00696499" },
+        { "label": "FedRAMP Marketplace — for inheritance evidence",                "url": "https://marketplace.fedramp.gov/" },
+        { "label": "Uptime Institute Tier Standard",                                 "url": "https://uptimeinstitute.com/tiers" },
+        { "label": "ASHRAE Thermal Guidelines for Data Processing Environments",     "url": "https://www.ashrae.org/technical-resources/bookstore/datacom-series" }
+    ]
+}
