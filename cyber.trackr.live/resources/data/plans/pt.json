@@ -1,0 +1,551 @@
+{
+    "_comment": "PII Processing and Transparency Plan generator. Authored at the Phase 2 assessability floor; r5-only privacy family with 8 base controls. PT is part of the NIST 800-53 r5 PRIVACY baseline rather than the LOW / MODERATE / HIGH security baselines — most users authoring this plan should select 'nist-privacy' in the baseline picker. Pairs with RA (RA-8 PIA is the entry point; categorization governs scope), AC (PT-2 / PT-3 authorize and limit processing — overlaps AC family), AT (PT-3 awareness training maps to AT-2 / AT-3), AU (PT-4 / PT-5 records overlap audit pipeline), and SI (SI-12(2) PII minimization echoes PT-3(2) data minimization).",
+
+    "family": "PT",
+    "family_name": "Personally Identifiable Information Processing and Transparency",
+    "title": "PII Processing and Transparency Plan",
+    "description": "Documents how the system manages PII processing authority, lawful purpose, transparency to data subjects, consent, system-of-records notices, individual rights (access / amendment), and dissemination across third parties. Covers the controls of the PT family in NIST SP 800-53 r5 and aligns with the Privacy Act of 1974 (5 U.S.C. § 552a), E-Government Act of 2002 (Section 208 — PIA), OMB M-03-22 (PIA guidance), OMB M-17-12 (breach response), NIST IR 8062 (Privacy Risk Management Framework), NIST IR 8112 (Attribute Metadata), GDPR / state privacy laws where applicable, and Fair Information Practice Principles (FIPPs).",
+
+    "intro_template": "This PII Processing and Transparency Plan documents the privacy approach for {system_name}. It establishes the practices, criteria, cadences, and roles used to authorize and limit PII processing, communicate with data subjects through privacy notices, manage consent, publish System of Records Notices (SORNs) where applicable, support individual rights of access and amendment, and govern dissemination of PII to third parties.\n\nThe scope covers PT-1 through PT-8 within the {system_name} authorization boundary. Note: PT controls apply to systems that process PII; if {system_name} does not process PII, this plan documents that determination and the scope is reduced accordingly. The plan is consistent with NIST SP 800-53 r5 (PII Processing and Transparency family), NIST IR 8062 (Privacy Risk Management Framework), the Privacy Act of 1974, and OMB privacy guidance.",
+
+    "approach_section_title": "PII Processing and Transparency Approach",
+    "approach_template": "{system_name} PII processing is governed by {privacy_program_role} who maintains the privacy program documentation at {privacy_program_location}. The system's Privacy Impact Assessment (PIA) is at {pia_location}; System of Records Notices (where applicable) are at {sorn_location}. Individual privacy rights — access, amendment, and complaint — are administered through {individual_rights_workflow}. Third-party dissemination is governed by {third_party_governance_role} per the agreements register at {agreements_register_location}.\n\nAdditional details on processing authority, lawful purpose, consent, privacy notices, system-of-records notices, individual access, amendment / correction, and dissemination are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Privacy-program performance for {system_name} is tracked through the metrics in §6.1 (PIA currency, SORN currency, privacy-notice currency, individual-rights-request response-time SLA compliance, consent-completion rate, third-party agreement currency, privacy-incident count). The PIA is reviewed on the cadence in §6.2; significant changes (new information collection, new processing purpose, new dissemination recipient) trigger immediate updates rather than waiting for the next periodic cycle. Privacy incidents are coordinated with the IR plan workflow under OMB M-17-12 breach-response timelines.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This PII Processing and Transparency Plan does not stand alone. The RA family supplies RA-8 PIA as the entry-point activity (often co-authored with PT-2 authority documentation); the AC family enforces PT-2 / PT-3 processing limits at the access-control layer; the AT family delivers PT-3 awareness training; the AU family captures PT-4 / PT-5 records in the audit pipeline; the SI family's SI-12(1) PII limitation and SI-12(2) test-data minimization echo PT-3(2); the IR family handles privacy incidents per OMB M-17-12 breach-response. The following cross-references identify the specific artifacts and locations where PT-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "PT-1", "from": "Organizational PT / privacy policy" },
+        { "number": "PT-2", "from": "Organizational privacy program / SAOP" },
+        { "number": "PT-4", "from": "Organizational consent-management framework" },
+        { "number": "PT-7", "from": "Organizational SORN catalog (if Privacy Act applies)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Roles and locations that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "pii_in_scope_determination",
+                    "label": "PII-in-scope determination",
+                    "type": "select",
+                    "required": true,
+                    "options": ["Yes — system processes PII (PT family fully applicable)", "Yes — system processes a limited set of PII (some PT controls scoped)", "Pending determination — PIA under review", "No — system does not process PII (PT family non-applicable; documented determination per RA-8)"]
+                },
+                {
+                    "id": "privacy_program_role",
+                    "label": "Privacy-program role (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Role accountable for the privacy program (e.g., 'Senior Agency Official for Privacy (SAOP)', 'Chief Privacy Officer', 'Privacy Officer + delegate to ISSO')."
+                },
+                {
+                    "id": "privacy_program_location",
+                    "label": "Privacy-program documentation location",
+                    "type": "text",
+                    "help": "Where privacy-program policy, procedures, and registers are maintained."
+                },
+                {
+                    "id": "pia_location",
+                    "label": "PIA location (RA-8 cross-reference)",
+                    "type": "text",
+                    "help": "Where the system's Privacy Impact Assessment lives. Per E-Government Act Section 208 + OMB M-03-22."
+                },
+                {
+                    "id": "sorn_location",
+                    "label": "SORN(s) location",
+                    "type": "text",
+                    "help": "Where applicable System of Records Notices (SORNs) are published / cited. Per Privacy Act § (e)(4)."
+                },
+                {
+                    "id": "individual_rights_workflow",
+                    "label": "Individual-rights workflow (one-liner)",
+                    "type": "text",
+                    "help": "Brief phrase describing how individuals exercise rights of access / amendment / complaint (e.g., 'Privacy Act request portal at agency.gov/privacy', 'Mailbox privacy@agency.gov triaged by Privacy Office')."
+                },
+                {
+                    "id": "third_party_governance_role",
+                    "label": "Third-party-dissemination governance role",
+                    "type": "text",
+                    "help": "Role accountable for third-party agreements involving PII (e.g., 'Privacy Officer with General Counsel concurrence')."
+                },
+                {
+                    "id": "agreements_register_location",
+                    "label": "Third-party agreements register location",
+                    "type": "text",
+                    "help": "Where MOUs / DSAs / Computer Matching Agreements / Routine Use authorizations are registered."
+                }
+            ]
+        },
+
+        {
+            "id": "processing_authority",
+            "type": "group",
+            "section": "approach",
+            "label": "Authority and Purpose (PT-2)",
+            "description": "Legal authority and lawful purpose for PII processing.",
+            "questions": [
+                { "id": "pt2_legal_authority",      "label": "Legal authority for PII processing", "type": "textarea", "rows": 4,
+                  "help": "Statute / regulation / executive order authorizing PII processing (e.g., '5 U.S.C. § 301 housekeeping authority + agency-specific statute X'). Reference Privacy Act § (e)(3)(A)." },
+                { "id": "pt2_processing_purposes",  "label": "Authorized processing purposes",     "type": "list",
+                  "suggestions": [
+                      "Personnel administration (HR, payroll)",
+                      "Benefits administration",
+                      "Tax administration",
+                      "Law-enforcement investigation",
+                      "Public-health surveillance",
+                      "Statistical research (de-identified)",
+                      "Service delivery to authorized recipient",
+                      "Eligibility determination"
+                  ] },
+                { "id": "pt2_purpose_limitation",   "label": "Purpose-limitation enforcement (PT-2(1))", "type": "textarea", "rows": 3,
+                  "help": "Per PT-2(1) — how the system enforces use only for authorized purposes. Access-control mapping, query restrictions, masking for non-authorized roles." },
+                { "id": "pt2_external_disclosure_basis","label": "External-disclosure basis (PT-2(2))","type": "textarea", "rows": 3,
+                  "help": "Per PT-2(2) — basis on which PII is disclosed externally (statute, routine use under SORN, individual consent, court order)." }
+            ]
+        },
+
+        {
+            "id": "data_minimization_consent",
+            "type": "group",
+            "section": "approach",
+            "label": "Data Minimization and Consent (PT-3, PT-4)",
+            "description": "Data-element minimization and individual consent.",
+            "questions": [
+                { "id": "pt3_pii_categories",       "label": "PII categories collected",           "type": "multi_select",
+                  "options": ["Direct identifiers (name, SSN, EIN)", "Contact information (address, email, phone)", "Government-issued IDs (PIV, driver's license)", "Financial information (account numbers, tax records)", "Health information (PHI per HIPAA)", "Biometric data (fingerprints, voice, face)", "Location data (GPS, IP address)", "Behavioral / usage data (clickstream, query history)", "Education / employment history", "Family / relationship data", "Sensitive personal characteristics (race, religion, sexual orientation)"] },
+                { "id": "pt3_minimization_practices","label": "Minimization practices (PT-3(2))",  "type": "multi_select",
+                  "options": ["Collect only data required for authorized purpose", "Anonymize / pseudonymize where purpose allows", "Aggregate where individual-level not required", "Periodic data-element review for continued necessity", "Test / training environments use synthesized data (SI-12(2))", "Quick-purge of data once retention expires (SI-12)", "Differential privacy / noise injection (research contexts)"] },
+                { "id": "pt3_pii_inventory_link",    "label": "PII data-element inventory location","type": "text",
+                  "help": "Where the data-element-level inventory of PII processed by the system lives. Reference RA-8." },
+                { "id": "pt4_consent_basis",         "label": "Consent basis",                     "type": "select",
+                  "options": ["Explicit / opt-in consent obtained at collection", "Implied consent based on system context (e.g., job-application submission)", "Statutory authority (no consent required)", "Mixed by data category", "Consent not applicable (involuntary processing under law)"] },
+                { "id": "pt4_consent_revocation",   "label": "Consent-revocation mechanism (PT-4(1))","type": "textarea", "rows": 3,
+                  "help": "Per PT-4(1) — how individuals revoke consent and consequences (some processing may continue under independent legal authority; some must stop)." },
+                { "id": "pt4_consent_records",       "label": "Consent-record management (PT-4(2))","type": "textarea", "rows": 3,
+                  "help": "Per PT-4(2) — how consent records are managed (timestamp, method, scope, retention)." }
+            ]
+        },
+
+        {
+            "id": "privacy_notice",
+            "type": "group",
+            "section": "approach",
+            "label": "Privacy Notice (PT-5)",
+            "description": "Notice provided to data subjects.",
+            "questions": [
+                { "id": "pt5_notice_content",       "label": "Privacy-notice content elements",    "type": "multi_select",
+                  "options": ["Authority for collection", "Purpose of collection", "Routine uses (Privacy Act systems)", "Whether disclosure is mandatory or voluntary", "Effects of failing to provide information", "How to exercise individual rights (access / amendment)", "Privacy contact info", "Effective date and version"] },
+                { "id": "pt5_notice_modalities",     "label": "Notice delivery modalities",        "type": "multi_select",
+                  "options": ["At point of collection (form / interface)", "Layered notice (short summary + detailed link)", "Privacy policy page on agency website", "Just-in-time notice for specific data uses", "Annual privacy-notice reaffirmation", "Push notification on policy change"] },
+                { "id": "pt5_review_cadence",       "label": "Notice review cadence (PT-5 ODV)",   "type": "text",
+                  "help": "How often the privacy notice is reviewed for currency. PT-5 ODV. Common: 'Annually + on substantive change to processing'." },
+                { "id": "pt5_just_in_time",          "label": "Just-in-time notices (PT-5(1))",    "type": "textarea", "rows": 3,
+                  "help": "Per PT-5(1) — when JIT notices are presented (e.g., when collecting data for a new purpose, when broadening dissemination)." },
+                { "id": "pt5_privacy_act_statements","label": "Privacy Act statements (PT-5(2))", "type": "textarea", "rows": 3,
+                  "help": "Per PT-5(2) and Privacy Act § (e)(3) — Privacy Act statement provided when collecting from individuals." }
+            ]
+        },
+
+        {
+            "id": "system_of_records",
+            "type": "group",
+            "section": "approach",
+            "label": "System of Records Notices (PT-6)",
+            "description": "Privacy Act SORN compliance.",
+            "questions": [
+                { "id": "pt6_privacy_act_applicability","label": "Privacy Act applicability",     "type": "select",
+                  "options": ["System of Records under Privacy Act (SORN required)", "Records about individuals but not retrieved by personal identifier (no SORN required)", "Privacy Act not applicable (not covered system)", "Pending determination"] },
+                { "id": "pt6_sorn_publication",      "label": "SORN publication status",          "type": "textarea", "rows": 3,
+                  "help": "If SORN required: when last published in Federal Register, citation, current applicability." },
+                { "id": "pt6_routine_uses",          "label": "Routine uses defined",              "type": "textarea", "rows": 4,
+                  "help": "List of routine uses authorized in the SORN. Reference Privacy Act § (a)(7)." },
+                { "id": "pt6_routine_use_inventory", "label": "Routine-use inventory location (PT-6(1))", "type": "text",
+                  "help": "Per PT-6(1) — where routine-use inventory is maintained for SORN currency." },
+                { "id": "pt6_privacy_act_records_practices","label": "Privacy Act records practices (PT-6(2))", "type": "textarea", "rows": 3,
+                  "help": "Per PT-6(2) — practices for maintaining records of disclosures and accountings." },
+                { "id": "pt6_systems_of_records_inventory","label": "Systems-of-records inventory","type": "text",
+                  "help": "If multiple SORNs apply, where the inventory is tracked." }
+            ]
+        },
+
+        {
+            "id": "specific_categories",
+            "type": "group",
+            "section": "approach",
+            "label": "Specific Categories of PII (PT-7)",
+            "description": "Special handling for sensitive PII categories.",
+            "questions": [
+                { "id": "pt7_categories_handled",   "label": "Special categories handled",         "type": "multi_select",
+                  "options": ["Social Security Numbers (SSN)", "Health information (PHI / HIPAA)", "Education records (FERPA)", "Tax records (IRS Pub 1075)", "Genetic information (GINA)", "Sensitive personal characteristics (race, religion, sexual orientation)", "Children's information (COPPA)", "Financial / banking records (GLBA)", "Substance-abuse treatment records (42 CFR Part 2)", "None — no special-category PII"] },
+                { "id": "pt7_special_handling",     "label": "Special-handling procedures",        "type": "textarea", "rows": 4,
+                  "help": "Special protections applied to sensitive categories (encryption, restricted access, additional consent, additional notice, statutory floor)." },
+                { "id": "pt7_ssn_alternatives",     "label": "SSN-alternative use (PT-7(1))",     "type": "textarea", "rows": 3,
+                  "help": "Per PT-7(1) — when SSN use is required vs alternatives (employee ID, tax ID, internal identifiers). Reference OMB M-07-16 SSN reduction." },
+                { "id": "pt7_first_amendment",      "label": "First-Amendment-protected information (PT-7(2))", "type": "textarea", "rows": 3,
+                  "help": "Per PT-7(2) — handling of First-Amendment-protected information (political beliefs, religion, association). Generally collected only when expressly authorized." }
+            ]
+        },
+
+        {
+            "id": "computer_matching",
+            "type": "group",
+            "section": "approach",
+            "label": "Computer Matching Requirements (PT-8)",
+            "description": "Computer-matching agreement governance.",
+            "questions": [
+                { "id": "pt8_matching_in_scope",    "label": "Computer-matching in scope?",        "type": "select",
+                  "options": ["Yes — system performs matching covered by Privacy Act § (a)(8)", "Yes — internal match only (within agency, may not require formal CMA)", "No — no matching activities", "Pending review"] },
+                { "id": "pt8_cma_register",         "label": "CMA register location",              "type": "text",
+                  "help": "Where Computer Matching Agreements are registered (if applicable)." },
+                { "id": "pt8_data_integrity_board", "label": "Data Integrity Board reference",     "type": "text",
+                  "help": "Federal-agency DIB role if matching applies." },
+                { "id": "pt8_match_results_notification","label": "Match-results notification process", "type": "textarea", "rows": 3,
+                  "help": "How individuals are notified of adverse match results before agency action (per Privacy Act § (p)(3))." }
+            ]
+        },
+
+        {
+            "id": "individual_rights",
+            "type": "group",
+            "section": "approach",
+            "label": "Individual Rights of Access and Amendment",
+            "description": "Privacy Act / regulatory rights administration.",
+            "questions": [
+                { "id": "rights_request_intake",    "label": "Request-intake channels",            "type": "multi_select",
+                  "options": ["Online privacy portal", "Postal mail to Privacy Officer", "Email to privacy mailbox", "In-person at agency office", "Phone (with verification)"] },
+                { "id": "rights_response_sla",      "label": "Response SLA (Privacy Act)",         "type": "textarea", "rows": 3,
+                  "help": "Time-to-respond per Privacy Act § (d) and agency policy. Common: 'Acknowledgment within 10 business days; substantive response within 30 days'." },
+                { "id": "rights_identity_verification","label": "Identity verification process",  "type": "textarea", "rows": 3,
+                  "help": "How requester identity is verified before disclosure. Privacy Act § (e)(1) prohibits release without verification." },
+                { "id": "rights_records_retention",  "label": "Rights-request records retention",  "type": "text",
+                  "help": "How long rights-request records are retained per NARA / Privacy Act § (c)." }
+            ]
+        },
+
+        {
+            "id": "pt_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Privacy Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_pii_data_subjects",  "label": "Approximate data-subject population", "type": "text",
+                  "help": "Order-of-magnitude count of individuals whose PII is processed (anchors breach-impact analysis)." },
+                { "id": "scope_data_element_count", "label": "Distinct PII data-element count",    "type": "text",
+                  "help": "Approximate count of distinct PII data elements collected." },
+                { "id": "scope_third_party_recipients","label": "Third-party PII recipients",      "type": "text",
+                  "help": "Count of external organizations receiving PII through SORN routine uses or other agreements." },
+                { "id": "scope_quarterly_rights_requests","label": "Quarterly individual-rights requests", "type": "text",
+                  "help": "Approximate volume of individual-rights requests per quarter." }
+            ]
+        },
+
+        {
+            "id": "pt_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Privacy Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate PT control effectiveness.",
+            "questions": [
+                { "id": "pt_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "PIA currency (last review date)",
+                      "SORN currency (last Federal Register publication)",
+                      "Privacy-notice currency rate",
+                      "Individual-rights-request response-time SLA compliance",
+                      "Individual-rights-request volume trend",
+                      "Consent-completion rate (where applicable)",
+                      "Third-party agreements current rate",
+                      "Privacy incidents per quarter (target: 0)",
+                      "Time-to-breach-notification (per OMB M-17-12 timeline)",
+                      "PII data-element inventory currency rate",
+                      "SSN-alternative-use compliance (where alternatives exist)",
+                      "Open POA&M items linked to PT controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "privacy_incident_handling",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Privacy Incident Handling",
+            "description": "Coordination with the IR plan for privacy incidents.",
+            "questions": [
+                { "id": "privacy_incident_types",   "label": "Privacy-incident types in scope",    "type": "multi_select",
+                  "options": ["Unauthorized PII disclosure", "Loss of PII-bearing media (overlaps MP)", "Unauthorized access by personnel (overlaps PS-8)", "Vendor PII breach", "Misuse of PII for unauthorized purpose", "Failure to honor consent revocation", "Failure to respond to access request"] },
+                { "id": "privacy_incident_notification","label": "Notification obligations",       "type": "textarea", "rows": 4,
+                  "help": "Notification obligations per OMB M-17-12 (federal), state breach laws, GDPR if applicable. Timing, recipients, content." },
+                { "id": "privacy_incident_dib_role","label": "DIB / privacy-program role in incident response", "type": "textarea", "rows": 3,
+                  "help": "How the privacy program coordinates with IR — typically privacy officer joins incident-handling team for PII-involving incidents." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the PT control implementations are summarized (e.g., 'SSP §13.17')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for PT findings", "type": "text",
+                  "help": "Convention for PT-related POA&M items (e.g., 'POAM-PT-' for general)." },
+                { "id": "ra_handoff",                   "label": "RA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How RA-8 PIA is the entry point. PIA initiation triggers PT plan review; PT implementation feeds PIA conclusions." },
+                { "id": "ac_handoff",                   "label": "AC handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PT-2 / PT-3 processing limits are enforced through AC-2 / AC-3 / AC-6 access-control mechanisms." },
+                { "id": "at_handoff",                   "label": "AT handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How privacy-related awareness and role-based training (PT-3) is delivered through AT-2 / AT-3." },
+                { "id": "au_handoff",                   "label": "AU handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PT-4 / PT-5 records overlap with the audit pipeline. Privacy Act accountings (§ (c)) recorded in audit." },
+                { "id": "si_handoff",                   "label": "SI handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PT-3(2) data minimization aligns with SI-12(1) PII limitation and SI-12(2) test-data minimization." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How privacy incidents trigger the IR plan workflow under OMB M-17-12 breach-notification timelines." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying PT continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "PT-2": {
+            "prompts": [
+                "Reference §4.2 — legal authority, processing purposes, purpose-limitation, external-disclosure basis.",
+                "Document Privacy Act § (e)(3)(A) authority citation if applicable.",
+                "Address how each authorized purpose maps to enforcement at the access-control layer.",
+                "Reference NIST IR 8062 § 4 for purpose-limitation.",
+                "Reference PT-2(1) data tagging, PT-2(2) automation."
+            ],
+            "evidence_suggestions": [
+                "PIA (cross-reference RA-8)",
+                "Legal-authority citation register",
+                "Authorized-processing-purpose list",
+                "Sample access-control rule enforcing purpose limitation",
+                "External-disclosure log"
+            ],
+            "extra_fields": [
+                { "id": "pt2_data_tagging",         "label": "Data-tagging approach (PT-2(1))",  "type": "textarea", "rows": 3,
+                  "help": "Per PT-2(1) — how PII is tagged with authorized processing purpose. Schema-level metadata, attribute-based access control (ABAC)." },
+                { "id": "pt2_automation_level",     "label": "Purpose-limitation automation (PT-2(2))", "type": "select",
+                  "options": ["Fully automated (ABAC enforces purpose at query time)", "Partial (manual review for non-routine queries)", "Manual (policy-only enforcement)", "Not implemented (with rationale)"] }
+            ]
+        },
+
+        "PT-3": {
+            "prompts": [
+                "Reference §4.3 — PII categories, minimization practices, PII inventory link.",
+                "Document SI-12(1) PII limitation and SI-12(2) test-data minimization cross-references.",
+                "Address de-identification / anonymization for non-essential uses.",
+                "Reference PT-3(1) identification of authorized PII processing, PT-3(2) data tagging."
+            ],
+            "evidence_suggestions": [
+                "PII data-element inventory",
+                "Minimization-decision log",
+                "Anonymization / pseudonymization SOP",
+                "Test-environment PII handling procedure"
+            ],
+            "extra_fields": [
+                { "id": "pt3_deidentification_method","label": "De-identification methodology",   "type": "textarea", "rows": 3,
+                  "help": "Specific approach (k-anonymity, l-diversity, differential privacy). Reference NIST IR 8053." }
+            ]
+        },
+
+        "PT-4": {
+            "prompts": [
+                "Reference §4.3 — consent basis, revocation, records.",
+                "Document the consent-management system (or rationale for not having one).",
+                "Address consent for data subjects who are not the original collector.",
+                "Reference PT-4(1) tailored consent, PT-4(2) just-in-time consent, PT-4(3) revocation."
+            ],
+            "evidence_suggestions": [
+                "Consent-management system specification",
+                "Sample consent record (sanitized)",
+                "Consent-revocation workflow",
+                "Just-in-time consent UI samples"
+            ],
+            "extra_fields": [
+                { "id": "pt4_consent_management_tool","label": "Consent-management tool",         "type": "text",
+                  "help": "Tool / system managing consent records. Internal database, OneTrust, etc." }
+            ]
+        },
+
+        "PT-5": {
+            "prompts": [
+                "Reference §4.4 — content elements, modalities, review cadence, JIT notices, Privacy Act statements.",
+                "Document layered-notice approach if used (NIST IR 8062 best practice).",
+                "Address translation / accessibility of privacy notices.",
+                "Reference Privacy Act § (e)(3) for required notice elements.",
+                "Reference PT-5(1) just-in-time notice and consent, PT-5(2) Privacy Act statements."
+            ],
+            "evidence_suggestions": [
+                "Current privacy notice (production version)",
+                "Annual review attestation",
+                "JIT notice samples",
+                "Privacy Act statement template (PT-5(2))"
+            ],
+            "extra_fields": [
+                { "id": "pt5_layered_notice_status", "label": "Layered-notice status",            "type": "select",
+                  "options": ["Yes — short summary at point of collection + detailed link", "Single notice (no layering)", "JIT-only (per-collection-point)", "Not applicable"] },
+                { "id": "pt5_translation_languages", "label": "Translation languages",            "type": "text",
+                  "help": "Languages in which the notice is provided (e.g., 'English, Spanish'). Required by EO 13166 for federal." }
+            ]
+        },
+
+        "PT-6": {
+            "prompts": [
+                "Reference §4.5 — Privacy Act applicability, SORN status, routine uses, routine-use inventory, records practices.",
+                "Document the SORN-publication-and-update workflow.",
+                "Address how routine uses are reviewed for continued applicability.",
+                "Reference Privacy Act § (e)(4) for SORN requirements.",
+                "Reference PT-6(1) routine uses and PT-6(2) exemption rules."
+            ],
+            "evidence_suggestions": [
+                "Current SORN(s) Federal Register citation",
+                "Routine-use inventory",
+                "SORN-update workflow document",
+                "Sample disclosure-accounting record"
+            ],
+            "extra_fields": [
+                { "id": "pt6_sorn_review_role",     "label": "SORN review role",                  "type": "text",
+                  "help": "Role accountable for SORN currency (typically SAOP or Privacy Officer)." }
+            ]
+        },
+
+        "PT-7": {
+            "prompts": [
+                "Reference §4.6 — special categories handled, special-handling procedures, SSN-alternative use, First Amendment.",
+                "Document statutory-floor protections (HIPAA, FERPA, IRC 6103, GLBA, etc.).",
+                "Address children's-information handling (COPPA) if applicable.",
+                "Reference PT-7(1) social security numbers, PT-7(2) first amendment information."
+            ],
+            "evidence_suggestions": [
+                "Special-categories register",
+                "Statutory-floor compliance attestations (HIPAA / FERPA / etc.)",
+                "SSN-alternative-use register",
+                "First-Amendment-information determination record"
+            ],
+            "extra_fields": [
+                { "id": "pt7_statutory_floor_register","label": "Statutory-floor register reference", "type": "text",
+                  "help": "Where applicable statutory-floor regimes are registered (HIPAA / HITRUST, FERPA, IRC 6103, GLBA, COPPA, GINA, 42 CFR Part 2)." }
+            ]
+        },
+
+        "PT-8": {
+            "prompts": [
+                "Reference §4.7 — matching scope, CMA register, DIB role, match-notification.",
+                "Document Privacy Act § (a)(8) Computer Matching Agreement compliance if applicable.",
+                "Address Federal Data Strategy data-sharing alignment.",
+                "Reference Privacy Act § (p) for match-result notification.",
+                "Reference OMB Circular A-108 SORN guidance."
+            ],
+            "evidence_suggestions": [
+                "Active CMAs (if applicable)",
+                "DIB approval records",
+                "Sample match-results notification to subject",
+                "Independent-verification records (Privacy Act § (p)(2))"
+            ],
+            "extra_fields": [
+                { "id": "pt8_dib_chair",            "label": "DIB chair / member roles",          "type": "text",
+                  "help": "Federal Data Integrity Board chair / members for matching activities." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "ABAC",                    "definition": "Attribute-Based Access Control — access decisions made on attributes of subject, resource, and context. Common implementation of PT-2 / PT-3 purpose-limitation enforcement." },
+        { "term": "Anonymization",           "definition": "Removing or altering data such that an individual can no longer be identified, even with additional information. Stronger than pseudonymization; reduces PT applicability." },
+        { "term": "Computer Matching Agreement (CMA)","definition": "Per Privacy Act § (a)(8), formal agreement governing computerized comparisons of records about individuals. Subject to PT-8 controls." },
+        { "term": "Consent",                 "definition": "Per PT-4, voluntary agreement to processing of one's PII. May be explicit (opt-in), implied, or statutorily authorized." },
+        { "term": "Data Integrity Board (DIB)","definition": "Federal-agency body responsible for oversight of computer-matching agreements. Per Privacy Act § (u)." },
+        { "term": "FIPPs",                   "definition": "Fair Information Practice Principles — foundational principles for PII handling: notice, choice, access, accuracy, security, accountability." },
+        { "term": "GINA",                    "definition": "Genetic Information Nondiscrimination Act — federal law protecting genetic information." },
+        { "term": "HIPAA",                   "definition": "Health Insurance Portability and Accountability Act — federal privacy law for Protected Health Information (PHI)." },
+        { "term": "Layered Notice",          "definition": "Privacy-notice approach providing a short summary at point of collection plus a detailed link. Best practice per NIST IR 8062." },
+        { "term": "Minimization",             "definition": "Per PT-3(2), collection / processing of only the PII data elements necessary for the authorized purpose." },
+        { "term": "OMB M-03-22",             "definition": "OMB Memorandum M-03-22 — guidance for implementing the Privacy Provisions of the E-Government Act of 2002, including PIA requirements." },
+        { "term": "OMB M-17-12",             "definition": "OMB Memorandum M-17-12 — Preparing for and Responding to a Breach of Personally Identifiable Information. Drives PT incident-notification timelines." },
+        { "term": "OMB M-07-16",             "definition": "OMB Memorandum M-07-16 — Safeguarding Against and Responding to the Breach of Personally Identifiable Information. Emphasizes SSN reduction." },
+        { "term": "PIA",                     "definition": "Privacy Impact Assessment — analysis of how PII is collected, used, shared, maintained, and disposed of. Per RA-8 / E-Government Act § 208." },
+        { "term": "PHI",                     "definition": "Protected Health Information — health data subject to HIPAA. Special category under PT-7." },
+        { "term": "Privacy Act",              "definition": "Privacy Act of 1974 (5 U.S.C. § 552a) — federal law governing collection, maintenance, use, and dissemination of PII held by federal agencies." },
+        { "term": "Pseudonymization",         "definition": "Replacing direct identifiers with consistent pseudonyms, allowing record-linkage without revealing identity. Re-identifiable; PT controls still apply." },
+        { "term": "Routine Use",             "definition": "Per Privacy Act § (a)(7), a use of records consistent with the purpose for which the records were collected. Routine uses are published in the SORN." },
+        { "term": "SAOP",                    "definition": "Senior Agency Official for Privacy — federal-agency role accountable for the privacy program. Common PT-2 governance role." },
+        { "term": "SORN",                    "definition": "System of Records Notice — Privacy Act § (e)(4) notice published in the Federal Register describing a system of records, its categories, routine uses, etc. Per PT-6." },
+        { "term": "SSN",                     "definition": "Social Security Number — sensitive PII subject to PT-7(1) reduction practices." },
+        { "term": "System of Records",       "definition": "Per Privacy Act § (a)(5), a group of records under control of an agency from which information is retrieved by personal identifier." }
+    ],
+
+    "acronyms": [
+        { "abbr": "ABAC",    "expansion": "Attribute-Based Access Control" },
+        { "abbr": "AC",      "expansion": "Access Control (NIST 800-53 family)" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "AT",      "expansion": "Awareness and Training (NIST 800-53 family)" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "AU",      "expansion": "Audit and Accountability (NIST 800-53 family)" },
+        { "abbr": "CA",      "expansion": "Assessment, Authorization, and Monitoring (NIST 800-53 family)" },
+        { "abbr": "CFR",     "expansion": "Code of Federal Regulations" },
+        { "abbr": "CMA",     "expansion": "Computer Matching Agreement" },
+        { "abbr": "COPPA",   "expansion": "Children's Online Privacy Protection Act" },
+        { "abbr": "DIB",     "expansion": "Data Integrity Board (Privacy Act § (u))" },
+        { "abbr": "EIN",     "expansion": "Employer Identification Number" },
+        { "abbr": "EO",      "expansion": "Executive Order" },
+        { "abbr": "FERPA",   "expansion": "Family Educational Rights and Privacy Act" },
+        { "abbr": "FIPPs",   "expansion": "Fair Information Practice Principles" },
+        { "abbr": "GDPR",    "expansion": "General Data Protection Regulation (EU)" },
+        { "abbr": "GLBA",    "expansion": "Gramm-Leach-Bliley Act" },
+        { "abbr": "GINA",    "expansion": "Genetic Information Nondiscrimination Act" },
+        { "abbr": "HIPAA",   "expansion": "Health Insurance Portability and Accountability Act" },
+        { "abbr": "HITRUST", "expansion": "Health Information Trust Alliance" },
+        { "abbr": "IR",      "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "IRC",     "expansion": "Internal Revenue Code" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "JIT",     "expansion": "Just-in-Time" },
+        { "abbr": "MOU",     "expansion": "Memorandum of Understanding" },
+        { "abbr": "MP",      "expansion": "Media Protection (NIST 800-53 family)" },
+        { "abbr": "NARA",    "expansion": "National Archives and Records Administration" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OMB",     "expansion": "Office of Management and Budget" },
+        { "abbr": "PHI",     "expansion": "Protected Health Information" },
+        { "abbr": "PIA",     "expansion": "Privacy Impact Assessment" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "PT",      "expansion": "PII Processing and Transparency (NIST 800-53 family)" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SAOP",    "expansion": "Senior Agency Official for Privacy" },
+        { "abbr": "SI",      "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SORN",    "expansion": "System of Records Notice" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSN",     "expansion": "Social Security Number" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "U.S.C.",  "expansion": "United States Code" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST IR 8062 — Privacy Risk Management Framework",              "url": "https://csrc.nist.gov/pubs/ir/8062/final" },
+        { "label": "NIST IR 8112 — Attribute Metadata",                             "url": "https://csrc.nist.gov/pubs/ir/8112/final" },
+        { "label": "NIST IR 8053 — De-Identification of Personal Information",     "url": "https://csrc.nist.gov/pubs/ir/8053/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "Privacy Act of 1974 (5 U.S.C. § 552a)",                         "url": "https://www.justice.gov/opcl/privacy-act-1974" },
+        { "label": "E-Government Act of 2002 § 208",                                "url": "https://www.govinfo.gov/content/pkg/PLAW-107publ347/pdf/PLAW-107publ347.pdf" },
+        { "label": "OMB M-03-22 — PIA Guidance",                                    "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/memoranda/2003/m03_22.pdf" },
+        { "label": "OMB M-17-12 — Breach Response",                                  "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/memoranda/2017/m-17-12_0.pdf" },
+        { "label": "OMB M-07-16 — Safeguarding PII",                                 "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/memoranda/2007/m07-16.pdf" },
+        { "label": "OMB Circular A-108 — Federal Agency Responsibilities Under the Privacy Act", "url": "https://www.whitehouse.gov/wp-content/uploads/legacy_drupal_files/omb/circulars/A108/omb_circular_a-108.pdf" }
+    ]
+}

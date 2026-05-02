@@ -779,7 +779,7 @@ Tiered by impact + natural pairings to plans already authored.
 
 - [x] PL — Planning Plan (authored at Phase 2 floor; 9 family-question groups, 5 guided controls — PL-2 / PL-4 / PL-8 / PL-10 / PL-11 — with 9 extra fields, 14 glossary entries, 43 acronyms, 9 references; renders 12 cards at nist-moderate — 6 bases + 6 enhancements; meta-family covering SSP / RoB / architecture / baseline-selection / tailoring)
 - [x] SR — Supply Chain Risk Management Plan (authored at Phase 2 floor; 13 family-question groups, 8 guided controls — SR-2 / SR-3 / SR-5 / SR-6 / SR-8 / SR-10 / SR-11 / SR-12 — with 9 extra fields, 19 glossary entries, 48 acronyms, 12 references; renders 19 cards at nist-moderate — 8 bases + 11 enhancements; r5-only family extending RA-3(1) into formal C-SCRM program per SP 800-161 r1)
-- [ ] PT — PII Processing and Transparency Plan *(r5-only; privacy-focused. PII, consent, data subject rights)*
+- [x] PT — PII Processing and Transparency Plan (authored at Phase 2 floor; 12 family-question groups, 7 guided controls — PT-2 / PT-3 / PT-4 / PT-5 / PT-6 / PT-7 / PT-8 — with 9 extra fields, 22 glossary entries, 45 acronyms, 11 references; renders 21 cards at nist-privacy baseline — 8 bases + 13 enhancements; r5-only privacy family. PT is part of the privacy baseline, not the LMH security baselines — wizard users should select 'nist-privacy' baseline)
 - [ ] PM — Program Management Plan *(org-wide; may not fit single-system pattern. Consider intent before authoring)*
 
 ### Stretch / nice-to-have (post-MVP)
