@@ -771,7 +771,9 @@ Tiered by impact + natural pairings to plans already authored.
 - [x] PS — Personnel Security Plan (authored at Phase 2 floor; 13 family-question groups, 7 guided controls — PS-2 / PS-3 / PS-4 / PS-5 / PS-6 / PS-7 / PS-8 — with 10 extra fields, 23 glossary entries, 56 acronyms, 9 references; renders 18 cards at nist-moderate — 9 bases + 9 enhancements; CV / Trusted Workforce 2.0, FIS Tier 1-5, EO 12968 in scope)
 - [x] MA — Maintenance Plan (authored at Phase 2 floor; 10 family-question groups, 5 guided controls — MA-2 / MA-3 / MA-4 / MA-5 / MA-6 — with 10 extra fields, 17 glossary entries, 46 acronyms, 7 references; renders 29 cards at nist-moderate — 6 bases + 23 enhancements; explicit inheritance-posture extras for cloud-hosted MA-2 / MA-3)
 - [x] MP — Media Protection Plan (authored at Phase 2 floor; 12 family-question groups, 6 guided controls — MP-2 / MP-3 / MP-4 / MP-5 / MP-6 / MP-7 — with 11 extra fields, 17 glossary entries, 49 acronyms, 7 references; renders 25 cards at nist-moderate — 7 bases + 18 enhancements; CUI marking per 32 CFR Part 2002 + NIST SP 800-88 r1 sanitization Decision Tree)
-- [ ] AT — Awareness and Training Plan *(role-based training, security awareness, phishing exercises)*
+- [x] AT — Awareness and Training Plan (authored at Phase 2 floor; 10 family-question groups, 5 guided controls — AT-2 / AT-2(2) / AT-2(3) / AT-3 / AT-4 — with 8 extra fields, 20 glossary entries, 54 acronyms, 8 references; renders 15 cards at nist-moderate — 4 bases + 11 enhancements; NICE Framework / DoD 8140 role mapping in scope)
+
+**Tier 3 COMPLETE.** Five physical / personnel / operational plans ship: PE, PS, MA, MP, AT.
 
 **Tier 4 — specialized / meta**
 

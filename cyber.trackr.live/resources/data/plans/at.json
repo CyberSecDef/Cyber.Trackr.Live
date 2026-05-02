@@ -1,0 +1,461 @@
+{
+    "_comment": "Awareness and Training Plan generator. Authored at the Phase 2 assessability floor; pairs with PS (PS-6 access agreements paired with AT-2 awareness training; PS-9 position descriptions cite AT-3 role-based requirements), IR (AT-2(3) phishing exercises produce reports that flow into IR), SA (SA-3 SDLC integration depends on AT-3 developer training), and PE (PE-3 / PE-6 implicate visitor-escort and physical-security awareness). Smallest 800-53 family — 4 base controls + 2 in-baseline enhancements at moderate; the rigor is in role-based curriculum design and completion-tracking discipline.",
+
+    "family": "AT",
+    "family_name": "Awareness and Training",
+    "title": "Awareness and Training Plan",
+    "description": "Documents how the system's user, administrator, and developer populations are trained in security awareness, role-based duties, insider-threat indicators, social-engineering / phishing recognition, and how training records are maintained. Covers the controls of the AT family in NIST SP 800-53 r5 and aligns with NIST SP 800-50 (Building an Information Technology Security Awareness and Training Program), NIST SP 800-181 r1 (NICE Workforce Framework), DoD 8140.03 (Cyberspace Workforce Qualification and Management), and Federal Information Security Modernization Act (FISMA) annual training requirements.",
+
+    "intro_template": "This Awareness and Training Plan documents the awareness and training approach for {system_name}. It establishes the practices, curriculum, cadences, and roles used to deliver baseline security-literacy training, role-based training tailored to specific responsibilities, insider-threat awareness, social-engineering / phishing recognition, and the recordkeeping that demonstrates compliance.\n\nThe scope covers literacy training and awareness per AT-2 (with insider-threat and social-engineering enhancements where applicable), role-based training per AT-3, and training records per AT-4 within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (Awareness and Training family), NIST SP 800-50 / SP 800-16 r1 (training program guidance), and NIST SP 800-181 r1 (NICE Workforce Framework).",
+
+    "approach_section_title": "Awareness and Training Approach",
+    "approach_function": "{system_name} delivers baseline security awareness training through {lms_platform} on the cadence in §4.2. Role-based training (AT-3) is mapped to position-description responsibilities per §4.5. Insider-threat awareness (AT-2(2)) is delivered via {insider_threat_program_link}. Phishing-simulation exercises (AT-2(3)) are run by {phishing_program_role} on the cadence in §4.4. Training records are maintained in {training_record_system} and reconciled with the access-list (AC-2 / PE-2) on the cadence in §6.\n\nAdditional details on literacy and awareness, insider-threat awareness, social-engineering exercises, role-based training, and training records are captured in the sub-sections below.",
+    "approach_template": "{system_name} delivers baseline security awareness training through {lms_platform} on the cadence in §4.2. Role-based training (AT-3) is mapped to position-description responsibilities per §4.5. Insider-threat awareness (AT-2(2)) is delivered via {insider_threat_program_link}. Phishing-simulation exercises (AT-2(3)) are run by {phishing_program_role} on the cadence in §4.4. Training records are maintained in {training_record_system} and reconciled with the access-list (AC-2 / PE-2) on the cadence in §6.\n\nAdditional details on literacy and awareness, insider-threat awareness, social-engineering exercises, role-based training, and training records are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Awareness-and-training performance for {system_name} is tracked through the metrics in §6.1 (annual literacy-training completion rate, role-based-training completion rate, phishing-simulation click-rate trend, phishing-report rate, insider-threat-awareness completion rate, time-from-onboarding-to-first-training-completed, training-record-currency rate). The training roster is reconciled with the personnel roster on the cadence in §6.2; access (AC-2 / PE-2) is conditioned on training currency, with overdue-training auto-suspension as the enforcement mechanism. Phishing-simulation results feed both AT and IR processes — patterns surfaced in simulation drive curriculum updates and inform IR detection-rule tuning.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This Awareness and Training Plan does not stand alone. The PS family pairs PS-6 access agreements with AT-2 awareness training; PS-9 position descriptions cite AT-3 role-based training requirements. The IR family receives reports from AT-2(3) phishing simulations as a detection feed; insider-threat indicators from AT-2(2) escalate via the same path. The SA family depends on AT-3 developer training to underwrite SA-3 SDLC integration. The PE family delivers visitor-escort and physical-security awareness through this plan's curriculum. The CA family validates AT outcomes via CA-2 assessment of training effectiveness. The following cross-references identify the specific artifacts and locations where AT-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "AT-1", "from": "Organizational awareness-and-training policy" },
+        { "number": "AT-2", "from": "Enterprise security-awareness program (when shared LMS + curriculum)" },
+        { "number": "AT-3", "from": "Enterprise role-based-training catalog (when shared)" },
+        { "number": "AT-4", "from": "Enterprise LMS / training-record system" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Platforms and roles that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "lms_platform",
+                    "label": "LMS / training platform (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Where awareness + role-based training is delivered (e.g., 'KnowBe4 (commercial)', 'DoD CyberAwareness Challenge via JKO', 'Internal Moodle deployment with SCORM courses')."
+                },
+                {
+                    "id": "training_record_system",
+                    "label": "Training-record system (one-liner)",
+                    "type": "text",
+                    "required": true,
+                    "help": "Authoritative system for training records (often the LMS itself, or a separate HRMS module that aggregates LMS + classroom + external)."
+                },
+                {
+                    "id": "insider_threat_program_link",
+                    "label": "Insider-threat program reference",
+                    "type": "text",
+                    "help": "Pointer to the org's insider-threat program — typically CISA-aligned for federal. Reference for AT-2(2) coordination."
+                },
+                {
+                    "id": "phishing_program_role",
+                    "label": "Phishing-simulation program owner role",
+                    "type": "text",
+                    "help": "Role accountable for phishing simulations (e.g., 'Security Awareness Lead under CISO', 'Enterprise SOC Phishing Operations')."
+                },
+                {
+                    "id": "training_program_lead",
+                    "label": "Training-program lead role",
+                    "type": "text",
+                    "help": "Senior role accountable for the awareness-and-training program (often Chief Learning Officer / CISO delegate)."
+                },
+                {
+                    "id": "annual_training_cadence",
+                    "label": "Annual training cadence summary",
+                    "type": "text",
+                    "help": "One-line summary of annual cadence (e.g., 'AT-2 baseline annually + on initial onboarding; AT-3 role-based at hire + annually + on role change'). Detail goes in the dedicated sub-section."
+                }
+            ]
+        },
+
+        {
+            "id": "literacy_awareness",
+            "type": "group",
+            "section": "approach",
+            "label": "Literacy Training and Awareness (AT-2)",
+            "description": "Baseline security training that all users receive.",
+            "questions": [
+                { "id": "at2_in_scope_audience",     "label": "In-scope audience",                 "type": "multi_select",
+                  "options": ["Full-time employees", "Part-time employees", "Contractor staff with system access", "Subcontractor staff with system access", "Volunteer / unpaid associates", "Vendor maintenance staff (PS-7 / MA-5)", "Cleared visitors with regular access"] },
+                { "id": "at2_curriculum_topics",     "label": "Baseline curriculum topics",        "type": "multi_select",
+                  "options": ["Acceptable use policy + Rules of Behavior", "Password / credential hygiene", "Phishing recognition (overlaps AT-2(3))", "Suspicious-activity reporting", "Physical security + clean-desk policy", "CUI / PII / classified handling (per organization)", "Removable-media use (MP-7 cross-reference)", "Privacy / FIPPs", "Insider-threat indicators (overlaps AT-2(2))", "Mobile-device security", "Telework security (PE-17 cross-reference)", "Records-retention awareness", "AI / LLM use policy (newer)"] },
+                { "id": "at2_modalities",            "label": "Delivery modalities",                "type": "multi_select",
+                  "options": ["E-learning (SCORM / xAPI in LMS)", "Live virtual instructor-led", "In-person classroom", "Just-in-time micro-learning (e.g., security-tip-of-the-day)", "Video-based (recorded segments)", "Posters / passive awareness", "Newsletter / bulletin", "Gamified (CTF-style awareness exercises)"] },
+                { "id": "at2_delivery_cadence",      "label": "Delivery cadence (AT-2 ODV)",       "type": "text",
+                  "help": "When training is delivered (e.g., 'Within 5 business days of onboarding; annually thereafter; within 30 days of role change'). AT-2 ODV." },
+                { "id": "at2_completion_threshold",  "label": "Completion criteria",                "type": "textarea", "rows": 3,
+                  "help": "What counts as 'complete' (e.g., 'Module completion + 80% on knowledge check; failed attempt → retake')." },
+                { "id": "at2_program_review_cadence","label": "Program-content review cadence",    "type": "text",
+                  "help": "How often the awareness curriculum is reviewed for currency (typical: 'Annually + on regulatory change'). AT-2 ODV." },
+                { "id": "at2_event_triggered_updates","label": "Event-triggered updates (AT-2(1))","type": "textarea", "rows": 3,
+                  "help": "Per AT-2(1) — content updates triggered by significant events (incident affecting org, new threat, regulatory change). Even though AT-2(1) may not be in moderate baseline, this is good practice." }
+            ]
+        },
+
+        {
+            "id": "insider_threat",
+            "type": "group",
+            "section": "approach",
+            "label": "Insider-Threat Awareness (AT-2(2))",
+            "description": "Per AT-2(2), training on indicators and reporting paths.",
+            "questions": [
+                { "id": "at22_in_scope_audience",    "label": "In-scope audience for AT-2(2)",     "type": "multi_select",
+                  "options": ["All personnel (broadest interpretation)", "Personnel with elevated access", "Managers and supervisors", "Privileged-account holders", "Personnel with access to critical components (RA-9)", "Cleared personnel only"] },
+                { "id": "at22_indicators_taught",    "label": "Indicators covered",                 "type": "multi_select",
+                  "options": ["Unusual data-access patterns", "After-hours work without business justification", "Persistent disregard for security controls", "Disgruntlement / personal-life stressors signaled", "Unauthorized devices / credentials", "Atypical financial behavior", "Foreign-contact disclosure obligations", "Recruitment / coercion approaches", "Intellectual-property exfiltration patterns"] },
+                { "id": "at22_reporting_path",       "label": "Reporting path",                     "type": "textarea", "rows": 3,
+                  "help": "How an observer reports a concern (anonymous hotline, ISSO direct, EAP-assisted referral). Reference org insider-threat program contact." },
+                { "id": "at22_protections_for_reporters","label": "Protections for reporters",     "type": "textarea", "rows": 3,
+                  "help": "Anti-retaliation policy, anonymity preservation. Reference org whistleblower policy." }
+            ]
+        },
+
+        {
+            "id": "phishing_social_engineering",
+            "type": "group",
+            "section": "approach",
+            "label": "Social-Engineering and Phishing (AT-2(3))",
+            "description": "Per AT-2(3), training plus simulated exercises.",
+            "questions": [
+                { "id": "at23_simulation_cadence",  "label": "Phishing-simulation cadence",        "type": "text",
+                  "help": "How often phishing simulations are run (e.g., 'Quarterly broad-cast; monthly targeted'). AT-2(3) ODV." },
+                { "id": "at23_simulation_difficulty","label": "Simulation difficulty progression",  "type": "textarea", "rows": 3,
+                  "help": "How simulation difficulty escalates over time (e.g., 'Easy generic in Q1; spear-phishing tied to system context in Q3; voice-phishing exercises annually')." },
+                { "id": "at23_topics_covered",       "label": "Topics covered",                    "type": "multi_select",
+                  "options": ["Email phishing (generic)", "Spear-phishing (targeted)", "Whaling (executive targets)", "Smishing (SMS phishing)", "Vishing (voice phishing)", "Pretexting (in-person social engineering)", "QR-code-based phishing", "Business-email-compromise (BEC)", "USB-drop attacks", "Tailgating (physical)"] },
+                { "id": "at23_response_to_failure",  "label": "Response to simulation failure",    "type": "textarea", "rows": 3,
+                  "help": "What happens when a user clicks / enters credentials in a simulation. Just-in-time micro-training, manager notification, repeated-failure escalation. Reference PS-8 only as last resort." },
+                { "id": "at23_report_button",        "label": "User report mechanism",              "type": "text",
+                  "help": "How users report suspected phishing in production (e.g., 'PhishAlarm button in Outlook; submitted to SOC for analysis')." },
+                { "id": "at23_metric_targets",       "label": "Click-rate target / phish-report-rate target", "type": "text",
+                  "help": "Targets for the program (e.g., 'Click rate <5%; report rate >40% on simulations within 60 minutes')." }
+            ]
+        },
+
+        {
+            "id": "role_based_training",
+            "type": "group",
+            "section": "approach",
+            "label": "Role-Based Training (AT-3)",
+            "description": "Per AT-3, training tailored to the security responsibilities of each role.",
+            "questions": [
+                { "id": "at3_role_taxonomy_source",  "label": "Role-taxonomy source",              "type": "select",
+                  "options": ["NIST SP 800-181 r1 (NICE Workforce Framework)", "DoD 8140.03 (DoD Cyberspace Workforce Framework)", "Internal role-mapping derived from NICE / 8140", "Other industry framework (e.g., (ISC)² CISSP body of knowledge)", "Custom internal taxonomy"] },
+                { "id": "at3_in_scope_roles",        "label": "Roles in scope",                    "type": "multi_select",
+                  "options": ["System Owner", "ISSO / ISSM", "AO / AODR", "Privileged users (system administrators, DBAs)", "Software developers", "DevSecOps / pipeline engineers", "Network / security engineers", "Help desk + first-tier support", "Security-Operations-Center analysts", "Incident responders", "Auditors / assessors (CA family staff)", "Privacy-Act personnel / SAOP", "Records officers", "Personnel-security officers (PS family staff)", "Training-program staff", "Maintenance personnel (MA-5)", "Insider-threat investigators"] },
+                { "id": "at3_curriculum_mapping",    "label": "Role-to-curriculum mapping",        "type": "textarea", "rows": 5,
+                  "help": "Crosswalk from each role to required training (e.g., 'Privileged users: MIS-525 plus CompTIA Security+; Developers: SSDF familiarization + secure-coding + threat-modeling; Incident responders: SANS FOR-508 or equivalent'). Often summarized as a separate appendix." },
+                { "id": "at3_delivery_cadence",      "label": "Delivery cadence (AT-3 ODV)",       "type": "text",
+                  "help": "When AT-3 training is delivered (e.g., 'At hire / role assignment; annually thereafter; on significant role expansion'). AT-3 ODV." },
+                { "id": "at3_certification_requirements","label": "Certification requirements",   "type": "textarea", "rows": 3,
+                  "help": "Roles that require external certification (e.g., 'CISSP for ISSO; Security+ CE for privileged users per DoD 8140; OSCP for red-team members'). Time-to-attain after role start." },
+                { "id": "at3_continuing_education",  "label": "Continuing-education requirement",  "type": "textarea", "rows": 3,
+                  "help": "How CE units are tracked (e.g., '40 hours per role per year; CISSP renewal at 120 CPEs / 3 years')." }
+            ]
+        },
+
+        {
+            "id": "training_records",
+            "type": "group",
+            "section": "approach",
+            "label": "Training Records (AT-4)",
+            "description": "Per AT-4, recordkeeping requirements.",
+            "questions": [
+                { "id": "at4_record_fields",        "label": "Required record fields",             "type": "multi_select",
+                  "options": ["Personnel identifier", "Course / training event identifier", "Training type (AT-2 / AT-2(2) / AT-2(3) / AT-3)", "Date completed", "Completion score (if applicable)", "Modality (e-learning / classroom)", "Instructor (if classroom)", "External certification number + expiration", "CE units awarded", "Linked role at time of training"] },
+                { "id": "at4_retention_period",     "label": "Record-retention period (AT-4 ODV)", "type": "text",
+                  "help": "How long training records are retained. AT-4 ODV. Common: 'Per NARA records-retention schedule'; 'Length of employment + 5 years'." },
+                { "id": "at4_record_review_cadence","label": "Record-review cadence",              "type": "text",
+                  "help": "How often training records are reviewed for completeness / accuracy (e.g., 'Quarterly reconciliation against personnel roster')." },
+                { "id": "at4_audit_trail",          "label": "Audit-trail requirement",            "type": "textarea", "rows": 3,
+                  "help": "How changes to training records are themselves audited (immutable LMS log, separate audit table). Reference AU plan." }
+            ]
+        },
+
+        {
+            "id": "at_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Training Scope and Coverage",
+            "description": "Quantitative scope numbers that anchor metrics later in the plan.",
+            "questions": [
+                { "id": "scope_total_trainees",      "label": "Total trainees in scope",           "type": "text",
+                  "help": "Approximate count of all personnel requiring AT-2 baseline training." },
+                { "id": "scope_role_based_trainees", "label": "Personnel requiring role-based training","type": "text",
+                  "help": "Approximate count of personnel in AT-3 roles." },
+                { "id": "scope_role_count",          "label": "Distinct AT-3 roles defined",       "type": "text",
+                  "help": "Number of distinct role-based training tracks (e.g., '8 — System Owner, ISSO, Privileged User, Developer, IR Analyst, etc.')." },
+                { "id": "scope_phishing_simulation_users","label": "Phishing-simulation user pool size","type": "text",
+                  "help": "Approximate count of users targeted in phishing simulations (typically all email-capable personnel)." }
+            ]
+        },
+
+        {
+            "id": "at_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Awareness-and-Training Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate AT control effectiveness.",
+            "questions": [
+                { "id": "at_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "AT-2 baseline-training completion rate (current vs roster)",
+                      "AT-2 mean-time-from-onboarding-to-completion",
+                      "AT-3 role-based-training completion rate",
+                      "AT-2(3) phishing-simulation click rate (trend down)",
+                      "AT-2(3) phish-report rate (trend up)",
+                      "AT-2(3) mean time to report (trend down)",
+                      "AT-2(2) insider-threat-awareness completion rate",
+                      "Overdue-training count + auto-suspended access count",
+                      "Certification currency rate (CE units on track)",
+                      "Training-program user satisfaction score (post-course survey)",
+                      "Open POA&M items linked to AT controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "training_access_enforcement",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Training-Access Enforcement",
+            "description": "How training currency is tied to access.",
+            "questions": [
+                { "id": "training_access_enforcement_mechanism","label": "Enforcement mechanism", "type": "select",
+                  "options": ["Auto-suspend access on overdue (typically privileged accounts only)", "Manager notification on overdue (warning) + escalation to suspension", "Manager notification only (no suspension)", "No automated enforcement (manual quarterly review)"] },
+                { "id": "training_access_grace_period","label": "Grace period before enforcement",  "type": "text",
+                  "help": "Days after due date before enforcement action (e.g., '14 days for privileged accounts; 30 days for standard')." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",         "type": "text",
+                  "help": "Where in the SSP the AT control implementations are summarized (e.g., 'SSP §13.2')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for AT findings", "type": "text",
+                  "help": "Convention for AT-related POA&M items (e.g., 'POAM-AT-' for general)." },
+                { "id": "ps_handoff",                   "label": "PS handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How PS-6 access agreements pair with AT-2 awareness training; PS-9 position descriptions cite AT-3 requirements." },
+                { "id": "ir_handoff",                   "label": "IR handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How AT-2(3) phishing-simulation results feed IR detection; insider-threat indicators escalate via the same path." },
+                { "id": "sa_handoff",                   "label": "SA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How AT-3 developer-training underwrites SA-3 SDLC integration. Where the developer-training catalog lives." },
+                { "id": "pe_handoff",                   "label": "PE handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How AT delivers the visitor-escort and physical-security awareness PE-3 / PE-6 implicate." },
+                { "id": "ca_handoff",                   "label": "CA handoff",                    "type": "textarea", "rows": 2,
+                  "help": "How CA-2 assessments validate AT outcomes (training-effectiveness assessment, knowledge-check sampling, behavioral metrics)." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying AT continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "AT-2": {
+            "prompts": [
+                "Reference §4.2 — audience, curriculum topics, modalities, cadence, completion threshold, review cadence.",
+                "Document the integration with onboarding (training before access).",
+                "Address how the access-list (AC-2 / PE-2) is gated on training currency.",
+                "Reference AT-2 ODV — frequency, events triggering updates.",
+                "Reference AT-2(1) practical exercises (withdrawn — incorporated into AT-2), AT-2(2) insider threat, AT-2(3) social engineering and mining, AT-2(4) suspicious communications and anomalous system behavior, AT-2(5) advanced persistent threat, AT-2(6) cyber threat environment."
+            ],
+            "evidence_suggestions": [
+                "Awareness-curriculum outline (current version)",
+                "Sample course completion certificate",
+                "Annual completion-rate report (current cycle)",
+                "Onboarding-checklist showing training requirement",
+                "Curriculum-review attestation"
+            ],
+            "extra_fields": [
+                { "id": "at2_lms_reporting_dashboard","label": "LMS reporting-dashboard reference", "type": "text",
+                  "help": "Where the AT-2 completion dashboard is exposed (LMS report URL, GRC dashboard, internal compliance portal)." },
+                { "id": "at2_inherited",            "label": "Inherited posture",                "type": "select",
+                  "options": ["Fully inherited from enterprise awareness program", "Hybrid — enterprise baseline + system-specific addition", "Fully implemented by the system", "Not applicable"] }
+            ]
+        },
+
+        "AT-2(2)": {
+            "prompts": [
+                "Reference §4.3 — audience, indicators taught, reporting path, reporter protections.",
+                "Document coordination with the org insider-threat program.",
+                "Address handling of indicator reports from outside HR / Security (peer concerns).",
+                "Reference org whistleblower policy and EAP availability."
+            ],
+            "evidence_suggestions": [
+                "AT-2(2) module content (current version)",
+                "Insider-threat-program coordination MOU",
+                "Sample completion roster",
+                "Whistleblower / anti-retaliation policy reference"
+            ],
+            "extra_fields": [
+                { "id": "at22_program_link",        "label": "Insider-threat program POC",       "type": "text",
+                  "help": "Point of contact for the insider-threat program coordination." }
+            ]
+        },
+
+        "AT-2(3)": {
+            "prompts": [
+                "Reference §4.4 — simulation cadence, difficulty progression, topics, response to failure, report button, metric targets.",
+                "Address coordination with IR (false positives during simulations should not page IR for legitimate drill).",
+                "Document sensitivity around executive whaling simulations.",
+                "Reference AT-2(3) ODV — frequency."
+            ],
+            "evidence_suggestions": [
+                "Last-quarter phishing-simulation results report",
+                "Simulation-tooling configuration (e.g., KnowBe4 PhishER)",
+                "Just-in-time training-after-failure module sample",
+                "Phishing-report-button telemetry export"
+            ],
+            "extra_fields": [
+                { "id": "at23_simulation_tool",     "label": "Simulation-tooling vendor",         "type": "text",
+                  "help": "Tool used for simulations (KnowBe4, Proofpoint Security Awareness, Cofense, etc.)." },
+                { "id": "at23_ir_coordination",     "label": "IR-coordination protocol",          "type": "textarea", "rows": 3,
+                  "help": "How simulations are pre-coordinated with the SOC / IR team to avoid false-positive incidents. Pre-simulation announcement to SOC, distinct simulation-source domain." }
+            ]
+        },
+
+        "AT-3": {
+            "prompts": [
+                "Reference §4.5 — role taxonomy, in-scope roles, curriculum mapping, cadence, certification requirements, CE.",
+                "Document mapping to NICE Framework or DoD 8140 if applicable.",
+                "Address the SAVANT / privileged-user dimension.",
+                "Reference AT-3 ODV — frequency, training types.",
+                "Reference AT-3(1) environmental controls (withdrawn — incorporated into AT-3), AT-3(2) physical security controls, AT-3(3) practical exercises (withdrawn), AT-3(4) suspicious communications and anomalous system behavior, AT-3(5) processing personally identifiable information."
+            ],
+            "evidence_suggestions": [
+                "Role-to-training crosswalk (appendix)",
+                "Sample role-based curriculum",
+                "Certification-currency dashboard (e.g., DoD 8140 compliance report)",
+                "Sample role-based training completion record",
+                "CE-tracking export"
+            ],
+            "extra_fields": [
+                { "id": "at3_developer_curriculum_link","label": "Developer-curriculum reference",  "type": "text",
+                  "help": "Pointer to the developer-specific curriculum (cross-reference SA-3)." },
+                { "id": "at3_pii_curriculum_link",  "label": "PII / privacy curriculum reference (AT-3(5))", "type": "text",
+                  "help": "Pointer to PII / privacy training for personnel processing PII. Reference RA-8 / PT family." }
+            ]
+        },
+
+        "AT-4": {
+            "prompts": [
+                "Reference §4.6 — record fields, retention period, review cadence, audit trail.",
+                "Document the linkage to the personnel-system reconciliation (AT-2 / AT-3 currency mapped to access).",
+                "Address handling of records when personnel leave (record retention through retention period).",
+                "Reference AT-4 ODV — retention period."
+            ],
+            "evidence_suggestions": [
+                "Training-record schema / data-dictionary",
+                "Sample training-record export (sanitized)",
+                "Records-retention schedule",
+                "Reconciliation-report sample (training vs roster)"
+            ],
+            "extra_fields": [
+                { "id": "at4_record_storage_location","label": "Authoritative training-record storage", "type": "text",
+                  "help": "Where training records are authoritatively stored (LMS, HRMS module, separate compliance database)." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Awareness",               "definition": "Per NIST SP 800-50, activities that focus user attention on security topics. Distinct from training (skill development) and education (broad understanding)." },
+        { "term": "BEC",                     "definition": "Business Email Compromise — a form of social engineering targeting financial transactions or credential disclosure by impersonating trusted parties. Often mixes phishing with vishing follow-up." },
+        { "term": "CE Units / CPEs",          "definition": "Continuing Education units / Continuing Professional Education credits — units required to maintain certifications. Tracked under AT-3 for personnel holding CISSP / CISA / Security+ / etc." },
+        { "term": "Click Rate",              "definition": "In phishing simulations, the percentage of recipients who clicked a simulated phishing link. Tracked under AT-2(3) as a leading indicator of awareness program effectiveness." },
+        { "term": "DoD 8140.03",             "definition": "DoD Manual 8140.03 — Cyberspace Workforce Qualification and Management Program. Mandates training and certification by role for DoD cyberspace personnel." },
+        { "term": "FISMA",                   "definition": "Federal Information Security Modernization Act of 2014 — federal law requiring agencies to implement information-security programs, including annual training requirements." },
+        { "term": "Insider Threat",           "definition": "A threat to the organization originating from a person with authorized access. Per AT-2(2), training covers indicators of insider activity and reporting paths." },
+        { "term": "JKO",                     "definition": "Joint Knowledge Online — DoD's online training delivery platform; common LMS for federal CyberAwareness Challenge delivery." },
+        { "term": "LMS",                     "definition": "Learning Management System — the software platform delivering and tracking training (e.g., Moodle, Cornerstone, Saba, KnowBe4)." },
+        { "term": "NICE Framework",           "definition": "NIST SP 800-181 r1 — National Initiative for Cybersecurity Education Workforce Framework. Defines a taxonomy of cybersecurity work roles, used for AT-3 role mapping." },
+        { "term": "Phishing Simulation",      "definition": "Per AT-2(3), a controlled exercise where benign messages are sent to users to measure susceptibility and provide just-in-time training. Distinct from production phishing." },
+        { "term": "Phish-Report Rate",        "definition": "Percentage of phishing-simulation recipients who reported the message via the phish-report button. Tracked as a positive metric — the inverse of click rate." },
+        { "term": "Pretexting",               "definition": "A social-engineering technique where the attacker fabricates a scenario to manipulate the target into providing information or access. Often a precursor to phishing or vishing." },
+        { "term": "Role-Based Training (RBT)","definition": "Per AT-3, training tailored to the security responsibilities of a specific role. Distinct from baseline (AT-2) which applies to all users." },
+        { "term": "SCORM / xAPI",             "definition": "Sharable Content Object Reference Model / Experience API — interoperability standards for e-learning content tracked by an LMS." },
+        { "term": "Smishing",                "definition": "SMS-based phishing — a social-engineering attack delivered via text message." },
+        { "term": "Tailgating",               "definition": "A physical-security violation where one person follows an authorized person through a controlled entry without independent credential verification. Often covered in AT-2 awareness." },
+        { "term": "Vishing",                  "definition": "Voice-based phishing — a social-engineering attack delivered via phone call." },
+        { "term": "Whaling",                  "definition": "A targeted phishing attack against high-value individuals (executives, system administrators)." },
+        { "term": "xAPI / Experience API",    "definition": "Successor to SCORM — captures broader learning experiences including informal learning and simulations. Common in modern LMS platforms." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AC",      "expansion": "Access Control (NIST 800-53 family)" },
+        { "abbr": "AODR",    "expansion": "Authorizing Official Designated Representative" },
+        { "abbr": "AO",      "expansion": "Authorizing Official" },
+        { "abbr": "APT",     "expansion": "Advanced Persistent Threat" },
+        { "abbr": "AT",      "expansion": "Awareness and Training (NIST 800-53 family)" },
+        { "abbr": "ATO",     "expansion": "Authority to Operate" },
+        { "abbr": "BEC",     "expansion": "Business Email Compromise" },
+        { "abbr": "CA",      "expansion": "Assessment, Authorization, and Monitoring (NIST 800-53 family)" },
+        { "abbr": "CE",      "expansion": "Continuing Education" },
+        { "abbr": "CISA",    "expansion": "Cybersecurity and Infrastructure Security Agency / Certified Information Systems Auditor" },
+        { "abbr": "CISSP",   "expansion": "Certified Information Systems Security Professional" },
+        { "abbr": "CISO",    "expansion": "Chief Information Security Officer" },
+        { "abbr": "CompTIA", "expansion": "Computing Technology Industry Association" },
+        { "abbr": "CPE",     "expansion": "Continuing Professional Education" },
+        { "abbr": "CTF",     "expansion": "Capture The Flag" },
+        { "abbr": "CUI",     "expansion": "Controlled Unclassified Information" },
+        { "abbr": "DBA",     "expansion": "Database Administrator" },
+        { "abbr": "DoD",     "expansion": "Department of Defense" },
+        { "abbr": "EAP",     "expansion": "Employee Assistance Program" },
+        { "abbr": "FIPPs",   "expansion": "Fair Information Practice Principles" },
+        { "abbr": "FISMA",   "expansion": "Federal Information Security Modernization Act" },
+        { "abbr": "HRMS",    "expansion": "Human Resources Management System" },
+        { "abbr": "IR",      "expansion": "Incident Response (NIST 800-53 family)" },
+        { "abbr": "ISC2",    "expansion": "International Information System Security Certification Consortium" },
+        { "abbr": "ISSM",    "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",    "expansion": "Information System Security Officer" },
+        { "abbr": "JKO",     "expansion": "Joint Knowledge Online (DoD)" },
+        { "abbr": "LLM",     "expansion": "Large Language Model" },
+        { "abbr": "LMS",     "expansion": "Learning Management System" },
+        { "abbr": "MA",      "expansion": "Maintenance (NIST 800-53 family)" },
+        { "abbr": "MIS",     "expansion": "Management Information Systems" },
+        { "abbr": "MOU",     "expansion": "Memorandum of Understanding" },
+        { "abbr": "MP",      "expansion": "Media Protection (NIST 800-53 family)" },
+        { "abbr": "NARA",    "expansion": "National Archives and Records Administration" },
+        { "abbr": "NICE",    "expansion": "National Initiative for Cybersecurity Education" },
+        { "abbr": "NIST",    "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "ODV",     "expansion": "Organization-Defined Value" },
+        { "abbr": "OSCP",    "expansion": "Offensive Security Certified Professional" },
+        { "abbr": "PE",      "expansion": "Physical and Environmental Protection (NIST 800-53 family)" },
+        { "abbr": "PII",     "expansion": "Personally Identifiable Information" },
+        { "abbr": "POAM",    "expansion": "Plan of Action and Milestones" },
+        { "abbr": "PS",      "expansion": "Personnel Security (NIST 800-53 family)" },
+        { "abbr": "PT",      "expansion": "PII Processing and Transparency (NIST 800-53 family)" },
+        { "abbr": "QR",      "expansion": "Quick Response (code)" },
+        { "abbr": "RA",      "expansion": "Risk Assessment (NIST 800-53 family)" },
+        { "abbr": "RBT",     "expansion": "Role-Based Training" },
+        { "abbr": "RMF",     "expansion": "Risk Management Framework" },
+        { "abbr": "SA",      "expansion": "System and Services Acquisition (NIST 800-53 family)" },
+        { "abbr": "SAOP",    "expansion": "Senior Agency Official for Privacy" },
+        { "abbr": "SCORM",   "expansion": "Sharable Content Object Reference Model" },
+        { "abbr": "SOC",     "expansion": "Security Operations Center / System and Organization Controls" },
+        { "abbr": "SP",      "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SSP",     "expansion": "System Security Plan" },
+        { "abbr": "xAPI",    "expansion": "Experience API (Tin Can)" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-50 — Building an Information Technology Security Awareness and Training Program", "url": "https://csrc.nist.gov/pubs/sp/800/50/final" },
+        { "label": "NIST SP 800-16 r1 — A Role-Based Model for Federal Information Technology / Cybersecurity Training", "url": "https://csrc.nist.gov/pubs/sp/800/16/r1/final" },
+        { "label": "NIST SP 800-181 r1 — Workforce Framework for Cybersecurity (NICE Framework)", "url": "https://csrc.nist.gov/pubs/sp/800/181/r1/final" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                 "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" },
+        { "label": "DoD Manual 8140.03 — Cyberspace Workforce Qualification and Management Program", "url": "https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodm/814003M.pdf" },
+        { "label": "FISMA — Federal Information Security Modernization Act of 2014","url": "https://www.cisa.gov/topics/cyber-threats-and-advisories/federal-information-security-modernization-act" },
+        { "label": "CISA Cybersecurity Awareness Resources",                        "url": "https://www.cisa.gov/cybersecurity-awareness-month" }
+    ]
+}
