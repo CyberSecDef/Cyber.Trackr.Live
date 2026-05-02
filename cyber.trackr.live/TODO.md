@@ -752,7 +752,7 @@ Tiered by impact + natural pairings to plans already authored.
 - [x] IA — Identification and Authentication Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls — IA-2/3/4/5/7/8/11/12 — with 14 extra fields, 26 glossary entries, 40 acronyms, 8 references)
 - [x] IR — Incident Response Plan (authored at Phase 2 floor; 11 family-question groups, 8 guided controls — IR-2/3/4/5/6/7/8/9 — with 15 extra fields, 25 glossary entries, 48 acronyms, 9 references)
 - [x] CP — Contingency Plan (authored at Phase 2 floor; 12 family-question groups, 8 guided controls — CP-2/3/4/6/7/8/9/10 — with 17 extra fields, 23 glossary entries, 30 acronyms, 6 references)
-- [ ] SI — System and Information Integrity Plan *(vulnerability management, malware protection, SI-4 monitoring)*
+- [x] SI — System and Information Integrity Plan (authored at Phase 2 floor; 13 family-question groups, 8 guided controls — SI-2/3/4/5/7/10/11/12 — with 15 extra fields, 24 glossary entries, 56 acronyms, 11 references)
 - [ ] CA — Assessment, Authorization, and Monitoring Plan *(meta-process; CA-7 continuous monitoring is heavily cross-referenced from every plan's §7)*
 
 **Tier 2 — broad technical scope**

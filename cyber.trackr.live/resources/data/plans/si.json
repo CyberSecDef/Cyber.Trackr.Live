@@ -1,0 +1,574 @@
+{
+    "_comment": "System and Information Integrity Plan generator. Authored at the Phase 2 assessability floor; pairs with AU (SI-4 system monitoring feeds the audit pipeline), IR (SI-3 malware + SI-7 integrity findings generate incident signals), and RA (SI-2 flaw remediation consumes RA-5 vulnerability scans). Broadest of the Tier 1 plans — 23 base controls in the catalog.",
+
+    "family": "SI",
+    "family_name": "System and Information Integrity",
+    "title": "System and Information Integrity Plan",
+    "description": "Documents how the system identifies, reports, and remediates flaws; protects against malicious code; monitors system events; and maintains the integrity of software, firmware, and information. Covers the controls of the SI family in NIST SP 800-53 r5 and aligns with NIST SP 800-40 r4 (Patch Management), NIST SP 800-83 r1 (Malware), NIST SP 800-94 (IDS/IPS), and NIST SP 800-115 (Technical Guide to Information Security Testing).",
+
+    "intro_template": "This System and Information Integrity Plan documents the integrity-protection approach for {system_name}. It establishes the practices, tooling, cadences, and roles used to detect and remediate flaws, prevent malicious code execution, monitor system behavior, validate inputs, and maintain the integrity of software, firmware, and stored information.\n\nThe scope covers vulnerability management and patching, malicious-code protection, system monitoring, security alerts and advisories, integrity verification of software / firmware / information, input validation, error handling, and information lifecycle within the {system_name} authorization boundary. The plan is consistent with NIST SP 800-53 r5 (System and Information Integrity family), NIST SP 800-40 r4 (Patch Management), and NIST SP 800-83 r1 (Malware Incident Prevention and Handling).",
+
+    "approach_section_title": "System and Information Integrity Approach",
+    "approach_template": "{system_name} relies on {vuln_scan_tool} for vulnerability scanning, {malware_tool} for malicious-code protection, and {monitoring_tool} for system monitoring. Patches are deployed per the SLA tiers in §4.2. Security alerts and advisories are ingested from {alert_sources}. Integrity of software, firmware, and configuration baselines is verified through {integrity_mechanism}.\n\nAdditional details on flaw remediation, malicious-code protection, system monitoring, alert ingestion, integrity verification, input validation, error handling, and information management are captured in the sub-sections below.",
+
+    "continuous_monitoring_section_title": "Continuous Monitoring",
+    "continuous_monitoring_template": "Integrity-related performance for {system_name} is tracked through the metrics in §6.1 (patch SLA compliance per severity tier, MTTR for critical vulnerabilities, malware detection-and-removal time, alert false-positive rate, integrity-verification coverage). Vulnerability scans run on the cadence in §6.2, with results feeding the patching queue and the POA&M. The CISA Known Exploited Vulnerabilities (KEV) catalog is monitored continuously and any KEV entry affecting the system triggers expedited handling.",
+
+    "integration_section_title": "Integration with Other RMF Artifacts",
+    "integration_template": "This System and Information Integrity Plan does not stand alone. The AU family records integrity-related events for analysis; the IR family handles incidents detected through SI-3 / SI-4 / SI-7 signals; the RA family supplies vulnerability data via RA-5 scanning; the CM family deploys patches and integrity-protected baselines via the change-control workflow. The following cross-references identify the specific artifacts and locations where SI-related content is exchanged with other RMF deliverables.",
+
+    "commonly_inheritable_controls": [
+        { "number": "SI-1",  "from": "Organizational system-and-information-integrity policy" },
+        { "number": "SI-2",  "from": "Enterprise vulnerability-management program (when shared scanning + patch infrastructure)" },
+        { "number": "SI-3",  "from": "Enterprise endpoint protection (AV / EDR) deployment" },
+        { "number": "SI-5",  "from": "Enterprise security-alert subscription service (CISA / vendor advisories)" },
+        { "number": "SI-8",  "from": "Enterprise email security gateway (spam / phishing protection)" }
+    ],
+
+    "family_questions": [
+        {
+            "id": "approach_basics",
+            "type": "group",
+            "section": "approach",
+            "label": "Approach basics",
+            "description": "Tooling and one-line summaries that anchor the rest of the plan.",
+            "questions": [
+                {
+                    "id": "vuln_scan_tool",
+                    "label": "Vulnerability scanning tool",
+                    "type": "text",
+                    "required": true,
+                    "help": "Primary scanner (e.g., 'Tenable.sc', 'Qualys VMDR', 'Rapid7 InsightVM', 'AWS Inspector + Trivy')."
+                },
+                {
+                    "id": "malware_tool",
+                    "label": "Malicious-code protection tooling",
+                    "type": "text",
+                    "required": true,
+                    "help": "AV / EDR platform (e.g., 'CrowdStrike Falcon', 'Microsoft Defender for Endpoint', 'SentinelOne', 'Carbon Black')."
+                },
+                {
+                    "id": "monitoring_tool",
+                    "label": "System monitoring / detection tooling",
+                    "type": "text",
+                    "required": true,
+                    "help": "IDS / IPS / NDR / EDR feeding monitoring (often the same tool as malware protection plus a network-side counterpart)."
+                },
+                {
+                    "id": "alert_sources",
+                    "label": "Security alert / advisory source summary",
+                    "type": "text",
+                    "help": "Brief phrase summarizing where alerts come from. Detail goes in the dedicated sub-section."
+                },
+                {
+                    "id": "integrity_mechanism",
+                    "label": "Integrity verification mechanism (one-liner)",
+                    "type": "text",
+                    "help": "How software / firmware / file integrity is verified (e.g., 'Tripwire FIM + signed Git tags + SBOM verification at build')."
+                }
+            ]
+        },
+
+        {
+            "id": "flaw_remediation",
+            "type": "group",
+            "section": "approach",
+            "label": "Flaw Remediation (SI-2)",
+            "description": "Vulnerability scanning, patch evaluation, and remediation SLAs.",
+            "questions": [
+                { "id": "vuln_scan_cadence",        "label": "Vulnerability scan cadence",       "type": "select",
+                  "options": ["Continuous (agent-based + cloud-native)", "Daily authenticated scans", "Weekly authenticated scans", "Monthly authenticated scans"] },
+                { "id": "vuln_scan_scope",          "label": "Scan scope",                       "type": "multi_select",
+                  "options": ["All hosts in authorization boundary", "External-facing (DMZ + public)", "Container images at build", "Container runtime", "Cloud configuration (CSPM)", "Web application (DAST)", "Source code (SAST)", "Software composition (SCA)", "Network appliances", "Mobile applications"] },
+                { "id": "vuln_severity_slas",       "label": "Patch SLAs by severity",           "type": "textarea", "rows": 5,
+                  "help": "Map CVSS / vendor severity to patch SLA. Example: 'Critical (CVSS 9.0+ or KEV catalog): 15 days; High (7.0–8.9): 30 days; Medium (4.0–6.9): 90 days; Low: best-effort.' Federal systems often follow BOD 22-01 timelines for KEVs." },
+                { "id": "vuln_kev_handling",        "label": "CISA KEV catalog handling",         "type": "textarea", "rows": 3,
+                  "help": "How CISA's Known Exploited Vulnerabilities catalog drives expedited remediation. BOD 22-01 timelines if applicable. Reference for federal agencies." },
+                { "id": "vuln_patch_workflow",      "label": "Patch evaluation + deployment workflow", "type": "textarea", "rows": 4,
+                  "help": "From CVE published → tested → CCB approved → deployed → verified. Reference §4 of the CM plan for the change workflow." },
+                { "id": "vuln_exception_process",   "label": "Vulnerability exception process",  "type": "textarea", "rows": 3,
+                  "help": "When a patch can't be applied within SLA: deviation request, compensating control, time-bound POA&M item." }
+            ]
+        },
+
+        {
+            "id": "malware_protection",
+            "type": "group",
+            "section": "approach",
+            "label": "Malicious Code Protection (SI-3)",
+            "description": "AV / EDR coverage, signature management, and response on detection.",
+            "questions": [
+                { "id": "malware_coverage",         "label": "Coverage",                         "type": "multi_select",
+                  "options": ["All endpoints", "Servers", "Container hosts", "Email gateway", "Web proxy / SWG", "DNS filtering", "USB / removable media scanning", "Cloud workload protection (CWPP)"] },
+                { "id": "malware_signature_update", "label": "Signature update cadence",         "type": "select",
+                  "options": ["Continuous (cloud-delivered, sub-hour)", "Hourly", "Daily", "Multiple times per day per vendor schedule"] },
+                { "id": "malware_detection_modes",  "label": "Detection modes",                  "type": "multi_select",
+                  "options": ["Signature-based", "Heuristic / behavioral", "Machine learning / AI", "Sandboxing (file detonation)", "Memory-resident detection", "Cloud reputation lookup"] },
+                { "id": "malware_response_action",  "label": "Default response on detection",    "type": "select",
+                  "options": ["Quarantine + alert", "Block + delete + alert", "Alert only (audit mode)", "Configurable per severity"] },
+                { "id": "malware_user_reporting",   "label": "User reporting channel for suspected malware", "type": "text",
+                  "help": "How users report suspected malware (e.g., 'phish report button in email client; ServiceNow Security Incident form')." }
+            ]
+        },
+
+        {
+            "id": "system_monitoring",
+            "type": "group",
+            "section": "approach",
+            "label": "System Monitoring (SI-4)",
+            "description": "IDS / IPS / EDR / NDR / WAF and what they monitor for.",
+            "questions": [
+                { "id": "monitoring_layers",        "label": "Monitoring layers deployed",       "type": "multi_select",
+                  "options": ["Network IDS / IPS (NIDS / NIPS)", "Host-based IDS (HIDS)", "Endpoint Detection and Response (EDR)", "Network Detection and Response (NDR)", "Web Application Firewall (WAF)", "Runtime Application Self-Protection (RASP)", "DNS monitoring / DNS filtering", "DLP (data-loss prevention)", "Cloud workload protection (CWPP)", "Anomaly detection (UEBA)"] },
+                { "id": "monitoring_events",        "label": "Events monitored for",             "type": "multi_select",
+                  "options": ["Authentication anomalies", "Privilege escalation", "Network exfiltration", "Lateral movement", "Process injection / DLL sideloading", "Persistence mechanisms", "Cryptomining / coinminer", "Ransomware behavior patterns", "Web exploit attempts", "SQL injection / OS command injection", "Reverse shell / C2 beaconing", "Insider-threat patterns"] },
+                { "id": "monitoring_alert_routing", "label": "Alert routing destination",        "type": "text",
+                  "help": "Where SI-4 alerts land (typically SIEM + IR ticketing — see §4 of AU and IR plans)." },
+                { "id": "monitoring_coverage_attestation","label": "Coverage attestation cadence", "type": "text",
+                  "help": "How often the org attests that all in-scope assets have monitoring agents installed and reporting." }
+            ]
+        },
+
+        {
+            "id": "alerts_advisories",
+            "type": "group",
+            "section": "approach",
+            "label": "Security Alerts and Advisories (SI-5)",
+            "description": "Sources of advisories and how they're triaged.",
+            "questions": [
+                { "id": "advisory_sources",         "label": "Advisory sources subscribed",      "type": "multi_select",
+                  "options": ["CISA (Cybersecurity Advisories + KEV catalog)", "US-CERT", "MS-ISAC", "Sector ISAC (FS / H / E / etc.)", "Vendor advisories (specific vendors)", "NVD / CVE feeds", "Coordinated disclosure platforms (HackerOne / Bugcrowd)", "Internal red-team / bug bounty"] },
+                { "id": "advisory_ingestion",        "label": "Advisory ingestion mechanism",     "type": "textarea", "rows": 3,
+                  "help": "How advisories flow into the workflow (email distribution → triage → ticket; automated TIP / SOAR ingestion)." },
+                { "id": "advisory_triage_sla",       "label": "Advisory triage SLA",              "type": "text",
+                  "help": "Time from advisory publication to triage decision (apply / not applicable / monitor / accept risk)." },
+                { "id": "advisory_dissemination",    "label": "Internal dissemination",           "type": "textarea", "rows": 3,
+                  "help": "Who internal to the org receives advisories that affect this system (System Owner, Engineering, ISSO, CCB chair)." }
+            ]
+        },
+
+        {
+            "id": "integrity_verification",
+            "type": "group",
+            "section": "approach",
+            "label": "Integrity Verification (SI-6, SI-7)",
+            "description": "Software / firmware / file integrity, and security-function verification.",
+            "questions": [
+                { "id": "integrity_fim_tool",       "label": "File integrity monitoring (FIM) tool", "type": "text",
+                  "help": "Tool monitoring the filesystem for unauthorized changes (e.g., 'Tripwire', 'OSSEC / Wazuh', 'AIDE', 'Defender for Endpoint integrity rules')." },
+                { "id": "integrity_fim_scope",      "label": "FIM scope",                         "type": "textarea", "rows": 3,
+                  "help": "Which files / directories are under FIM (system binaries, config dirs, web content, application code, etc.)." },
+                { "id": "integrity_software_verification", "label": "Software / firmware integrity verification", "type": "textarea", "rows": 3,
+                  "help": "Code signing for installed software, signed package repositories, secure boot for firmware. Reference SBOM if applicable." },
+                { "id": "integrity_sec_function_verify_cadence", "label": "Security-function verification cadence (SI-6)", "type": "text",
+                  "help": "How often security functions (e.g., crypto, access control) are verified to be operating correctly." },
+                { "id": "integrity_sec_function_verify_action",  "label": "Action on security-function verification failure", "type": "select",
+                  "options": ["Notify security operations + continue", "Notify + restrict to safe-mode operations", "Halt the system component", "Configurable per function"] }
+            ]
+        },
+
+        {
+            "id": "input_validation",
+            "type": "group",
+            "section": "approach",
+            "label": "Input Validation (SI-10)",
+            "description": "How input from users, services, and external sources is validated.",
+            "questions": [
+                { "id": "input_validation_strategy",  "label": "Input validation strategy",        "type": "textarea", "rows": 4,
+                  "help": "Whitelist vs blacklist, schema validation, parameterized queries, OWASP ASVS alignment level." },
+                { "id": "input_validation_layers",    "label": "Validation enforcement layers",    "type": "multi_select",
+                  "options": ["Web Application Firewall (WAF)", "API gateway", "Application middleware", "Framework-level (e.g., FormRequest, Pydantic, Zod)", "Database layer (parameterized queries, stored procedures)", "Client-side (UX hint only — never security boundary)"] },
+                { "id": "input_validation_owasp_level","label": "OWASP ASVS alignment level",        "type": "select",
+                  "options": ["Level 1 (basic)", "Level 2 (standard for most apps)", "Level 3 (high-assurance)", "Not formally aligned with ASVS"] },
+                { "id": "input_validation_review",     "label": "Review cadence for validation rules", "type": "text",
+                  "help": "How often validation rules are reviewed against new attack patterns (e.g., 'After each major release', 'Quarterly with security')." }
+            ]
+        },
+
+        {
+            "id": "error_handling",
+            "type": "group",
+            "section": "approach",
+            "label": "Error Handling (SI-11)",
+            "description": "What's exposed in error messages vs what's logged for debugging.",
+            "questions": [
+                { "id": "error_user_facing",       "label": "User-facing error policy",          "type": "textarea", "rows": 3,
+                  "help": "What users see on errors. Best practice: generic messages with a correlation ID; sensitive details in logs only." },
+                { "id": "error_logged_content",    "label": "Logged error content",              "type": "textarea", "rows": 3,
+                  "help": "What's captured in audit / application logs (stack trace, query, parameters). Reference AU plan privacy_redaction for what's masked." },
+                { "id": "error_review_cadence",    "label": "Error log review cadence",          "type": "text",
+                  "help": "How often error logs are reviewed for new failure patterns / security signals." }
+            ]
+        },
+
+        {
+            "id": "info_management",
+            "type": "group",
+            "section": "approach",
+            "label": "Information Management & Retention (SI-12)",
+            "description": "Lifecycle of information stored, processed, or transmitted by the system.",
+            "questions": [
+                { "id": "info_categories",          "label": "Information categories handled",   "type": "multi_select",
+                  "options": ["CUI (Controlled Unclassified Information)", "PII (Personally Identifiable Information)", "PHI (Protected Health Information)", "Payment card data (PCI scope)", "Federal Tax Information (FTI)", "Export-controlled data (ITAR / EAR)", "Trade secret / proprietary", "Public / open data"] },
+                { "id": "info_retention_schedule",   "label": "Retention schedule reference",     "type": "text",
+                  "help": "NARA records schedule, organizational records-retention policy, or contractual reference (e.g., 'NARA GRS 4.2 for security records; per data-sharing-agreement Sec 8 for partner data')." },
+                { "id": "info_disposal_method",     "label": "Disposal method",                   "type": "textarea", "rows": 3,
+                  "help": "How records are destroyed at end of retention. Reference NIST SP 800-88 r1 sanitization requirements + MP-6." },
+                { "id": "info_quality_controls",    "label": "Information quality controls (SI-18)","type": "textarea", "rows": 3,
+                  "help": "How accuracy / completeness / currency of stored information is maintained, especially for PII (per SI-18)." }
+            ]
+        },
+
+        {
+            "id": "integrity_scope",
+            "type": "group",
+            "section": "system_overview",
+            "label": "Integrity Scope and Coverage",
+            "description": "What's in scope for monitoring, scanning, and integrity protection.",
+            "questions": [
+                { "id": "scope_total_endpoints",    "label": "Total endpoints in scope",         "type": "text",
+                  "help": "Approximate count of hosts / containers / VMs requiring monitoring + AV/EDR coverage." },
+                { "id": "scope_external_facing",    "label": "External-facing components count", "type": "text",
+                  "help": "Public-facing surface (web servers, APIs, etc.) — typically more frequently scanned." },
+                { "id": "scope_data_volume",        "label": "Data volume protected (approximate)", "type": "text",
+                  "help": "Order of magnitude (e.g., '5 TB application data; ~50M user records')." }
+            ]
+        },
+
+        {
+            "id": "si_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Integrity Metrics & KPIs",
+            "description": "Metrics tracked to demonstrate SI control effectiveness.",
+            "questions": [
+                { "id": "si_metrics_list", "label": "Tracked metrics", "type": "list",
+                  "suggestions": [
+                      "% Critical vulnerabilities patched within SLA",
+                      "% High vulnerabilities patched within SLA",
+                      "Mean time to patch (MTTP) — Critical",
+                      "% KEV-catalog vulns affecting system + SLA compliance",
+                      "Endpoint coverage rate (% reporting in last 24h)",
+                      "Malware detections per quarter (trend)",
+                      "Malware-to-removal mean time",
+                      "FIM unauthorized change events (target: 0)",
+                      "Alert false-positive rate",
+                      "Open POA&M items linked to SI controls"
+                  ] }
+            ]
+        },
+
+        {
+            "id": "monitoring_coverage_metrics",
+            "type": "group",
+            "section": "continuous_monitoring",
+            "label": "Monitoring Coverage Verification",
+            "description": "How the org continuously verifies SI tooling is actually deployed everywhere it should be.",
+            "questions": [
+                { "id": "coverage_gap_detection",   "label": "Coverage-gap detection mechanism", "type": "textarea", "rows": 3,
+                  "help": "How assets without required SI agents are detected (CMDB ↔ EDR roster reconciliation; nightly diff job)." },
+                { "id": "coverage_remediation_sla", "label": "Coverage-gap remediation SLA",     "type": "text",
+                  "help": "Time from detection to gap closed (e.g., 'Within 24h for production'; '7 days otherwise')." }
+            ]
+        },
+
+        {
+            "id": "integration",
+            "type": "group",
+            "section": "integration",
+            "label": "Cross-references to other RMF artifacts",
+            "description": "Where this plan plugs into the broader RMF package.",
+            "questions": [
+                { "id": "ssp_section_reference",        "label": "SSP section reference",        "type": "text",
+                  "help": "Where in the SSP the SI control implementations are summarized (e.g., 'SSP §13.10')." },
+                { "id": "poam_id_prefix",               "label": "POA&M ID prefix for SI findings", "type": "text",
+                  "help": "Convention for SI-related POA&M items (e.g., 'POAM-SI-' for general; 'POAM-SI2-' for vuln-specific)." },
+                { "id": "au_event_handoff",             "label": "AU event handoff",             "type": "textarea", "rows": 2,
+                  "help": "How SI-4 monitoring events flow into the audit pipeline (SIEM index, log sources, retention)." },
+                { "id": "ir_signal_handoff",            "label": "IR signal handoff",            "type": "textarea", "rows": 2,
+                  "help": "How SI-3 / SI-4 / SI-7 detections become incidents in the IR plan workflow." },
+                { "id": "ra_data_consumption",          "label": "RA-5 vulnerability data consumption", "type": "textarea", "rows": 2,
+                  "help": "How SI-2 flaw remediation consumes RA-5 vulnerability scans. Tooling, frequency, ticket queue." },
+                { "id": "cm_change_workflow",           "label": "CM change-workflow integration", "type": "textarea", "rows": 2,
+                  "help": "How patches feed through the CM-3 change-control workflow. Emergency-patch pathway." },
+                { "id": "ca7_monitoring_strategy_link", "label": "CA-7 continuous-monitoring strategy reference", "type": "textarea", "rows": 2,
+                  "help": "Pointer to the CA-7 monitoring strategy document tying SI continuous-monitoring metrics to the broader ConMon plan." }
+            ]
+        }
+    ],
+
+    "per_control_guidance": {
+        "SI-2": {
+            "prompts": [
+                "Reference §4.2 — vuln scan tool, cadence, and patch SLAs by severity.",
+                "Document CISA KEV-catalog handling and BOD 22-01 timelines if applicable.",
+                "Address coordination with CM change-control (CM-3) — see CM Plan §4.1.",
+                "Document emergency-patch pathway for active exploitation.",
+                "Reference SI-2(2) automated flaw remediation status, SI-2(3) time to remediate / benchmarks, SI-2(5) automatic software / firmware updates, SI-2(6) removal of previous versions."
+            ],
+            "evidence_suggestions": [
+                "Vulnerability-scan results (last cycle, redacted as needed)",
+                "Patch-deployment records (last quarter)",
+                "Sample emergency-patch CCB record",
+                "KEV-catalog tracking dashboard",
+                "Vulnerability-exception register"
+            ],
+            "extra_fields": [
+                { "id": "si2_kev_compliance_method","label": "KEV compliance tracking method", "type": "textarea", "rows": 3,
+                  "help": "How affected KEVs are identified for this system and tracked to BOD 22-01 deadline (or organizational equivalent)." },
+                { "id": "si2_emergency_patch",      "label": "Emergency-patch pathway",        "type": "textarea", "rows": 3,
+                  "help": "Expedited workflow for actively-exploited vulnerabilities. CCB retroactive review window." }
+            ]
+        },
+
+        "SI-3": {
+            "prompts": [
+                "Reference §4.3 — coverage, signature update cadence, detection modes, response action.",
+                "Address allowlisting / application control coordination if used (overlaps CM-7).",
+                "Document handling of false positives that block legitimate operations.",
+                "Reference SI-3(8) detect unauthorized commands, SI-3(10) malicious code analysis."
+            ],
+            "evidence_suggestions": [
+                "EDR / AV deployment console showing coverage",
+                "Signature-update verification report",
+                "Sample malware detection-and-response audit log",
+                "Allowlisting / application-control policy",
+                "False-positive exception register"
+            ],
+            "extra_fields": [
+                { "id": "si3_allowlist_coordination","label": "Allowlist / application-control coordination", "type": "textarea", "rows": 3,
+                  "help": "How SI-3 (malware protection) coordinates with CM-7 (least functionality) allowlisting (e.g., 'EDR enforces signature + behavior; WDAC enforces allowlist; both bypassed only via CCB approval')." },
+                { "id": "si3_malware_analysis_capability","label": "Malicious-code analysis capability (SI-3(10))", "type": "select",
+                  "options": ["In-house sandbox / detonation", "Vendor-cloud detonation (EDR provider)", "External IR retainer for novel samples", "No formal analysis capability"] }
+            ]
+        },
+
+        "SI-4": {
+            "prompts": [
+                "Reference §4.4 — monitoring layers, events monitored, alert routing.",
+                "Address monitoring strategy (continuous vs sampling, breadth vs depth).",
+                "Document protection of the monitoring tools themselves (tamper-evidence, RBAC).",
+                "Reference SI-4(2) automated tools for real-time analysis, SI-4(4) inbound + outbound communications traffic, SI-4(5) system-generated alerts, SI-4(11) wireless intrusion detection, SI-4(14) wireless intrusion detection systems, SI-4(20) privileged users, SI-4(22) unauthorized network services."
+            ],
+            "evidence_suggestions": [
+                "Monitoring tool deployment console",
+                "Monitoring-strategy document",
+                "Sample SIEM correlation rules (sanitized)",
+                "Coverage attestation (last cycle)",
+                "Monitoring-tool RBAC export"
+            ],
+            "extra_fields": [
+                { "id": "si4_monitoring_tool_protection","label": "Protection of monitoring tools themselves", "type": "textarea", "rows": 3,
+                  "help": "Tamper protection on the monitoring infrastructure: who can disable agents, who can edit detection rules, audit-trail of changes." },
+                { "id": "si4_inbound_outbound_coverage", "label": "Inbound + outbound traffic monitoring (SI-4(4))", "type": "textarea", "rows": 3,
+                  "help": "How both ingress and egress traffic are monitored. Cloud-native (VPC flow logs, Azure NSG flow logs) and traditional (IDS taps, SPAN ports)." }
+            ]
+        },
+
+        "SI-5": {
+            "prompts": [
+                "Reference §4.5 — sources, ingestion, triage SLA, dissemination.",
+                "Document the role responsible for monitoring advisory feeds.",
+                "Address coordination with the CISA KEV catalog (overlaps SI-2).",
+                "Reference SI-5(1) automated alerts and advisories ingestion."
+            ],
+            "evidence_suggestions": [
+                "Advisory subscription roster",
+                "Sample advisory triage record",
+                "Internal dissemination roster",
+                "TIP / SOAR feed configuration"
+            ],
+            "extra_fields": [
+                { "id": "si5_monitoring_role",    "label": "Advisory-monitoring role", "type": "text",
+                  "help": "Role accountable for monitoring advisory feeds (e.g., 'Vulnerability Management Team Lead')." },
+                { "id": "si5_automation_level",   "label": "Automation level for advisory ingestion (SI-5(1))", "type": "select",
+                  "options": ["Fully automated (TIP → ticket on match)", "Partial (curated email feed → manual triage)", "Manual (analyst monitors mailing lists)"] }
+            ]
+        },
+
+        "SI-7": {
+            "prompts": [
+                "Reference §4.6 — FIM tool, scope, software / firmware integrity verification.",
+                "Document signed-package verification at install / update time.",
+                "Address SBOM generation and consumption.",
+                "Reference SI-7(1) integrity checks at startup + at defined frequency, SI-7(7) integration of detection and response, SI-7(15) code authentication."
+            ],
+            "evidence_suggestions": [
+                "FIM tool configuration + sample alert",
+                "Code-signing infrastructure documentation",
+                "Sample SBOM (CycloneDX / SPDX format)",
+                "Package-signature verification configuration",
+                "Integrity-check schedule export"
+            ],
+            "extra_fields": [
+                { "id": "si7_sbom_approach",       "label": "SBOM approach",            "type": "textarea", "rows": 3,
+                  "help": "Whether and how SBOMs are generated (build-time tooling, format, where stored) and consumed (vulnerability matching, license-compliance checking). Reference EO 14028 / OMB M-22-18 for federal context." },
+                { "id": "si7_code_authentication", "label": "Code authentication (SI-7(15))","type": "textarea", "rows": 3,
+                  "help": "Cryptographic verification of code authenticity prior to execution. Sigstore, Authenticode, vendor signing, internal CA." }
+            ]
+        },
+
+        "SI-10": {
+            "prompts": [
+                "Reference §4.7 — validation strategy, enforcement layers, ASVS alignment.",
+                "Document handling of structured (JSON / XML) and unstructured (free text) inputs separately.",
+                "Address the WAF rule maintenance cadence if WAF is in scope.",
+                "Reference SI-10(3) predictable behavior, SI-10(5) restrict inputs to trusted sources, SI-10(6) injection prevention."
+            ],
+            "evidence_suggestions": [
+                "Application input-validation specification",
+                "WAF rule export (sanitized)",
+                "OWASP ASVS gap-analysis report",
+                "Sample integration test for validation rules"
+            ],
+            "extra_fields": [
+                { "id": "si10_injection_prevention","label": "Injection prevention approach (SI-10(6))", "type": "textarea", "rows": 3,
+                  "help": "Specific mitigations for SQL / OS / LDAP / NoSQL / template / XPath injection. Parameterized queries, ORM, escape contexts, etc." }
+            ]
+        },
+
+        "SI-11": {
+            "prompts": [
+                "Reference §4.8 — user-facing vs logged error content.",
+                "Address sensitive information that must NEVER appear in logs (passwords, full PII, session tokens) — coordinate with AU plan privacy_redaction.",
+                "Document correlation IDs that let users / support reference an error without revealing internals.",
+                "Reference SI-11 ODV — organization-defined personnel or roles to whom error information is revealed."
+            ],
+            "evidence_suggestions": [
+                "Error-handling policy document",
+                "Sample stack trace from production logs (showing redaction)",
+                "Sample user-facing error page",
+                "Correlation-ID generation strategy"
+            ],
+            "extra_fields": [
+                { "id": "si11_correlation_id_strategy","label": "Correlation ID strategy", "type": "textarea", "rows": 3,
+                  "help": "How a single user-action error gets tied to its server-side log entries (request ID propagation, distributed-trace ID)." },
+                { "id": "si11_log_review_for_errors",  "label": "Log review for error patterns", "type": "text",
+                  "help": "Cadence for reviewing error logs for new failure patterns or security signals." }
+            ]
+        },
+
+        "SI-12": {
+            "prompts": [
+                "Reference §4.9 — information categories, retention schedule, disposal method.",
+                "Address quality controls for PII (SI-18) if applicable.",
+                "Document data classification labels in use.",
+                "Reference SI-12(1) limit personally identifiable information elements, SI-12(2) minimize personally identifiable information in testing, training, and research, SI-12(3) information disposal."
+            ],
+            "evidence_suggestions": [
+                "Information-management policy",
+                "Records-retention schedule (NARA or organizational)",
+                "Sample sanitization-of-disposed-media certificate (per NIST SP 800-88)",
+                "Data-classification labels register"
+            ],
+            "extra_fields": [
+                { "id": "si12_minimization_test_data","label": "PII minimization in test / training (SI-12(2))", "type": "textarea", "rows": 3,
+                  "help": "How production PII is excluded / synthesized for non-production environments. Tooling and verification." },
+                { "id": "si12_disposal_certification", "label": "Disposal certification process (SI-12(3))", "type": "textarea", "rows": 3,
+                  "help": "Chain of custody and certificate of destruction for disposed information / media. References MP-6." }
+            ]
+        }
+    },
+
+    "glossary": [
+        { "term": "Behavioral Detection",   "definition": "Detection of malicious activity by recognizing patterns of behavior (process injection, lateral movement, privilege escalation) rather than file signatures." },
+        { "term": "BOD 22-01",              "definition": "CISA Binding Operational Directive 22-01, requiring federal agencies to remediate vulnerabilities in the CISA KEV catalog within specified timeframes." },
+        { "term": "CVE",                    "definition": "Common Vulnerabilities and Exposures — a unique identifier assigned to a publicly disclosed vulnerability." },
+        { "term": "CVSS",                   "definition": "Common Vulnerability Scoring System — a numerical score (0.0–10.0) reflecting the severity of a CVE based on exploitability and impact." },
+        { "term": "DAST",                   "definition": "Dynamic Application Security Testing — runtime testing of a deployed application by sending crafted inputs and observing behavior." },
+        { "term": "EDR",                    "definition": "Endpoint Detection and Response — security tooling deployed on hosts that collects telemetry, detects threats, and supports incident response." },
+        { "term": "False Positive",          "definition": "An alert that, on investigation, was not a real security event. False-positive tuning is a continuous calibration." },
+        { "term": "FIM",                    "definition": "File Integrity Monitoring — tooling that detects unauthorized changes to specified files / directories." },
+        { "term": "Heuristic Detection",    "definition": "Detection that uses rules and characteristics (rather than exact signatures) to identify suspected malicious content. Higher recall but more false positives." },
+        { "term": "IDS / IPS",              "definition": "Intrusion Detection System / Intrusion Prevention System. IDS alerts on observed attacks; IPS additionally blocks them." },
+        { "term": "KEV Catalog",            "definition": "CISA's Known Exploited Vulnerabilities catalog — a curated list of CVEs known to be actively exploited. BOD 22-01 mandates expedited federal remediation." },
+        { "term": "Malicious Code",         "definition": "Software designed to perform unauthorized actions or compromise the integrity, availability, or confidentiality of a system. Includes malware, viruses, worms, ransomware, trojans, rootkits, etc." },
+        { "term": "MDR",                    "definition": "Managed Detection and Response — a service combining technology (typically EDR) with human analysts who triage alerts on the customer's behalf." },
+        { "term": "MTTP",                   "definition": "Mean Time to Patch — average duration from a patch becoming available to deployment in the system." },
+        { "term": "OWASP ASVS",             "definition": "Application Security Verification Standard — OWASP framework for verifying web-application security at three assurance levels." },
+        { "term": "Patch",                  "definition": "A software update that addresses a specific defect, often a security vulnerability." },
+        { "term": "RASP",                   "definition": "Runtime Application Self-Protection — security instrumentation embedded in an application that detects and blocks attacks at runtime." },
+        { "term": "Ransomware",             "definition": "Malicious code that encrypts or exfiltrates data and demands payment for restoration or non-disclosure." },
+        { "term": "SAST",                   "definition": "Static Application Security Testing — analysis of application source code (or compiled binary) to identify security defects without executing it." },
+        { "term": "SBOM",                   "definition": "Software Bill of Materials — a formal record of components and dependencies in a piece of software. Required for federal software per EO 14028 / OMB M-22-18." },
+        { "term": "SCA",                    "definition": "Software Composition Analysis — examining the third-party components in an application for known vulnerabilities and license compliance." },
+        { "term": "Signature",              "definition": "A pattern (file hash, byte sequence, network packet pattern) that uniquely identifies a known threat. Used by signature-based detection engines." },
+        { "term": "Tainting",               "definition": "Per SI-20, deliberately marking information so that unauthorized exfiltration or modification can be detected. Generally used in high-risk classified contexts." },
+        { "term": "WAF",                    "definition": "Web Application Firewall — a filter applied to HTTP / HTTPS traffic that detects and blocks application-layer attacks like SQL injection and cross-site scripting." },
+        { "term": "Zero-Day",               "definition": "A vulnerability that is exploited before the vendor / public is aware (i.e., zero days of advance notice). Particularly dangerous because no patch exists at exploitation time." }
+    ],
+
+    "acronyms": [
+        { "abbr": "AO",     "expansion": "Authorizing Official" },
+        { "abbr": "ASVS",   "expansion": "Application Security Verification Standard (OWASP)" },
+        { "abbr": "ATO",    "expansion": "Authority to Operate" },
+        { "abbr": "BOD",    "expansion": "Binding Operational Directive (CISA)" },
+        { "abbr": "CISA",   "expansion": "Cybersecurity and Infrastructure Security Agency" },
+        { "abbr": "CSPM",   "expansion": "Cloud Security Posture Management" },
+        { "abbr": "CUI",    "expansion": "Controlled Unclassified Information" },
+        { "abbr": "CVE",    "expansion": "Common Vulnerabilities and Exposures" },
+        { "abbr": "CVSS",   "expansion": "Common Vulnerability Scoring System" },
+        { "abbr": "CWPP",   "expansion": "Cloud Workload Protection Platform" },
+        { "abbr": "DAST",   "expansion": "Dynamic Application Security Testing" },
+        { "abbr": "DLP",    "expansion": "Data Loss Prevention" },
+        { "abbr": "EDR",    "expansion": "Endpoint Detection and Response" },
+        { "abbr": "EO",     "expansion": "Executive Order" },
+        { "abbr": "FIM",    "expansion": "File Integrity Monitoring" },
+        { "abbr": "FTI",    "expansion": "Federal Tax Information" },
+        { "abbr": "HIDS",   "expansion": "Host-based Intrusion Detection System" },
+        { "abbr": "IDS",    "expansion": "Intrusion Detection System" },
+        { "abbr": "IPS",    "expansion": "Intrusion Prevention System" },
+        { "abbr": "ISSM",   "expansion": "Information System Security Manager" },
+        { "abbr": "ISSO",   "expansion": "Information System Security Officer" },
+        { "abbr": "ITAR",   "expansion": "International Traffic in Arms Regulations" },
+        { "abbr": "KEV",    "expansion": "Known Exploited Vulnerabilities (CISA catalog)" },
+        { "abbr": "MDR",    "expansion": "Managed Detection and Response" },
+        { "abbr": "MTTP",   "expansion": "Mean Time to Patch" },
+        { "abbr": "MTTR",   "expansion": "Mean Time to Remediate / Respond" },
+        { "abbr": "NDR",    "expansion": "Network Detection and Response" },
+        { "abbr": "NIDS",   "expansion": "Network Intrusion Detection System" },
+        { "abbr": "NIST",   "expansion": "National Institute of Standards and Technology" },
+        { "abbr": "NIPS",   "expansion": "Network Intrusion Prevention System" },
+        { "abbr": "NVD",    "expansion": "National Vulnerability Database" },
+        { "abbr": "ODV",    "expansion": "Organization-Defined Value" },
+        { "abbr": "OMB",    "expansion": "Office of Management and Budget" },
+        { "abbr": "OWASP",  "expansion": "Open Web Application Security Project" },
+        { "abbr": "PCI",    "expansion": "Payment Card Industry (data security standard)" },
+        { "abbr": "PHI",    "expansion": "Protected Health Information" },
+        { "abbr": "PII",    "expansion": "Personally Identifiable Information" },
+        { "abbr": "POAM",   "expansion": "Plan of Action and Milestones" },
+        { "abbr": "RASP",   "expansion": "Runtime Application Self-Protection" },
+        { "abbr": "RMF",    "expansion": "Risk Management Framework" },
+        { "abbr": "SAST",   "expansion": "Static Application Security Testing" },
+        { "abbr": "SBOM",   "expansion": "Software Bill of Materials" },
+        { "abbr": "SCA",    "expansion": "Software Composition Analysis" },
+        { "abbr": "SI",     "expansion": "System and Information Integrity (NIST 800-53 family)" },
+        { "abbr": "SIEM",   "expansion": "Security Information and Event Management" },
+        { "abbr": "SOAR",   "expansion": "Security Orchestration, Automation, and Response" },
+        { "abbr": "SOC",    "expansion": "Security Operations Center" },
+        { "abbr": "SP",     "expansion": "Special Publication (NIST series)" },
+        { "abbr": "SPDX",   "expansion": "Software Package Data Exchange (SBOM format)" },
+        { "abbr": "SSP",    "expansion": "System Security Plan" },
+        { "abbr": "SWG",    "expansion": "Secure Web Gateway" },
+        { "abbr": "TIP",    "expansion": "Threat Intelligence Platform" },
+        { "abbr": "UEBA",   "expansion": "User and Entity Behavior Analytics" },
+        { "abbr": "VMDR",   "expansion": "Vulnerability Management, Detection, and Response" },
+        { "abbr": "WAF",    "expansion": "Web Application Firewall" },
+        { "abbr": "WDAC",   "expansion": "Windows Defender Application Control" },
+        { "abbr": "XDR",    "expansion": "Extended Detection and Response" }
+    ],
+
+    "references": [
+        { "label": "NIST SP 800-53 r5 — Security and Privacy Controls",            "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+        { "label": "NIST SP 800-40 r4 — Guide to Enterprise Patch Management Planning", "url": "https://csrc.nist.gov/pubs/sp/800/40/r4/final" },
+        { "label": "NIST SP 800-83 r1 — Malware Incident Prevention and Handling for Desktops and Laptops", "url": "https://csrc.nist.gov/pubs/sp/800/83/r1/final" },
+        { "label": "NIST SP 800-94 — Guide to Intrusion Detection and Prevention Systems", "url": "https://csrc.nist.gov/pubs/sp/800/94/final" },
+        { "label": "NIST SP 800-115 — Technical Guide to Information Security Testing and Assessment", "url": "https://csrc.nist.gov/pubs/sp/800/115/final" },
+        { "label": "NIST SP 800-167 — Guide to Application Whitelisting",          "url": "https://csrc.nist.gov/pubs/sp/800/167/final" },
+        { "label": "CISA Known Exploited Vulnerabilities (KEV) Catalog",           "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog" },
+        { "label": "CISA BOD 22-01 — Reducing the Significant Risk of Known Exploited Vulnerabilities", "url": "https://www.cisa.gov/news-events/directives/bod-22-01" },
+        { "label": "OMB M-22-18 — Enhancing the Security of the Software Supply Chain", "url": "https://www.whitehouse.gov/wp-content/uploads/2022/09/M-22-18.pdf" },
+        { "label": "OWASP Application Security Verification Standard (ASVS)",      "url": "https://owasp.org/www-project-application-security-verification-standard/" },
+        { "label": "NIST SP 800-37 r2 — Risk Management Framework",                "url": "https://csrc.nist.gov/pubs/sp/800/37/r2/final" }
+    ]
+}
