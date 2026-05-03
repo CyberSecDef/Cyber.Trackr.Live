@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}IAVMs &amp; CTOs in the corpus &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}IAVMs and CTOs harvested from the STIG/SCAP corpus{% endblock %}
+{% block og_description %}Bulletin IDs (IAVA-format YYYY-A-NNNN, Cyber Tasking Orders CTOnnnn) that DISA published inside STIG XML, with backlinks to every rule that cites them.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="iavm-page-title">
+        <nav class="vulns-breadcrumbs" aria-label="Breadcrumbs">
+            <a href="{{ path('vulns') }}">Vulnerabilities</a>
+            <span aria-hidden="true">&rsaquo;</span>
+            <span class="vulns-breadcrumbs__current">IAVMs &amp; CTOs</span>
+        </nav>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">From the public STIG/SCAP corpus</span>
+            <h1 id="iavm-page-title" class="lib-page__title-large">
+                IAVMs &amp; CTOs<br>
+                <em>that survived publication.</em>
+            </h1>
+            <p class="lib-page__lede">
+                Specific bulletin IDs DISA chose to embed in STIG XML &mdash; either as <code>YYYY-A-NNNN</code> IAVA-format references, or as Cyber Tasking Order numbers (<code>CTOnnnn</code>). The list is small because nearly all bulletin distribution happens behind CAC, but every entry links back to the rule that cites it.
+            </p>
+        </header>
+
+        <aside class="vulns-dod-notice" aria-label="Note for DoD users">
+            <div class="vulns-dod-notice__title">
+                <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                For DoD users
+            </div>
+            <p>
+                For the authoritative IAVM list, consult your <strong>ACAS console</strong>, <strong>VRAM</strong>, or the IAVM listing on <strong>public.cyber.mil</strong> with your CAC. This page surfaces only what's already published openly inside STIG XML.
+            </p>
+        </aside>
+
+        <div class="vulns-stats vulns-stats--compact">
+            <div class="vulns-stat-card">
+                <span class="vulns-stat-card__eyebrow">IAVA-format IDs</span>
+                <span class="vulns-stat-card__num">{{ iavms|length }}</span>
+                <span class="vulns-stat-card__label">distinct <code>YYYY-A-NNNN</code> references</span>
+            </div>
+            <div class="vulns-stat-card">
+                <span class="vulns-stat-card__eyebrow">Cyber Tasking Orders</span>
+                <span class="vulns-stat-card__num">{{ ctos|length }}</span>
+                <span class="vulns-stat-card__label">distinct <code>CTOnnnn</code> references</span>
+            </div>
+            <div class="vulns-stat-card">
+                <span class="vulns-stat-card__eyebrow">Prose-only mentions</span>
+                <span class="vulns-stat-card__num">{{ prose_count|number_format }}</span>
+                <span class="vulns-stat-card__label">rules say "IAVA" without naming a specific bulletin</span>
+            </div>
+        </div>
+
+        {% if iavms|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">IAVA / IAVB / IAVT references</h2>
+                <ul class="vulns-iavm-list">
+                    {% for iv in iavms %}
+                        <li class="vulns-iavm">
+                            <a class="vulns-iavm__id ident ident--link" href="{{ path('vulns_iavm_view', {id: iv.id}) }}">{{ iv.id }}</a>
+                            <span class="vulns-iavm__kind">{{ iv.kind }}</span>
+                            <span class="vulns-iavm__count">{{ iv.rule_count }} rule{{ iv.rule_count == 1 ? '' : 's' }}</span>
+                            {% if iv.cves|length %}
+                                <span class="vulns-iavm__cves">
+                                    {% for c in iv.cves %}
+                                        <a class="ident ident--link ident--small" href="{{ path('vulns_cve_view', {cve: c}) }}">{{ c }}</a>
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        {% if ctos|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Cyber Tasking Orders</h2>
+                <p class="vulns-section__lede">CTOs are USCYBERCOM directives. They appear in older STIGs and remain referenced in current ones for legacy reasons.</p>
+                <ul class="vulns-iavm-list">
+                    {% for c in ctos %}
+                        <li class="vulns-iavm">
+                            <a class="vulns-iavm__id ident ident--link" href="{{ path('vulns_iavm_view', {id: c.id}) }}">{{ c.id }}</a>
+                            <span class="vulns-iavm__kind">CTO</span>
+                            <span class="vulns-iavm__count">{{ c.rule_count }} rule{{ c.rule_count == 1 ? '' : 's' }}</span>
+                            {% if c.cves|length %}
+                                <span class="vulns-iavm__cves">
+                                    {% for cv in c.cves %}
+                                        <a class="ident ident--link ident--small" href="{{ path('vulns_cve_view', {cve: cv}) }}">{{ cv }}</a>
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        {% if iavms|length == 0 and ctos|length == 0 %}
+            <p class="vulns-empty">No IAVM or CTO IDs found in the current corpus. Run <code>app:vulns:rebuild-toc</code> to refresh after a STIG/SCAP update.</p>
+        {% endif %}
+
+        {% if toc_generated_at %}
+            <p class="vulns-footnote">
+                Scan run <time datetime="{{ toc_generated_at }}">{{ toc_generated_at|date('j M Y, H:i T') }}</time> across {{ toc_stats.stig_files_scanned|number_format }} STIG and {{ toc_stats.scap_files_scanned|number_format }} SCAP XML files.
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}

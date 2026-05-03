@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}{{ cve }} &mdash; CISA KEV &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}{{ cve }} — {{ entry.vendorProject }} {{ entry.product }}{% endblock %}
+{% block og_description %}{{ entry.shortDescription|default('CISA Known Exploited Vulnerability detail with cross-references to STIG, SCAP, and 800-53 controls.')|slice(0, 250) }}{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="kev-detail-title">
+        <nav class="vulns-breadcrumbs" aria-label="Breadcrumbs">
+            <a href="{{ path('vulns') }}">Vulnerabilities</a>
+            <span aria-hidden="true">&rsaquo;</span>
+            <a href="{{ path('vulns_kev_list') }}">CISA KEV</a>
+            <span aria-hidden="true">&rsaquo;</span>
+            <span class="vulns-breadcrumbs__current">{{ cve }}</span>
+        </nav>
+
+        <header class="lib-page__header vulns-detail-header">
+            <span class="eyebrow">CISA Known Exploited Vulnerability</span>
+            <h1 id="kev-detail-title" class="vulns-detail-title">
+                {{ ui.ident(cve) }}
+                {% if (entry.knownRansomwareCampaignUse|default('')) == 'Known' %}
+                    <span class="vulns-flag vulns-flag--ransom" title="Linked to known ransomware campaigns">Ransomware</span>
+                {% endif %}
+            </h1>
+            <p class="vulns-detail-product">{{ entry.vendorProject|default('') }} &middot; {{ entry.product|default('') }}</p>
+            <p class="vulns-detail-name">{{ entry.vulnerabilityName|default('') }}</p>
+        </header>
+
+        <div class="vulns-meta-grid">
+            <div class="vulns-meta">
+                <span class="vulns-meta__label">Date added</span>
+                <span class="vulns-meta__value"><time datetime="{{ entry.dateAdded }}">{{ entry.dateAdded|default('—') }}</time></span>
+            </div>
+            <div class="vulns-meta">
+                <span class="vulns-meta__label">BOD 22-01 due date</span>
+                <span class="vulns-meta__value"><time datetime="{{ entry.dueDate }}">{{ entry.dueDate|default('—') }}</time></span>
+            </div>
+            <div class="vulns-meta">
+                <span class="vulns-meta__label">CWE</span>
+                <span class="vulns-meta__value">{% if entry.cwes is defined and entry.cwes|length %}{{ entry.cwes|join(', ') }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="vulns-meta">
+                <span class="vulns-meta__label">Ransomware</span>
+                <span class="vulns-meta__value">{{ entry.knownRansomwareCampaignUse|default('Unknown') }}</span>
+            </div>
+        </div>
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">CISA description</h2>
+            <p class="vulns-section__prose">{{ entry.shortDescription|default('—') }}</p>
+        </article>
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">Required action</h2>
+            <p class="vulns-section__prose">{{ entry.requiredAction|trim('"')|default('—') }}</p>
+        </article>
+
+        {% if entry.notes is defined and entry.notes|trim('"')|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Notes &amp; references</h2>
+                <ul class="vulns-link-list">
+                    {% for note in entry.notes|trim('" ')|split(';') %}
+                        {% set n = note|trim %}
+                        {% if n starts with 'http' %}
+                            <li><a href="{{ n }}" target="_blank" rel="noopener noreferrer">{{ n }}</a></li>
+                        {% elseif n != '' %}
+                            <li>{{ n }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        {% if rules|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Referenced in the corpus</h2>
+                <p class="vulns-section__lede">{{ rules|length }} STIG/SCAP rule{{ rules|length == 1 ? '' : 's' }} cite{{ rules|length == 1 ? 's' : '' }} this CVE directly.</p>
+                {{ include('vulns/_rules_table.html.twig', {rules: rules}) }}
+            </article>
+        {% endif %}
+
+        {% if iavms|length or ctos|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Co-occurring bulletins</h2>
+                <ul class="vulns-link-list">
+                    {% for i in iavms %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_iavm_view', {id: i}) }}">{{ i }}</a></li>
+                    {% endfor %}
+                    {% for c in ctos %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_iavm_view', {id: c}) }}">{{ c }}</a></li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">Where this lands in 800-53</h2>
+            <p class="vulns-section__lede">Vulnerability data triggers these controls during assessment and continuous monitoring.</p>
+            <ul class="vulns-controls-list">
+                {% for ctl, name in related_controls %}
+                    <li><a href="{{ path('rmf_v5_view') }}#rmf_{{ ctl }}">{{ ui.ident(ctl) }} &middot; {{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">External lookups</h2>
+            <ul class="vulns-link-list">
+                <li><a href="https://nvd.nist.gov/vuln/detail/{{ cve }}" target="_blank" rel="noopener noreferrer">NVD &middot; {{ cve }}</a></li>
+                <li><a href="https://www.cve.org/CVERecord?id={{ cve }}" target="_blank" rel="noopener noreferrer">CVE.org &middot; {{ cve }}</a></li>
+                <li><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener noreferrer">CISA KEV catalog (canonical)</a></li>
+            </ul>
+        </article>
+    </section>
+{% endblock %}

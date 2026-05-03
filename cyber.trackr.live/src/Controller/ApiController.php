@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\Vulns\VulnsRegistry;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -83,6 +84,33 @@ class ApiController extends AbstractController
                     "version" => "The version of the specific SCAP.",
                     "release" => "The release of the specific SCAP.",
                     "vuln" => "The vuln_id to be viewed, i.e. V-123456"
+                ]
+            ],
+            "/vulns" => [
+                "summary" => "Vulnerabilities root — KEV catalog summary, IAVM/CTO/CVE corpus stats, and the index of /vulns subroutes."
+            ],
+            "/vulns/kev" => [
+                "summary" => "Full CISA Known Exploited Vulnerabilities catalog (mirrored locally)."
+            ],
+            "/vulns/kev/{cve}" => [
+                "summary" => "Single KEV entry by CVE id, plus any STIG/SCAP rules in the corpus that cite the same CVE.",
+                "parameters" => [
+                    "cve" => "The CVE id, i.e. CVE-2024-1708"
+                ]
+            ],
+            "/vulns/iavm" => [
+                "summary" => "IAVA / IAVB / IAVT / CTO bulletin IDs harvested from the public STIG/SCAP corpus."
+            ],
+            "/vulns/iavm/{id}" => [
+                "summary" => "Single bulletin with rule backlinks and co-occurring CVEs.",
+                "parameters" => [
+                    "id" => "The bulletin id (YYYY-A-NNNN format or CTOnnnn)"
+                ]
+            ],
+            "/vulns/cve/{cve}" => [
+                "summary" => "Unified CVE view — KEV record (if any) + STIG/SCAP rule references + co-occurring bulletins.",
+                "parameters" => [
+                    "cve" => "The CVE id, i.e. CVE-2009-3555"
                 ]
             ],
         ];
@@ -776,5 +804,101 @@ class ApiController extends AbstractController
 
 	return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
 	//return new Response(str_replace("\\n", "\n", json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
+    }
+
+    /* ============================================================
+       /api/vulns/* — JSON mirror of the /vulnerabilities/* tree.
+       Returns the same data as the HTML pages, raw and parseable.
+       ============================================================ */
+
+    #[Route('/api/vulns', name: 'api_vulns_summary')]
+    public function api_vulns_summary(VulnsRegistry $registry): Response
+    {
+        return $this->jsonOk([
+            'summary' => $registry->summary(),
+            'related_controls' => VulnsRegistry::RELATED_CONTROLS,
+            'endpoints' => [
+                '/api/vulns/kev' => 'Full CISA KEV catalog',
+                '/api/vulns/kev/{cve}' => 'Single KEV entry by CVE id',
+                '/api/vulns/iavm' => 'IAVMs and CTOs harvested from STIG/SCAP',
+                '/api/vulns/iavm/{id}' => 'Single IAVM/CTO with rule backlinks',
+                '/api/vulns/cve/{cve}' => 'Unified CVE view (KEV + corpus)',
+            ],
+        ]);
+    }
+
+    #[Route('/api/vulns/kev', name: 'api_vulns_kev_list')]
+    public function api_vulns_kev_list(VulnsRegistry $registry): Response
+    {
+        return $this->jsonOk([
+            'meta' => $registry->kev()->meta(),
+            'entries' => $registry->listKev(),
+        ]);
+    }
+
+    #[Route('/api/vulns/kev/{cve}', name: 'api_vulns_kev_view', requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'])]
+    public function api_vulns_kev_view(string $cve, VulnsRegistry $registry): Response
+    {
+        $entry = $registry->getKev($cve);
+        if ($entry === null) {
+            return $this->jsonOk(['error' => "CVE {$cve} is not in the CISA KEV catalog."], Response::HTTP_NOT_FOUND);
+        }
+        $unified = $registry->getCve($cve);
+        return $this->jsonOk([
+            'cve' => strtoupper($cve),
+            'kev' => $entry,
+            'rules' => $unified['rules'] ?? [],
+            'iavms' => $unified['iavms'] ?? [],
+            'ctos' => $unified['ctos'] ?? [],
+        ]);
+    }
+
+    #[Route('/api/vulns/iavm', name: 'api_vulns_iavm_list')]
+    public function api_vulns_iavm_list(VulnsRegistry $registry): Response
+    {
+        return $this->jsonOk([
+            'iavms' => $registry->listIavms(),
+            'ctos' => $registry->listCtos(),
+            'prose_mention_count' => count($registry->proseMentionRules()),
+            'stats' => $registry->tocStats(),
+            'generated_at' => $registry->tocGeneratedAt(),
+        ]);
+    }
+
+    #[Route(
+        '/api/vulns/iavm/{id}',
+        name: 'api_vulns_iavm_view',
+        requirements: ['id' => '20\d{2}-[ABT]-\d{4}|CTO\d{4}']
+    )]
+    public function api_vulns_iavm_view(string $id, VulnsRegistry $registry): Response
+    {
+        $entry = $registry->getIavm($id);
+        if ($entry === null) {
+            return $this->jsonOk(['error' => "No bulletin {$id} found in the corpus."], Response::HTTP_NOT_FOUND);
+        }
+        return $this->jsonOk($entry);
+    }
+
+    #[Route(
+        '/api/vulns/cve/{cve}',
+        name: 'api_vulns_cve_view',
+        requirements: ['cve' => 'CVE-\d{4}-\d{4,7}']
+    )]
+    public function api_vulns_cve_view(string $cve, VulnsRegistry $registry): Response
+    {
+        $entry = $registry->getCve($cve);
+        if ($entry === null) {
+            return $this->jsonOk(['error' => "CVE {$cve} is not in KEV and not referenced by any STIG or SCAP rule."], Response::HTTP_NOT_FOUND);
+        }
+        return $this->jsonOk($entry);
+    }
+
+    private function jsonOk(array $data, int $status = Response::HTTP_OK): Response
+    {
+        return new Response(
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            $status,
+            ['content-type' => 'application/json']
+        );
     }
 }

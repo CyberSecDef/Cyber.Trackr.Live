@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}CISA KEV catalog &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}CISA Known Exploited Vulnerabilities — full catalog{% endblock %}
+{% block og_description %}{{ entries|length|number_format }} CVEs CISA has confirmed are being actively exploited. Each entry carries a vendor, product, BOD 22-01 due date, and ransomware-campaign flag.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="kev-page-title">
+        <div class="rule-text">&sect; Vulnerabilities &middot; CISA KEV</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Known exploited vulnerabilities</span>
+            <h1 id="kev-page-title" class="lib-page__title-large">
+                <em>{{ entries|length|number_format }}</em> CVEs<br>
+                with confirmed exploitation.
+            </h1>
+            <p class="lib-page__lede">
+                The CISA KEV catalog &mdash; CVEs CISA has documented being actively exploited in the wild. BOD 22-01 obligates federal civilian agencies to patch by the due date; everyone else uses the list as a high-confidence triage queue.
+                {% if kev_meta.catalogVersion %}Catalog v{{ kev_meta.catalogVersion }}{% if kev_meta.dateReleased %}, released <time datetime="{{ kev_meta.dateReleased }}">{{ kev_meta.dateReleased|date('j M Y') }}</time>{% endif %}.{% endif %}
+            </p>
+        </header>
+
+        <div id="kev_container">
+        <table id="kev_table" class="vulns-table cci-table compact w-100">
+            <thead>
+                <tr>
+                    <th>CVE</th>
+                    <th>Vendor</th>
+                    <th>Product</th>
+                    <th>Vulnerability</th>
+                    <th>Added</th>
+                    <th>Due</th>
+                    <th>Ransom</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in entries %}
+                    <tr>
+                        <td><a class="ident ident--link" href="{{ path('vulns_kev_view', {cve: e.cveID}) }}">{{ e.cveID }}</a></td>
+                        <td>{{ e.vendorProject|default('') }}</td>
+                        <td>{{ e.product|default('') }}</td>
+                        <td>{{ e.vulnerabilityName|default('') }}</td>
+                        <td><time datetime="{{ e.dateAdded }}">{{ e.dateAdded|default('') }}</time></td>
+                        <td><time datetime="{{ e.dueDate }}">{{ e.dueDate|default('') }}</time></td>
+                        <td>{% if (e.knownRansomwareCampaignUse|default('')) == 'Known' %}<span class="vulns-flag vulns-flag--ransom" title="Linked to known ransomware campaigns">Yes</span>{% else %}<span class="vulns-flag vulns-flag--unknown" title="No known ransomware-campaign linkage">—</span>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function () {
+            const dt = $('#kev_table').DataTable({
+                dom: '<"cci-toolbar"<"cci-toolbar__left"f><"cci-toolbar__right"lB>>rt<"cci-foot"<"cci-foot__info"i>p>',
+                pageLength: 25,
+                order: [[ 4, "desc" ]],   // newest dateAdded first
+                responsive: true,
+                columnDefs: [
+                    { responsivePriority: 1,     targets: 0 },  // CVE
+                    { responsivePriority: 2,     targets: 3 },  // vulnerability name
+                    { responsivePriority: 3,     targets: 1 },  // vendor
+                    { responsivePriority: 10001, targets: '_all' },
+                ],
+                buttons: [
+                    { extend: 'copyHtml5',  text: '<i class="bi bi-copy"></i>',          titleAttr: 'Copy'  },
+                    { extend: 'excelHtml5', text: '<i class="bi bi-file-excel"></i>',    titleAttr: 'Excel' },
+                    { extend: 'csvHtml5',   text: '<i class="bi bi-filetype-csv"></i>',  titleAttr: 'CSV'   },
+                    { extend: 'print',      text: '<i class="bi bi-printer"></i>',       titleAttr: 'Print' },
+                ],
+            });
+
+            // Deep-link: /vulnerabilities/kev#CVE-2024-1234 prefilters.
+            const applyHash = () => {
+                const h = (window.location.hash || '').replace(/^#/, '').trim();
+                if (/^CVE-\d{4}-\d{4,7}$/i.test(h)) {
+                    dt.search(h).draw();
+                }
+            };
+            applyHash();
+            $(window).on('hashchange', applyHash);
+        });
+    </script>
+{% endblock %}

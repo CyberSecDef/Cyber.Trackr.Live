@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}{{ entry.id }} &mdash; {{ entry.kind }} &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}{{ entry.id }} — {{ entry.kind }} bulletin reference{% endblock %}
+{% block og_description %}Bulletin {{ entry.id }} as referenced in {{ entry.rules|length }} STIG/SCAP rule(s) in the public corpus, with cross-links to associated CVEs and 800-53 controls.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="iavm-detail-title">
+        <nav class="vulns-breadcrumbs" aria-label="Breadcrumbs">
+            <a href="{{ path('vulns') }}">Vulnerabilities</a>
+            <span aria-hidden="true">&rsaquo;</span>
+            <a href="{{ path('vulns_iavm_list') }}">IAVMs &amp; CTOs</a>
+            <span aria-hidden="true">&rsaquo;</span>
+            <span class="vulns-breadcrumbs__current">{{ entry.id }}</span>
+        </nav>
+
+        <header class="lib-page__header vulns-detail-header">
+            <span class="eyebrow">{{ entry.kind }} bulletin reference</span>
+            <h1 id="iavm-detail-title" class="vulns-detail-title">
+                {{ ui.ident(entry.id) }}
+                <span class="vulns-flag vulns-flag--corpus">From STIG/SCAP corpus</span>
+            </h1>
+            <p class="vulns-detail-name">
+                {{ entry.rules|length }} rule{{ entry.rules|length == 1 ? '' : 's' }} reference{{ entry.rules|length == 1 ? 's' : '' }} this bulletin in the public corpus.
+            </p>
+        </header>
+
+        <aside class="vulns-dod-notice" aria-label="Note for DoD users">
+            <div class="vulns-dod-notice__title">
+                <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                For DoD users
+            </div>
+            <p>
+                This page only shows the references DISA published openly inside STIG XML. The bulletin's full technical content is in <strong>VRAM</strong>, <strong>ACAS plugin metadata</strong>, or on <strong>public.cyber.mil</strong> behind CAC.
+            </p>
+        </aside>
+
+        {% if entry.cves|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Associated CVEs</h2>
+                <p class="vulns-section__lede">CVEs that appear in the same rule body as this bulletin reference.</p>
+                <ul class="vulns-link-list">
+                    {% for c in entry.cves %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_cve_view', {cve: c}) }}">{{ c }}</a></li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        {% if entry.iavms is defined and entry.iavms|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Co-cited IAVMs</h2>
+                <ul class="vulns-link-list">
+                    {% for i in entry.iavms %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_iavm_view', {id: i}) }}">{{ i }}</a></li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        {% if entry.ctos is defined and entry.ctos|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Co-cited CTOs</h2>
+                <ul class="vulns-link-list">
+                    {% for c in entry.ctos %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_iavm_view', {id: c}) }}">{{ c }}</a></li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">Referenced by</h2>
+            {{ include('vulns/_rules_table.html.twig', {rules: entry.rules}) }}
+        </article>
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">Related 800-53 controls</h2>
+            <p class="vulns-section__lede">The control family that governs vulnerability advisories in the RMF lifecycle.</p>
+            <ul class="vulns-controls-list">
+                {% for ctl, name in related_controls %}
+                    <li><a href="{{ path('rmf_v5_view') }}#rmf_{{ ctl }}">{{ ui.ident(ctl) }} &middot; {{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </article>
+    </section>
+{% endblock %}

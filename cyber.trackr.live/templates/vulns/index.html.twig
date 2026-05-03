@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}Vulnerabilities &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}Vulnerabilities — KEV catalog + STIG/SCAP cross-references{% endblock %}
+{% block og_description %}The CISA Known Exploited Vulnerabilities catalog cross-linked to the STIG and SCAP corpus. Search by CVE, browse by IAVM/CTO, and pivot back to the 800-53 controls that govern remediation.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="vulns-page-title">
+        <div class="rule-text">&sect; Library &middot; Vulnerabilities</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Known exploits &middot; published bulletins</span>
+            <h1 id="vulns-page-title" class="lib-page__title-large">
+                Vulnerabilities,<br>
+                <em>cross-linked.</em>
+            </h1>
+            <p class="lib-page__lede">
+                The CISA Known Exploited Vulnerabilities catalog stitched to whatever IAVM, CTO, and CVE references survive in the public STIG and SCAP corpus. Pivot from a CVE to the 800-53 controls that govern its remediation, or from a STIG rule to the bulletin it cites.
+            </p>
+        </header>
+
+        {# DoD-users notice — IAVMs are largely CAC-gated, so this is the
+           only honest way to scope expectations for that audience. #}
+        <aside class="vulns-dod-notice" aria-label="Note for DoD users">
+            <div class="vulns-dod-notice__title">
+                <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                For DoD users
+            </div>
+            <p>
+                IAVA, IAVB, and IAVT bulletins are distributed through DoD-only channels (VRAM, ACAS plugin feeds, public.cyber.mil with CAC). This page surfaces only what's already public — references that DISA chose to publish inside STIG XML &mdash; plus the open CISA KEV catalog. For authoritative IAVM lookups consult your <strong>ACAS console</strong>, <strong>VRAM</strong>, or the IAVM listing on <strong>public.cyber.mil</strong> with your CAC.
+            </p>
+        </aside>
+
+        <div class="vulns-stats">
+            <a href="{{ path('vulns_kev_list') }}" class="vulns-stat-card vulns-stat-card--link">
+                <span class="vulns-stat-card__eyebrow">CISA KEV</span>
+                <span class="vulns-stat-card__num">{{ summary.kev.total|number_format }}</span>
+                <span class="vulns-stat-card__label">known exploited CVEs</span>
+                {% if summary.kev_meta.catalogVersion %}
+                    <span class="vulns-stat-card__meta">catalog v{{ summary.kev_meta.catalogVersion }}</span>
+                {% endif %}
+            </a>
+
+            <div class="vulns-stat-card vulns-stat-card--accent">
+                <span class="vulns-stat-card__eyebrow">Ransomware</span>
+                <span class="vulns-stat-card__num">{{ summary.kev.ransomware|number_format }}</span>
+                <span class="vulns-stat-card__label">CVEs flagged for ransomware campaign use</span>
+            </div>
+
+            <div class="vulns-stat-card">
+                <span class="vulns-stat-card__eyebrow">Patch deadlines</span>
+                <span class="vulns-stat-card__num">{{ summary.kev.overdue|number_format }}</span>
+                <span class="vulns-stat-card__label">overdue today &middot; {{ summary.kev.due_soon }} due in next 30 days</span>
+            </div>
+
+            <a href="{{ path('vulns_iavm_list') }}" class="vulns-stat-card vulns-stat-card--link">
+                <span class="vulns-stat-card__eyebrow">From STIG/SCAP</span>
+                <span class="vulns-stat-card__num">{{ (summary.corpus.distinct_iavms + summary.corpus.distinct_ctos)|number_format }}</span>
+                <span class="vulns-stat-card__label">distinct IAVM/CTO IDs found</span>
+                <span class="vulns-stat-card__meta">{{ summary.corpus.rules_with_iavm_prose|number_format }} more rules mention IAVA in prose</span>
+            </a>
+        </div>
+
+        <div class="vulns-cards">
+            <article class="vulns-card">
+                <div class="vulns-card__head">
+                    <h2 class="vulns-card__title">CISA Known Exploited Vulnerabilities</h2>
+                    <span class="vulns-card__eyebrow">{{ summary.kev.total|number_format }} entries</span>
+                </div>
+                <p class="vulns-card__lede">
+                    The full KEV catalog as published by CISA. Each entry carries a CVE, vendor, product, BOD 22-01 due date, and a short narrative. Federal civilian agencies must remediate by the listed due date; everyone else uses it as a "patch this first" priority queue.
+                </p>
+                {% if summary.kev_meta.dateReleased %}
+                    <p class="vulns-card__meta">
+                        Catalog released <time datetime="{{ summary.kev_meta.dateReleased }}">{{ summary.kev_meta.dateReleased|date('j M Y') }}</time>{% if summary.kev.latest_added %} &middot; latest CVE added {{ summary.kev.latest_added|date('j M Y') }}{% endif %}.
+                    </p>
+                {% endif %}
+                <div class="vulns-card__actions">
+                    <a href="{{ path('vulns_kev_list') }}" class="cta-primary">
+                        Browse the catalog
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </article>
+
+            <article class="vulns-card">
+                <div class="vulns-card__head">
+                    <h2 class="vulns-card__title">IAVM &amp; CTO references in the corpus</h2>
+                    <span class="vulns-card__eyebrow">From {{ summary.corpus.rules_with_match|number_format }} rules</span>
+                </div>
+                <p class="vulns-card__lede">
+                    Specific bulletin IDs (IAVA-format <code>YYYY-A-NNNN</code> and Cyber Tasking Orders <code>CTOnnnn</code>) that DISA chose to embed in published STIG XML. The list is small &mdash; almost all DoD bulletin distribution happens behind CAC &mdash; but every reference here links back to the rule that cites it.
+                </p>
+                <p class="vulns-card__meta">
+                    {{ summary.corpus.distinct_iavms|number_format }} IAVMs &middot; {{ summary.corpus.distinct_ctos|number_format }} CTOs &middot; {{ summary.corpus.distinct_cves|number_format }} CVEs &middot; {{ summary.corpus.rules_with_iavm_prose|number_format }} prose mentions
+                </p>
+                <div class="vulns-card__actions">
+                    <a href="{{ path('vulns_iavm_list') }}" class="cta-primary">
+                        Browse IAVMs &amp; CTOs
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">Where this fits in the 800-53 stack</h2>
+            <p class="vulns-section__prose">
+                Vulnerability data is the trigger for the controls below. A KEV entry is what an assessor checks against <strong>RA-5 Vulnerability Monitoring and Scanning</strong> output and <strong>SI-2 Flaw Remediation</strong> patch evidence. Detail pages for each CVE, IAVM, and KEV entry deep-link straight into the 800-53 r5 catalog so you can read the control text without leaving the site.
+            </p>
+            <ul class="vulns-controls-list">
+                {% for ctl, name in related_controls %}
+                    <li><a href="{{ path('rmf_v5_view') }}#rmf_{{ ctl }}">{{ ui.ident(ctl) }} &middot; {{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        {% if summary.toc_generated_at %}
+            <p class="vulns-footnote">
+                STIG/SCAP scan last refreshed <time datetime="{{ summary.toc_generated_at }}">{{ summary.toc_generated_at|date('j M Y, H:i T') }}</time>.
+                KEV catalog refreshed via <code>app:kev:refresh</code>; corpus scan via <code>app:vulns:rebuild-toc</code>.
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -6774,3 +6774,538 @@ del {
     color: var(--text-muted);
     font-family: 'Helvetica', Arial, sans-serif;
 }
+
+/* ============================================================
+   Vulnerabilities tree — landing, KEV catalog, IAVM/CTO list,
+   single-CVE/KEV/IAVM detail views.
+
+   Mobile-first: everything stacks at narrow widths; the multi-
+   column stat grid and meta-grid promote to 2-up at 600px and
+   3- or 4-up at 900px+.
+
+   Color/spacing all routed through the existing token set so
+   the eight themes pick this up automatically.
+   ============================================================ */
+
+.vulns-dod-notice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    margin: 0 0 var(--space-6);
+    background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-lg);
+}
+
+.vulns-dod-notice__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--accent);
+}
+
+.vulns-dod-notice p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+}
+
+/* Stat grid for landing + sub-pages. Mobile-first single column,
+   2-up at >=600px, 4-up at >=900px. */
+.vulns-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin: 0 0 var(--space-7);
+}
+@media (min-width: 600px) {
+    .vulns-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (min-width: 900px) {
+    .vulns-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+.vulns-stats--compact {
+    margin-bottom: var(--space-5);
+}
+@media (min-width: 900px) {
+    .vulns-stats--compact {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.vulns-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.vulns-stat-card--link:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+.vulns-stat-card--accent {
+    border-left: 3px solid var(--accent);
+}
+.vulns-stat-card__eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+.vulns-stat-card__num {
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: clamp(32px, 5vw, 44px);
+    line-height: 1;
+    font-weight: 300;
+    color: var(--text);
+    margin: 2px 0;
+}
+.vulns-stat-card--link:hover .vulns-stat-card__num {
+    color: var(--accent);
+}
+.vulns-stat-card__label {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text);
+}
+.vulns-stat-card__meta {
+    margin-top: var(--space-2);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Two large content cards on the landing page. */
+.vulns-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin: 0 0 var(--space-7);
+}
+@media (min-width: 800px) {
+    .vulns-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.vulns-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-6);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+}
+.vulns-card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+.vulns-card__title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0;
+    color: var(--text);
+}
+.vulns-card__eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+.vulns-card__lede {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+}
+.vulns-card__meta {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.vulns-card__actions {
+    margin-top: auto;
+    padding-top: var(--space-3);
+}
+
+/* Generic prose section reused across detail pages. */
+.vulns-section {
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--border);
+}
+.vulns-section:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+}
+.vulns-section__title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 var(--space-3);
+    color: var(--text);
+}
+.vulns-section__lede {
+    margin: 0 0 var(--space-3);
+    font-size: 14px;
+    color: var(--text-muted);
+}
+.vulns-section__prose {
+    margin: 0 0 var(--space-3);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    white-space: pre-wrap;
+}
+.vulns-section__prose--muted {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Detail page header — title with inline flag pills, vendor + name lines. */
+.vulns-detail-header {
+    margin-bottom: var(--space-5);
+}
+.vulns-detail-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 300;
+    line-height: 1.15;
+    margin: var(--space-2) 0 var(--space-3);
+    color: var(--text);
+}
+.vulns-detail-title .ident {
+    font-size: 0.55em;
+    padding: 0.25em 0.6em;
+}
+.vulns-detail-product {
+    margin: 0 0 var(--space-1);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+}
+.vulns-detail-name {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+/* Flag pills (ransomware, KEV-membership, corpus-source) — shown inline
+   beside the title or in table cells. */
+.vulns-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-muted);
+    line-height: 1;
+    text-decoration: none;
+}
+.vulns-flag--ransom {
+    color: #b91c1c;
+    border-color: color-mix(in srgb, #b91c1c 50%, var(--border));
+    background: color-mix(in srgb, #b91c1c 10%, var(--surface));
+}
+[data-theme="ink"] .vulns-flag--ransom,
+[data-theme="dracula"] .vulns-flag--ransom,
+[data-theme="solarized-dark"] .vulns-flag--ransom,
+[data-theme="nord"] .vulns-flag--ransom {
+    color: #f87171;
+    background: color-mix(in srgb, #f87171 18%, transparent);
+}
+.vulns-flag--kev {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+a.vulns-flag--kev:hover {
+    background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+}
+.vulns-flag--corpus {
+    color: var(--text);
+    background: var(--surface-2);
+}
+.vulns-flag--unknown {
+    color: var(--text-muted);
+    border-color: var(--border);
+    background: transparent;
+}
+
+/* Meta-key/value grid on detail pages. 1-up mobile, 2-up at 600px,
+   4-up at 900px+. */
+.vulns-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-6);
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+@media (min-width: 600px) {
+    .vulns-meta-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (min-width: 900px) {
+    .vulns-meta-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+.vulns-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.vulns-meta__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+.vulns-meta__value {
+    font-size: 15px;
+    color: var(--text);
+}
+
+/* Small ident pill variant for inline lists of CVEs under an IAVM row. */
+.ident--small {
+    font-size: 11px;
+    padding: 0.05em 0.3em;
+    margin-right: 4px;
+}
+
+/* Link-list — generic vertical list of links used for references,
+   co-occurring bulletins, related controls, external lookups. */
+.vulns-link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+.vulns-link-list li {
+    line-height: 1.45;
+    font-size: 14px;
+    word-break: break-word;
+}
+.vulns-link-list a {
+    color: var(--text);
+}
+.vulns-link-list a:hover {
+    color: var(--accent);
+}
+
+.vulns-controls-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+.vulns-controls-list li a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 14px;
+    color: var(--text);
+    text-decoration: none;
+}
+.vulns-controls-list li a:hover {
+    color: var(--accent);
+}
+
+/* IAVM / CTO list rows — id pill, kind badge, rule count, and (if any)
+   small CVE pills. Stacks vertically on phones, single line at 700px+. */
+.vulns-iavm-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+.vulns-iavm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+.vulns-iavm__id {
+    font-size: 14px;
+}
+.vulns-iavm__kind {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+}
+.vulns-iavm__count {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.vulns-iavm__cves {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-left: auto;
+}
+
+/* Per-rule cards on detail pages. */
+.vulns-rules-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+.vulns-rule {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+.vulns-rule__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    font-size: 13px;
+}
+.vulns-rule__corpus {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+}
+.vulns-rule__corpus--stig {
+    background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+    color: var(--accent);
+}
+.vulns-rule__corpus--scap {
+    background: var(--surface-2);
+    color: var(--text);
+}
+.vulns-rule__link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    flex: 1 1 auto;
+    min-width: 0;
+    word-break: break-word;
+}
+.vulns-rule__link:hover {
+    color: var(--accent);
+}
+.vulns-rule__ver {
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 12px;
+}
+.vulns-rule__vuln {
+    font-size: 11px;
+}
+.vulns-rule__title {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
+/* Breadcrumbs — small nav strip above detail headers. */
+.vulns-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 var(--space-4);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.vulns-breadcrumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+.vulns-breadcrumbs a:hover {
+    color: var(--accent);
+}
+.vulns-breadcrumbs__current {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.vulns-empty {
+    padding: var(--space-5);
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+}
+
+.vulns-footnote {
+    margin: var(--space-6) 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Override the .cci-table wrapping when used as the KEV table —
+   the .vulnerabilityName column tends to wrap heavily on phones, so
+   we let it wrap rather than truncate. */
+.vulns-table.dataTable td {
+    white-space: normal;
+    vertical-align: top;
+    line-height: 1.4;
+}

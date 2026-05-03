@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
+
+{% block title %}{{ entry.id }} &mdash; CVE detail &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}{{ entry.id }} — unified CVE view{% endblock %}
+{% block og_description %}Cross-corpus view of {{ entry.id }} — KEV status, STIG/SCAP rules that reference it, related IAVMs/CTOs, and the 800-53 controls governing remediation.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="cve-detail-title">
+        <nav class="vulns-breadcrumbs" aria-label="Breadcrumbs">
+            <a href="{{ path('vulns') }}">Vulnerabilities</a>
+            <span aria-hidden="true">&rsaquo;</span>
+            <span class="vulns-breadcrumbs__current">{{ entry.id }}</span>
+        </nav>
+
+        <header class="lib-page__header vulns-detail-header">
+            <span class="eyebrow">Unified CVE view</span>
+            <h1 id="cve-detail-title" class="vulns-detail-title">
+                {{ ui.ident(entry.id) }}
+                {% if entry.kev %}
+                    <a class="vulns-flag vulns-flag--kev" href="{{ path('vulns_kev_view', {cve: entry.id}) }}" title="On the CISA KEV catalog">In KEV</a>
+                {% endif %}
+                {% if entry.kev and entry.kev.knownRansomwareCampaignUse|default('') == 'Known' %}
+                    <span class="vulns-flag vulns-flag--ransom">Ransomware</span>
+                {% endif %}
+            </h1>
+            {% if entry.kev %}
+                <p class="vulns-detail-product">{{ entry.kev.vendorProject|default('') }} &middot; {{ entry.kev.product|default('') }}</p>
+                <p class="vulns-detail-name">{{ entry.kev.vulnerabilityName|default('') }}</p>
+            {% endif %}
+        </header>
+
+        {% if entry.kev %}
+            <div class="vulns-meta-grid">
+                <div class="vulns-meta">
+                    <span class="vulns-meta__label">Date added to KEV</span>
+                    <span class="vulns-meta__value"><time datetime="{{ entry.kev.dateAdded }}">{{ entry.kev.dateAdded|default('—') }}</time></span>
+                </div>
+                <div class="vulns-meta">
+                    <span class="vulns-meta__label">BOD 22-01 due date</span>
+                    <span class="vulns-meta__value"><time datetime="{{ entry.kev.dueDate }}">{{ entry.kev.dueDate|default('—') }}</time></span>
+                </div>
+                <div class="vulns-meta">
+                    <span class="vulns-meta__label">CWE</span>
+                    <span class="vulns-meta__value">{% if entry.kev.cwes is defined and entry.kev.cwes|length %}{{ entry.kev.cwes|join(', ') }}{% else %}—{% endif %}</span>
+                </div>
+            </div>
+
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">CISA description</h2>
+                <p class="vulns-section__prose">{{ entry.kev.shortDescription|default('—') }}</p>
+            </article>
+        {% else %}
+            <article class="vulns-section">
+                <p class="vulns-section__prose vulns-section__prose--muted">
+                    {{ entry.id }} is not in the CISA KEV catalog. The references below are from the STIG/SCAP corpus directly &mdash; the CVE is named in rule descriptions but isn't currently flagged for active exploitation.
+                </p>
+            </article>
+        {% endif %}
+
+        {% if entry.rules|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Referenced in the corpus</h2>
+                <p class="vulns-section__lede">{{ entry.rules|length }} STIG/SCAP rule{{ entry.rules|length == 1 ? '' : 's' }} cite{{ entry.rules|length == 1 ? 's' : '' }} this CVE directly.</p>
+                {{ include('vulns/_rules_table.html.twig', {rules: entry.rules}) }}
+            </article>
+        {% else %}
+            <article class="vulns-section">
+                <p class="vulns-section__prose vulns-section__prose--muted">
+                    No STIG or SCAP rules in the corpus reference this CVE directly. STIGs lean on configuration baselines rather than per-CVE checks, so most KEV entries won't have backlinks here even when they're tied to widely-deployed software.
+                </p>
+            </article>
+        {% endif %}
+
+        {% if entry.iavms|length or entry.ctos|length %}
+            <article class="vulns-section">
+                <h2 class="vulns-section__title">Co-occurring bulletins</h2>
+                <ul class="vulns-link-list">
+                    {% for i in entry.iavms %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_iavm_view', {id: i}) }}">{{ i }}</a></li>
+                    {% endfor %}
+                    {% for c in entry.ctos %}
+                        <li><a class="ident ident--link" href="{{ path('vulns_iavm_view', {id: c}) }}">{{ c }}</a></li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endif %}
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">Where this lands in 800-53</h2>
+            <ul class="vulns-controls-list">
+                {% for ctl, name in related_controls %}
+                    <li><a href="{{ path('rmf_v5_view') }}#rmf_{{ ctl }}">{{ ui.ident(ctl) }} &middot; {{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article class="vulns-section">
+            <h2 class="vulns-section__title">External lookups</h2>
+            <ul class="vulns-link-list">
+                <li><a href="https://nvd.nist.gov/vuln/detail/{{ entry.id }}" target="_blank" rel="noopener noreferrer">NVD &middot; {{ entry.id }}</a></li>
+                <li><a href="https://www.cve.org/CVERecord?id={{ entry.id }}" target="_blank" rel="noopener noreferrer">CVE.org &middot; {{ entry.id }}</a></li>
+                {% if entry.kev %}
+                    <li><a href="{{ path('vulns_kev_view', {cve: entry.id}) }}">CISA KEV detail (this site)</a></li>
+                {% endif %}
+            </ul>
+        </article>
+    </section>
+{% endblock %}

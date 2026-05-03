@@ -1,0 +1,29 @@
+{#
+ # Reusable rule-list table for vulns detail pages. Renders a compact list
+ # of {corpus, title, version, release, vuln, rule_title} rows linking back
+ # to the appropriate STIG or SCAP detail view.
+ #
+ # Mobile-first: stacks rule_title under the metadata line on narrow viewports.
+ #}
+<ul class="vulns-rules-list">
+    {% for r in rules %}
+        <li class="vulns-rule">
+            <div class="vulns-rule__head">
+                <span class="vulns-rule__corpus vulns-rule__corpus--{{ r.corpus }}">{{ r.corpus|upper }}</span>
+                {% if r.corpus == 'stig' %}
+                    <a class="vulns-rule__link" href="{{ path('stig_view', {title: r.title, version: r.version, release: r.release}) }}">
+                        {{ r.title|replace({'_': ' '}) }} <span class="vulns-rule__ver">V{{ r.version }}R{{ r.release }}</span>
+                    </a>
+                {% else %}
+                    <a class="vulns-rule__link" href="{{ path('scap_view', {title: r.title, version: r.version, release: r.release}) }}">
+                        {{ r.title|replace({'_': ' '}) }} <span class="vulns-rule__ver">V{{ r.version }}R{{ r.release }}</span>
+                    </a>
+                {% endif %}
+                <span class="ident vulns-rule__vuln">{{ r.vuln }}</span>
+            </div>
+            {% if r.rule_title %}
+                <p class="vulns-rule__title">{{ r.rule_title }}</p>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
