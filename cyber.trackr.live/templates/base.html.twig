@@ -102,7 +102,7 @@
             <link rel="stylesheet" href="/css/bootstrap.min.css" />
             <link rel="stylesheet" href="/css/bootstrap-icons.css" />
             <link rel="stylesheet" href="/css/datatables.min.css" />
-            <link rel="stylesheet" href="/css/app.css" />
+            <link rel="stylesheet" href="/css/app.css?v={{ app_version }}" />
         {% endblock %}
 
         {# Feed-reader auto-discovery — the STIG updates Atom feed. #}
@@ -120,8 +120,8 @@
                     search: "{{ path('search', {query: 'REPLACE_THIS'}) }}"
                 };
             </script>
-            <script src="/js/app.js"></script>
-            <script src="/js/saved_searches.js"></script>
+            <script src="/js/app.js?v={{ app_version }}"></script>
+            <script src="/js/saved_searches.js?v={{ app_version }}"></script>
         {% endblock %}
 
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
