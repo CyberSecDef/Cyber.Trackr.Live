@@ -50,9 +50,21 @@
             </div>
 
             <div class="vulns-stat-card">
-                <span class="vulns-stat-card__eyebrow">Patch deadlines</span>
-                <span class="vulns-stat-card__num">{{ summary.kev.overdue|number_format }}</span>
-                <span class="vulns-stat-card__label">overdue today &middot; {{ summary.kev.due_soon }} due in next 30 days</span>
+                <span class="vulns-stat-card__eyebrow">Last 30 days</span>
+                <span class="vulns-stat-card__num">{{ summary.kev.added_30d|number_format }}</span>
+                <span class="vulns-stat-card__label">CVEs added to KEV in the last 30 days</span>
+            </div>
+
+            <div class="vulns-stat-card">
+                <span class="vulns-stat-card__eyebrow">Active deadlines</span>
+                <span class="vulns-stat-card__num">{{ summary.kev.active_deadlines|number_format }}</span>
+                <span class="vulns-stat-card__label">entries with a BOD 22-01 deadline still in the future</span>
+            </div>
+
+            <div class="vulns-stat-card">
+                <span class="vulns-stat-card__eyebrow">This year</span>
+                <span class="vulns-stat-card__num">{{ summary.kev.added_this_year|number_format }}</span>
+                <span class="vulns-stat-card__label">CVEs added to KEV since 1 January</span>
             </div>
 
             <a href="{{ path('vulns_iavm_list') }}" class="vulns-stat-card vulns-stat-card--link">

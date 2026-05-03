@@ -6817,7 +6817,9 @@ del {
 }
 
 /* Stat grid for landing + sub-pages. Mobile-first single column,
-   2-up at >=600px, 4-up at >=900px. */
+   2-up at >=600px, 3-up at >=900px (clean 3+3 stack for the 6-card
+   landing), and 6-up at >=1200px so all cards land on one row on
+   typical desktops. Sub-pages with fewer cards flow naturally. */
 .vulns-stats {
     display: grid;
     grid-template-columns: 1fr;
@@ -6831,16 +6833,16 @@ del {
 }
 @media (min-width: 900px) {
     .vulns-stats {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (min-width: 1200px) {
+    .vulns-stats {
+        grid-template-columns: repeat(6, 1fr);
     }
 }
 .vulns-stats--compact {
     margin-bottom: var(--space-5);
-}
-@media (min-width: 900px) {
-    .vulns-stats--compact {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 .vulns-stat-card {

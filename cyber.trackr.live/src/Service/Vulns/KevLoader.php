@@ -123,56 +123,84 @@ class KevLoader
     }
 
     /**
-     * Summary stats for the landing page: total count, ransomware-flagged
-     * count, due-date distribution (overdue / due-soon / future), most-recent
-     * dateAdded for "freshness" display.
+     * Summary stats for the landing page.
+     *
+     * Tracks the metrics that actually move week-over-week — recent
+     * additions and live (not-yet-passed) BOD 22-01 deadlines — rather
+     * than calendar-stale counts like "overdue", which would show
+     * effectively the entire catalog because most KEV deadlines passed
+     * months or years ago.
+     *
+     *   total            — count of all KEV entries
+     *   ransomware       — entries flagged knownRansomwareCampaignUse=Known
+     *   added_30d        — dateAdded within the last 30 days
+     *   active_deadlines — dueDate is today or in the future (the slice
+     *                      where BOD 22-01 still demands action)
+     *   added_this_year  — dateAdded since 1 January of current year
+     *   top_vendors      — top 10 vendors by entry count
+     *   latest_added     — most recent dateAdded across the catalog
      */
     public function summary(): array
     {
         $entries = $this->all();
         $total = count($entries);
         $ransomware = 0;
-        $overdue = 0;
-        $dueSoon = 0;
+        $added30d = 0;
+        $activeDeadlines = 0;
+        $addedThisYear = 0;
         $vendors = [];
         $latestAdded = null;
 
         $today = new \DateTimeImmutable('today');
-        $soon = $today->modify('+30 days');
+        $thirtyDaysAgo = $today->modify('-30 days');
+        $startOfYear = new \DateTimeImmutable($today->format('Y') . '-01-01');
 
         foreach ($entries as $e) {
             if (($e['knownRansomwareCampaignUse'] ?? '') === 'Known') {
                 $ransomware++;
             }
+
+            $added = $e['dateAdded'] ?? '';
+            if ($added !== '') {
+                try {
+                    $d = new \DateTimeImmutable($added);
+                    if ($d >= $thirtyDaysAgo) {
+                        $added30d++;
+                    }
+                    if ($d >= $startOfYear) {
+                        $addedThisYear++;
+                    }
+                } catch (\Exception $ex) { /* skip */ }
+                if ($latestAdded === null || $added > $latestAdded) {
+                    $latestAdded = $added;
+                }
+            }
+
             $due = $e['dueDate'] ?? '';
             if ($due !== '') {
                 try {
                     $d = new \DateTimeImmutable($due);
-                    if ($d < $today) {
-                        $overdue++;
-                    } elseif ($d <= $soon) {
-                        $dueSoon++;
+                    if ($d >= $today) {
+                        $activeDeadlines++;
                     }
                 } catch (\Exception $ex) { /* skip */ }
             }
+
             $vendor = (string) ($e['vendorProject'] ?? '');
             if ($vendor !== '') {
                 $vendors[$vendor] = ($vendors[$vendor] ?? 0) + 1;
-            }
-            $added = $e['dateAdded'] ?? '';
-            if ($added !== '' && ($latestAdded === null || $added > $latestAdded)) {
-                $latestAdded = $added;
             }
         }
         arsort($vendors);
 
         return [
-            'total'        => $total,
-            'ransomware'   => $ransomware,
-            'overdue'      => $overdue,
-            'due_soon'     => $dueSoon,
-            'top_vendors'  => array_slice($vendors, 0, 10, true),
-            'latest_added' => $latestAdded,
+            'total'            => $total,
+            'ransomware'       => $ransomware,
+            'added_30d'        => $added30d,
+            'active_deadlines' => $activeDeadlines,
+            'added_this_year'  => $addedThisYear,
+            'top_vendors'      => array_slice($vendors, 0, 10, true),
+            'latest_added'     => $latestAdded,
         ];
     }
 }
