@@ -6,13 +6,23 @@
 #   ./bin/ship.sh
 #
 # Order:
-#   1. app:version:freeze   — bake the version string into /VERSION so
+#   1. app:kev:refresh      — pull the latest CISA Known Exploited
+#                             Vulnerabilities catalog into resources/data/kev/
+#                             so the rsync ships fresh KEV data. Network-
+#                             dependent; runs first so we fail fast if
+#                             CISA's feed is unreachable.
+#   2. app:vulns:rebuild-toc — re-scan the STIG + SCAP corpus for IAVM/
+#                             CTO/CVE refs into resources/data/vulns_toc.json.
+#                             Cheap (~30s); harmless to run every ship
+#                             since the inputs rarely change between ships
+#                             and the JSON output is tiny.
+#   3. app:version:freeze   — bake the version string into /VERSION so
 #                             prod doesn't try to compute it from .git
 #                             (which doesn't survive the rsync).
-#   2. app:changelog:freeze — snapshot the git log into
+#   4. app:changelog:freeze — snapshot the git log into
 #                             resources/data/changelog.json so the
 #                             /changelog page works on prod.
-#   3. rsync                — push everything except .env to the prod
+#   5. rsync                — push everything except .env to the prod
 #                             host. -a preserves perms / mtimes;
 #                             -v prints each transferred file;
 #                             -z compresses on the wire.
@@ -29,15 +39,23 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/3] Freezing version string …"
+echo "[1/5] Refreshing CISA KEV catalog …"
+php bin/console app:kev:refresh
+
+echo
+echo "[2/5] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
+php bin/console app:vulns:rebuild-toc
+
+echo
+echo "[3/5] Freezing version string …"
 php bin/console app:version:freeze
 
 echo
-echo "[2/3] Freezing changelog from git log …"
+echo "[4/5] Freezing changelog from git log …"
 php bin/console app:changelog:freeze
 
 echo
-echo "[3/3] Rsyncing to prod (--exclude .env) …"
+echo "[5/5] Rsyncing to prod (--exclude .env) …"
 rsync -avz \
     --exclude '.env' \
     /home/rweber/Git/Cyber.Trackr.Live/cyber.trackr.live/ \
