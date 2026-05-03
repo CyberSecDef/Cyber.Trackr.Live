@@ -4,7 +4,7 @@
 
 **Live:** [cyber.trackr.live](https://cyber.trackr.live)
 **Stack:** Symfony 7.4 LTS · PHP 8.2+ · Twig 3 · custom CSS design system · jQuery 3 + Bootstrap 5 + DataTables for interactive surfaces
-**License:** Proprietary (source-available — see [License](#license))
+**License:** [GNU AGPL-3.0-or-later](LICENSE) — see [License](#license) and [`NOTICE.md`](NOTICE.md) for the full attribution
 
 ---
 
@@ -361,12 +361,15 @@ For corrections, broken links, or new STIG releases that haven't appeared yet, o
 
 ## License
 
-Code in this repository is **proprietary** (per `composer.json`). The compliance datasets it serves (STIGs, SCAP benchmarks, CCI catalog, NIST 800-53) are public-domain works of the U.S. Government and are redistributed unmodified. Self-hosted typefaces are subject to their own licenses:
+The application code in this repository is licensed under the **[GNU Affero General Public License, version 3 or later](LICENSE)** (AGPL-3.0-or-later). The full license text is in [`LICENSE`](LICENSE).
 
-- **Fraunces** — SIL Open Font License 1.1
-- **IBM Plex Sans / Mono** — SIL Open Font License 1.1
+The compliance datasets it serves (STIGs, SCAP benchmarks, CCI catalog, NIST 800-53, OSCAL profiles) are public-domain works of the U.S. Government and are redistributed unmodified — the AGPL on the surrounding code does not apply to them. Self-hosted typefaces (Fraunces, IBM Plex) ship under the SIL Open Font License 1.1, and bundled JavaScript libraries each carry their upstream licenses (MIT, Apache-2.0, BSD-3-Clause).
 
-If you want to use any of the application code outside of contributing back to this repository, please reach out first.
+The full attribution table — every code path, every dataset, every font, every JS library, with its license — is in [`NOTICE.md`](NOTICE.md).
+
+**Practical summary:** you can read, run, fork, and modify this code. If you run a modified version as a network service, the AGPL requires you to publish your changes under the same license. The goal is to keep improvements in the commons.
+
+The terms governing **use of the hosted service** at `cyber.trackr.live` are separate from the code license and live at [cyber.trackr.live/terms](https://cyber.trackr.live/terms).
 
 ---
 

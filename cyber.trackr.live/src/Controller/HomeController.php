@@ -103,4 +103,12 @@ class HomeController extends AbstractController
             'entries' => $changelog->getEntries(),
         ]);
     }
+
+    #[Route('/terms', name: 'terms')]
+    public function terms(): Response
+    {
+        return $this->render('home/terms.html.twig', [
+            'controller_name' => 'HomeController'
+        ]);
+    }
 }

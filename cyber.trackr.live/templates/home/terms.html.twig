@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Terms of Use &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}Terms of Use — Cyber Trackr{% endblock %}
+{% block og_description %}The plain-English terms covering use of the cyber.trackr.live public service. Free, informational, provided as-is, no warranty, not affiliated with the Department of Defense or NIST.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <section class="lib-page lib-page--prose mission" aria-labelledby="terms-page-title">
+        <div class="rule-text">&sect; Terms of Use</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">The plain-English version</span>
+            <h1 id="terms-page-title" class="lib-page__title-large">
+                A free reference,<br>
+                <em>used at your own risk.</em>
+            </h1>
+            <p class="lib-page__lede">
+                cyber.trackr.live is a personal project I&rsquo;ve made public. It costs nothing to use and collects nothing about you. In exchange, please read these terms before relying on it for anything that matters.
+            </p>
+            <p class="lib-page__lede" style="font-size: 14px;">
+                Last updated: 3 May 2026
+            </p>
+        </header>
+
+        <div class="mission__grid">
+            <article class="mission__section">
+                <span class="rule-text">&sect; I &middot; Who runs this</span>
+                <h2 class="mission__heading">One person, <em>not an organization</em>.</h2>
+                <p class="mission__prose">
+                    cyber.trackr.live is built and maintained by Robert Weber as a personal side project. There is no company behind it, no team, no SLA, and no support contract. When &ldquo;I&rdquo; appears on this page, that&rsquo;s who it means.
+                </p>
+                <p class="mission__prose">
+                    Cyber Trackr is not affiliated with, endorsed by, or sponsored by the Department of Defense, DISA, NIST, or any other government agency. Treat anything you find here as a convenience layer over those agencies&rsquo; published work, not a substitute for it.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; II &middot; What this service is</span>
+                <h2 class="mission__heading">A reference desk &mdash; <em>not advice</em>.</h2>
+                <p class="mission__prose">
+                    The site is a browseable mirror of public DoD and NIST compliance data, plus a few helper tools (CKL viewer, plan generator, baseline heat map, search). It exists to make that material easier to find and cross-reference.
+                </p>
+                <p class="mission__prose">
+                    Nothing here is legal, regulatory, security, or compliance advice. Output from the plan generator is a starting draft, not an authoritative System Security Plan. The CKL viewer renders and edits checklists in your browser; the resulting files are your work, not mine. If a control, mapping, or rule on this site differs from the authoritative source, the authoritative source wins. Always.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; III &middot; Authoritative sources</span>
+                <h2 class="mission__heading">Always go back to the source <em>before you ship</em>.</h2>
+                <p class="mission__prose">
+                    For decisions that touch a real ATO package, audit, or live system, verify against the official publishers:
+                </p>
+                <ul class="mission__principles">
+                    <li>
+                        <strong>STIGs and SCAP &mdash;</strong>
+                        <a href="https://public.cyber.mil/stigs/" target="_blank" rel="noopener noreferrer">public.cyber.mil/stigs</a>
+                    </li>
+                    <li>
+                        <strong>NIST 800-53, OSCAL, baseline catalogs &mdash;</strong>
+                        <a href="https://csrc.nist.gov/publications/sp800" target="_blank" rel="noopener noreferrer">csrc.nist.gov</a>
+                    </li>
+                    <li>
+                        <strong>FedRAMP baselines &mdash;</strong>
+                        <a href="https://www.fedramp.gov/" target="_blank" rel="noopener noreferrer">fedramp.gov</a>
+                    </li>
+                </ul>
+                <p class="mission__prose">
+                    The data on this site is redistributed unmodified and synced on a manual cadence (the footer shows the last DISA and NIST sync timestamps). Between syncs, the upstream sources may have moved on.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; IV &middot; Privacy</span>
+                <h2 class="mission__heading">No accounts, no tracking, <em>nothing to leak</em>.</h2>
+                <p class="mission__prose">
+                    There are no user accounts on this site. There is no analytics provider tracking your visits across the web. The server logs the same kind of HTTP request data every web server logs &mdash; IP, user agent, path, status &mdash; and that&rsquo;s it.
+                </p>
+                <p class="mission__prose">
+                    The Plan Generator and CKL Viewer keep their drafts in your browser&rsquo;s <code>localStorage</code>. That data never leaves your device. You can clear it any time by clearing site data in your browser.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; V &middot; Provided &ldquo;as is&rdquo;</span>
+                <h2 class="mission__heading">No warranty, <em>express or implied</em>.</h2>
+                <p class="mission__prose">
+                    The service is provided as-is and as-available, without warranty of any kind &mdash; including, without limitation, warranties of merchantability, fitness for a particular purpose, accuracy, completeness, timeliness, or non-infringement. I make a good-faith effort to keep the data current and the site working, but I make no guarantee of either.
+                </p>
+                <p class="mission__prose">
+                    To the maximum extent permitted by applicable law, in no event shall I be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, revenue, data, or goodwill, arising out of or related to your use of (or inability to use) this site &mdash; even if I&rsquo;ve been advised of the possibility of such damages.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; VI &middot; Your responsibilities</span>
+                <h2 class="mission__heading">Be a good neighbor.</h2>
+                <ul class="mission__principles">
+                    <li>
+                        <strong>Verify before you act.</strong>
+                        Cross-check anything you pull from here against the authoritative source listed in &sect; III before using it in an audit, ATO package, or production system.
+                    </li>
+                    <li>
+                        <strong>Don&rsquo;t hammer the API.</strong>
+                        The REST API has no auth and no rate limits, but it runs on one shared box. Reasonable, polite use is welcome; scraping the entire dataset in a tight loop is not. If you need a bulk pull, the data files are also available on the GitHub repo.
+                    </li>
+                    <li>
+                        <strong>Don&rsquo;t attack the site.</strong>
+                        No probing for vulnerabilities, no automated injection attempts, no traffic that&rsquo;s clearly designed to break things. If you found a real security issue and want to report it, use the contact form below.
+                    </li>
+                    <li>
+                        <strong>Stay legal.</strong>
+                        If your use of the site or its data violates an applicable law or regulation in your jurisdiction, don&rsquo;t use it.
+                    </li>
+                </ul>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; VII &middot; Code and data licenses</span>
+                <h2 class="mission__heading">The code is open. The data is <em>public domain</em>.</h2>
+                <p class="mission__prose">
+                    The application code that powers this site is licensed under <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU AGPL-3.0-or-later</a>. You can read it, run it, fork it, and modify it &mdash; with the catch that if you run a modified version as a network service, you have to publish your changes under the same license. The full text is in the <a href="https://github.com/CyberSecDef/Cyber.Trackr.Live/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">LICENSE</a> file in the repo.
+                </p>
+                <p class="mission__prose">
+                    The compliance datasets (STIGs, SCAP, CCI, NIST 800-53, OSCAL profiles) are works of the U.S. Government, in the public domain within the United States, and redistributed here unmodified. The AGPL on the surrounding code does not apply to them. Full attributions are in <a href="https://github.com/CyberSecDef/Cyber.Trackr.Live/blob/master/NOTICE.md" target="_blank" rel="noopener noreferrer">NOTICE.md</a>.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; VIII &middot; Changes and availability</span>
+                <h2 class="mission__heading">The site can change. <em>So can these terms.</em></h2>
+                <p class="mission__prose">
+                    Features may be added, modified, or removed at any time. The site itself may go offline for maintenance, due to a hosting issue, or because I decide to stop running it. There&rsquo;s no commitment of continuous availability.
+                </p>
+                <p class="mission__prose">
+                    These terms may be updated when the project changes meaningfully. The &ldquo;Last updated&rdquo; date at the top reflects the current revision. If you&rsquo;ve been relying on the site for something material, it&rsquo;s worth re-reading this page once in a while.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; IX &middot; Governing law</span>
+                <h2 class="mission__heading">U.S. law, common-sense reading.</h2>
+                <p class="mission__prose">
+                    These terms are governed by the laws of the United States and the Commonwealth of Virginia, without regard to conflict-of-law principles. If any clause turns out to be unenforceable, the rest of the terms still apply.
+                </p>
+            </article>
+        </div>
+
+        <aside class="mission__cta">
+            <h2 class="mission__cta-title">Questions or concerns?</h2>
+            <p class="mission__cta-text">
+                If something on this page is unclear, broken, or you&rsquo;ve found a real issue with the site &mdash; security, copyright, broken data, anything &mdash; reach out and I&rsquo;ll take a look.
+            </p>
+            <a href="{{ path('contact_us') }}" class="cta-primary">
+                Get in touch
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </aside>
+    </section>
+{% endblock %}
