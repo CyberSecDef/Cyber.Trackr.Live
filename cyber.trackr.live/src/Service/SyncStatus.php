@@ -3,7 +3,7 @@
 namespace App\Service;
 
 /**
- * Exposes the DISA / NIST refresh timestamps to templates.
+ * Exposes the DISA / NIST / CISA refresh timestamps to templates.
  *
  * DISA is sourced from resources/data/sync_status.json (stamped by the
  * stig/scap disa_download endpoints via markDisaSyncedNow()).
@@ -12,8 +12,11 @@ namespace App\Service;
  * profile/catalog files in resources/data/overlays/ — when a new OSCAL
  * file lands, the badge advances automatically with no manual upkeep.
  *
+ * CISA is the file mtime of the local KEV mirror, refreshed by
+ * app:kev:refresh (which ship.sh invokes on every deploy).
+ *
  * Wired to Twig as the global `sync_status` in config/packages/twig.yaml.
- * Use as `{{ sync_status.disa | rel_time }}` etc. Both getters return null
+ * Use as `{{ sync_status.disa | rel_time }}` etc. All getters return null
  * when their source is unavailable; templates should null-check.
  */
 class SyncStatus
@@ -22,13 +25,17 @@ class SyncStatus
     private bool $loaded = false;
     private string $path;
     private string $overlaysDir;
+    private string $kevPath;
     private bool $nistComputed = false;
     private ?\DateTimeImmutable $nistCached = null;
+    private bool $cisaComputed = false;
+    private ?\DateTimeImmutable $cisaCached = null;
 
     public function __construct(string $projectDir)
     {
         $this->path = $projectDir . '/resources/data/sync_status.json';
         $this->overlaysDir = $projectDir . '/resources/data/overlays';
+        $this->kevPath = $projectDir . '/resources/data/kev/known_exploited_vulnerabilities.json';
     }
 
     public function getDisa(): ?\DateTimeImmutable
@@ -64,6 +71,28 @@ class SyncStatus
             return null;
         }
         return $this->nistCached = (new \DateTimeImmutable('@' . $latest))->setTimezone(new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * mtime of the local CISA KEV mirror at
+     * resources/data/kev/known_exploited_vulnerabilities.json. The file
+     * is rewritten by app:kev:refresh (called from ship.sh on every
+     * deploy), so the badge advances automatically without manual upkeep.
+     */
+    public function getCisa(): ?\DateTimeImmutable
+    {
+        if ($this->cisaComputed) {
+            return $this->cisaCached;
+        }
+        $this->cisaComputed = true;
+        if (!is_file($this->kevPath)) {
+            return null;
+        }
+        $mtime = @filemtime($this->kevPath);
+        if ($mtime === false) {
+            return null;
+        }
+        return $this->cisaCached = (new \DateTimeImmutable('@' . $mtime))->setTimezone(new \DateTimeZone('UTC'));
     }
 
     public function isAvailable(): bool

@@ -271,6 +271,9 @@
                             {% if sync_status.nist %}
                                 <li>NIST sync &middot; {{ sync_status.nist|date("d M Y") }}</li>
                             {% endif %}
+                            {% if sync_status.cisa %}
+                                <li>CISA sync &middot; {{ sync_status.cisa|date("d M Y") }}</li>
+                            {% endif %}
                             <li>v{{ app_version }}</li>
                         </ul>
                     </div>
