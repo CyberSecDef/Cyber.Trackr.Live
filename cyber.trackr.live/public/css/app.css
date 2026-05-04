@@ -7311,3 +7311,18 @@ a.vulns-flag--kev:hover {
     vertical-align: top;
     line-height: 1.4;
 }
+
+/* Compare page mobile separators — when desc/check/fix stack vertically
+   below 768px they visually run together. Give the first two columns a
+   1px bottom rule + a touch of padding/margin so each block reads as a
+   discrete section. The last column (vuln_fix) is omitted because the
+   next compare entry's .req-header margin-top already separates it
+   from what follows. */
+@media (max-width: 767.98px) {
+    .compare-container .vuln_desc,
+    .compare-container .vuln_check {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: var(--space-3);
+        margin-bottom: var(--space-3);
+    }
+}

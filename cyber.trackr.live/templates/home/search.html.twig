@@ -94,7 +94,7 @@
                         <div class="collapse search-section__body" id="ccis_results">
                             {% for c in results.ccis %}
                                 <div class="search-section__item">
-                                    <div class="search-section__item-title">{{ ui.ident(c.id) }}</div>
+                                    <div class="search-section__item-title">{{ ui.cci_link(c.id) }}</div>
                                     <div class="search-section__excerpt">{{c.description|regex_replace('/\\[Withdrawn.*\\]/is', '')}}</div>
                                 </div>
                             {% endfor %}

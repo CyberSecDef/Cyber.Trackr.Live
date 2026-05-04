@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as ui %}
 
 {% set _human_title = title|replace({'_': ' '}) %}
 {% set _xml_title   = stig1.xpath("/xmlns:Benchmark/xmlns:title")|first|default(_human_title) %}
@@ -77,31 +78,32 @@
 
         <div class="compare-container collapse">
             <div class="req-header">
+                <div class="fw-bold pb-2 mb-2 border-bottom">{{group.Rule.title}}</div>
                 <div class="row text-sm">
-                    <div class="col"><strong>Vuln ID: </strong><br />{{group.attributes.id}}</div>
-                    <div class="col"><strong>Rule ID: </strong><br />{{group.Rule.attributes.id}}</div>
-                    <div class="col"><strong>Group ID: </strong><br />{{group.title}}</div>
-                    <div class="col"><strong>Version: </strong><br />{{group.Rule.version}}</div>
-                    <div class="col"><strong>CCI: </strong><br />{{group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'CCI-')|first : '' }}</div>
-                    <div class="col"><strong>Severity:  </strong><br />{{group.Rule.attributes.severity|title }}</div>
+                    <div class="col-6 col-md"><strong>Vuln ID: </strong><br />{{group.attributes.id}}</div>
+                    <div class="col-6 col-md"><strong>Rule ID: </strong><br />{{group.Rule.attributes.id}}</div>
+                    <div class="col-6 col-md"><strong>Group ID: </strong><br />{{group.title}}</div>
+                    <div class="col-6 col-md"><strong>Version: </strong><br />{{group.Rule.version}}</div>
+                    <div class="col-6 col-md"><strong>CCI: </strong><br />{{ ui.cci_link(group.Rule.ident is defined ? (group.Rule.ident|filter(v => v.__toString() starts with 'CCI-')|first) : '') }}</div>
+                    <div class="col-6 col-md"><strong>Severity:  </strong><br />{{group.Rule.attributes.severity|title }}</div>
                 </div>
             </div>
             <div class="row">
-                <div class="col vuln_desc" style="">
+                <div class="col-12 col-md vuln_desc" style="">
                     <strong>Description:</strong>
                     <div class="desc_diff"></div>
                     <div class="collapse desc1">{{group.Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}</div>
                     <div class="collapse desc2">{% if stig1_group is defined and stig1_group is not null and stig1_group|length > 0%}{{stig1_group[0].Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
                 </div>
 
-                <div class="col vuln_check"  style="">
+                <div class="col-12 col-md vuln_check"  style="">
                     <strong>Check:</strong>
                     <div class="desc_check"></div>
                     <div class="collapse check1">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</div>
                     <div class="collapse check2">{% if stig1_group is defined and stig1_group is not null and stig1_group|length > 0%}{{stig1_group[0].Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
                 </div>
 
-                <div class="col vuln_fix"  style="">
+                <div class="col-12 col-md vuln_fix"  style="">
                     <strong>Fix:</strong>
                     <div class="desc_fix"></div>
                     <div class="collapse fix1">{{ group.Rule.fixtext }}</div>
@@ -125,31 +127,32 @@
 
             <div class="compare-container collapse">
                 <div class="req-header">
+                    <div class="fw-bold pb-2 mb-2 border-bottom">{{group.Rule.title}}</div>
                     <div class="row text-sm">
-                        <div class="col"><strong>Vuln ID: </strong><br />{{group.attributes.id}}</div>
-                        <div class="col"><strong>Rule ID: </strong><br />{{group.Rule.attributes.id}}</div>
-                        <div class="col"><strong>Group ID: </strong><br />{{group.title}}</div>
-                        <div class="col"><strong>Version: </strong><br />{{group.Rule.version}}</div>
-                        <div class="col"><strong>CCI: </strong><br />{{group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'CCI-')|first : '' }}</div>
-                        <div class="col"><strong>Severity:  </strong><br />{{group.Rule.attributes.severity|title }}</div>
+                        <div class="col-6 col-md"><strong>Vuln ID: </strong><br />{{group.attributes.id}}</div>
+                        <div class="col-6 col-md"><strong>Rule ID: </strong><br />{{group.Rule.attributes.id}}</div>
+                        <div class="col-6 col-md"><strong>Group ID: </strong><br />{{group.title}}</div>
+                        <div class="col-6 col-md"><strong>Version: </strong><br />{{group.Rule.version}}</div>
+                        <div class="col-6 col-md"><strong>CCI: </strong><br />{{ ui.cci_link(group.Rule.ident is defined ? (group.Rule.ident|filter(v => v.__toString() starts with 'CCI-')|first) : '') }}</div>
+                        <div class="col-6 col-md"><strong>Severity:  </strong><br />{{group.Rule.attributes.severity|title }}</div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col vuln_desc" style="">
+                    <div class="col-12 col-md vuln_desc" style="">
                         <strong>Description:</strong>
                         <div class="desc_diff"></div>
                         <div class="collapse desc2">{{group.Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}</div>
                         <div class="collapse desc1">{% if stig2_group is defined and stig2_group is not null and stig2_group|length > 0%}{{stig2_group[0].Rule.description|replace({'<Documentable>false</Documentable>':''})|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
                     </div>
 
-                    <div class="col vuln_check"  style="">
+                    <div class="col-12 col-md vuln_check"  style="">
                         <strong>Check:</strong>
                         <div class="desc_check"></div>
                         <div class="collapse check2">{{ group.Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}</div>
                         <div class="collapse check1">{% if stig2_group is defined and stig2_group is not null and stig2_group|length > 0%}{{stig2_group[0].Rule.check.asXml()|regex_replace('/<[^>]*>/is', '' ) }}{% endif %}</div>
                     </div>
 
-                    <div class="col vuln_fix"  style="">
+                    <div class="col-12 col-md vuln_fix"  style="">
                         <strong>Fix:</strong>
                         <div class="desc_fix"></div>
                         <div class="collapse fix2">{{ group.Rule.fixtext }}</div>
