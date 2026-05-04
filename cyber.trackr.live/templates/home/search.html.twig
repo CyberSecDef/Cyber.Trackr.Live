@@ -111,7 +111,7 @@
                         <div class="collapse search-section__body" id="aps_results">
                             {% for c in results.aps %}
                                 <div class="search-section__item">
-                                    <div class="search-section__item-title">{{ ui.ident(c.id) }} &middot; {{c.title}}</div>
+                                    <div class="search-section__item-title">{{ ui.ident(c.id) }} &middot; {{ ui.cci_link(c.title) }}</div>
                                     <div class="search-section__excerpt">
                                         {{c.description}}
                                         {{c.note}}
