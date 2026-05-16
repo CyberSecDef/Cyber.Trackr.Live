@@ -1,6 +1,141 @@
 {
-    "frozen_at": "2026-05-02T20:04:24+00:00",
+    "frozen_at": "2026-05-16T00:53:04+00:00",
     "entries": [
+        {
+            "hash": "4d46e9044a7ad2b61c4777bdc6e66b8268703b74",
+            "short_hash": "4d46e90",
+            "subject": "feat(stig): companion ZIP/PDF section on STIG view pages",
+            "summary": "Surfaces DISA's companion bundle (overview/revision-history/readme PDFs and the full ZIP) in an expandable section above the Digest of Updates. Matches ZIPs to STIGs by reading the XCCDF XML *inside* each archive rather than by filename, so abbreviated DISA names (e.g.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-15T20:45:24-04:00",
+            "date_human": "May 15, 2026 · 20:45"
+        },
+        {
+            "hash": "2fea57a5aa10ca5a1b73a65c4288a78f486a0272",
+            "short_hash": "2fea57a",
+            "subject": "feat(cron): add bin/refresh-data.sh for daily KEV + vulns refresh",
+            "summary": "Lets prod self-update without a dev → rsync deploy. Runs app:kev:refresh, app:vulns:rebuild-toc, then a best-effort IndexNow ping of the vulns landing pages and sitemap.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-06T18:43:33-04:00",
+            "date_human": "May 06, 2026 · 18:43"
+        },
+        {
+            "hash": "cf04cd9b86b90b027aa0cc56b5e49718055eebdd",
+            "short_hash": "cf04cd9",
+            "subject": "fix(seo): give every BreadcrumbList ListItem an item URL",
+            "summary": "Google Search Console flagged \"Missing field 'item' (in 'itemListElement')\" on STIG and SCAP detail pages. Both templates emitted a position-2 ListItem (the title-level breadcrumb) with only a name — schema.org/Google requires an item URL on every entry.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-04T18:58:01-04:00",
+            "date_human": "May 04, 2026 · 18:58"
+        },
+        {
+            "hash": "5175db46572393e5adbae157050c783168f8defe",
+            "short_hash": "5175db4",
+            "subject": "fix(search): link CCI on AP search-result items",
+            "summary": "The Assessment Procedures section on /search/<query> renders each row as \"<AP acronym> · <CCI id>\". The AP acronym side stays as a plain ident pill (there's no AP detail page to link to), but the CCI side should deep-link to /cci#CCI-XXXXXX so the existing cci_app.applyHashFilter() pre-filters the catalog table on arrival.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-04T18:44:19-04:00",
+            "date_human": "May 04, 2026 · 18:44"
+        },
+        {
+            "hash": "6662c837aafb17ef465fd13304c0701b9f7130d6",
+            "short_hash": "6662c83",
+            "subject": "feat(footer): CISA sync badge + refreshed KEV catalog",
+            "summary": "Adds a third line to the footer status column — \"CISA sync · DD MMM YYYY\" — sitting below the existing DISA and NIST sync timestamps. Source is the file mtime of the local KEV mirror at resources/data/kev/known_exploited_vulnerabilities.json, which app:kev:refresh rewrites every time it runs (and ship.sh calls that on every deploy).",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-04T18:35:20-04:00",
+            "date_human": "May 04, 2026 · 18:35"
+        },
+        {
+            "hash": "90cb044de928bad634488279159918f593fb6ab9",
+            "short_hash": "90cb044",
+            "subject": "polish: CCI links + mobile layout pass on STIG compare and RMF views",
+            "summary": "Two interleaved fixes from a post-release audit on /rmf/4, /rmf/5, /search, and /stig/{title}/{v1}/{r1}/{v2}/{r2}.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-04T18:22:52-04:00",
+            "date_human": "May 04, 2026 · 18:22"
+        },
+        {
+            "hash": "276198bbe169ef09ff30036027f9504cf599648e",
+            "short_hash": "276198b",
+            "subject": "fix(vulns): rework landing stat row — actionable metrics, 6 cards wide",
+            "summary": "The original stat row had a \"Patch deadlines\" card showing \"1,573 overdue today · 14 due in next 30 days\" — structurally misleading because most KEV entries were added months or years ago, their 2-week BOD 22-01 deadlines passed long ago, and the count trends toward total-catalog-size by definition. The metric only moves with the calendar, not with anyone's actual patching progress.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-03T19:53:12-04:00",
+            "date_human": "May 03, 2026 · 19:53"
+        },
+        {
+            "hash": "704b03a7d9710f93917444b3c482cd3b198e3cc5",
+            "short_hash": "704b03a",
+            "subject": "feat(ops): app:stig:rebuild meta-command + ship.sh KEV/vulns automation",
+            "summary": "Two operational tightenings around the new /vulnerabilities tree:",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-03T19:40:54-04:00",
+            "date_human": "May 03, 2026 · 19:40"
+        },
+        {
+            "hash": "e50be424056fa48c65402155e42d76aa316d24a4",
+            "short_hash": "e50be42",
+            "subject": "feat(vulns): /vulnerabilities tree — CISA KEV + STIG/SCAP IAVM harvest",
+            "summary": "A new Library section that joins the public CISA Known Exploited Vulnerabilities catalog to the cross-references already living in the STIG and SCAP corpus. Six routes on the web side, six matching JSON endpoints under /api/vulns.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-03T19:40:32-04:00",
+            "date_human": "May 03, 2026 · 19:40"
+        },
+        {
+            "hash": "a4c8713ad07cc94ad8b4152be6b951b9011cc59c",
+            "short_hash": "a4c8713",
+            "subject": "feat(license): adopt AGPL-3.0-or-later + publish /terms page",
+            "summary": "Drops the \"proprietary\" placeholder license that came in by default and puts the project under the GNU Affero General Public License (v3 or later) — same family as Mastodon, Nextcloud, and Plausible. The network-copyleft clause means anyone running a modified version of cyber.trackr.live as a public service has to publish their changes under the same license; in practice this discourages closed-source forks while keeping the code legitimately open.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-03T18:18:29-04:00",
+            "date_human": "May 03, 2026 · 18:18"
+        },
+        {
+            "hash": "0f6cce70c231f988619e17b7f6c36830425e6c7c",
+            "short_hash": "0f6cce7",
+            "subject": "fix(seo): cache-bust local assets via ?v={{ app_version }}",
+            "summary": "Apache on prod sends `cache-control: max-age=2592000` (30 days) for static assets. Without a per-deploy version query string, returning visitors on aggressive caches (notably Chrome on mobile) keep stale JS and CSS for up to a month after a ship — manifested last as the theme menu button silently breaking on prod after a deploy.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-03T18:18:00-04:00",
+            "date_human": "May 03, 2026 · 18:18"
+        },
+        {
+            "hash": "5181d0572ab747f3af0b312aae0a78c4029315c6",
+            "short_hash": "5181d05",
+            "subject": "feat(seo): bin/submit-urls.sh for weekly IndexNow bulk submission",
+            "summary": "Pulls the live sitemap (https://cyber.trackr.live/sitemap.xml), extracts every <loc>, auto-discovers the IndexNow key file from /public/, and POSTs the whole lot to the shared IndexNow endpoint at api.indexnow.org. Bing, Yandex, Seznam, Naver, and DuckDuckGo all get the notification in one call.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T16:54:56-04:00",
+            "date_human": "May 02, 2026 · 16:54"
+        },
+        {
+            "hash": "8a19448581d3abbe006da73a37c8eddea13702bb",
+            "short_hash": "8a19448",
+            "subject": "feat(deploy): bin/fix-perms.sh — standard PHP-site permissions",
+            "summary": "After rsync the perms can drift (especially on DreamHost where the remote user shell sometimes carries umask quirks), and Symfony gets cranky about world-writable cache dirs or files it can't read.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T16:34:18-04:00",
+            "date_human": "May 02, 2026 · 16:34"
+        },
+        {
+            "hash": "abee5d6753e5ea6343cb1b294e509775145b00e0",
+            "short_hash": "abee5d6",
+            "subject": "feat(deploy): bin/ship.sh for the dev-side push to prod",
+            "summary": "Companion to bin/deploy.sh.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T16:06:27-04:00",
+            "date_human": "May 02, 2026 · 16:06"
+        },
+        {
+            "hash": "a5506f7ecbb418dfb12b03c52c9fa93f02ba4028",
+            "short_hash": "a5506f7",
+            "subject": "feat(seo): IndexNow pinger + bin/deploy.sh",
+            "summary": "IndexNow lets us push URL-change notifications directly to Bing / Yandex / Seznam / Naver / DuckDuckGo (Google opted out of the protocol but has its own faster path via Search Console). Search engines re-fetch flagged URLs within minutes instead of waiting on the natural crawl cycle, which for a content site that updates with every DISA sync is a meaningful win.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-02T16:04:44-04:00",
+            "date_human": "May 02, 2026 · 16:04"
+        },
         {
             "hash": "96881af7b8f1ea3a3c90bb86bc6344faf6f764ce",
             "short_hash": "96881af",
