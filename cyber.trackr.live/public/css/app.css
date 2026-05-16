@@ -5477,6 +5477,223 @@ del {
     white-space: nowrap;
 }
 
+/* ============================================================
+   STIG bulk-download panel — collapsed details on /stig and the
+   standalone /stig/bulk page. Mirrors the digest/companion
+   component shape so the three stack consistently.
+   ============================================================ */
+.bulk-dl-panel {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+}
+.bulk-dl-panel[open] { box-shadow: 0 1px 0 var(--border); }
+.bulk-dl-panel__summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    background: linear-gradient(180deg, rgba(34, 122, 200, 0.05), transparent);
+    transition: background 0.15s ease;
+}
+.bulk-dl-panel__summary::-webkit-details-marker { display: none; }
+.bulk-dl-panel__summary:hover {
+    background: linear-gradient(180deg, rgba(34, 122, 200, 0.10), transparent);
+}
+.bulk-dl-panel__summary-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+}
+.bulk-dl-panel__summary-label > i {
+    color: var(--accent);
+    font-size: 18px;
+}
+.bulk-dl-panel__summary-meta {
+    flex: 1 1 60%;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.bulk-dl-panel__summary-cta {
+    margin-left: auto;
+}
+.bulk-dl-panel__deeplink {
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+}
+.bulk-dl-panel__deeplink:hover { text-decoration: underline; }
+
+.data-table-wrap.is-hidden { display: none; }
+
+.bulk-dl {
+    padding: var(--space-4);
+}
+
+/* DataTables theming for #bulk-dl-table — mirrors the #ccis pattern so
+   the table respects --surface / --text / --border across all themes
+   (default light, ink, dracula, solarized-dark, etc.). Also neutralises
+   the white scrollY container that Scroller injects. */
+#bulk-dl-table thead th {
+    background: var(--surface) !important;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    border-bottom: 1.5px solid var(--border-strong) !important;
+    padding: 12px var(--space-3) !important;
+    white-space: nowrap;
+}
+#bulk-dl-table tbody td {
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text);
+    padding: 10px var(--space-3) !important;
+    font-size: 13px;
+}
+#bulk-dl-table tbody tr:hover > * {
+    background: color-mix(in srgb, var(--accent) 5%, transparent) !important;
+}
+#bulk-dl-table tbody tr.odd,
+#bulk-dl-table tbody tr.even,
+#bulk-dl-table tbody tr,
+#bulk-dl-table tbody tr > * {
+    background-color: transparent !important;
+    --bs-table-accent-bg: transparent !important;
+    --bs-table-bg: transparent !important;
+}
+#bulk-dl-table,
+#bulk-dl-table > :not(caption) > * > * {
+    background-color: transparent;
+    color: var(--text);
+    box-shadow: none;
+}
+
+/* Scroller injects two divs around the table:
+     .dataTables_scroll
+       .dataTables_scrollHead  (clone of <thead> for sticky positioning)
+       .dataTables_scrollBody  (the scrolling container)
+   Plus .dts / .DTS for the Scroller-managed viewport. All of these
+   inherit white from DataTables core CSS; force them theme-aware. */
+.bulk-dl .dataTables_wrapper,
+.bulk-dl .dataTables_scroll,
+.bulk-dl .dataTables_scrollHead,
+.bulk-dl .dataTables_scrollHeadInner,
+.bulk-dl .dataTables_scrollBody,
+.bulk-dl .DTS,
+.bulk-dl .dts {
+    background: var(--surface) !important;
+    color: var(--text);
+}
+.bulk-dl .dataTables_scrollHead table.dataTable,
+.bulk-dl .dataTables_scrollBody table.dataTable {
+    background: var(--surface) !important;
+    color: var(--text);
+}
+.bulk-dl .dataTables_scrollHead th {
+    background: var(--surface) !important;
+    color: var(--text-muted);
+    border-bottom: 1.5px solid var(--border-strong) !important;
+}
+
+/* Toolbar (search box row) above the table. */
+.bulk-dl__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--space-3);
+}
+.bulk-dl .dataTables_filter input {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+.bulk-dl__intro {
+    margin: 0 0 var(--space-3);
+}
+.bulk-dl__intro p {
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: var(--text);
+}
+.bulk-dl__hint {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+.bulk-dl__table {
+    width: 100%;
+}
+.bulk-dl__table thead th {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+.bulk-dl__th-check {
+    text-align: center;
+    width: 60px;
+}
+.bulk-dl__cell-check {
+    text-align: center;
+}
+.bulk-dl__check {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+.bulk-dl__absent {
+    color: #b91c1c;
+    font-weight: 600;
+    opacity: 0.55;
+}
+.bulk-dl__bar {
+    position: sticky;
+    bottom: 0;
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    z-index: 5;
+}
+.bulk-dl__counts {
+    font-size: 14px;
+    color: var(--text);
+}
+.bulk-dl__counts span {
+    font-weight: 600;
+}
+.bulk-dl__actions {
+    margin-left: auto;
+    display: inline-flex;
+    gap: var(--space-2);
+}
+.bulk-dl__progress {
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-size: 14px;
+    color: var(--text);
+    background: rgba(34, 122, 200, 0.08);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 4px);
+}
+
 .lib-page__feed-link {
     display: inline-flex;
     align-items: center;

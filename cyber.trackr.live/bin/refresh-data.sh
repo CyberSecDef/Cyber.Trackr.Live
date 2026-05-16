@@ -24,7 +24,11 @@
 #                                       used to surface DISA companion
 #                                       PDFs on each STIG page. ~5s
 #                                       for ~1200 ZIPs. Idempotent.
-#   4. app:indexnow:ping              — best-effort nudge to Bing/
+#   4. app:bulk-download:rebuild-index — stat()s every STIG XML and
+#                                       companion ZIP to build the
+#                                       presence/size sidecar used by
+#                                       /stig/bulk. Depends on step 3.
+#   5. app:indexnow:ping              — best-effort nudge to Bing/
 #                                       Yandex/etc. that the vulns
 #                                       landing pages + sitemap
 #                                       changed. Pings the index
@@ -50,19 +54,23 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/4] Refreshing CISA KEV catalog …"
+echo "[1/5] Refreshing CISA KEV catalog …"
 php bin/console app:kev:refresh
 
 echo
-echo "[2/4] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
+echo "[2/5] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
 php bin/console app:vulns:rebuild-toc
 
 echo
-echo "[3/4] Rebuilding companion-ZIP index for STIG pages …"
+echo "[3/5] Rebuilding companion-ZIP index for STIG pages …"
 php bin/console app:companion-zip:rebuild-index
 
 echo
-echo "[4/4] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
+echo "[4/5] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
+php bin/console app:bulk-download:rebuild-index
+
+echo
+echo "[5/5] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
 php bin/console app:indexnow:ping \
     /vulnerabilities \
     /vulnerabilities/kev \

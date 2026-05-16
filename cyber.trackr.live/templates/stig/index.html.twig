@@ -47,6 +47,22 @@
             <span><span class="dot old"></span>   Old &middot; &gt; 5 yr</span>
         </div>
 
+        <details class="bulk-dl-panel" data-bulk-panel>
+            <summary class="bulk-dl-panel__summary">
+                <span class="bulk-dl-panel__summary-label">
+                    <i class="bi bi-archive" aria-hidden="true"></i>
+                    Bulk download
+                </span>
+                <span class="bulk-dl-panel__summary-meta">
+                    Pick any combination of XCCDF XML + DISA companion ZIPs across every archived version. Bundled into &le;500&nbsp;MB chunks.
+                </span>
+                <span class="bulk-dl-panel__summary-cta">
+                    <a class="bulk-dl-panel__deeplink" href="{{ path('stig_bulk') }}" onclick="event.stopPropagation();">Open full page &rarr;</a>
+                </span>
+            </summary>
+            {% include 'stig/_bulk_table.html.twig' with {entries: bulk_entries} only %}
+        </details>
+
         <div class="data-table-wrap">
             <div class="data-table-scroll">
                 <table id="stig-table" class="data-table">
@@ -101,4 +117,26 @@
             </div>
         </div>
     </section>
+
+    <script src="/js/bulk_download.js?v={{ app_version }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const panel = document.querySelector('[data-bulk-panel]');
+            const root  = panel ? panel.querySelector('[data-bulk-root]') : null;
+            if (!panel || !root) return;
+            // Lazy-init DataTables the first time the panel is opened.
+            let initialized = false;
+            panel.addEventListener('toggle', function () {
+                if (panel.open) {
+                    document.querySelector('.data-table-wrap').classList.add('is-hidden');
+                    if (!initialized) {
+                        window.bulkDownload.init(root);
+                        initialized = true;
+                    }
+                } else {
+                    document.querySelector('.data-table-wrap').classList.remove('is-hidden');
+                }
+            });
+        });
+    </script>
 {% endblock %}

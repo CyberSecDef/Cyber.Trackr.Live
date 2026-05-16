@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Service\BulkDownloadIndex;
+use App\Service\BulkDownloadPlanner;
 use App\Service\Search\IndexBuilder;
 use App\Service\StigCompanionZipFinder;
 use App\Service\StigDigestBuilder;
@@ -13,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -21,7 +24,7 @@ class StigController extends AbstractController
 {
 
     #[Route('/stig', name: 'stig')]
-    public function stig(StigTocBuilder $tocBuilder): Response
+    public function stig(StigTocBuilder $tocBuilder, BulkDownloadIndex $bulkIndex): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
@@ -61,6 +64,7 @@ class StigController extends AbstractController
             'controller_name' => 'StigController',
             'stigs_latest' => $stigs_latest,
             'stig_count'   => count($stigs),
+            'bulk_entries' => $bulkIndex->entries(),
         ]);
     }
 
@@ -136,6 +140,62 @@ class StigController extends AbstractController
             $resp->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', strtotime($latestUpdated)) . ' GMT');
         }
         return $resp;
+    }
+
+    /**
+     * Bulk-download landing page — single virtual-scrolled DataTable with
+     * a checkbox per (STIG version, file kind). Lets a user grab every
+     * historical STIG/SCAP they care about in one go, split across
+     * ≤500MB ZIP chunks streamed sequentially by the client.
+     */
+    #[Route('/stig/bulk', name: 'stig_bulk')]
+    public function stig_bulk(BulkDownloadIndex $index): Response
+    {
+        return $this->render('stig/bulk.html.twig', [
+            'entries' => $index->entries(),
+        ]);
+    }
+
+    /**
+     * POST {selections: [{kind:"xml"|"zip", id:"..."}, ...]}
+     * → JSON {chunks: [{index, of, files, bytes}, ...], total_files, total_bytes}.
+     * Stateless — the client re-sends each chunk's file list when it
+     * actually wants the ZIP bytes.
+     */
+    #[Route('/stig/bulk-download/plan', name: 'stig_bulk_plan', methods: ['POST'])]
+    public function stig_bulk_plan(Request $request, BulkDownloadPlanner $planner): JsonResponse
+    {
+        $payload = json_decode($request->getContent() ?: '{}', true);
+        $selections = is_array($payload['selections'] ?? null) ? $payload['selections'] : [];
+        $resolved = $planner->resolve($selections);
+        $plan = $planner->plan($resolved);
+        $plan['chunk_limit'] = BulkDownloadPlanner::CHUNK_LIMIT_BYTES;
+        return new JsonResponse($plan);
+    }
+
+    /**
+     * POST {files: [{kind, id, name, size}, ...], index, of}
+     * → streamed ZIP containing those files. The client constructs each
+     * request from a chunk returned by /stig/bulk-download/plan.
+     */
+    #[Route('/stig/bulk-download/chunk', name: 'stig_bulk_chunk', methods: ['POST'])]
+    public function stig_bulk_chunk(Request $request, BulkDownloadPlanner $planner): Response
+    {
+        $payload = json_decode($request->getContent() ?: '{}', true);
+        $files = is_array($payload['files'] ?? null) ? $payload['files'] : [];
+        $index = (int)($payload['index'] ?? 1);
+        $of    = (int)($payload['of'] ?? 1);
+        if ($index < 1) $index = 1;
+        if ($of < 1)    $of = 1;
+
+        $resolved = $planner->resolve($files);
+        if (empty($resolved)) {
+            throw $this->createNotFoundException('No valid files in chunk.');
+        }
+
+        $stamp = date('Ymd-His');
+        $zipName = sprintf('cyber-trackr-bulk-%s-part%d-of-%d.zip', $stamp, $index, $of);
+        return $planner->streamChunk($resolved, $zipName);
     }
 
     #[Route('/stig/{title}/{v1}/{r1}/{v2}/{r2}', name: 'stig_compare')]

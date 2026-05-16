@@ -1,0 +1,89 @@
+{# Bulk-download table partial. Shared by the inline collapsed panel on
+   /stig and the standalone /stig/bulk page. Renders one row per STIG
+   version with XML/ZIP checkboxes (disabled when the file is missing).
+   Sorting + virtual scroll are bolted on by JS in bulk_download.js. #}
+<div class="bulk-dl" data-bulk-root>
+    <div class="bulk-dl__intro">
+        <p>
+            One row per STIG version. Tick the XML or ZIP cells you want — disabled cells mean the file isn't archived locally. Selections are bundled into <strong>≤500 MB ZIP chunks</strong> and downloaded sequentially when you click <em>Download selected</em>.
+        </p>
+        <p class="bulk-dl__hint">
+            Your browser may ask once whether to allow multiple file downloads from this site; accept it so the chunks come through.
+        </p>
+    </div>
+
+    <table id="bulk-dl-table" class="data-table bulk-dl__table" data-bulk-table>
+        <thead>
+            <tr>
+                <th class="bulk-dl__th-check">
+                    <label class="bulk-dl__check">
+                        <input type="checkbox" data-bulk-all="xml" aria-label="Select all available XML">
+                        <span>XML</span>
+                    </label>
+                </th>
+                <th class="bulk-dl__th-check">
+                    <label class="bulk-dl__check">
+                        <input type="checkbox" data-bulk-all="zip" aria-label="Select all available ZIP">
+                        <span>ZIP</span>
+                    </label>
+                </th>
+                <th>Title</th>
+                <th>Version</th>
+                <th>Released</th>
+                <th class="num">XML size</th>
+                <th class="num">ZIP size</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in entries %}
+                {% set xml_ok = e.xml_size > 0 %}
+                {% set zip_ok = e.zip_size > 0 %}
+                <tr data-id="{{ e.id }}"
+                    data-title="{{ e.title|replace({'_': ' '})|lower }}"
+                    data-version="V{{ e.version }}R{{ e.release }}"
+                    data-released="{{ e.date }}"
+                    data-xml-size="{{ e.xml_size }}"
+                    data-zip-size="{{ e.zip_size }}">
+                    <td data-label="XML" class="bulk-dl__cell-check">
+                        {% if xml_ok %}
+                            <input type="checkbox" data-bulk-row="xml" data-id="{{ e.id }}" data-size="{{ e.xml_size }}" aria-label="Select XML for {{ e.title|replace({'_':' '}) }} V{{ e.version }}R{{ e.release }}">
+                        {% else %}
+                            <span class="bulk-dl__absent" aria-label="XML not available">&times;</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="ZIP" class="bulk-dl__cell-check">
+                        {% if zip_ok %}
+                            <input type="checkbox" data-bulk-row="zip" data-id="{{ e.id }}" data-size="{{ e.zip_size }}" aria-label="Select ZIP for {{ e.title|replace({'_':' '}) }} V{{ e.version }}R{{ e.release }}">
+                        {% else %}
+                            <span class="bulk-dl__absent" aria-label="ZIP not available">&times;</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Title">
+                        <a href="{{ path('stig_view', {title: e.title, version: e.version, release: e.release}) }}">{{ e.title|replace({'_': ' '}) }}</a>
+                    </td>
+                    <td data-label="Version">V{{ e.version }}R{{ e.release }}</td>
+                    <td data-label="Released">{% if e.released %}{{ e.released }}{% elseif e.date %}{{ e.date }}{% endif %}</td>
+                    <td data-label="XML size" class="num">{% if xml_ok %}{{ (e.xml_size / 1024)|number_format(0) }} KB{% endif %}</td>
+                    <td data-label="ZIP size" class="num">{% if zip_ok %}{{ (e.zip_size / 1024 / 1024)|number_format(1) }} MB{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="bulk-dl__bar" data-bulk-bar role="status" aria-live="polite">
+        <div class="bulk-dl__counts">
+            <span data-bulk-count-files>0</span> files &middot;
+            <span data-bulk-count-bytes>0 B</span> &middot;
+            <span data-bulk-count-chunks>0</span> chunks
+        </div>
+        <div class="bulk-dl__actions">
+            <button type="button" class="cta-secondary" data-bulk-clear disabled>Clear</button>
+            <button type="button" class="cta-primary" data-bulk-download disabled>
+                <i class="bi bi-download" aria-hidden="true"></i>
+                Download selected
+            </button>
+        </div>
+    </div>
+
+    <div class="bulk-dl__progress" data-bulk-progress hidden role="status" aria-live="polite"></div>
+</div>

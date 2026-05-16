@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bulk download &mdash; STIGs &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}Bulk download STIG library — XML + DISA companion ZIPs{% endblock %}
+{% block og_description %}Pick any combination of STIG XCCDF XML files and DISA companion ZIPs from the full archive and download them in ≤500 MB chunks.{% endblock %}
+{% block og_image_name %}stig{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="stig-bulk-title">
+        <div class="rule-text">&sect; Library &middot; STIGs &middot; Bulk download</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">DoD Compliance</span>
+            <h1 id="stig-bulk-title" class="lib-page__title-large">
+                Bulk <em>STIG &amp; companion</em> download
+            </h1>
+            <p class="lib-page__lede">
+                Every archived STIG version, with both the XCCDF XML and the DISA companion ZIP when available.
+                <a class="lib-page__feed-link" href="{{ path('stig') }}">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to STIG list
+                </a>
+            </p>
+        </header>
+
+        {% include 'stig/_bulk_table.html.twig' with {entries: entries} only %}
+    </section>
+
+    <script src="/js/bulk_download.js?v={{ app_version }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.bulkDownload.init(document.querySelector('[data-bulk-root]'));
+        });
+    </script>
+{% endblock %}
