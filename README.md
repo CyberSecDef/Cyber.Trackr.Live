@@ -165,9 +165,15 @@ The API mirrors the browseable library at `/api/...` and returns JSON. No auth, 
 | `GET /api/vulns/cve/{cve}` | Unified CVE view (KEV record if any + corpus refs) |
 | `GET /plans/{family}/schema.json` | Per-family plan schema (consumed by the wizard JS but readable directly) |
 
-### DISA refresh endpoints
+### DISA refresh
 
-Two routes (`/stig/disa_download`, `/scap/disa_download`) scrape the DISA Cyber Exchange catalog API for new releases, fetch the zips, and unpack them into `resources/data/{stig,scap}/`. These are intentionally manual and human-triggered — they're not on a cron.
+The cyber.mil download catalog is scraped via a single `DisaCatalogSyncer` service exposed three ways:
+
+- **Console:** `bin/console app:disa:sync-stig` and `bin/console app:disa:sync-scap` (the daily `bin/refresh-data.sh` cron calls both).
+- **Web routes:** `/stig/disa_download` and `/scap/disa_download` for interactive admin runs — stream live progress to the browser as the sync proceeds.
+- **Dry-run:** both console commands accept `--dry-run` to fetch the catalog and report what *would* be downloaded without writing anything to disk. Useful for verifying the API hasn't changed.
+
+New ZIPs land in `resources/data/zips/` and any XCCDF XML inside is extracted into `resources/data/{stig,scap}/`. Existing files are skipped, so the steady-state cron cost is small (only new bundles).
 
 ### Plan Generator at a glance
 
@@ -208,6 +214,13 @@ bin/console app:vulns:rebuild-toc
 # Pull the latest CISA Known Exploited Vulnerabilities catalog into
 # resources/data/kev/known_exploited_vulnerabilities.json
 bin/console app:kev:refresh
+
+# Sync any new STIG / SCAP bundles from the DISA cyber.mil catalog
+# (downloads ZIPs into resources/data/zips/, extracts XCCDF XML into
+# resources/data/{stig,scap}/). Append --dry-run to preview without
+# writing anything.
+bin/console app:disa:sync-stig
+bin/console app:disa:sync-scap
 
 # Build the XCCDF-XML → companion-ZIP map (resolves DISA's inconsistent
 # zip filenames) used by the "Supporting documents" section on each STIG.
@@ -308,13 +321,13 @@ bash cyber.trackr.live/public/og/src/build.sh
 
 The site is "git is the database" by design. To add or refresh content:
 
-1. **STIGs** — drop new `U_*_STIG.xml` files into `cyber.trackr.live/resources/data/stig/` (or use `/stig/disa_download` to scrape DISA), then `bin/console app:stig:rebuild-toc`. After a bulk drop, prefer `bin/console app:stig:rebuild` so the SCAP toc and `vulns_toc.json` refresh too.
-2. **SCAP** — drop new `U_*_Benchmark.xml` files into `cyber.trackr.live/resources/data/scap/` (or `/scap/disa_download`), then `bin/console app:scap:rebuild-toc` (or `app:stig:rebuild` for the bundled refresh).
+1. **STIGs** — drop new `U_*_STIG.xml` files into `cyber.trackr.live/resources/data/stig/` (or run `bin/console app:disa:sync-stig` / hit `/stig/disa_download` to pull from DISA), then `bin/console app:stig:rebuild-toc`. After a bulk drop, prefer `bin/console app:stig:rebuild` so the SCAP toc and `vulns_toc.json` refresh too.
+2. **SCAP** — drop new `U_*_Benchmark.xml` files into `cyber.trackr.live/resources/data/scap/` (or `bin/console app:disa:sync-scap` / `/scap/disa_download`), then `bin/console app:scap:rebuild-toc` (or `app:stig:rebuild` for the bundled refresh).
 3. **CCIs** — replace `cyber.trackr.live/resources/data/cci/U_CCI_List_2024.xml`. No rebuild needed; reads happen on every request.
 4. **800-53** — replace the `rmf/800-53v[45]-controls.xml` files. Same — read on demand.
 5. **Baselines** — drop a new `*_profile.json` into `resources/data/overlays/`. The chip strip on `/rmf/5`, the wizard dropdown on every plan, and the baseline heat map all pick it up automatically.
 6. **Plan families** — drop a new `<family>.json` into `resources/data/plans/`. The plan-generator landing page and wizard machinery handle it.
-7. **CISA KEV + derived indexes** — both `bin/ship.sh` (deploy-time) and the daily `bin/refresh-data.sh` cron refresh the KEV catalog (`app:kev:refresh`), the IAVM/CTO/CVE harvest (`app:vulns:rebuild-toc`), the XML→ZIP companion map (`app:companion-zip:rebuild-index`), and the bulk-download presence/size index (`app:bulk-download:rebuild-index`). Run any of them individually with `bin/console <name>` for a one-off rebuild.
+7. **Daily cron (`bin/refresh-data.sh`)** — pulls everything that changes on its own: the CISA KEV catalog (`app:kev:refresh`), any new STIG / SCAP bundles from cyber.mil (`app:disa:sync-stig`, `app:disa:sync-scap`), the IAVM/CTO/CVE harvest (`app:vulns:rebuild-toc`), the XML→ZIP companion map (`app:companion-zip:rebuild-index`), and the bulk-download presence/size index (`app:bulk-download:rebuild-index`). `bin/ship.sh` runs the same set at deploy time. Run any individually with `bin/console <name>` for a one-off rebuild.
 8. **Sync timestamps** — edit `resources/data/sync_status.json`.
 9. Commit and push. Production deploy is `git pull` (or `bin/console app:deploy`).
 
@@ -357,6 +370,7 @@ The site is "git is the database" by design. To add or refresh content:
 | `Service/ScapTocBuilder.php` | Same shape, for SCAP benchmarks |
 | `Service/BulkDownloadIndex.php` | Sidecar `bulk_download_index.json` reader + builder — per-version XML/ZIP presence + size for the bulk-download table |
 | `Service/BulkDownloadPlanner.php` | Validates a user's selection, dedupes shared-bundle paths, greedy-packs into ≤500 MB chunks, streams each chunk as a ZIP via ZipStream-PHP |
+| `Service/DisaCatalogSyncer.php` | Single engine behind both `/{stig,scap}/disa_download` web routes and the `app:disa:sync-{stig,scap}` console commands — pulls the cyber.mil catalog, filters for STIG vs SCAP, downloads new ZIPs, extracts XCCDF XML, marks `sync_status.json` |
 | `Service/SyncStatus.php` | Reads `sync_status.json`; exposed as Twig global |
 | `Service/Plans/PlanRegistry.php` | Discovers plan schema files, exposes `availablePlans()` |
 | `Service/Plans/ControlResolver.php` | Family + baseline → ordered list of controls + enhancements with `in_baseline` flags |
@@ -377,6 +391,8 @@ The site is "git is the database" by design. To add or refresh content:
 | `Command/KevRefreshCommand.php` | `app:kev:refresh` |
 | `Command/CompanionZipRebuildIndexCommand.php` | `app:companion-zip:rebuild-index` |
 | `Command/BulkDownloadRebuildIndexCommand.php` | `app:bulk-download:rebuild-index` |
+| `Command/DisaSyncStigCommand.php` | `app:disa:sync-stig` (supports `--dry-run`) |
+| `Command/DisaSyncScapCommand.php` | `app:disa:sync-scap` (supports `--dry-run`) |
 | `Command/SearchRebuildCommand.php` | `app:search:rebuild` |
 | `Command/AppVersionFreezeCommand.php` | `app:version:freeze` |
 | `Command/DeployCommand.php` | `app:deploy` |

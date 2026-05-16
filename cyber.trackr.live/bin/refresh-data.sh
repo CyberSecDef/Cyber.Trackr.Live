@@ -16,19 +16,28 @@
 #                                       Network-dependent; runs first
 #                                       so we fail fast if the feed is
 #                                       unreachable.
-#   2. app:vulns:rebuild-toc          — re-scans STIG + SCAP XML for
+#   2. app:disa:sync-stig             — pulls any new STIG bundles
+#   3. app:disa:sync-scap               from cyber.mil into the local
+#                                       archive. Network-dependent;
+#                                       wrapped in `|| true` so a
+#                                       transient DISA outage doesn't
+#                                       kill the cron and skip the
+#                                       downstream index rebuilds.
+#                                       Steady-state cost is small
+#                                       (only fetches new ZIPs).
+#   4. app:vulns:rebuild-toc          — re-scans STIG + SCAP XML for
 #                                       IAVM/CTO/CVE refs into
 #                                       vulns_toc.json. Cheap.
-#   3. app:companion-zip:rebuild-index — re-scans resources/data/zips/
+#   5. app:companion-zip:rebuild-index — re-scans resources/data/zips/
 #                                       and rebuilds the XML→ZIP map
 #                                       used to surface DISA companion
 #                                       PDFs on each STIG page. ~5s
 #                                       for ~1200 ZIPs. Idempotent.
-#   4. app:bulk-download:rebuild-index — stat()s every STIG XML and
+#   6. app:bulk-download:rebuild-index — stat()s every STIG XML and
 #                                       companion ZIP to build the
 #                                       presence/size sidecar used by
-#                                       /stig/bulk. Depends on step 3.
-#   5. app:indexnow:ping              — best-effort nudge to Bing/
+#                                       /stig/bulk. Depends on step 5.
+#   7. app:indexnow:ping              — best-effort nudge to Bing/
 #                                       Yandex/etc. that the vulns
 #                                       landing pages + sitemap
 #                                       changed. Pings the index
@@ -54,23 +63,31 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/5] Refreshing CISA KEV catalog …"
+echo "[1/7] Refreshing CISA KEV catalog …"
 php bin/console app:kev:refresh
 
 echo
-echo "[2/5] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
+echo "[2/7] Syncing new STIG bundles from DISA (best-effort) …"
+php bin/console app:disa:sync-stig || true
+
+echo
+echo "[3/7] Syncing new SCAP benchmarks from DISA (best-effort) …"
+php bin/console app:disa:sync-scap || true
+
+echo
+echo "[4/7] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
 php bin/console app:vulns:rebuild-toc
 
 echo
-echo "[3/5] Rebuilding companion-ZIP index for STIG pages …"
+echo "[5/7] Rebuilding companion-ZIP index for STIG pages …"
 php bin/console app:companion-zip:rebuild-index
 
 echo
-echo "[4/5] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
+echo "[6/7] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
 php bin/console app:bulk-download:rebuild-index
 
 echo
-echo "[5/5] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
+echo "[7/7] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
 php bin/console app:indexnow:ping \
     /vulnerabilities \
     /vulnerabilities/kev \

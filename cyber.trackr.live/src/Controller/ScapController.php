@@ -2,10 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\Search\IndexBuilder;
-use App\Service\SyncStatus;
 use Symfony\Component\Routing\Attribute\Route;
-use ZipArchive;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -157,127 +154,34 @@ class ScapController extends AbstractController
     }
 
 
+    /**
+     * Admin-triggered DISA mirror — same engine as
+     * `app:disa:sync-scap` (run nightly via bin/refresh-data.sh).
+     * Streams progress to the browser so the operator can watch the
+     * sync proceed.
+     */
     #[Route('/scap/disa_download', name: 'scap_disa_download')]
-    public function scap_disa_download(SyncStatus $syncStatus, IndexBuilder $indexBuilder)
+    public function scap_disa_download(\App\Service\DisaCatalogSyncer $syncer): Response
     {
-        $destination_dir = realpath(__DIR__ . "/../../resources/data/scap/");
-
         set_time_limit(60 * 15);
-
-        $zip = new ZipArchive;
-        
-        // Set up the session
-        $session = curl_init();
-        curl_setopt(
-            $session, 
-            CURLOPT_USERAGENT, 
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0"
-        );
-        curl_setopt($session, CURLOPT_ENCODING, "");
-        curl_setopt($session, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($session, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
-
-
-        // Set the cookies
-        $cookies = [
-            "CookieConsentPolicy" => "0:1",
-            'LSKey-c$CookieConsentPolicy' => "0:1",
-            "_ga" => "GA1.1.2133560557.1755112757",
-            "_ga_6XQ570DY75" => 'GS2.1.s175511275$o1$g$t1755112873$j5$l0$h0'
-        ];
-        
-        $headers = [
-            "Accept: */*",
-            "Accept-Encoding: gzip, deflate, br, zstd",
-            "Accept-Language: en-US,en;q=0.9",
-            "Origin: https://www.cyber.mil",
-            "Referer: https://www.cyber.mil/stigs/downloads",
-            "Sec-Fetch-Dest: empty",
-            "Sec-Fetch-Mode: cors",
-            "Sec-Fetch-Site: same-origin",
-            "X-B3-Sampled: 0",
-            "X-B3-SpanId: 2c49e714f67fbe18",
-            "X-B3-TraceId: cc1d2f44f74587f28d6010e49537e8d4",
-            "X-SFDC-Request-Id: 175511287321871eb0",
-            "sec-ch-ua: Not;A=Brand;v=99, Microsoft Edge;v=139, Chromium;v=139",
-            "sec-ch-ua-mobile: ?0",
-            "sec-ch-ua-platform: Windows"
-        ];
-        
-        $body =  '{"namespace":"","classname":"@udd/01pRw0000002mOj","method":"getCyberDocumentCatalogByDocumentLibrary","isContinuation":false,"params":{"documentLibrary":"STIGs"},"cacheable":false}';
-
-        curl_setopt($session, CURLOPT_COOKIE, http_build_query($cookies));
-        curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($session, CURLOPT_POSTFIELDS, $body);
-
-        curl_setopt($session, CURLOPT_URL, "https://www.cyber.mil/webruntime/api/apex/execute?language=en-US&asGuest=true&htmlEncode=false");
-        curl_setopt($session, CURLOPT_POST, true);
-        curl_setopt($session, CURLOPT_HTTPHEADER, array_merge($headers, ["Content-Type: application/json; charset=utf-8"]));
-
-        $web_context = stream_context_create(
-            [
-                "http" => [
-                    "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
-                ]
-            ]
-        );
-
-        // Execute the request
-        $response = curl_exec($session);
-        
-        $phpObject = json_decode($response);
-        $index = 0;
-        echo "<pre style='color:rgb(236, 226, 200);'>\n";
-        foreach($phpObject->returnValue as $item){
-            //preg_match_all('/https:.*wp-content.*stigs.*U_.*\.zip/', $web_contents, $matches);
-            $link = $item->DownloadLink;
-            if (stristr((string) $link, "Benchmark") && !stristr((string) $link, "STIGViewer") && !stristr((string) $link, "STIG_Library") && stristr((string) $link, "wp-content") && stristr((string) $link, "U_") && stristr((string) $link, ".zip")) {
-                $index++;
-                echo "{$index}. {$item->DownloadLink}\n";
-
-                $temp_file = tempnam(sys_get_temp_dir(), 'STIG');
-                $temp_file = realpath(__DIR__ . "/../../resources/data/zips/" );
-                
-                //see if the file is already downloaded
-                if(!file_exists( $temp_file . "/" . basename((string) $link) )){
-                    file_put_contents(
-                        $temp_file . "/" . basename((string) $link),
-                        file_get_contents($link, false, $web_context)
-                    );
-
-                    if ($zip->open($temp_file . "/" . basename((string) $link)) == TRUE) {
-                        for ($i = 0; $i < $zip->numFiles; $i++) {
-                            $filename = basename($zip->getNameIndex($i));
-                            if (stristr($filename, ".xml") && str_starts_with($filename, "U_")) {
-                                if (!file_exists("{$destination_dir}/{$filename}")) {
-                                    echo "\t{$filename}\n";
-                                    file_put_contents(
-                                        "{$destination_dir}/{$filename}",
-                                        $zip->getFromIndex($i)
-                                    );
-                                }
-                            }
-                        }
-                    } else {
-                        echo "could not open\n";
-                    }
-                    $zip->close();
-                }
-
+        $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($syncer) {
+            echo "<pre style='color:rgb(236, 226, 200);'>\n";
+            @ob_flush(); flush();
+            try {
+                $stats = $syncer->sync(
+                    \App\Service\DisaCatalogSyncer::KIND_SCAP,
+                    function (string $line) { echo $line . "\n"; @ob_flush(); flush(); },
+                );
+                printf("\nDone. downloaded=%d skipped=%d xml=%d errors=%d\n",
+                    $stats['downloaded'], $stats['skipped'], $stats['xml_extracted'], $stats['errors']);
+            } catch (\Throwable $e) {
+                echo "\nERROR: " . htmlspecialchars($e->getMessage()) . "\n";
             }
-        }
-        curl_close($session);
-
-        $syncStatus->markDisaSyncedNow();
-        $indexBuilder->syncDeltas();
-
-        return new Response(
-            "Done.",
-            Response::HTTP_OK,
-            ['content-type' => 'text/html']
-        );
-
+            echo "</pre>";
+        });
+        $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        return $response;
     }
 }
 
