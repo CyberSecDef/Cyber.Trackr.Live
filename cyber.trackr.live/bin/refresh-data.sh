@@ -12,19 +12,29 @@
 #       >> /home/dh_t7zn6y/cyber.trackr.live/var/log/refresh-data.log 2>&1
 #
 # Order:
-#   1. app:kev:refresh       — pulls the CISA KEV catalog. Network-
-#                              dependent; runs first so we fail fast
-#                              if the feed is unreachable.
-#   2. app:vulns:rebuild-toc — re-scans STIG + SCAP XML for IAVM/CTO/
-#                              CVE refs into vulns_toc.json. Cheap.
-#   3. app:indexnow:ping     — best-effort nudge to Bing/Yandex/etc.
-#                              that the vulns landing pages + sitemap
-#                              changed. Pings the index surfaces only,
-#                              not every CVE detail URL — search
-#                              engines will re-crawl those from the
-#                              sitemap. Wrapped in `|| true` so a
-#                              transient IndexNow failure can't fail
-#                              the cron run and skip tomorrow's email.
+#   1. app:kev:refresh                — pulls the CISA KEV catalog.
+#                                       Network-dependent; runs first
+#                                       so we fail fast if the feed is
+#                                       unreachable.
+#   2. app:vulns:rebuild-toc          — re-scans STIG + SCAP XML for
+#                                       IAVM/CTO/CVE refs into
+#                                       vulns_toc.json. Cheap.
+#   3. app:companion-zip:rebuild-index — re-scans resources/data/zips/
+#                                       and rebuilds the XML→ZIP map
+#                                       used to surface DISA companion
+#                                       PDFs on each STIG page. ~5s
+#                                       for ~1200 ZIPs. Idempotent.
+#   4. app:indexnow:ping              — best-effort nudge to Bing/
+#                                       Yandex/etc. that the vulns
+#                                       landing pages + sitemap
+#                                       changed. Pings the index
+#                                       surfaces only, not every CVE
+#                                       detail URL — search engines
+#                                       re-crawl those from the
+#                                       sitemap. Wrapped in `|| true`
+#                                       so a transient IndexNow
+#                                       failure can't fail the cron
+#                                       run and skip tomorrow's email.
 #
 # Cron runs with a minimal PATH, so we set one explicitly and use
 # absolute cwd via $(dirname "$0")/.. — same pattern as ship.sh /
@@ -40,15 +50,19 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/3] Refreshing CISA KEV catalog …"
+echo "[1/4] Refreshing CISA KEV catalog …"
 php bin/console app:kev:refresh
 
 echo
-echo "[2/3] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
+echo "[2/4] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
 php bin/console app:vulns:rebuild-toc
 
 echo
-echo "[3/3] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
+echo "[3/4] Rebuilding companion-ZIP index for STIG pages …"
+php bin/console app:companion-zip:rebuild-index
+
+echo
+echo "[4/4] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
 php bin/console app:indexnow:ping \
     /vulnerabilities \
     /vulnerabilities/kev \

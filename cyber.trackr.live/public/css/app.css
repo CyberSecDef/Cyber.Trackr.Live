@@ -5330,6 +5330,153 @@ del {
     font-style: italic;
 }
 
+/* ============================================================
+   STIG view — Supporting documents (companion ZIP + PDFs).
+   Sits directly above the Digest of Updates; mirrors that
+   component's shape so the two stack consistently.
+   ============================================================ */
+.stig-companion {
+    margin: var(--space-5) 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+}
+.stig-companion[open] {
+    box-shadow: 0 1px 0 var(--border);
+}
+.stig-companion__summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    background: linear-gradient(180deg, rgba(34, 122, 200, 0.05), transparent);
+    transition: background 0.15s ease;
+}
+.stig-companion__summary::-webkit-details-marker { display: none; }
+.stig-companion__summary:hover {
+    background: linear-gradient(180deg, rgba(34, 122, 200, 0.10), transparent);
+}
+.stig-companion__summary-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+}
+.stig-companion__summary-label > i {
+    color: var(--accent);
+    font-size: 18px;
+}
+.stig-companion__summary-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.stig-companion__summary-counts {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+.stig-companion__count {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    white-space: nowrap;
+}
+.stig-companion__count--pdf {
+    color: #991b1b;
+    background: rgba(220, 38, 38, 0.10);
+    border-color: #b91c1c;
+}
+[data-theme="ink"] .stig-companion__count--pdf,
+[data-theme="dracula"] .stig-companion__count--pdf,
+[data-theme="solarized-dark"] .stig-companion__count--pdf {
+    color: #fca5a5;
+    background: rgba(248, 113, 113, 0.14);
+    border-color: #f87171;
+}
+
+.stig-companion__body {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border);
+}
+.stig-companion__lede {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-4);
+    line-height: 1.55;
+}
+.stig-companion__actions {
+    margin: 0 0 var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+.stig-companion__actions .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.stig-companion__file {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.85;
+}
+.stig-companion__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.stig-companion__list li {
+    border-bottom: 1px solid var(--border);
+}
+.stig-companion__list li:last-child {
+    border-bottom: 0;
+}
+.stig-companion__list a {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: 8px 4px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.45;
+}
+.stig-companion__list a:hover {
+    background: rgba(34, 122, 200, 0.06);
+}
+.stig-companion__list a > i {
+    color: #b91c1c;
+    font-size: 16px;
+    flex: 0 0 auto;
+}
+.stig-companion__pdf-name {
+    flex: 1 1 auto;
+    word-break: break-word;
+}
+.stig-companion__pdf-size {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
 .lib-page__feed-link {
     display: inline-flex;
     align-items: center;

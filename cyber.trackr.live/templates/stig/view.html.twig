@@ -129,6 +129,55 @@
             {{ stig.xpath("/xmlns:Benchmark/xmlns:description")|first }}
         </div>
 
+        {% if companion %}
+            <details class="stig-companion">
+                <summary class="stig-companion__summary">
+                    <span class="stig-companion__summary-label">
+                        <i class="bi bi-file-earmark-zip" aria-hidden="true"></i>
+                        Supporting documents
+                    </span>
+                    <span class="stig-companion__summary-meta">
+                        DISA companion ZIP &middot; {{ (companion.size / 1024 / 1024)|number_format(1) }} MB
+                    </span>
+                    <span class="stig-companion__summary-counts">
+                        {% if companion.pdfs|length %}
+                            <span class="stig-companion__count stig-companion__count--pdf">{{ companion.pdfs|length }} PDF{{ companion.pdfs|length == 1 ? '' : 's' }}</span>
+                        {% endif %}
+                    </span>
+                </summary>
+
+                <div class="stig-companion__body">
+                    <p class="stig-companion__lede">
+                        Bundled by DISA alongside this STIG release: overview, revision history, and readme files. Download the full archive or open an individual PDF.
+                    </p>
+
+                    <div class="stig-companion__actions">
+                        <a class="cta-primary"
+                           href="{{ path('stig_companion_zip', {title: title, version: version, release: release}) }}"
+                           download>
+                            <i class="bi bi-download" aria-hidden="true"></i>
+                            Download full ZIP
+                            <span class="stig-companion__file">{{ companion.basename }}</span>
+                        </a>
+                    </div>
+
+                    {% if companion.pdfs|length %}
+                        <ul class="stig-companion__list">
+                            {% for pdf in companion.pdfs %}
+                                <li>
+                                    <a href="{{ path('stig_companion_pdf', {title: title, version: version, release: release, file: pdf.name}) }}" target="_blank" rel="noopener">
+                                        <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+                                        <span class="stig-companion__pdf-name">{{ pdf.basename }}</span>
+                                        <span class="stig-companion__pdf-size">{{ (pdf.size / 1024)|number_format(0) }} KB</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </details>
+        {% endif %}
+
         {% if digest %}
             <details class="stig-digest">
                 <summary class="stig-digest__summary">

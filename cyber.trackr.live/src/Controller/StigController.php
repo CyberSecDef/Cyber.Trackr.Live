@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\Search\IndexBuilder;
+use App\Service\StigCompanionZipFinder;
 use App\Service\StigDigestBuilder;
 use App\Service\StigTocBuilder;
 use App\Service\SyncStatus;
@@ -12,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -201,7 +203,7 @@ class StigController extends AbstractController
     }
 
     #[Route('/stig/{title}/{version}/{release}', name: 'stig_view')]
-    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder): Response
+    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder, StigCompanionZipFinder $companionFinder): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -251,6 +253,8 @@ class StigController extends AbstractController
             $stigs[$title]
         );
 
+        $companion = $companionFinder->find($title, $version, $release);
+
         return $this->render('stig/view.html.twig', [
             'controller_name' => 'StigController',
             'cci' => $cci_xml,
@@ -260,7 +264,43 @@ class StigController extends AbstractController
             'version' => $version,
             'release' => $release,
             'digest' => $digest,
+            'companion' => $companion,
         ]);
+    }
+
+    #[Route('/stig/{title}/{version}/{release}/companion.zip', name: 'stig_companion_zip')]
+    public function stig_companion_zip(string $title, string $version, string $release, StigCompanionZipFinder $companionFinder): Response
+    {
+        $path = $companionFinder->resolveZipPath($title, $version, $release);
+        if ($path === null || !is_file($path)) {
+            throw $this->createNotFoundException('Companion ZIP not found.');
+        }
+        $response = new BinaryFileResponse($path);
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            basename($path)
+        );
+        return $response;
+    }
+
+    #[Route('/stig/{title}/{version}/{release}/companion.pdf', name: 'stig_companion_pdf')]
+    public function stig_companion_pdf(string $title, string $version, string $release, Request $request, StigCompanionZipFinder $companionFinder): Response
+    {
+        $entry = (string) $request->query->get('file', '');
+        $pdf = $companionFinder->readPdfEntry($title, $version, $release, $entry);
+        if ($pdf === null) {
+            throw $this->createNotFoundException('Companion PDF not found.');
+        }
+
+        $response = new Response($pdf['bytes']);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $pdf['basename']
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+        return $response;
     }
 
     #[Route('/stig/{title}/{version}/{release}/download', name: 'stig_download')]
