@@ -25,9 +25,16 @@
 #                                       downstream index rebuilds.
 #                                       Steady-state cost is small
 #                                       (only fetches new ZIPs).
-#   4. app:vulns:rebuild-toc          — re-scans STIG + SCAP XML for
-#                                       IAVM/CTO/CVE refs into
-#                                       vulns_toc.json. Cheap.
+#   4. app:stig:rebuild               — meta: rebuilds stig_toc.json,
+#                                       scap_toc.json, and vulns_toc.json
+#                                       from the freshly-synced XML. The
+#                                       /stig and /scap controllers do
+#                                       lazy ADD of new files on request,
+#                                       but only a full rebuild detects
+#                                       changes to existing XMLs (e.g.
+#                                       updated severity counts) and
+#                                       refreshes the sidecar indexes
+#                                       below from current data.
 #   5. app:companion-zip:rebuild-index — re-scans resources/data/zips/
 #                                       and rebuilds the XML→ZIP map
 #                                       used to surface DISA companion
@@ -36,18 +43,20 @@
 #   6. app:bulk-download:rebuild-index — stat()s every STIG XML and
 #                                       companion ZIP to build the
 #                                       presence/size sidecar used by
-#                                       /stig/bulk. Depends on step 5.
-#   7. app:indexnow:ping              — best-effort nudge to Bing/
-#                                       Yandex/etc. that the vulns
-#                                       landing pages + sitemap
-#                                       changed. Pings the index
-#                                       surfaces only, not every CVE
-#                                       detail URL — search engines
-#                                       re-crawl those from the
-#                                       sitemap. Wrapped in `|| true`
-#                                       so a transient IndexNow
-#                                       failure can't fail the cron
-#                                       run and skip tomorrow's email.
+#                                       /stig/bulk. Depends on steps 4+5.
+#   7. app:search:rebuild              — incremental sync of the
+#                                       inverted search index so newly-
+#                                       synced STIGs/SCAPs are
+#                                       searchable before the next ship.
+#                                       (Deploy still does --full.)
+#   8. app:indexnow:ping              — best-effort nudge to Bing/
+#                                       Yandex/etc. about new STIG
+#                                       versions (--recent --within=1)
+#                                       plus the vulns landing pages and
+#                                       sitemap. Wrapped in `|| true` so
+#                                       a transient IndexNow failure
+#                                       can't fail the cron run and
+#                                       skip tomorrow's email.
 #
 # Cron runs with a minimal PATH, so we set one explicitly and use
 # absolute cwd via $(dirname "$0")/.. — same pattern as ship.sh /
@@ -63,32 +72,37 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/7] Refreshing CISA KEV catalog …"
+echo "[1/8] Refreshing CISA KEV catalog …"
 php bin/console app:kev:refresh
 
 echo
-echo "[2/7] Syncing new STIG bundles from DISA (best-effort) …"
+echo "[2/8] Syncing new STIG bundles from DISA (best-effort) …"
 php bin/console app:disa:sync-stig || true
 
 echo
-echo "[3/7] Syncing new SCAP benchmarks from DISA (best-effort) …"
+echo "[3/8] Syncing new SCAP benchmarks from DISA (best-effort) …"
 php bin/console app:disa:sync-scap || true
 
 echo
-echo "[4/7] Rebuilding vulns_toc.json from the STIG/SCAP corpus …"
-php bin/console app:vulns:rebuild-toc
+echo "[4/8] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
+php bin/console app:stig:rebuild
 
 echo
-echo "[5/7] Rebuilding companion-ZIP index for STIG pages …"
+echo "[5/8] Rebuilding companion-ZIP index for STIG pages …"
 php bin/console app:companion-zip:rebuild-index
 
 echo
-echo "[6/7] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
+echo "[6/8] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
 php bin/console app:bulk-download:rebuild-index
 
 echo
-echo "[7/7] Pinging IndexNow about KEV/vulns surfaces (best-effort) …"
+echo "[7/8] Syncing the inverted search index (incremental) …"
+php bin/console app:search:rebuild
+
+echo
+echo "[8/8] Pinging IndexNow about recent STIGs + KEV/vulns surfaces (best-effort) …"
 php bin/console app:indexnow:ping \
+    --recent --within=1 \
     /vulnerabilities \
     /vulnerabilities/kev \
     /vulnerabilities/iavm \

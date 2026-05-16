@@ -239,9 +239,6 @@ bin/console app:search:rebuild
 
 # Freeze the version string into a /VERSION file for deploys
 bin/console app:version:freeze
-
-# Pull + rebuild + restart in one step (used by the production deploy hook)
-bin/console app:deploy
 ```
 
 Run the toc rebuilds after dropping new DISA files into the data dir. The site auto-detects new XML files on the next request anyway, but a full rebuild is faster than thousands of incremental parses. `app:stig:rebuild` is the convenience wrapper when you've just done a bulk drop and want every dependent index refreshed in one command.
@@ -327,11 +324,32 @@ The site is "git is the database" by design. To add or refresh content:
 4. **800-53** — replace the `rmf/800-53v[45]-controls.xml` files. Same — read on demand.
 5. **Baselines** — drop a new `*_profile.json` into `resources/data/overlays/`. The chip strip on `/rmf/5`, the wizard dropdown on every plan, and the baseline heat map all pick it up automatically.
 6. **Plan families** — drop a new `<family>.json` into `resources/data/plans/`. The plan-generator landing page and wizard machinery handle it.
-7. **Daily cron (`bin/refresh-data.sh`)** — pulls everything that changes on its own: the CISA KEV catalog (`app:kev:refresh`), any new STIG / SCAP bundles from cyber.mil (`app:disa:sync-stig`, `app:disa:sync-scap`), the IAVM/CTO/CVE harvest (`app:vulns:rebuild-toc`), the XML→ZIP companion map (`app:companion-zip:rebuild-index`), and the bulk-download presence/size index (`app:bulk-download:rebuild-index`). `bin/ship.sh` runs the same set at deploy time. Run any individually with `bin/console <name>` for a one-off rebuild.
+7. **Daily cron (`bin/refresh-data.sh`)** — pulls everything that changes on its own and rebuilds every dependent index, in order: CISA KEV (`app:kev:refresh`), new STIG / SCAP bundles from cyber.mil (`app:disa:sync-stig`, `app:disa:sync-scap`), the stig / scap / vulns tocs (`app:stig:rebuild` meta), the XML→ZIP companion map (`app:companion-zip:rebuild-index`), the bulk-download presence/size index (`app:bulk-download:rebuild-index`), the inverted search index (`app:search:rebuild`, incremental), and an IndexNow ping for new STIGs + the vulns landing pages. `bin/ship.sh` runs the same content-side set at deploy time. Run any individually with `bin/console <name>` for a one-off rebuild.
 8. **Sync timestamps** — edit `resources/data/sync_status.json`.
-9. Commit and push. Production deploy is `git pull` (or `bin/console app:deploy`).
+9. Commit and push. Production deploy is `git pull` followed by `./bin/deploy.sh` on prod.
 
 > **Note:** any zip with the word "Compilation" in its name is `.gitignore`d. The DISA SRG-STIG sunset compilation bundle is 150 MB and exceeds GitHub's per-file limit; this rule prevents it from being accidentally re-committed.
+
+---
+
+## Deploy pipeline
+
+Three scripts under `cyber.trackr.live/bin/` form the end-to-end content + code pipeline. Each one's header comment lists its steps in detail.
+
+| Script | Where it runs | When | What |
+| --- | --- | --- | --- |
+| `bin/ship.sh` | dev | when shipping new code or data | Refreshes KEV; rebuilds the stig / scap / vulns tocs, companion-ZIP index, and bulk-download index from current XML; freezes version + changelog; rsyncs everything (except `.env`) to prod. |
+| `bin/deploy.sh` | prod, after rsync | every deploy | Full rebuild of the inverted search index; clears the prod + dev caches so Symfony picks up the new compiled container; best-effort IndexNow ping for recently-changed pages; runs `fix-perms.sh` last to normalise file modes. |
+| `bin/refresh-data.sh` | prod cron, 04:00 daily | nightly | Pulls the CISA KEV catalog + any new STIG / SCAP bundles from cyber.mil; rebuilds every toc + sidecar index; incremental search-index sync; IndexNow ping for new STIGs + vulns landing pages. Network-dependent steps are wrapped in `\|\| true` so a cyber.mil / CISA outage can't kill the cron and skip the downstream rebuilds. |
+
+A typical dev → prod deploy:
+
+```bash
+./bin/ship.sh                                # on dev
+ssh prod 'cd /path/to/cyber.trackr.live && ./bin/deploy.sh'
+```
+
+Out-of-band utility: `bin/fix-perms.sh` resets directory / file modes to the standard PHP-site pattern (755 / 644, with `.env` files at 600). Already wired into `deploy.sh` step 5, but safe to re-run any time prod starts returning 403/500 from permission-denied errors.
 
 ---
 
@@ -395,7 +413,6 @@ The site is "git is the database" by design. To add or refresh content:
 | `Command/DisaSyncScapCommand.php` | `app:disa:sync-scap` (supports `--dry-run`) |
 | `Command/SearchRebuildCommand.php` | `app:search:rebuild` |
 | `Command/AppVersionFreezeCommand.php` | `app:version:freeze` |
-| `Command/DeployCommand.php` | `app:deploy` |
 
 ### Frontend
 

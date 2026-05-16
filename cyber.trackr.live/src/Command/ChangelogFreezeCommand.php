@@ -22,15 +22,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * file when present, falling back to live `git log` for dev shells where the
  * repo is intact.
  *
- * Pair with `app:version:freeze` in your pre-rsync workflow:
- *
- *     php bin/console app:version:freeze
- *     php bin/console app:changelog:freeze
- *     rsync -av cyber.trackr.live/ prod:/path/to/cyber.trackr.live/
- *     ssh prod 'cd /path/to/cyber.trackr.live && bin/console app:deploy'
- *
- * The JSON is gitignored — it's generated, not authored. Run before every
- * deploy to keep prod's changelog page current.
+ * Called automatically from bin/ship.sh between the toc rebuilds and
+ * the rsync. The JSON is gitignored — it's generated, not authored.
  */
 #[AsCommand(
     name: 'app:changelog:freeze',
