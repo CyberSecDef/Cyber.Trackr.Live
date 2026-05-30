@@ -45,6 +45,15 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# PHP binary to run the console with. This script runs on dev, where the
+# default `php` is current; override with `PHP=/path/to/php ./bin/ship.sh`
+# if your dev php is too old for composer.json.
+PHP="${PHP:-php}"
+if ! command -v "$PHP" >/dev/null 2>&1; then
+    echo "[ship] PHP binary not found: $PHP (set PHP=/path/to/php)" >&2
+    exit 1
+fi
+
 echo "──────────────────────────────────────────"
 echo "  Cyber Trackr ship (dev → prod)"
 echo "  $(date -Iseconds)"
@@ -52,27 +61,27 @@ echo "────────────────────────�
 
 echo
 echo "[1/7] Refreshing CISA KEV catalog …"
-php bin/console app:kev:refresh
+"$PHP" bin/console app:kev:refresh
 
 echo
 echo "[2/7] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
-php bin/console app:stig:rebuild
+"$PHP" bin/console app:stig:rebuild
 
 echo
 echo "[3/7] Rebuilding companion-ZIP index for STIG pages …"
-php bin/console app:companion-zip:rebuild-index
+"$PHP" bin/console app:companion-zip:rebuild-index
 
 echo
 echo "[4/7] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
-php bin/console app:bulk-download:rebuild-index
+"$PHP" bin/console app:bulk-download:rebuild-index
 
 echo
 echo "[5/7] Freezing version string …"
-php bin/console app:version:freeze
+"$PHP" bin/console app:version:freeze
 
 echo
 echo "[6/7] Freezing changelog from git log …"
-php bin/console app:changelog:freeze
+"$PHP" bin/console app:changelog:freeze
 
 echo
 echo "[7/7] Rsyncing to prod (--exclude .env) …"

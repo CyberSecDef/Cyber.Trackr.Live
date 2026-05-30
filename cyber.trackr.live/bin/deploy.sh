@@ -30,6 +30,15 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# DreamHost's default CLI php is 8.2, older than composer.json requires, so
+# default to the php84 build. Override with `PHP=php ./bin/deploy.sh` (or any
+# path) on hosts where the default php is already current.
+PHP="${PHP:-/usr/local/php84/bin/php}"
+if ! command -v "$PHP" >/dev/null 2>&1; then
+    echo "[deploy] PHP binary not found: $PHP (set PHP=/path/to/php)" >&2
+    exit 1
+fi
+
 echo "──────────────────────────────────────────"
 echo "  Cyber Trackr deploy"
 echo "  $(date -Iseconds)"
@@ -37,19 +46,19 @@ echo "────────────────────────�
 
 echo
 echo "[1/5] Rebuilding the inverted search index (this takes a minute) …"
-./bin/console app:search:rebuild --full
+"$PHP" bin/console app:search:rebuild --full
 
 echo
 echo "[2/5] Clearing the prod cache …"
-php bin/console cache:clear --env=prod
+"$PHP" bin/console cache:clear --env=prod
 
 echo
 echo "[3/5] Clearing the dev cache …"
-php bin/console cache:clear --env=dev
+"$PHP" bin/console cache:clear --env=dev
 
 echo
 echo "[4/5] Pinging IndexNow about recently-changed pages (best-effort) …"
-php bin/console app:indexnow:ping --recent --within=30 || true
+"$PHP" bin/console app:indexnow:ping --recent --within=30 || true
 
 echo
 echo "[5/5] Resetting PHP-site permissions …"

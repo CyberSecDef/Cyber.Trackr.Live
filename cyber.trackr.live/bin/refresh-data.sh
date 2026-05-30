@@ -66,6 +66,15 @@ set -euo pipefail
 export PATH=/usr/local/bin:/usr/bin:/bin
 cd "$(dirname "$0")/.."
 
+# DreamHost's default CLI php is 8.2, older than composer.json requires, so
+# default to the php84 build. Override with `PHP=php ./bin/refresh-data.sh`
+# (or any path) on hosts where the default php is already current.
+PHP="${PHP:-/usr/local/php84/bin/php}"
+if ! command -v "$PHP" >/dev/null 2>&1; then
+    echo "[refresh-data] PHP binary not found: $PHP (set PHP=/path/to/php)" >&2
+    exit 1
+fi
+
 echo "──────────────────────────────────────────"
 echo "  Cyber Trackr daily data refresh"
 echo "  $(date -Iseconds)"
@@ -73,35 +82,35 @@ echo "────────────────────────�
 
 echo
 echo "[1/8] Refreshing CISA KEV catalog …"
-php bin/console app:kev:refresh
+"$PHP" bin/console app:kev:refresh
 
 echo
 echo "[2/8] Syncing new STIG bundles from DISA (best-effort) …"
-php bin/console app:disa:sync-stig || true
+"$PHP" bin/console app:disa:sync-stig || true
 
 echo
 echo "[3/8] Syncing new SCAP benchmarks from DISA (best-effort) …"
-php bin/console app:disa:sync-scap || true
+"$PHP" bin/console app:disa:sync-scap || true
 
 echo
 echo "[4/8] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
-php bin/console app:stig:rebuild
+"$PHP" bin/console app:stig:rebuild
 
 echo
 echo "[5/8] Rebuilding companion-ZIP index for STIG pages …"
-php bin/console app:companion-zip:rebuild-index
+"$PHP" bin/console app:companion-zip:rebuild-index
 
 echo
 echo "[6/8] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
-php bin/console app:bulk-download:rebuild-index
+"$PHP" bin/console app:bulk-download:rebuild-index
 
 echo
 echo "[7/8] Syncing the inverted search index (incremental) …"
-php bin/console app:search:rebuild
+"$PHP" bin/console app:search:rebuild
 
 echo
 echo "[8/8] Pinging IndexNow about recent STIGs + KEV/vulns surfaces (best-effort) …"
-php bin/console app:indexnow:ping \
+"$PHP" bin/console app:indexnow:ping \
     --recent --within=1 \
     /vulnerabilities \
     /vulnerabilities/kev \
