@@ -228,7 +228,10 @@
             return;
         }
 
-        target.innerHTML = '<p class="plan-wizard__placeholder">Loading controls for ' + baseline + '…</p>';
+        var loading = document.createElement('p');
+        loading.className = 'plan-wizard__placeholder';
+        loading.textContent = 'Loading controls for ' + baseline + '…';
+        target.replaceChildren(loading);
 
         var url = window.planConfig.controlsUrlTemplate.replace('baseline-placeholder', encodeURIComponent(baseline));
         fetch(url, { credentials: 'same-origin' })
@@ -244,7 +247,10 @@
                 applyControlDispositionClasses();
             })
             .catch(function (err) {
-                target.innerHTML = '<p class="plan-wizard__placeholder">Could not load controls: ' + err.message + '</p>';
+                var error = document.createElement('p');
+                error.className = 'plan-wizard__placeholder';
+                error.textContent = 'Could not load controls: ' + err.message;
+                target.replaceChildren(error);
             });
     }
 
