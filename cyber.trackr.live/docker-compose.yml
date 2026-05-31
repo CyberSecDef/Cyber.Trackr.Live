@@ -1,0 +1,21 @@
+# Run the air-gapped image. After `docker load`, start it with:
+#   docker compose up -d
+# then browse http://localhost:8080
+services:
+  cyber-trackr:
+    image: cyber-trackr:latest
+    container_name: cyber-trackr
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      # Pin a stable secret to keep CSRF tokens valid across restarts.
+      # If unset, the container generates a throwaway one on each start.
+      # APP_SECRET: "change-me"
+    volumes:
+      - cyber_var:/app/var
+    restart: unless-stopped
+
+volumes:
+  cyber_var:

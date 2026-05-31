@@ -1,0 +1,25 @@
+# Keep the build context lean. resources/data/ is deliberately NOT ignored —
+# the whole point is to bake it into the image.
+.git
+.gitignore
+vendor/
+var/
+node_modules/
+tests/
+tests-e2e/
+playwright.config.js
+playwright-report/
+test-results/
+.playwright/
+.phpunit.cache/
+phpunit.xml.dist
+.env.local
+.env.*.local
+.env.test
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+*.tar
+*.tar.gz
+README.md
+DOCKER.md

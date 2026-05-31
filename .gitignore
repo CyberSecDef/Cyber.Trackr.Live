@@ -33,6 +33,17 @@
 # resources/data/zips/ stay tracked; only Compilation bundles are excluded.
 *Compilation*.zip
 
+# The Symfony app lives in the cyber.trackr.live/ subdirectory, so the
+# root-anchored /var/, /vendor/, /node_modules/ rules above don't reach it.
+# Ignore its generated/installed directories explicitly.
+/cyber.trackr.live/var/
+/cyber.trackr.live/vendor/
+/cyber.trackr.live/node_modules/
+
+# Air-gapped image tarballs produced by cyber.trackr.live/bin/build-image.sh
+# (multi-GB `docker save` output) — generated artifacts, never committed.
+/cyber.trackr.live/dist/
+
 # Baked version string written by `php bin/console app:version:freeze` at
 # deploy time. Generated, not authored — let dev compute live and let prod
 # read the file produced by CI.
