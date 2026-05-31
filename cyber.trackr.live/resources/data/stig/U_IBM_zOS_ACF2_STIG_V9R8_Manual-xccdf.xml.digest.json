@@ -1,0 +1,77 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115651,
+    "previous_mtime": 1777115712,
+    "digest": {
+        "previous": {
+            "version": "9",
+            "release": "7",
+            "date": "2025-12-15",
+            "released": "05 Jan 2026"
+        },
+        "current": {
+            "version": "9",
+            "release": "8",
+            "date": "2026-03-09",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [
+            {
+                "vuln_id": "V-223524",
+                "rule_id": "SV-223524r958804_rule",
+                "title": "The IBM z/OS TFTP Server program must be properly protected.",
+                "severity": "medium"
+            }
+        ],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-223519",
+                "rule_id": "SV-223519r1195303_rule",
+                "title": "IBM z/OS permission bits and user audit bits for HFS objects that are part of the FTP Server component must be properly configured.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-223592",
+                "rule_id": "SV-223592r1196248_rule",
+                "title": "IBM z/OS Syslog daemon must be properly defined and secured.",
+                "severity": "medium",
+                "fields": [
+                    "description",
+                    "check"
+                ]
+            },
+            {
+                "vuln_id": "V-223633",
+                "rule_id": "SV-223633r1195309_rule",
+                "title": "IBM z/OS UNIX security parameters for restricted network service(s) in /etc/inetd.conf must be properly specified.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-275951",
+                "rule_id": "SV-275951r1195460_rule",
+                "title": "ICSF resources must be protected in accordance with security requirements.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 1,
+            "severity_changed": 0,
+            "content_changed": 4,
+            "unchanged": 221
+        }
+    }
+}

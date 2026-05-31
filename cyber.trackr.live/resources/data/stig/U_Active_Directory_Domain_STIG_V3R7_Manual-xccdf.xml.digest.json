@@ -1,0 +1,40 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115725,
+    "previous_mtime": 1777115710,
+    "digest": {
+        "previous": {
+            "version": "3",
+            "release": "6",
+            "date": "2025-11-19",
+            "released": "05 Jan 2026"
+        },
+        "current": {
+            "version": "3",
+            "release": "7",
+            "date": "2026-02-11",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-243471",
+                "rule_id": "SV-243471r1186313_rule",
+                "title": "Local administrator accounts on domain systems must not share the same password.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 1,
+            "unchanged": 35
+        }
+    }
+}

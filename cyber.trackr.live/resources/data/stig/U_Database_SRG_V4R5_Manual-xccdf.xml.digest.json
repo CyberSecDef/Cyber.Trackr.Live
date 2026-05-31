@@ -1,0 +1,42 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115720,
+    "previous_mtime": 1777115712,
+    "digest": {
+        "previous": {
+            "version": "4",
+            "release": "4",
+            "date": "2025-09-15",
+            "released": "28 Oct 2025"
+        },
+        "current": {
+            "version": "4",
+            "release": "5",
+            "date": "2026-02-26",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-206603",
+                "rule_id": "SV-206603r1193220_rule",
+                "title": "The DBMS must only accept end entity certificates issued by DOD PKI or DOD-approved PKI Certification Authorities (CAs) for the establishment of all encrypted sessions.",
+                "severity": "medium",
+                "fields": [
+                    "description",
+                    "check",
+                    "fix"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 1,
+            "unchanged": 141
+        }
+    }
+}

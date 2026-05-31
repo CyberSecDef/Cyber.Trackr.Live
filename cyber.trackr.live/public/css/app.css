@@ -7690,3 +7690,181 @@ a.vulns-flag--kev:hover {
         margin-bottom: var(--space-3);
     }
 }
+
+/* ============================================================
+   STIG wizard (issue #15) — view-page launch CTA + wizard form
+   ============================================================ */
+
+.stig-wizard-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-4) 0 var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-xl);
+}
+
+.stig-wizard-cta__icon {
+    font-size: 26px;
+    color: var(--accent);
+    flex: 0 0 auto;
+}
+
+.stig-wizard-cta__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.stig-wizard-cta__text strong {
+    display: block;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.stig-wizard-cta__text p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.stig-wizard-cta__btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 639.98px) {
+    .stig-wizard-cta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Wizard form: reuse the plan-wizard look without coupling the two. */
+.stig-wizard__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-3) 0 var(--space-5);
+}
+
+.stig-wizard__upload {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stig-wizard__actions--bottom {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+}
+
+.stig-wizard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.stig-wizard__section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.stig-wizard__section > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-4) var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    color: var(--text);
+    transition: background-color 0.1s ease;
+}
+
+.stig-wizard__section > summary::-webkit-details-marker { display: none; }
+
+.stig-wizard__section > summary::after {
+    content: '+';
+    margin-left: auto;
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
+.stig-wizard__section[open] > summary::after { content: '−'; }
+
+.stig-wizard__section > summary:hover { background: var(--surface-2); }
+
+.stig-wizard__section-label { flex: 1; }
+
+.stig-wizard__section-body {
+    padding: var(--space-3) var(--space-5) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.form-field__help {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+
+.form-field input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 10px var(--space-3);
+    font-size: 14px;
+}
+
+.stig-wizard__radios,
+.stig-wizard__checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+}
+
+.stig-wizard__radio,
+.stig-wizard__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Reveal groups (free-text + follow-up questions) indent under their parent. */
+.stig-wizard__reveal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-left: var(--space-4);
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--border);
+}
+
+.stig-wizard__reveal[hidden] { display: none; }
+
+.cta-primary.is-busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.stig-wizard__noscript { color: var(--text-muted); }

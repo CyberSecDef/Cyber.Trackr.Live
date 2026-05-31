@@ -1,0 +1,40 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115720,
+    "previous_mtime": 1777115675,
+    "digest": {
+        "previous": {
+            "version": "3",
+            "release": "3",
+            "date": "2024-12-20",
+            "released": "30 Jan 2025"
+        },
+        "current": {
+            "version": "3",
+            "release": "4",
+            "date": "2026-03-04",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-221071",
+                "rule_id": "SV-221071r1195277_rule",
+                "title": "The Cisco switch must be configured to enforce approved authorizations for controlling the flow of information within the network based on organization-defined information flow control policies.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 1,
+            "unchanged": 77
+        }
+    }
+}

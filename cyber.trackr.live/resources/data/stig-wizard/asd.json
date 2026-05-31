@@ -1,0 +1,392 @@
+{
+    "_comment": "ASD STIG interview wizard schema. DRAFT — every status-changing action below is a best-effort applicability determination that REQUIRES SME review before use. The wizard JS reads `questions` to render an interview, then resolves `actions` against the blank CKLB skeleton. `rule_groups` are reusable named V-ID sets referenced as \"@name\". Merge rules: Not_Applicable is dominant; otherwise precedence Not_Applicable > Open > NotAFinding > Not_Reviewed; comments from all matching actions concatenate in question order. `{var}` tokens in comments interpolate the answer with that question/followup id. `always_apply` injects guidance comments without changing status. See README.md for the full schema contract.",
+
+    "meta": {
+        "stig_id": "Application_Security_and_Development",
+        "title": "Application Security and Development STIG",
+        "benchmark_version": "V6R4",
+        "source_file": "U_ASD_STIG_V6R4_Manual-xccdf.xml",
+        "rule_count": 286,
+        "authoring_status": "draft-needs-sme-review"
+    },
+
+    "defaults": {
+        "status": "Not_Reviewed",
+        "review_stamp": "[stig-wizard auto-determination — review required]"
+    },
+
+    "system_questions": [
+        { "id": "system_name",     "label": "System / application name",         "type": "text",     "required": true,  "help": "Official name of the application being assessed." },
+        { "id": "system_acronym",  "label": "Acronym / short name",              "type": "text",     "required": false },
+        { "id": "system_version",  "label": "Application version",               "type": "text",     "required": false },
+        { "id": "isso",            "label": "ISSO",                              "type": "text",     "required": false },
+        { "id": "issm",            "label": "ISSM",                              "type": "text",     "required": false }
+    ],
+
+    "rule_groups": {
+        "@web_session":        ["V-222388","V-222575","V-222576","V-222577","V-222578","V-222579","V-222580","V-222581","V-222582","V-222583"],
+        "@xss_csrf":           ["V-222602","V-222603"],
+        "@soap_saml":          ["V-222398","V-222399","V-222400","V-222401","V-222402","V-222403","V-222404","V-222405","V-222406","V-222573"],
+        "@xml_processing":     ["V-222593","V-222608"],
+        "@web_service_soa":    ["V-222534","V-222595","V-222625"],
+        "@pki_auth":           ["V-222550","V-222551","V-222552","V-222553"],
+        "@piv_cac":            ["V-222524","V-222525"],
+        "@piv_federated":      ["V-222557","V-222558","V-222559","V-222560"],
+        "@passwords":          ["V-222536","V-222537","V-222538","V-222539","V-222540","V-222541","V-222542","V-222543","V-222544","V-222545","V-222546","V-222547","V-222548","V-222554"],
+        "@mfa":                ["V-222523","V-222526","V-222527","V-222528","V-222530","V-222531"],
+        "@mobile_code":        ["V-222618","V-222665"],
+        "@non_local_maint":    ["V-222561","V-222562","V-222563","V-222564","V-222565","V-222566"],
+        "@account_core":       ["V-222387","V-222407","V-222411","V-222412","V-222413","V-222414","V-222415","V-222416","V-222417","V-222418","V-222419","V-222420","V-222421","V-222422","V-222430","V-222432","V-222433","V-222437","V-222462","V-222467","V-222549","V-222619","V-222661","V-222672"],
+        "@account_group":      ["V-222408","V-222478","V-222529"],
+        "@account_temp":       ["V-222409"],
+        "@account_emergency":  ["V-222410"],
+        "@logon_banner":       ["V-222434","V-222435"],
+        "@banner_public":      ["V-222436"],
+        "@classification_audit":["V-222453","V-222457","V-222461"],
+        "@classified_data":    ["V-265634","V-222664","V-222643"],
+        "@database":           ["V-222460","V-222607","V-222666"],
+        "@transaction":        ["V-222479"],
+        "@remote_access":      ["V-222396","V-222397"],
+        "@audit_aggregation":  ["V-222439","V-222487","V-222489","V-222490","V-222491","V-222492","V-222493","V-222494","V-222495","V-222496"],
+        "@sdlc_dev":           ["V-222515","V-222624","V-222625","V-222644","V-222645","V-222646","V-222647","V-222648","V-222649","V-222650","V-222652","V-222653","V-222654","V-222655","V-222657","V-222673","V-222632","V-222633"],
+        "@tiered_dmz":         ["V-222620","V-222671"]
+    },
+
+    "questions": [
+        {
+            "id": "has_user_accounts",
+            "label": "Does the application maintain its own user accounts and authentication?",
+            "help": "Answer No only if the application has no authenticated users at all, OR delegates 100% of authentication and account lifecycle to an external IdP/SSO and holds no local accounts of its own (including admin/service accounts it manages).",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@account_core", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "The application maintains no local user accounts; account-management, lockout, and account-audit requirements are not applicable. Authentication/account lifecycle is handled outside the application." },
+                        { "rules": "@account_group", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "No local accounts; shared/group account requirement not applicable." },
+                        { "rules": "@account_temp", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "No local accounts; temporary-account requirement not applicable." },
+                        { "rules": "@account_emergency", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "No local accounts; emergency-account requirement not applicable." },
+                        { "rules": "@logon_banner", "status": "Not_Applicable", "confidence": "low",
+                          "comment": "Application performs no interactive user logon; DoD logon-banner requirement not applicable. REVIEW: if any interactive logon exists (incl. via SSO redirect), the banner may still be required." },
+                        { "rules": "@mfa", "status": "Not_Applicable", "confidence": "low",
+                          "comment": "Application performs no local authentication; multifactor-authentication requirements are not applicable to the application (may be inherited from the IdP). REVIEW carefully." }
+                    ]
+                },
+                "yes": {
+                    "followups": [
+                        {
+                            "id": "roles_used",
+                            "label": "Does the application use roles / RBAC for authorization?",
+                            "type": "yesno_text",
+                            "text_label": "Briefly describe the role model (roles and what each may do).",
+                            "answers": {
+                                "yes": {
+                                    "actions": [
+                                        { "rules": ["V-222425","V-222426","V-222429"], "status": "Not_Reviewed", "confidence": "low",
+                                          "comment": "Role-based access control is implemented. Role model: {roles_used_text}" }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "id": "account_kinds",
+                            "label": "Which of these account kinds does the application actually use?",
+                            "type": "multiselect",
+                            "options": ["Temporary accounts", "Emergency accounts", "Shared / group accounts"],
+                            "help": "Unchecked kinds let the wizard mark the matching requirement Not Applicable.",
+                            "answers": {
+                                "not:Temporary accounts":  { "actions": [ { "rules": "@account_temp", "status": "Not_Applicable", "confidence": "high", "comment": "Application does not use temporary user accounts; requirement not applicable." } ] },
+                                "not:Emergency accounts":  { "actions": [ { "rules": "@account_emergency", "status": "Not_Applicable", "confidence": "high", "comment": "Application does not use emergency accounts; requirement not applicable." } ] },
+                                "not:Shared / group accounts": { "actions": [ { "rules": "@account_group", "status": "Not_Applicable", "confidence": "high", "comment": "Application does not use shared/group accounts; requirement not applicable." } ] }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "uses_passwords",
+            "label": "Does the application authenticate users with passwords it manages itself?",
+            "help": "Answer No if authentication is exclusively CAC/PIV/PKI, or is fully delegated to an external IdP/SSO that owns all password policy.",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@passwords", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "The application does not manage passwords (authentication is certificate-based and/or delegated to an external identity provider); password-policy requirements are not applicable to the application." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "uses_pki",
+            "label": "Does the application use PKI / certificate-based authentication (CAC, client certs)?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@pki_auth", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application does not use PKI-based authentication; certificate path-validation, private-key, identity-mapping, and revocation-cache requirements are not applicable." },
+                        { "rules": "@piv_cac", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "Application does not use PKI/PIV credentials for authentication; PIV accept/verify requirements not applicable. REVIEW: DoD generally mandates CAC/PIV — confirm an approved alternative authentication is authorized." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "federated_external_users",
+            "label": "Does the application accept identities from OTHER federal agencies or the public (federated / FICAM)?",
+            "help": "This is about non-organizational, cross-agency, or public federated logins — not your own organization's SSO.",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@piv_federated", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application serves only organizational users; acceptance/verification of other-agency PIV and FICAM third-party credentials is not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "web_based",
+            "label": "Is the application accessed through a web browser (HTML pages over HTTP/HTTPS)?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@web_session", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application is not browser-based; HTTP session-cookie and browser-session-identifier requirements are not applicable." },
+                        { "rules": "@xss_csrf", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application renders no HTML to a browser; Cross-Site Scripting and Cross-Site Request Forgery requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "internet_accessible",
+            "label": "Is the application accessible from the public Internet?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@banner_public", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application is not publicly accessible; the publicly-accessible-banner requirement is not applicable (the standard logon banner requirement still applies if there is interactive logon)." },
+                        { "rules": "@tiered_dmz", "status": "Not_Applicable", "confidence": "low",
+                          "comment": "Application is not Internet-facing; DMZ requirement may not apply. REVIEW against the actual network architecture." }
+                    ]
+                },
+                "yes": {
+                    "actions": [
+                        { "rules": ["V-222671"], "status": "Not_Reviewed", "confidence": "low",
+                          "comment": "Application is Internet-accessible — confirm a DMZ separates the DoD enclave from the public network." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "uses_database",
+            "label": "Does the application use a database?",
+            "type": "yesno_text",
+            "text_label": "Which DBMS (e.g., PostgreSQL 15, SQL Server 2019)?",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@database", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application uses no database; SQL-injection, database-object-audit, and database-export requirements are not applicable." }
+                    ]
+                },
+                "yes": {
+                    "actions": [
+                        { "rules": "@database", "status": "Not_Reviewed", "confidence": "low",
+                          "comment": "Application uses a database: {uses_database_text}" }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "uses_soap_saml",
+            "label": "Does the application use SOAP messages, WS-Security, or SAML assertions?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@soap_saml", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application does not use SOAP/WS-Security/SAML; SOAP message integrity, WS-Security timestamp, and SAML assertion requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "processes_xml",
+            "label": "Does the application parse or process XML input?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@xml_processing", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application does not process XML; XML-based DoS mitigation and XML-oriented attack requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "is_web_service",
+            "label": "Is the application a web service / API (SOA), exposing services consumed by other systems?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@web_service_soa", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "Application is not a web service / SOA endpoint; service-oriented mutual-TLS, web-service redundancy, and web-service execution-flow requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "uses_mobile_code",
+            "label": "Does the application deliver or use mobile code (Java applets, ActiveX, Flash/Silverlight, signed downloadable code)?",
+            "help": "DoD treats applets/ActiveX/Flash as mobile code. Ordinary first-party JavaScript served by your own web app is generally not what these two requirements target — answer No if you use no downloadable/categorized mobile code.",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@mobile_code", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "Application uses no categorized/emerging mobile code; mobile-code requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "data_classification",
+            "label": "What is the highest sensitivity of data the application processes?",
+            "type": "select",
+            "options": ["Unclassified (no CUI)", "CUI", "Classified (Confidential/Secret/Top Secret)", "Classified with SAMI"],
+            "answers": {
+                "Unclassified (no CUI)": {
+                    "actions": [
+                        { "rules": "@classified_data", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application processes only unclassified, non-CUI data; NSA-approved cryptography for classified data, classified-output marking, and Security Classification Guide requirements are not applicable." },
+                        { "rules": "@classification_audit", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "Application does not handle multiple classification categories/levels; audit requirements for access/modify/delete of information categories (classification levels) are not applicable." }
+                    ]
+                },
+                "Classified (Confidential/Secret/Top Secret)": {
+                    "actions": [
+                        { "rules": "@classified_data", "status": "Not_Reviewed", "confidence": "low",
+                          "comment": "Application processes classified data — NSA-approved cryptography, output marking, and a Security Classification Guide are required." }
+                    ]
+                },
+                "Classified with SAMI": {
+                    "actions": [
+                        { "rules": ["V-222621"], "status": "Not_Reviewed", "confidence": "low",
+                          "comment": "Application includes SAMI data — audit trails must be retained for five years." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "supports_remote_access",
+            "label": "Does the application support remote access sessions (users connecting from outside the local enclave)?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@remote_access", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "Application does not provide remote access sessions; remote-access encryption and integrity requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "non_local_maintenance",
+            "label": "Is the application used to perform non-local (remote) maintenance or diagnostic sessions on other systems?",
+            "help": "This targets management/diagnostic tools, not ordinary application use.",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@non_local_maint", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application is not used for non-local maintenance or diagnostic sessions; the non-local maintenance requirements are not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "transaction_based",
+            "label": "Is the application transaction-based (performs transactions requiring recovery logs)?",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@transaction", "status": "Not_Applicable", "confidence": "high",
+                          "comment": "Application is not transaction-based; the transaction-recovery-log requirement is not applicable." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "software_origin",
+            "label": "Is the software internally developed, GOTS, or COTS / third-party?",
+            "type": "select",
+            "options": ["Internally developed", "GOTS", "COTS / third-party"],
+            "answers": {
+                "COTS / third-party": {
+                    "actions": [
+                        { "rules": "@sdlc_dev", "status": "Not_Applicable", "confidence": "medium",
+                          "comment": "COTS/third-party product: code review, code-coverage, coding-standards, design-document, threat-model, defect-tracking, security-tester, SCM/CCB, and developer security-training requirements are the vendor's development-team responsibility, not the fielding organization's. REVIEW: your AO may prefer these documented as inherited/vendor-attested rather than Not Applicable; obtain vendor SDLC artifacts where available." }
+                    ]
+                }
+            }
+        },
+
+        {
+            "id": "audit_self_aggregation",
+            "label": "Does the application ITSELF provide centralized audit aggregation, review, reduction, and reporting (as opposed to only forwarding logs to an enterprise SIEM)?",
+            "help": "Many apps forward to Splunk/ACAS and rely on the SIEM for review/reduction/reporting.",
+            "type": "yesno",
+            "answers": {
+                "no": {
+                    "actions": [
+                        { "rules": "@audit_aggregation", "status": "Not_Applicable", "confidence": "low",
+                          "comment": "Audit aggregation, review, reduction, and report-generation are provided by the enterprise logging platform (e.g., SIEM), not the application. REVIEW: confirm with your AO — some assessors expect these documented as inherited from the centralized logging service rather than Not Applicable." }
+                    ]
+                }
+            }
+        }
+    ],
+
+    "always_apply": [
+        { "rules": ["V-222510","V-222511","V-222512","V-222513","V-222514","V-222518","V-222519","V-222628","V-222629","V-222630","V-222631","V-222663"],
+          "comment": "Configuration management / PPSM control — verify via the application's Configuration Management plan, CM repository controls, PPSM CAL registration, and Application Configuration Guide." },
+        { "rules": ["V-222506","V-222585","V-222586","V-222636","V-222637","V-222638","V-222639","V-222640"],
+          "comment": "Contingency / backup / fail-secure control — verify against the system Contingency Plan, backup schedule, and recovery procedures." },
+        { "rules": ["V-222613","V-222614","V-222658","V-222659","V-222660","V-222669","V-222670"],
+          "comment": "Patch / vendor-support / decommissioning control — verify the product is vendor-supported, patched current, and has documented update-notification and decommissioning procedures." },
+        { "rules": ["V-222621","V-222622","V-222623","V-222627","V-222651"],
+          "comment": "ISSO / governance responsibility — verify via system documentation (audit retention/review records, IA violation reporting, change-impact assessments)." },
+        { "rules": ["V-222604","V-222605","V-222606","V-222609","V-222610","V-222611","V-222612","V-222656","V-222567"],
+          "comment": "General secure-coding / input-handling control — applies to virtually all applications; verify via code review, SAST/DAST results, and testing." },
+        { "rules": ["V-222570","V-222571","V-222572","V-222584","V-222587","V-222588","V-222589","V-222596","V-222597","V-222598","V-222599","V-222641","V-222642","V-222423"],
+          "comment": "Cryptography / data-protection control — verify FIPS-validated modules and approved encryption are used for data at rest and in transit." }
+    ],
+
+    "provenance_note": "Every action with a status other than Not_Reviewed is an automated applicability determination produced by this wizard and stamped for reviewer attention. An assessor remains responsible for the final determination. Confidence values (high/medium/low) reflect the authoring SME's certainty that the gating question cleanly drives applicability; low-confidence determinations should always be manually confirmed."
+}

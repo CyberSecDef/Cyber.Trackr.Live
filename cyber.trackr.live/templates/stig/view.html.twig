@@ -75,6 +75,20 @@
             </div>
         </header>
 
+        {% if wizard_key %}
+            <aside class="stig-wizard-cta" aria-label="STIG checklist wizard">
+                <i class="bi bi-magic stig-wizard-cta__icon" aria-hidden="true"></i>
+                <div class="stig-wizard-cta__text">
+                    <strong>Generate a starter checklist</strong>
+                    <p>Answer a short set of questions about your application and download a pre-populated <code>.cklb</code> &mdash; applicable requirements pre-marked with rationale, ready to finish in the checklist viewer. Every auto-determination is flagged for your review.</p>
+                </div>
+                <a class="cta-primary stig-wizard-cta__btn" href="{{ path('stig_wizard', {title: title, version: version, release: release}) }}">
+                    <i class="bi bi-stars" aria-hidden="true"></i>
+                    Launch wizard
+                </a>
+            </aside>
+        {% endif %}
+
         <div class="stat-cards" role="group" aria-label="Severity filters">
             <button type="button" class="stat-card high active" data-bs-toggle="button" aria-pressed="true" onclick="stig_app.toggleFilter(this, 'high');" aria-label="Toggle {{ hi_count }} high-severity rules">
                 <span class="stat-card__num">{{ hi_count|number_format }}</span>

@@ -1,0 +1,162 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115719,
+    "previous_mtime": 1777115684,
+    "digest": {
+        "previous": {
+            "version": "2",
+            "release": "2",
+            "date": "2025-02-12",
+            "released": "02 Apr 2025"
+        },
+        "current": {
+            "version": "2",
+            "release": "3",
+            "date": "2026-02-25",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [
+            {
+                "vuln_id": "V-214362",
+                "rule_id": "SV-214362r960735_rule",
+                "title": "The Apache web server must limit the number of allowed simultaneous session requests.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214363",
+                "rule_id": "SV-214363r960735_rule",
+                "title": "The Apache web server must perform server-side session management.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214364",
+                "rule_id": "SV-214364r962395_rule",
+                "title": "The Apache web server must produce log records containing sufficient information to establish what type of events occurred.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214366",
+                "rule_id": "SV-214366r960963_rule",
+                "title": "The Apache web server must have resource mappings set to disable the serving of certain file types.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214369",
+                "rule_id": "SV-214369r1043177_rule",
+                "title": "The Apache web server must be configured to use a specified IP address and port.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214370",
+                "rule_id": "SV-214370r961038_rule",
+                "title": "The Apache web server must perform RFC 5280-compliant certification path validation.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214375",
+                "rule_id": "SV-214375r1067795_rule",
+                "title": "The Apache web server must invalidate session identifiers upon hosted application user logout or other session termination.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214377",
+                "rule_id": "SV-214377r1043180_rule",
+                "title": "The Apache web server must accept only system-generated session identifiers.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214378",
+                "rule_id": "SV-214378r1043181_rule",
+                "title": "The Apache web server must generate unique session identifiers that cannot be reliably reproduced.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214379",
+                "rule_id": "SV-214379r1043181_rule",
+                "title": "The Apache web server must generate a session ID using as much of the character set as possible to reduce the risk of brute force.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214381",
+                "rule_id": "SV-214381r961122_rule",
+                "title": "The Apache web server must be configured to provide clustering.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214384",
+                "rule_id": "SV-214384r961167_rule",
+                "title": "Warning and error messages displayed to clients must be modified to minimize the identity of the Apache web server, patches, loaded modules, and directory paths.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214385",
+                "rule_id": "SV-214385r961167_rule",
+                "title": "Debugging and trace information used to diagnose the Apache web server must be disabled.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214386",
+                "rule_id": "SV-214386r1043182_rule",
+                "title": "The Apache web server must set an absolute timeout for sessions.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214387",
+                "rule_id": "SV-214387r1043182_rule",
+                "title": "The Apache web server must set an inactive timeout for completing the TLS handshake.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214391",
+                "rule_id": "SV-214391r965407_rule",
+                "title": "The Apache web server must only accept client certificates issued by DoD PKI or DoD-approved PKI Certification Authorities (CAs).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214392",
+                "rule_id": "SV-214392r1067798_rule",
+                "title": "The Apache web server must be tuned to handle the operational requirements of the hosted application.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214393",
+                "rule_id": "SV-214393r961632_rule",
+                "title": "The Apache web server cookies, such as session cookies, sent to the client using SSL/TLS must not be compressed.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-214396",
+                "rule_id": "SV-214396r960759_rule",
+                "title": "An Apache web server must maintain the confidentiality of controlled information during transmission through the use of an approved TLS version.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-214397",
+                "rule_id": "SV-214397r961863_rule",
+                "title": "The Apache web server must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs.",
+                "severity": "low"
+            }
+        ],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-214390",
+                "rule_id": "SV-214390r1192950_rule",
+                "title": "The Apache web server must prohibit or restrict the use of nonsecure or unnecessary ports, protocols, modules, and/or services.",
+                "severity": "medium",
+                "fields": [
+                    "description",
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 20,
+            "severity_changed": 0,
+            "content_changed": 1,
+            "unchanged": 15
+        }
+    }
+}

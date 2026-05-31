@@ -1,0 +1,41 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115436,
+    "previous_mtime": 1777115436,
+    "digest": {
+        "previous": {
+            "version": "4",
+            "release": "7",
+            "date": "2018-06-20",
+            "released": "27 Jul 2018"
+        },
+        "current": {
+            "version": "4",
+            "release": "8",
+            "date": "2018-09-13",
+            "released": "26 Oct 2018"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-70157",
+                "rule_id": "SV-84779r2_rule",
+                "title": "The application must not display passwords/PINs as clear text.",
+                "severity": "high",
+                "fields": [
+                    "description",
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 1,
+            "unchanged": 288
+        }
+    }
+}

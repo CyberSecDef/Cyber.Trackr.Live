@@ -133,6 +133,82 @@
                 routeDroppedFile(e.dataTransfer.files[0]);
             });
         }
+
+        // STIG wizard handoff (issue #15): load a CKLB that the wizard stashed
+        // in sessionStorage, or fetch a server-built skeleton named in the URL.
+        loadHandoff() || loadSkeletonParam();
+    }
+
+    // ---------------------------------------------------------------------
+    //  STIG wizard handoff
+    // ---------------------------------------------------------------------
+
+    /**
+     * Adopt a fully-formed CKLB model object as the active checklist, exactly
+     * as if it had been parsed from a dropped file. Shared by both handoff
+     * paths below.
+     */
+    function adoptModel(cklbModel, filename, markDirtyFlag) {
+        model = cklbModel;
+        sourceFormat = "CKLB";
+        sourceFilename = filename || "generated.cklb";
+        originalSnapshot = JSON.stringify(model);
+        dirty = !!markDirtyFlag;
+        renderEverything();
+        showLoaded(true);
+    }
+
+    /**
+     * The wizard writes the generated CKLB JSON to sessionStorage and
+     * navigates here. We consume it once (then clear it so a refresh doesn't
+     * silently reload a stale draft).
+     */
+    function loadHandoff() {
+        var raw, meta = {};
+        try { raw = sessionStorage.getItem("cyber_ckl_handoff"); } catch (e) { return false; }
+        if (!raw) return false;
+        try {
+            meta = JSON.parse(sessionStorage.getItem("cyber_ckl_handoff_meta") || "{}");
+        } catch (e) { /* meta is optional */ }
+        try {
+            sessionStorage.removeItem("cyber_ckl_handoff");
+            sessionStorage.removeItem("cyber_ckl_handoff_meta");
+        } catch (e) { /* ignore */ }
+        try {
+            adoptModel(parseCklb(raw), meta.filename, meta.dirty);
+            return true;
+        } catch (e) {
+            console.error("CKL wizard handoff failed to parse:", e);
+            return false;
+        }
+    }
+
+    /**
+     * Convenience bridge for manual testing and direct links:
+     *   /ckl-viewer?skeleton=<title>&v=<version>&r=<release>
+     * fetches the server-built blank skeleton and loads it. The wizard itself
+     * uses the sessionStorage path above; this just lets the endpoint be
+     * exercised end-to-end without the wizard UI.
+     */
+    function loadSkeletonParam() {
+        var p = new URLSearchParams(location.search);
+        var title = p.get("skeleton"), v = p.get("v"), r = p.get("r");
+        if (!title || !v || !r) return false;
+        var url = "/stig/" + encodeURIComponent(title) + "/" +
+                  encodeURIComponent(v) + "/" + encodeURIComponent(r) + "/skeleton.cklb";
+        fetch(url, { credentials: "same-origin" })
+            .then(function (res) {
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                return res.text();
+            })
+            .then(function (txt) {
+                var stem = title.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+                adoptModel(parseCklb(txt), stem + "-v" + v + "r" + r + "-skeleton.cklb", false);
+            })
+            .catch(function (e) {
+                alert("Could not load STIG skeleton: " + (e && e.message ? e.message : e));
+            });
+        return true;
     }
 
     function wireDropZone(zone, input, handler) {

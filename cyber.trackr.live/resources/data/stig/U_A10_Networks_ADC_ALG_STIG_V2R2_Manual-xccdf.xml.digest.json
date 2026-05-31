@@ -1,0 +1,37 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115433,
+    "previous_mtime": 1777115433,
+    "digest": {
+        "previous": {
+            "version": "2",
+            "release": "1",
+            "date": "2021-03-25",
+            "released": "23 Apr 2021"
+        },
+        "current": {
+            "version": "2",
+            "release": "2",
+            "date": "2024-06-04",
+            "released": "24 Jul 2024"
+        },
+        "added": [
+            {
+                "vuln_id": "V-264425",
+                "rule_id": "SV-264425r992072_rule",
+                "title": "The A10 Networks ALG must be using a version supported by the vendor.",
+                "severity": "high"
+            }
+        ],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [],
+        "totals": {
+            "added": 1,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 0,
+            "unchanged": 33
+        }
+    }
+}

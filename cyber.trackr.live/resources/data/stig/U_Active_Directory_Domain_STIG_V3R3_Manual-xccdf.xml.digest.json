@@ -1,0 +1,49 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115437,
+    "previous_mtime": 1777115437,
+    "digest": {
+        "previous": {
+            "version": "3",
+            "release": "2",
+            "date": "2022-08-26",
+            "released": "14 Nov 2022"
+        },
+        "current": {
+            "version": "3",
+            "release": "3",
+            "date": "2023-02-09",
+            "released": "11 May 2023"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-243481",
+                "rule_id": "SV-243481r890559_rule",
+                "title": "Access to need-to-know information must be restricted to an authorized community of interest.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            },
+            {
+                "vuln_id": "V-243484",
+                "rule_id": "SV-243484r890561_rule",
+                "title": "Security identifiers (SIDs) must be configured to use only authentication data of directly trusted external or forest trust.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 2,
+            "unchanged": 34
+        }
+    }
+}

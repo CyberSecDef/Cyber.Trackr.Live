@@ -1,0 +1,61 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115719,
+    "previous_mtime": 1777115700,
+    "digest": {
+        "previous": {
+            "version": "3",
+            "release": "3",
+            "date": "2025-09-09",
+            "released": "01 Oct 2025"
+        },
+        "current": {
+            "version": "3",
+            "release": "4",
+            "date": "2026-02-25",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-222998",
+                "rule_id": "SV-222998r1193096_rule",
+                "title": "Changes to $CATALINA_HOME/bin/ folder must be logged.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-222999",
+                "rule_id": "SV-222999r1193098_rule",
+                "title": "Changes to $CATALINA_BASE/conf/ folder must be logged.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-223000",
+                "rule_id": "SV-223000r1193100_rule",
+                "title": "Changes to $CATALINA_HOME/lib/ folder must be logged.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 3,
+            "unchanged": 76
+        }
+    }
+}

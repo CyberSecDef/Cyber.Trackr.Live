@@ -1,0 +1,98 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115718,
+    "previous_mtime": 1777115700,
+    "digest": {
+        "previous": {
+            "version": "1",
+            "release": "1",
+            "date": "2025-07-15",
+            "released": "14 Jul 2025"
+        },
+        "current": {
+            "version": "1",
+            "release": "2",
+            "date": "2025-11-20",
+            "released": "05 Jan 2026"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-273999",
+                "rule_id": "SV-273999r1155171_rule",
+                "title": "Amazon Linux 2023 must be a vendor-supported release.",
+                "severity": "high",
+                "fields": [
+                    "description"
+                ]
+            },
+            {
+                "vuln_id": "V-274020",
+                "rule_id": "SV-274020r1155173_rule",
+                "title": "Amazon Linux 2023 must have the rsyslog package installed.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            },
+            {
+                "vuln_id": "V-274049",
+                "rule_id": "SV-274049r1120747_rule",
+                "title": "Amazon Linux 2023 must not permit direct logons to the root account using remote access via SSH.",
+                "severity": "medium",
+                "fields": [
+                    "description"
+                ]
+            },
+            {
+                "vuln_id": "V-274121",
+                "rule_id": "SV-274121r1155161_rule",
+                "title": "Amazon Linux 2023 library files must have mode \"755\" or less permissive.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-274122",
+                "rule_id": "SV-274122r1155164_rule",
+                "title": "Amazon Linux 2023 library files must be owned by root.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-274123",
+                "rule_id": "SV-274123r1155167_rule",
+                "title": "Amazon Linux 2023 library files must be group-owned by root or a system account.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            },
+            {
+                "vuln_id": "V-274166",
+                "rule_id": "SV-274166r1155170_rule",
+                "title": "Amazon Linux 2023 must terminate idle user sessions.",
+                "severity": "medium",
+                "fields": [
+                    "check",
+                    "fix"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 7,
+            "unchanged": 185
+        }
+    }
+}

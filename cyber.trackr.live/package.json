@@ -1,0 +1,11 @@
+{
+    "name": "cyber-trackr-live-e2e",
+    "private": true,
+    "description": "End-to-end browser tests (Playwright). The app itself is server-rendered PHP/Symfony; this is test-only tooling.",
+    "scripts": {
+        "test:e2e": "playwright test"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.60.0"
+    }
+}

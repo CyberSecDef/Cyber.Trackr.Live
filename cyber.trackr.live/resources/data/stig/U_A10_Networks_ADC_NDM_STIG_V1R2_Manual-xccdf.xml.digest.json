@@ -1,0 +1,482 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115433,
+    "previous_mtime": 1777115433,
+    "digest": {
+        "previous": {
+            "version": "1",
+            "release": "1",
+            "date": "2016-04-15",
+            "released": "15 Apr 2016"
+        },
+        "current": {
+            "version": "1",
+            "release": "2",
+            "date": "2024-06-04",
+            "released": "24 Jul 2024"
+        },
+        "added": [
+            {
+                "vuln_id": "V-255587",
+                "rule_id": "SV-255587r960735_rule",
+                "title": "The A10 Networks ADC must limit the number of concurrent sessions to one (1) for each administrator account and/or administrator account type.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255588",
+                "rule_id": "SV-255588r960840_rule",
+                "title": "The A10 Networks ADC must enforce the limit of three consecutive invalid logon attempts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255589",
+                "rule_id": "SV-255589r960843_rule",
+                "title": "The A10 Networks ADC must display the Standard Mandatory DoD Notice and Consent Banner before granting access to the device.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255590",
+                "rule_id": "SV-255590r961863_rule",
+                "title": "The A10 Networks ADC must allow only the ISSM (or individuals or roles appointed by the ISSM) Root, Read Write, or Read Only privileges.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255591",
+                "rule_id": "SV-255591r960900_rule",
+                "title": "The A10 Networks ADC must produce audit log records containing information (FQDN, unique hostname, management or loopback IP address) to establish the source of events.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255592",
+                "rule_id": "SV-255592r960909_rule",
+                "title": "The A10 Networks ADC must have command auditing enabled.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255593",
+                "rule_id": "SV-255593r961863_rule",
+                "title": "The A10 Networks ADC must alert the ISSO and SA (at a minimum) in the event of an audit processing failure.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255594",
+                "rule_id": "SV-255594r961863_rule",
+                "title": "The A10 Networks ADC must back up audit records at least every seven days onto a different system or system component than the system or component being audited.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255595",
+                "rule_id": "SV-255595r960966_rule",
+                "title": "The A10 Networks ADC must disable management protocol access to all interfaces except the management interface.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255596",
+                "rule_id": "SV-255596r961863_rule",
+                "title": "The A10 Networks ADC must not have any shared accounts (other than the emergency administration account).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255597",
+                "rule_id": "SV-255597r961863_rule",
+                "title": "The A10 Networks ADC must not use the default admin account.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-255598",
+                "rule_id": "SV-255598r960993_rule",
+                "title": "The A10 Networks ADC must implement replay-resistant authentication mechanisms for network access to privileged accounts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255599",
+                "rule_id": "SV-255599r961029_rule",
+                "title": "The A10 Networks ADC must prohibit the use of unencrypted protocols for network access to privileged accounts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255600",
+                "rule_id": "SV-255600r961068_rule",
+                "title": "The A10 Networks ADC must terminate management sessions after 10 minutes of inactivity except to fulfill documented and validated mission requirements.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-255601",
+                "rule_id": "SV-255601r961863_rule",
+                "title": "The A10 Networks ADC must reveal error messages only to authorized individuals (ISSO, ISSM, and SA).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255602",
+                "rule_id": "SV-255602r961863_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are created.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-255603",
+                "rule_id": "SV-255603r961863_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are modified.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255604",
+                "rule_id": "SV-255604r961863_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are disabled.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255605",
+                "rule_id": "SV-255605r961863_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are removed.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255606",
+                "rule_id": "SV-255606r984107_rule",
+                "title": "When anyone who has access to the emergency administration account no longer requires access to it or leaves the organization, the password for the emergency administration account must be changed.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255607",
+                "rule_id": "SV-255607r961863_rule",
+                "title": "The A10 Networks ADC must notify System Administrators (SAs) and Information System Security Officers (ISSMs) when accounts are created, or enabled when previously disabled.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255608",
+                "rule_id": "SV-255608r961863_rule",
+                "title": "The A10 Networks ADC must automatically lock the account until the locked account is released by an administrator when three unsuccessful logon attempts in 15 minutes are exceeded.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255609",
+                "rule_id": "SV-255609r961401_rule",
+                "title": "The A10 Networks ADC must send Emergency messages to the Console, Syslog, and Monitor.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255610",
+                "rule_id": "SV-255610r961863_rule",
+                "title": "The A10 Networks ADC must compare internal information system clocks at least every 24 hours with an authoritative time server.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255611",
+                "rule_id": "SV-255611r961863_rule",
+                "title": "The A10 Networks ADC must synchronize internal information system clocks to the authoritative time source when the time difference is greater than one second.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-255612",
+                "rule_id": "SV-255612r987682_rule",
+                "title": "The A10 Networks ADC must be configured to synchronize internal information system clocks with the primary and secondary time sources located in different geographic regions using redundant authoritative time sources.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255613",
+                "rule_id": "SV-255613r961443_rule",
+                "title": "The A10 Networks ADC must record time stamps for audit records that can be mapped to Coordinated Universal Time (UTC) or Greenwich Mean Time (GMT).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255614",
+                "rule_id": "SV-255614r961506_rule",
+                "title": "The A10 Networks ADC must authenticate Network Time Protocol sources.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255615",
+                "rule_id": "SV-255615r961554_rule",
+                "title": "Operators of the A10 Networks ADC must not use the Telnet client built into the device.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255616",
+                "rule_id": "SV-255616r961557_rule",
+                "title": "The A10 Networks ADC must not use SNMP Versions 1 or 2.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-255617",
+                "rule_id": "SV-255617r961860_rule",
+                "title": "The A10 Networks ADC must off-load audit records onto a different system or media than the system being audited.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255618",
+                "rule_id": "SV-255618r961863_rule",
+                "title": "The A10 Networks ADC must use automated mechanisms to alert security personnel to threats identified by authoritative sources (e.g., CTOs) and IAW CJCSM 6510.01B.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255619",
+                "rule_id": "SV-255619r961863_rule",
+                "title": "The A10 Networks ADC must employ centrally managed authentication server(s).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255620",
+                "rule_id": "SV-255620r961863_rule",
+                "title": "The A10 Networks ADC must use DoD-approved PKI rather than proprietary or self-signed device certificates.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255621",
+                "rule_id": "SV-255621r960801_rule",
+                "title": "The A10 Networks ADC must restrict management connections to the management network.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255622",
+                "rule_id": "SV-255622r961554_rule",
+                "title": "The A10 Networks ADC must only allow the use of secure protocols that implement cryptographic mechanisms to protect the integrity of maintenance and diagnostic communications for nonlocal maintenance sessions.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-255623",
+                "rule_id": "SV-255623r961863_rule",
+                "title": "The A10 Networks ADC must not use the default enable password.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-264426",
+                "rule_id": "SV-264426r992075_rule",
+                "title": "The A10 Networks NDM must be using a version supported by the vendor.",
+                "severity": "high"
+            }
+        ],
+        "removed": [
+            {
+                "vuln_id": "V-68031",
+                "rule_id": "SV-82521r1_rule",
+                "title": "The A10 Networks ADC must limit the number of concurrent sessions to one (1) for each administrator account and/or administrator account type.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68033",
+                "rule_id": "SV-82523r1_rule",
+                "title": "The A10 Networks ADC must enforce the limit of three consecutive invalid logon attempts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68035",
+                "rule_id": "SV-82525r1_rule",
+                "title": "The A10 Networks ADC must display the Standard Mandatory DoD Notice and Consent Banner before granting access to the device.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68037",
+                "rule_id": "SV-82527r1_rule",
+                "title": "The A10 Networks ADC must allow only the ISSM (or individuals or roles appointed by the ISSM) Root, Read Write, or Read Only privileges.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68039",
+                "rule_id": "SV-82529r1_rule",
+                "title": "The A10 Networks ADC must produce audit log records containing information (FQDN, unique hostname, management or loopback IP address) to establish the source of events.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68041",
+                "rule_id": "SV-82531r1_rule",
+                "title": "The A10 Networks ADC must have command auditing enabled.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68043",
+                "rule_id": "SV-82533r1_rule",
+                "title": "The A10 Networks ADC must alert the ISSO and SA (at a minimum) in the event of an audit processing failure.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68045",
+                "rule_id": "SV-82535r1_rule",
+                "title": "The A10 Networks ADC must back up audit records at least every seven days onto a different system or system component than the system or component being audited.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68047",
+                "rule_id": "SV-82537r1_rule",
+                "title": "The A10 Networks ADC must disable management protocol access to all interfaces except the management interface.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68049",
+                "rule_id": "SV-82539r1_rule",
+                "title": "The A10 Networks ADC must not have any shared accounts (other than the emergency administration account).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68051",
+                "rule_id": "SV-82541r1_rule",
+                "title": "The A10 Networks ADC must not use the default admin account.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-68053",
+                "rule_id": "SV-82543r1_rule",
+                "title": "The A10 Networks ADC must implement replay-resistant authentication mechanisms for network access to privileged accounts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68055",
+                "rule_id": "SV-82545r1_rule",
+                "title": "The A10 Networks ADC must prohibit the use of unencrypted protocols for network access to privileged accounts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68057",
+                "rule_id": "SV-82547r1_rule",
+                "title": "The A10 Networks ADC must terminate management sessions after 10 minutes of inactivity except to fulfill documented and validated mission requirements.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-68059",
+                "rule_id": "SV-82549r1_rule",
+                "title": "The A10 Networks ADC must reveal error messages only to authorized individuals (ISSO, ISSM, and SA).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68061",
+                "rule_id": "SV-82551r1_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are created.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-68063",
+                "rule_id": "SV-82553r1_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are modified.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68065",
+                "rule_id": "SV-82555r1_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are disabled.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68067",
+                "rule_id": "SV-82557r1_rule",
+                "title": "The A10 Networks ADC must generate alerts to the administrators and ISSO when accounts are removed.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68069",
+                "rule_id": "SV-82559r1_rule",
+                "title": "When anyone who has access to the emergency administration account no longer requires access to it or leaves the organization, the password for the emergency administration account must be changed.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68071",
+                "rule_id": "SV-82561r1_rule",
+                "title": "The A10 Networks ADC must notify System Administrators (SAs) and Information System Security Officers (ISSMs) when accounts are created, or enabled when previously disabled.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68073",
+                "rule_id": "SV-82563r1_rule",
+                "title": "The A10 Networks ADC must automatically lock the account until the locked account is released by an administrator when three unsuccessful logon attempts in 15 minutes are exceeded.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68075",
+                "rule_id": "SV-82565r1_rule",
+                "title": "The A10 Networks ADC must send Emergency messages to the Console, Syslog, and Monitor.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68077",
+                "rule_id": "SV-82567r1_rule",
+                "title": "The A10 Networks ADC must compare internal information system clocks at least every 24 hours with an authoritative time server.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68079",
+                "rule_id": "SV-82569r1_rule",
+                "title": "The A10 Networks ADC must synchronize internal information system clocks to the authoritative time source when the time difference is greater than one second.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-68081",
+                "rule_id": "SV-82571r1_rule",
+                "title": "The A10 Networks ADC must be configured to synchronize internal information system clocks with the primary and secondary time sources located in different geographic regions using redundant authoritative time sources.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68083",
+                "rule_id": "SV-82573r1_rule",
+                "title": "The A10 Networks ADC must record time stamps for audit records that can be mapped to Coordinated Universal Time (UTC) or Greenwich Mean Time (GMT).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68085",
+                "rule_id": "SV-82575r1_rule",
+                "title": "The A10 Networks ADC must authenticate Network Time Protocol sources.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68087",
+                "rule_id": "SV-82577r1_rule",
+                "title": "Operators of the A10 Networks ADC must not use the Telnet client built into the device.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68089",
+                "rule_id": "SV-82579r1_rule",
+                "title": "The A10 Networks ADC must not use SNMP Versions 1 or 2.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-68091",
+                "rule_id": "SV-82581r1_rule",
+                "title": "The A10 Networks ADC must off-load audit records onto a different system or media than the system being audited.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68093",
+                "rule_id": "SV-82583r1_rule",
+                "title": "The A10 Networks ADC must not use the default enable password.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-68095",
+                "rule_id": "SV-82585r1_rule",
+                "title": "The A10 Networks ADC must only allow the use of secure protocols that implement cryptographic mechanisms to protect the integrity of maintenance and diagnostic communications for nonlocal maintenance sessions.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68097",
+                "rule_id": "SV-82587r1_rule",
+                "title": "The A10 Networks ADC must restrict management connections to the management network.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68099",
+                "rule_id": "SV-82589r1_rule",
+                "title": "The A10 Networks ADC must use DoD-approved PKI rather than proprietary or self-signed device certificates.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68101",
+                "rule_id": "SV-82591r1_rule",
+                "title": "The A10 Networks ADC must use automated mechanisms to alert security personnel to threats identified by authoritative sources (e.g., CTOs) and IAW CJCSM 6510.01B.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-68103",
+                "rule_id": "SV-82593r1_rule",
+                "title": "The A10 Networks ADC must employ centrally managed authentication server(s).",
+                "severity": "medium"
+            }
+        ],
+        "severity_changed": [],
+        "content_changed": [],
+        "totals": {
+            "added": 38,
+            "removed": 37,
+            "severity_changed": 0,
+            "content_changed": 0,
+            "unchanged": 0
+        }
+    }
+}

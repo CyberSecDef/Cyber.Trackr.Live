@@ -1,0 +1,464 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115433,
+    "previous_mtime": 1777115433,
+    "digest": {
+        "previous": {
+            "version": "2",
+            "release": "13",
+            "date": "2019-03-21",
+            "released": "26 Apr 2019"
+        },
+        "current": {
+            "version": "3",
+            "release": "1",
+            "date": "2021-10-05",
+            "released": "01 Nov 2021"
+        },
+        "added": [
+            {
+                "vuln_id": "V-243466",
+                "rule_id": "SV-243466r723433_rule",
+                "title": "Membership to the Enterprise Admins group must be restricted to accounts used only to manage the Active Directory Forest.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-243467",
+                "rule_id": "SV-243467r723436_rule",
+                "title": "Membership to the Domain Admins group must be restricted to accounts used only to manage the Active Directory domain and domain controllers.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-243468",
+                "rule_id": "SV-243468r723439_rule",
+                "title": "Administrators must have separate accounts specifically for managing domain member servers.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243469",
+                "rule_id": "SV-243469r723442_rule",
+                "title": "Administrators must have separate accounts specifically for managing domain workstations.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243470",
+                "rule_id": "SV-243470r723445_rule",
+                "title": "Delegation of privileged accounts must be prohibited.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-243471",
+                "rule_id": "SV-243471r804653_rule",
+                "title": "Local administrator accounts on domain systems must not share the same password.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243472",
+                "rule_id": "SV-243472r723451_rule",
+                "title": "Separate smart cards must be used for Enterprise Admin (EA) and Domain Admin (DA) accounts from smart cards used for other accounts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243473",
+                "rule_id": "SV-243473r723565_rule",
+                "title": "Separate domain accounts must be used to manage public facing servers from any domain accounts used to manage internal servers.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243474",
+                "rule_id": "SV-243474r723457_rule",
+                "title": "Windows service \\ application accounts with administrative privileges and manually managed passwords,  must have passwords changed at least every 60 days.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243475",
+                "rule_id": "SV-243475r723460_rule",
+                "title": "Domain controllers must be blocked from Internet access.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243476",
+                "rule_id": "SV-243476r723463_rule",
+                "title": "All accounts, privileged and unprivileged, that require smart cards must have the underlying NT hash rotated at least every 60 days.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243477",
+                "rule_id": "SV-243477r723466_rule",
+                "title": "User accounts with domain level administrative privileges must be members of the Protected Users group in domains with a domain functional level of Windows 2012 R2 or higher.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243478",
+                "rule_id": "SV-243478r723469_rule",
+                "title": "Domain-joined systems (excluding domain controllers) must not be configured for unconstrained delegation.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243479",
+                "rule_id": "SV-243479r723472_rule",
+                "title": "The Directory Service Restore Mode (DSRM) password must be changed at least annually.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243480",
+                "rule_id": "SV-243480r723563_rule",
+                "title": "The domain functional level must be at a Windows Server version still supported by Microsoft.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243481",
+                "rule_id": "SV-243481r723478_rule",
+                "title": "Access to need-to-know information must be restricted to an authorized community of interest.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243482",
+                "rule_id": "SV-243482r723481_rule",
+                "title": "Interconnections between DoD directory services of different classification levels must use a cross-domain solution that is approved for use with inter-classification trusts.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-243483",
+                "rule_id": "SV-243483r723559_rule",
+                "title": "A controlled interface must have interconnections among DoD information systems operating between DoD and non-DoD systems or networks.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-243484",
+                "rule_id": "SV-243484r723487_rule",
+                "title": "Security identifiers (SIDs) must be configured to use only authentication data of directly trusted external or forest trust.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243485",
+                "rule_id": "SV-243485r723490_rule",
+                "title": "Selective Authentication must be enabled on outgoing forest trusts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243486",
+                "rule_id": "SV-243486r723493_rule",
+                "title": "The Anonymous Logon and Everyone groups must not be members of the Pre-Windows 2000 Compatible Access group.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243487",
+                "rule_id": "SV-243487r723496_rule",
+                "title": "Membership in the Group Policy Creator Owners and Incoming Forest Trust Builders groups must be limited.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243488",
+                "rule_id": "SV-243488r723555_rule",
+                "title": "User accounts with delegated authority must be removed from Windows built-in administrative groups or remove the delegated authority from the accounts.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-243489",
+                "rule_id": "SV-243489r723564_rule",
+                "title": "Read-only Domain Controller (RODC) architecture and configuration must comply with directory services requirements.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243490",
+                "rule_id": "SV-243490r723505_rule",
+                "title": "Usage of administrative accounts must be monitored for suspicious and anomalous activity.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243491",
+                "rule_id": "SV-243491r723508_rule",
+                "title": "Systems must be monitored for attempts to use local accounts to log on remotely from other systems.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243492",
+                "rule_id": "SV-243492r723511_rule",
+                "title": "Systems must be monitored for remote desktop logons.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243493",
+                "rule_id": "SV-243493r723514_rule",
+                "title": "Active Directory data must be backed up daily for systems with a Risk Management Framework categorization for Availability of moderate or high.  Systems with a categorization of low must be backed up weekly.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243494",
+                "rule_id": "SV-243494r723517_rule",
+                "title": "Each cross-directory authentication configuration must be documented.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-243495",
+                "rule_id": "SV-243495r723520_rule",
+                "title": "A VPN must be used to protect directory network traffic for directory service implementation spanning enclave boundaries.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243496",
+                "rule_id": "SV-243496r804648_rule",
+                "title": "Accounts from outside directories that are not part of the same organization or are not subject to the same security policies must be removed from all highly privileged groups.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243497",
+                "rule_id": "SV-243497r723526_rule",
+                "title": "Inter-site replication must be enabled and configured to occur at least daily.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243498",
+                "rule_id": "SV-243498r723529_rule",
+                "title": "If a VPN is used in the AD implementation, the traffic must be inspected by the network Intrusion detection system (IDS).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243499",
+                "rule_id": "SV-243499r723532_rule",
+                "title": "Active Directory implementation information must be added to the organization contingency plan where the Risk Management Framework categorization for Availability is moderate or high.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-243500",
+                "rule_id": "SV-243500r723535_rule",
+                "title": "Active Directory must be supported by multiple domain controllers where the Risk Management Framework categorization for Availability is moderate or high.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-243501",
+                "rule_id": "SV-243501r723557_rule",
+                "title": "The impact of INFOCON changes on the cross-directory authentication configuration must be considered and procedures documented.",
+                "severity": "low"
+            }
+        ],
+        "removed": [
+            {
+                "vuln_id": "V-25385",
+                "rule_id": "SV-31547r3_rule",
+                "title": "Active Directory data must be backed up daily for systems with a Risk Management Framework categorization for Availability of moderate or high.  Systems with a categorization of low must be backed up weekly.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-25840",
+                "rule_id": "SV-32179r3_rule",
+                "title": "The Directory Service Restore Mode (DSRM) password must be changed at least annually.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-25997",
+                "rule_id": "SV-32648r2_rule",
+                "title": "Read-only Domain Controller (RODC) architecture and configuration must comply with directory services requirements.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-36431",
+                "rule_id": "SV-47837r2_rule",
+                "title": "Membership to the Enterprise Admins group must be restricted to accounts used only to manage the Active Directory Forest.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-36432",
+                "rule_id": "SV-47838r2_rule",
+                "title": "Membership to the Domain Admins group must be restricted to accounts used only to manage the Active Directory domain and domain controllers.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-36433",
+                "rule_id": "SV-47839r2_rule",
+                "title": "Administrators must have separate accounts specifically for managing domain member servers.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-36434",
+                "rule_id": "SV-47840r2_rule",
+                "title": "Administrators must have separate accounts specifically for managing domain workstations.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-36435",
+                "rule_id": "SV-47841r2_rule",
+                "title": "Delegation of privileged accounts must be prohibited.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-36438",
+                "rule_id": "SV-47844r5_rule",
+                "title": "Local administrator accounts on domain systems must not share the same password.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-43648",
+                "rule_id": "SV-56469r2_rule",
+                "title": "Separate smart cards must be used for Enterprise Admin (EA) and Domain Admin (DA) accounts from smart cards used for other accounts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-43652",
+                "rule_id": "SV-56473r2_rule",
+                "title": "Separate domain accounts must be used to manage public facing servers from any domain accounts used to manage internal servers.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-43712",
+                "rule_id": "SV-56533r4_rule",
+                "title": "Usage of administrative accounts must be monitored for suspicious and anomalous activity.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-43713",
+                "rule_id": "SV-56534r4_rule",
+                "title": "Systems must be monitored for attempts to use local accounts to log on remotely from other systems.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-43714",
+                "rule_id": "SV-56535r4_rule",
+                "title": "Systems must be monitored for remote desktop logons.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-44059",
+                "rule_id": "SV-56889r2_rule",
+                "title": "Windows service \\ application accounts with administrative privileges and manually managed passwords,  must have passwords changed at least every 60 days.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-53727",
+                "rule_id": "SV-67945r1_rule",
+                "title": "Domain controllers must be blocked from Internet access.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-72821",
+                "rule_id": "SV-87467r1_rule",
+                "title": "All accounts, privileged and unprivileged, that require smart cards must have the underlying NT hash rotated at least every 60 days.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-78131",
+                "rule_id": "SV-92837r3_rule",
+                "title": "User accounts with domain level administrative privileges must be members of the Protected Users group in domains with a domain functional level of Windows 2012 R2 or higher.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8521",
+                "rule_id": "SV-9018r3_rule",
+                "title": "User accounts with delegated authority must be removed from Windows built-in administrative groups or remove the delegated authority from the accounts.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-8522",
+                "rule_id": "SV-30991r3_rule",
+                "title": "A VPN must be used to protect directory network traffic for directory service implementation spanning enclave boundaries.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8523",
+                "rule_id": "SV-30994r3_rule",
+                "title": "If a VPN is used in the AD implementation, the traffic must be inspected by the network Intrusion detection system (IDS).",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8524",
+                "rule_id": "SV-30996r3_rule",
+                "title": "Active Directory must be supported by multiple domain controllers where the Risk Management Framework categorization for Availability is moderate or high.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8525",
+                "rule_id": "SV-30995r4_rule",
+                "title": "Active Directory implementation information must be added to the organization contingency plan where the Risk Management Framework categorization for Availability is moderate or high.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-8526",
+                "rule_id": "SV-31214r2_rule",
+                "title": "The impact of INFOCON changes on the cross-directory authentication configuration must be considered and procedures documented.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-8530",
+                "rule_id": "SV-30989r3_rule",
+                "title": "Each cross-directory authentication configuration must be documented.",
+                "severity": "low"
+            },
+            {
+                "vuln_id": "V-8533",
+                "rule_id": "SV-9030r2_rule",
+                "title": "Access to need-to-know information must be restricted to an authorized community of interest.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8534",
+                "rule_id": "SV-9031r2_rule",
+                "title": "Interconnections between DoD directory services of different classification levels must use a cross-domain solution that is approved for use with inter-classification trusts.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-8536",
+                "rule_id": "SV-9033r2_rule",
+                "title": "A controlled interface must have interconnections among DoD information systems operating between DoD and non-DoD systems or networks.",
+                "severity": "high"
+            },
+            {
+                "vuln_id": "V-8538",
+                "rule_id": "SV-9035r3_rule",
+                "title": "Security identifiers (SIDs) must be configured to use only authentication data of directly trusted external or forest trust.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8540",
+                "rule_id": "SV-9037r3_rule",
+                "title": "Selective Authentication must be enabled on outgoing forest trusts.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8547",
+                "rule_id": "SV-9044r3_rule",
+                "title": "The Anonymous Logon and Everyone groups must not be members of the Pre-Windows 2000 Compatible Access group.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8548",
+                "rule_id": "SV-9045r3_rule",
+                "title": "Membership in the Group Policy Creator Owners and Incoming Forest Trust Builders groups must be limited.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8549",
+                "rule_id": "SV-31557r2_rule",
+                "title": "Accounts from outside directories that are not part of the same organization or are not subject to the same security policies must be removed from all highly privileged groups.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8551",
+                "rule_id": "SV-9048r4_rule",
+                "title": "The domain functional level must be at a Windows Server version still supported by Microsoft.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-8553",
+                "rule_id": "SV-30992r3_rule",
+                "title": "Inter-site replication must be enabled and configured to occur at least daily.",
+                "severity": "medium"
+            },
+            {
+                "vuln_id": "V-92285",
+                "rule_id": "SV-102373r1_rule",
+                "title": "Domain-joined systems (excluding domain controllers) must not be configured for unconstrained delegation.",
+                "severity": "medium"
+            }
+        ],
+        "severity_changed": [],
+        "content_changed": [],
+        "totals": {
+            "added": 36,
+            "removed": 36,
+            "severity_changed": 0,
+            "content_changed": 0,
+            "unchanged": 0
+        }
+    }
+}

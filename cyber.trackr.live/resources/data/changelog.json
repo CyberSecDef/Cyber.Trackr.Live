@@ -1,6 +1,78 @@
 {
-    "frozen_at": "2026-05-16T00:53:04+00:00",
+    "frozen_at": "2026-05-30T18:49:07+00:00",
     "entries": [
+        {
+            "hash": "3328f0677fb3b352d7dd26c31a085233fb073182",
+            "short_hash": "3328f06",
+            "subject": "fix(ops): run console scripts under an explicit PHP binary",
+            "summary": "DreamHost's default CLI php is 8.2, older than the deployed Symfony requires. refresh-data.sh and deploy.sh now default to the php84 build (override with PHP=...); ship.sh defaults to dev's php.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-30T14:45:17-04:00",
+            "date_human": "May 30, 2026 · 14:45"
+        },
+        {
+            "hash": "2e880e6782004b9efc424e521b10d7a7e59ea982",
+            "short_hash": "2e880e6",
+            "subject": "fix(security): resolve XSS in plans wizard + patch twig/symfony CVEs",
+            "summary": "plans.js: replace two innerHTML string concatenations with textContent so the baseline value and exception message can't be reinterpreted as HTML (CodeQL js/xss-through-dom, js/xss-through-exception).",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-30T14:11:57-04:00",
+            "date_human": "May 30, 2026 · 14:11"
+        },
+        {
+            "hash": "0ea63f603a8786d9e86a2e0d4766395582079ef9",
+            "short_hash": "0ea63f6",
+            "subject": "feat(ops): close the automation gaps before deploy",
+            "summary": "Cross-referencing every console command against ship.sh / deploy.sh / refresh-data.sh surfaced five things that needed regular running but weren't wired anywhere.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-16T10:16:04-04:00",
+            "date_human": "May 16, 2026 · 10:16"
+        },
+        {
+            "hash": "a4130860011591634687b79ee8b171dcab8c288d",
+            "short_hash": "a413086",
+            "subject": "chore(deploy): run fix-perms.sh as the final deploy step",
+            "summary": "Adds the script to the deploy.sh sequence so prod permissions are guaranteed to be reset on every deploy — easy to forget when deploying by hand. Runs after cache:clear so any cache files regenerated under a weird umask get normalized.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-16T09:55:24-04:00",
+            "date_human": "May 16, 2026 · 09:55"
+        },
+        {
+            "hash": "18d735397d7389246ce2433470f39b66cc04a283",
+            "short_hash": "18d7353",
+            "subject": "feat(ops): wire DISA STIG/SCAP catalog sync into the daily cron",
+            "summary": "Extracts the shared scrape logic from /stig/disa_download and /scap/disa_download controllers into a DisaCatalogSyncer service, exposes it as app:disa:sync-stig and app:disa:sync-scap (each with --dry-run), and wires both into bin/refresh-data.sh (best-effort, between KEV refresh and vulns_toc rebuild).",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-16T09:55:16-04:00",
+            "date_human": "May 16, 2026 · 09:55"
+        },
+        {
+            "hash": "04ebbffddc47546461c3de6643f901b7a9da25f7",
+            "short_hash": "04ebbff",
+            "subject": "docs(readme): cover companion-ZIP section + bulk download",
+            "summary": "Brings the README in sync with the two recent feature drops: new routes (/stig/bulk, companion.zip, companion.pdf), the two new sidecar indexes (companion_zip_index.json, bulk_download_index.json), the two new console commands, the new services + JS file, and ZipStream-PHP as a new server-side dependency. Also broadens the \"Updating the data\" KEV bullet to call out bin/refresh-data.sh and all four indexes it now rebuilds daily.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-16T09:41:34-04:00",
+            "date_human": "May 16, 2026 · 09:41"
+        },
+        {
+            "hash": "8322ff7c0a291a50668082089ba081723183fd19",
+            "short_hash": "8322ff7",
+            "subject": "feat(stig): bulk download — multi-select XML/ZIP across the full library",
+            "summary": "Adds a collapsed Bulk Download panel on /stig (with a standalone /stig/bulk view for deep-linking). Lists every STIG version in one virtual-scrolled table with independent XML and ZIP checkboxes per row, header \"select all available\" toggles, and a sticky footer showing file count / total bytes / chunk count as you tick.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-16T09:37:49-04:00",
+            "date_human": "May 16, 2026 · 09:37"
+        },
+        {
+            "hash": "ff963a382e802f9754984cc6906fb8ccb4761cac",
+            "short_hash": "ff963a3",
+            "subject": "Data updates with deployment",
+            "summary": "",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-15T20:56:12-04:00",
+            "date_human": "May 15, 2026 · 20:56"
+        },
         {
             "hash": "4d46e9044a7ad2b61c4777bdc6e66b8268703b74",
             "short_hash": "4d46e90",

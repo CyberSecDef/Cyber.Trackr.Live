@@ -7,6 +7,7 @@ use App\Service\BulkDownloadPlanner;
 use App\Service\StigCompanionZipFinder;
 use App\Service\StigDigestBuilder;
 use App\Service\StigTocBuilder;
+use App\Service\Stig\CklbSkeletonBuilder;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -260,7 +261,7 @@ class StigController extends AbstractController
     }
 
     #[Route('/stig/{title}/{version}/{release}', name: 'stig_view')]
-    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder, StigCompanionZipFinder $companionFinder): Response
+    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder, StigCompanionZipFinder $companionFinder, \App\Service\Stig\StigWizardRegistry $wizardRegistry): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -312,6 +313,8 @@ class StigController extends AbstractController
 
         $companion = $companionFinder->find($title, $version, $release);
 
+        $wizard = $wizardRegistry->findForStig($title, $version);
+
         return $this->render('stig/view.html.twig', [
             'controller_name' => 'StigController',
             'cci' => $cci_xml,
@@ -322,6 +325,7 @@ class StigController extends AbstractController
             'release' => $release,
             'digest' => $digest,
             'companion' => $companion,
+            'wizard_key' => $wizard['key'] ?? null,
         ]);
     }
 
@@ -358,6 +362,43 @@ class StigController extends AbstractController
         );
         $response->headers->set('Content-Disposition', $disposition);
         return $response;
+    }
+
+    /**
+     * Blank CKLB skeleton for a STIG version — every rule Not_Reviewed.
+     * Server-side half of the STIG wizard (issue #15): built from PUBLIC STIG
+     * content only. The wizard JS fetches this, applies the user's answers
+     * client-side, and hands the result to /ckl-viewer. Also a valid .cklb on
+     * its own for DISA STIG Viewer 3.x.
+     */
+    #[Route('/stig/{title}/{version}/{release}/skeleton.cklb', name: 'stig_skeleton_cklb')]
+    public function stig_skeleton_cklb($title, $version, $release, CklbSkeletonBuilder $builder): Response
+    {
+        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
+        $stigs = (array) json_decode(file_get_contents($toc_path));
+
+        if (!isset($stigs[$title])) {
+            throw $this->createNotFoundException('Unknown STIG.');
+        }
+        $stig = array_filter($stigs[$title], fn($o) => $o->version == $version && $o->release == $release);
+        $stig = array_pop($stig);
+        if (!$stig) {
+            throw $this->createNotFoundException('Unknown STIG version/release.');
+        }
+        $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
+        if (!$stig_filename || !is_file($stig_filename)) {
+            throw $this->createNotFoundException('STIG file missing.');
+        }
+
+        $cklb = $builder->build($stig_filename, ['version' => $version, 'release' => $release]);
+
+        $stem = trim(strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $title)), '-') ?: 'stig';
+        $filename = sprintf('%s-v%sr%s-skeleton.cklb', $stem, $version, $release);
+
+        return new JsonResponse($cklb, 200, [
+            'Content-Disposition'     => 'inline; filename="' . $filename . '"',
+            'X-Content-Type-Options'  => 'nosniff',
+        ]);
     }
 
     #[Route('/stig/{title}/{version}/{release}/download', name: 'stig_download')]

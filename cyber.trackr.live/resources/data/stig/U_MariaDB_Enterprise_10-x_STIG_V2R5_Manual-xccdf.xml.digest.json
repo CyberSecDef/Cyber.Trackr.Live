@@ -1,0 +1,41 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115721,
+    "previous_mtime": 1777115702,
+    "digest": {
+        "previous": {
+            "version": "2",
+            "release": "4",
+            "date": "2025-09-09",
+            "released": "01 Oct 2025"
+        },
+        "current": {
+            "version": "2",
+            "release": "5",
+            "date": "2026-03-02",
+            "released": "01 Apr 2026"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-265882",
+                "rule_id": "SV-265882r1193305_rule",
+                "title": "MariaDB products must be an enterprise version supported by the vendor.",
+                "severity": "high",
+                "fields": [
+                    "description",
+                    "check"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 1,
+            "unchanged": 106
+        }
+    }
+}

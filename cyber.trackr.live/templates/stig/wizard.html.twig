@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% set _meta = schema.meta|default({}) %}
+{% set _title = _meta.title|default(title|replace({'_': ' '})) %}
+
+{% block title %}{{ _title }} Wizard &mdash; V{{ version }}R{{ release }}{% endblock %}
+{% block og_title %}{{ _title }} checklist wizard{% endblock %}
+{% block og_description %}Answer a short set of questions about your application and generate a pre-populated {{ _title }} (V{{ version }}R{{ release }}) checklist (.cklb). Applicable requirements are pre-marked with rationale. Browser-only — your answers never leave your machine.{% endblock %}
+{% block og_image_name %}stig{% endblock %}
+
+{% block body %}
+    <section class="lib-page" aria-labelledby="stig-wizard-title">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{{ path('stig') }}">STIGs</a></li>
+                <li><a href="{{ path('stig_view', {title: title, version: version, release: release}) }}">{{ title|replace({'_': ' '}) }}</a></li>
+                <li aria-current="page">Wizard</li>
+            </ol>
+        </nav>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">STIG wizard &middot; V{{ version }}R{{ release }}</span>
+            <h1 id="stig-wizard-title" class="lib-page__title-large">{{ _title }} <em>Wizard.</em></h1>
+            <p class="lib-page__lede">
+                Answer the questions below about your application. The wizard builds a {{ _title }} checklist
+                from the published STIG and pre-marks the requirements your answers make
+                <strong>Not Applicable</strong>, <strong>Not a Finding</strong>, or worth a starting comment &mdash;
+                then opens it in the checklist viewer to download or finish.
+            </p>
+            <div class="plans-data-banner" role="alert">
+                <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                <div>
+                    <strong>Public site &mdash; unclassified data only.</strong>
+                    Everything runs in your browser; your answers and the generated checklist are never uploaded.
+                    Even so, do not enter classified or CUI content &mdash; complete those fields on an authorized system.
+                    <br>
+                    <strong>Every auto-determination is a suggestion that requires your review.</strong>
+                    An assessor remains responsible for the final status of each requirement.
+                </div>
+            </div>
+        </header>
+
+        <div class="stig-wizard__actions">
+            <button type="button" class="cta-secondary" onclick="stigWizard.saveAnswers()">
+                <i class="bi bi-download" aria-hidden="true"></i> Save answers
+            </button>
+            <label class="cta-secondary stig-wizard__upload">
+                <i class="bi bi-upload" aria-hidden="true"></i> Load answers
+                <input type="file" accept="application/json" onchange="stigWizard.loadAnswers(event)" hidden>
+            </label>
+            <button type="button" class="cta-primary stig-wizard__generate" onclick="stigWizard.generate()">
+                <i class="bi bi-stars" aria-hidden="true"></i> Generate checklist
+            </button>
+        </div>
+
+        <form id="stig-wizard-form" class="stig-wizard" onsubmit="event.preventDefault(); stigWizard.generate();">
+            <noscript><p class="stig-wizard__noscript">This wizard requires JavaScript.</p></noscript>
+        </form>
+
+        {# Same actions repeated below the questions so they're in reach once the
+           form is filled out. #}
+        <div class="stig-wizard__actions stig-wizard__actions--bottom">
+            <button type="button" class="cta-secondary" onclick="stigWizard.saveAnswers()">
+                <i class="bi bi-download" aria-hidden="true"></i> Save answers
+            </button>
+            <label class="cta-secondary stig-wizard__upload">
+                <i class="bi bi-upload" aria-hidden="true"></i> Load answers
+                <input type="file" accept="application/json" onchange="stigWizard.loadAnswers(event)" hidden>
+            </label>
+            <button type="button" class="cta-primary stig-wizard__generate" onclick="stigWizard.generate()">
+                <i class="bi bi-stars" aria-hidden="true"></i> Generate checklist
+            </button>
+        </div>
+    </section>
+
+    <script>
+        window.stigWizardConfig = {
+            key:         {{ wizard_key|json_encode|raw }},
+            title:       {{ title|json_encode|raw }},
+            version:     {{ version|json_encode|raw }},
+            release:     {{ release|json_encode|raw }},
+            schema:      {{ schema|json_encode|raw }},
+            skeletonUrl: {{ path('stig_skeleton_cklb', {title: title, version: version, release: release})|json_encode|raw }},
+            viewerUrl:   {{ path('ckl_viewer')|json_encode|raw }},
+        };
+    </script>
+    <script src="/js/stig_wizard.js"></script>
+{% endblock %}

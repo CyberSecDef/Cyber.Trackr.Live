@@ -1,0 +1,49 @@
+{
+    "schema_version": 1,
+    "source_mtime": 1777115437,
+    "previous_mtime": 1777115437,
+    "digest": {
+        "previous": {
+            "version": "2",
+            "release": "10",
+            "date": "2018-05-30",
+            "released": "27 Jul 2018"
+        },
+        "current": {
+            "version": "2",
+            "release": "11",
+            "date": "2018-09-13",
+            "released": "26 Oct 2018"
+        },
+        "added": [],
+        "removed": [],
+        "severity_changed": [],
+        "content_changed": [
+            {
+                "vuln_id": "V-36438",
+                "rule_id": "SV-47844r5_rule",
+                "title": "Local administrator accounts on domain systems must not share the same password.",
+                "severity": "medium",
+                "fields": [
+                    "check"
+                ]
+            },
+            {
+                "vuln_id": "V-8547",
+                "rule_id": "SV-9044r3_rule",
+                "title": "The Anonymous Logon and Everyone groups must not be members of the Pre-Windows 2000 Compatible Access group.",
+                "severity": "medium",
+                "fields": [
+                    "description"
+                ]
+            }
+        ],
+        "totals": {
+            "added": 0,
+            "removed": 0,
+            "severity_changed": 0,
+            "content_changed": 2,
+            "unchanged": 34
+        }
+    }
+}
