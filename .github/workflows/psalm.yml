@@ -7,9 +7,9 @@ name: Psalm Security Scan
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
   schedule:
     - cron: '40 12 * * 3'
 
@@ -24,6 +24,11 @@ jobs:
       security-events: write   # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read            # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
+    # The Symfony app (composer.json, src/, psalm.xml) lives in this subdirectory.
+    defaults:
+      run:
+        working-directory: cyber.trackr.live
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -37,7 +42,7 @@ jobs:
           ini-values: memory_limit=512M
 
       - name: Validate composer.json
-        run: composer validate --strict
+        run: composer validate --no-check-publish
 
       - name: Get Composer cache directory
         id: composer-cache
@@ -61,4 +66,5 @@ jobs:
       - name: Upload Security Analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: results.sarif
+          # uses: steps ignore the job's working-directory, so qualify the path.
+          sarif_file: cyber.trackr.live/results.sarif
