@@ -64,7 +64,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Security Analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           # uses: steps ignore the job's working-directory, so qualify the path.
           sarif_file: cyber.trackr.live/results.sarif
