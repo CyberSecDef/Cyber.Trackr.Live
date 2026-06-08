@@ -73,6 +73,9 @@ class ScapController extends AbstractController
         });
 
         $scap = array_pop($scap);
+        if ($scap === null) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
 
         if (file_exists($scap_filename)) {
@@ -106,6 +109,9 @@ class ScapController extends AbstractController
             return false;
         });
         $scap = array_pop($scap);
+        if ($scap === null) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
         if ($scap_filename === false || !is_file($scap_filename)) {
             throw $this->createNotFoundException('The SCAP does not exist');

@@ -39,6 +39,7 @@
 /cyber.trackr.live/var/
 /cyber.trackr.live/vendor/
 /cyber.trackr.live/node_modules/
+/cyber.trackr.live/.phpunit.cache/
 
 # Air-gapped image tarballs produced by cyber.trackr.live/bin/build-image.sh
 # (multi-GB `docker save` output) — generated artifacts, never committed.

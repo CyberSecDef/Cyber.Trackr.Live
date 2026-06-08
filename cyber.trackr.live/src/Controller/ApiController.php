@@ -253,7 +253,7 @@ class ApiController extends AbstractController
 
         $results['enhancements'] = [];
         foreach ($controls_xml->xpath("./aaa:control-enhancements/aaa:control-enhancement") as $enhancement) {
-            $results['enhancements'][current($enhancement->number)] = current($enhancement->title);
+            $results['enhancements'][(string)$enhancement->number] = (string)$enhancement->title;
         }
 
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
@@ -385,15 +385,15 @@ class ApiController extends AbstractController
         $results['references'] = [];
         foreach ($controls_xml->xpath("./xmlns:references/xmlns:reference") as $ref) {
             $results['references'][] = [
-                "href" => str_replace("\/", "/", current($ref->item)['href']),
-                "text" => current($ref->item->text),
-                "name" => current($ref->short_name)
+                "href" => str_replace("\/", "/", (string)$ref->item['href']),
+                "text" => (string)$ref->item->text,
+                "name" => (string)$ref->short_name
             ];
         }
 
         $results['enhancements'] = [];
         foreach ($controls_xml->xpath("./xmlns:control-enhancements/xmlns:control-enhancement") as $enhancement) {
-            $results['enhancements'][current($enhancement->number)] = current($enhancement->title);
+            $results['enhancements'][(string)$enhancement->number] = (string)$enhancement->title;
         }
 
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
@@ -541,9 +541,9 @@ class ApiController extends AbstractController
         $vuln_id = (string)$group->attributes()['id'];
 
         $collection[$key]->tip = [
-            "title" => (string)current($group->Rule->title),
-            "rule" => (string)current($group->Rule->attributes()['id']),
-            "severity" => (string)current($group->Rule->attributes()['severity']),
+            "title" => (string)$group->Rule->title,
+            "rule" => (string)$group->Rule->attributes()['id'],
+            "severity" => (string)$group->Rule->attributes()['severity'],
             "vuln_id" => $vuln_id,        
         ];
         
@@ -573,6 +573,9 @@ class ApiController extends AbstractController
             return false;
         });
         $stig = array_pop($stig);
+        if ($stig === null) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
         if ($stig_filename === false || !is_file($stig_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
@@ -598,7 +601,7 @@ class ApiController extends AbstractController
 
         $results["profiles"] = [];
         foreach ($stig_xml->xpath('/xmlns:Benchmark/xmlns:Profile') as $profile) {
-            $results["profiles"][(string)$profile->attributes()['id']] = (string)current($profile->title);
+            $results["profiles"][(string)$profile->attributes()['id']] = (string)$profile->title;
         }
 
         $results["requirements"] = [];
@@ -606,9 +609,9 @@ class ApiController extends AbstractController
             $vuln_id = (string)$group->attributes()['id'];
 
             $results["requirements"][$vuln_id] = [
-                "title" => (string)current($group->Rule->title),
-                "rule" => (string)current($group->Rule->attributes()['id']),
-                "severity" => (string)current($group->Rule->attributes()['severity']),
+                "title" => (string)$group->Rule->title,
+                "rule" => (string)$group->Rule->attributes()['id'],
+                "severity" => (string)$group->Rule->attributes()['severity'],
                 "link" => "/stig/{$title}/{$version}/{$release}/{$vuln_id}"
             ];
         }
@@ -634,6 +637,9 @@ class ApiController extends AbstractController
             return false;
         });
         $stig = array_pop($stig);
+        if ($stig === null) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
         if ($stig_filename === false || !is_file($stig_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
@@ -659,7 +665,7 @@ class ApiController extends AbstractController
         $results["stig-published"] = (string)current($stig_xml->xpath('/xmlns:Benchmark/xmlns:status/@date'));
 
         $vuln = current($stig_xml->xpath("/xmlns:Benchmark/xmlns:Group[@id='{$vuln}']"));
-        $results["id"] = (string)current($vuln->attributes()['id']);
+        $results["id"] = (string)$vuln->attributes()['id'];
         $results["group"] = (string)$vuln->title;
         $results["rule"] = (string)$vuln->Rule->attributes()['id'];
         $results["severity"] = (string)$vuln->Rule->attributes()['severity'];
@@ -725,6 +731,9 @@ class ApiController extends AbstractController
             return false;
         });
         $scap = array_pop($scap);
+        if ($scap === null) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
         if ($scap_filename === false || !is_file($scap_filename)) {
             throw $this->createNotFoundException('The SCAP does not exist');
@@ -786,6 +795,9 @@ class ApiController extends AbstractController
             return false;
         });
         $scap = array_pop($scap);
+        if ($scap === null) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
         if ($scap_filename === false || !is_file($scap_filename)) {
             throw $this->createNotFoundException('The SCAP does not exist');
@@ -816,7 +828,7 @@ class ApiController extends AbstractController
 
         $vuln = current($scap_xml->xpath("//xccdf:Benchmark/xccdf:Group[@id='xccdf_mil.disa.stig_group_{$vuln}']"));
 
-        $results["id"] = (string)current($vuln->attributes()['id']);
+        $results["id"] = (string)$vuln->attributes()['id'];
         $results["group"] = (string)current($vuln->xpath("./xccdf:title"));
         $results["rule"] = (string)current($vuln->xpath("./xccdf:Rule/@id"));
         $results["severity"] = (string)current($vuln->xpath("./xccdf:Rule/@severity"));

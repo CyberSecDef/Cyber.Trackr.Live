@@ -213,6 +213,9 @@ class StigController extends AbstractController
             return false;
         });
         $stig1 = array_pop($stig1);
+        if ($stig1 === null) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig1_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig1->filename);
         if ($stig1_filename === false || !is_file($stig1_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
@@ -229,6 +232,9 @@ class StigController extends AbstractController
             return false;
         });
         $stig2 = array_pop($stig2);
+        if ($stig2 === null) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig2_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig2->filename);
         if ($stig2_filename === false || !is_file($stig2_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
@@ -285,6 +291,9 @@ class StigController extends AbstractController
             return false;
         });
         $stig = array_pop($stig);
+        if ($stig === null) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
         if ($stig_filename === false || !is_file($stig_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
@@ -435,6 +444,9 @@ class StigController extends AbstractController
         });
 
         $stig = array_pop($stig);
+        if ($stig === null) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
 
         if (file_exists($stig_filename)) {
