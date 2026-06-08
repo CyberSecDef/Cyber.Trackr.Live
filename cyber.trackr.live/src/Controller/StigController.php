@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class StigController extends AbstractController
 {
@@ -213,8 +214,12 @@ class StigController extends AbstractController
         });
         $stig1 = array_pop($stig1);
         $stig1_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig1->filename);
-        if (file_exists($stig1_filename)) {
-            $stig1_xml = simplexml_load_file($stig1_filename);
+        if ($stig1_filename === false || !is_file($stig1_filename)) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
+        $stig1_xml = simplexml_load_file($stig1_filename);
+        if ($stig1_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'STIG file could not be parsed.');
         }
 
         $stig2 = array_filter($stigs[$title], function ($obj) use ($v2, $r2) {
@@ -225,8 +230,12 @@ class StigController extends AbstractController
         });
         $stig2 = array_pop($stig2);
         $stig2_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig2->filename);
-        if (file_exists($stig2_filename)) {
-            $stig2_xml = simplexml_load_file($stig2_filename);
+        if ($stig2_filename === false || !is_file($stig2_filename)) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
+        $stig2_xml = simplexml_load_file($stig2_filename);
+        if ($stig2_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'STIG file could not be parsed.');
         }
 
         if ($stig1_xml && $stig2_xml) {
@@ -277,8 +286,12 @@ class StigController extends AbstractController
         });
         $stig = array_pop($stig);
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
-        if (file_exists($stig_filename)) {
-            $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_filename === false || !is_file($stig_filename)) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
+        $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'STIG file could not be parsed.');
         }
 
         foreach ($stig_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -290,8 +303,12 @@ class StigController extends AbstractController
         $stig_xml->registerXPathNamespace("xmlns", "http://checklists.nist.gov/xccdf/1.1");
 
         $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if (file_exists($cci_filename)) {
-            $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_filename === false || !is_file($cci_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
+        }
+        $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
         }
 
         foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {

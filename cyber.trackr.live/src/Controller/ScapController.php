@@ -9,6 +9,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class ScapController extends AbstractController
 {
@@ -106,8 +107,12 @@ class ScapController extends AbstractController
         });
         $scap = array_pop($scap);
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
-        if (file_exists($scap_filename)) {
-            $scap_xml = simplexml_load_file($scap_filename);
+        if ($scap_filename === false || !is_file($scap_filename)) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
+        $scap_xml = simplexml_load_file($scap_filename);
+        if ($scap_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'SCAP file could not be parsed.');
         }
 
         foreach ($scap_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -122,8 +127,12 @@ class ScapController extends AbstractController
         $scap_xml->registerXPathNamespace("xccdf", "http://checklists.nist.gov/xccdf/1.2");
 
         $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if (file_exists($cci_filename)) {
-            $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_filename === false || !is_file($cci_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
+        }
+        $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
         }
 
         foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {

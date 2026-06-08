@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class RmfController extends AbstractController
 {
@@ -19,13 +20,18 @@ class RmfController extends AbstractController
         $finder = new Finder();
 
         $rmf_json_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
-        if(file_exists($rmf_json_path)){
-            $rmfs_json = json_decode(file_get_contents($rmf_json_path));
+        $rmfs_json = [];
+        if($rmf_json_path !== false && is_file($rmf_json_path)){
+            $rmfs_json = json_decode(file_get_contents($rmf_json_path)) ?: [];
         }
         
         $rmf_v5_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
-        if (file_exists($rmf_v5_filename)) {
-            $rmf_v5_xml = simplexml_load_file($rmf_v5_filename);
+        if ($rmf_v5_filename === false || !is_file($rmf_v5_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev5 control catalog is not available.');
+        }
+        $rmf_v5_xml = simplexml_load_file($rmf_v5_filename);
+        if ($rmf_v5_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev5 control catalog could not be parsed.');
         }
 
         foreach ($rmf_v5_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -39,8 +45,12 @@ class RmfController extends AbstractController
         $rmf_v5_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
         $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if (file_exists($cci_filename)) {
-            $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_filename === false || !is_file($cci_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
+        }
+        $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
         }
 
         foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -91,13 +101,18 @@ class RmfController extends AbstractController
         $finder = new Finder();
         
         $rmf_json_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
-        if(file_exists($rmf_json_path)){
-            $rmfs_json = json_decode(file_get_contents($rmf_json_path));
+        $rmfs_json = [];
+        if($rmf_json_path !== false && is_file($rmf_json_path)){
+            $rmfs_json = json_decode(file_get_contents($rmf_json_path)) ?: [];
         }
 
         $rmf_v4_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v4-controls.xml");
-        if (file_exists($rmf_v4_filename)) {
-            $rmf_v4_xml = simplexml_load_file($rmf_v4_filename);
+        if ($rmf_v4_filename === false || !is_file($rmf_v4_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev4 control catalog is not available.');
+        }
+        $rmf_v4_xml = simplexml_load_file($rmf_v4_filename);
+        if ($rmf_v4_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev4 control catalog could not be parsed.');
         }
 
         foreach ($rmf_v4_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -111,8 +126,12 @@ class RmfController extends AbstractController
         $rmf_v4_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
         $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if (file_exists($cci_filename)) {
-            $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_filename === false || !is_file($cci_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
+        }
+        $cci_xml = simplexml_load_file($cci_filename);
+        if ($cci_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
         }
 
         foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {

@@ -9,6 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 
 class ApiController extends AbstractController
@@ -121,8 +122,12 @@ class ApiController extends AbstractController
     public function api_rmfv4_list(): Response
     {
         $rmf_v4_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v4-controls.xml");
-        if (file_exists($rmf_v4_filename)) {
-            $rmf_v4_xml = simplexml_load_file($rmf_v4_filename);
+        if ($rmf_v4_filename === false || !is_file($rmf_v4_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev4 control catalog is not available.');
+        }
+        $rmf_v4_xml = simplexml_load_file($rmf_v4_filename);
+        if ($rmf_v4_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev4 control catalog could not be parsed.');
         }
 
         foreach ($rmf_v4_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -258,8 +263,12 @@ class ApiController extends AbstractController
     public function api_rmf_list(): Response
     {
         $rmf_v5_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
-        if (file_exists($rmf_v5_filename)) {
-            $rmf_v5_xml = simplexml_load_file($rmf_v5_filename);
+        if ($rmf_v5_filename === false || !is_file($rmf_v5_filename)) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev5 control catalog is not available.');
+        }
+        $rmf_v5_xml = simplexml_load_file($rmf_v5_filename);
+        if ($rmf_v5_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev5 control catalog could not be parsed.');
         }
 
         foreach ($rmf_v5_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -394,8 +403,12 @@ class ApiController extends AbstractController
     public function api_cci_list(): Response
     {
         $cci_path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if (file_exists($cci_path)) {
-            $cci_xml = simplexml_load_file($cci_path);
+        if ($cci_path === false || !is_file($cci_path)) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
+        }
+        $cci_xml = simplexml_load_file($cci_path);
+        if ($cci_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
         }
 
         foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -425,8 +438,12 @@ class ApiController extends AbstractController
         $cci_path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
         $rmf_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
 
-        if (file_exists($cci_path)) {
-            $cci_xml = simplexml_load_file($cci_path);
+        if ($cci_path === false || !is_file($cci_path)) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
+        }
+        $cci_xml = simplexml_load_file($cci_path);
+        if ($cci_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
         }
 
         foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -437,8 +454,9 @@ class ApiController extends AbstractController
         }
         $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
 
-        if (file_exists($rmf_path)) {
-            $rmfs_json = json_decode(file_get_contents($rmf_path));
+        $rmfs_json = [];
+        if ($rmf_path !== false && is_file($rmf_path)) {
+            $rmfs_json = json_decode(file_get_contents($rmf_path)) ?: [];
         }
 
         $cci = current($cci_xml->xpath("//xmlns:cci_item[@id='$item']"));
@@ -501,8 +519,12 @@ class ApiController extends AbstractController
         $finder = new Finder();
 
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $collection[$key]->filename);
-        if (file_exists($stig_filename)) {
-            $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_filename === false || !is_file($stig_filename)) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
+        $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'STIG file could not be parsed.');
         }
 
         foreach ($stig_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -552,8 +574,12 @@ class ApiController extends AbstractController
         });
         $stig = array_pop($stig);
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
-        if (file_exists($stig_filename)) {
-            $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_filename === false || !is_file($stig_filename)) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
+        $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'STIG file could not be parsed.');
         }
 
         foreach ($stig_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -609,8 +635,12 @@ class ApiController extends AbstractController
         });
         $stig = array_pop($stig);
         $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
-        if (file_exists($stig_filename)) {
-            $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_filename === false || !is_file($stig_filename)) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
+        $stig_xml = simplexml_load_file($stig_filename);
+        if ($stig_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'STIG file could not be parsed.');
         }
 
         foreach ($stig_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -696,8 +726,12 @@ class ApiController extends AbstractController
         });
         $scap = array_pop($scap);
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
-        if (file_exists($scap_filename)) {
-            $scap_xml = simplexml_load_file($scap_filename);
+        if ($scap_filename === false || !is_file($scap_filename)) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
+        $scap_xml = simplexml_load_file($scap_filename);
+        if ($scap_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'SCAP file could not be parsed.');
         }
 
         foreach ($scap_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
@@ -753,8 +787,12 @@ class ApiController extends AbstractController
         });
         $scap = array_pop($scap);
         $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
-        if (file_exists($scap_filename)) {
-            $scap_xml = simplexml_load_file($scap_filename);
+        if ($scap_filename === false || !is_file($scap_filename)) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
+        $scap_xml = simplexml_load_file($scap_filename);
+        if ($scap_xml === false) {
+            throw new ServiceUnavailableHttpException(null, 'SCAP file could not be parsed.');
         }
 
         foreach ($scap_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
