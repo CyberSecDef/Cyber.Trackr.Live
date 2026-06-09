@@ -66,6 +66,22 @@ class DockerImageLocatorTest extends TestCase
         $this->assertSame('cyber-trackr-2026-06.tar.gz', (new DockerImageLocator($dir))->latest()['filename']);
     }
 
+    public function testBuiltAtReflectsBundleMtime(): void
+    {
+        $dir = $this->tmpDir();
+        $this->writeBundle($dir, 'cyber-trackr-2026-06.tar.gz', 10);
+        touch($dir . '/dist/cyber-trackr-2026-06.tar.gz', 1_700_000_000);
+
+        $builtAt = (new DockerImageLocator($dir))->builtAt();
+        $this->assertInstanceOf(\DateTimeImmutable::class, $builtAt);
+        $this->assertSame(1_700_000_000, $builtAt->getTimestamp());
+    }
+
+    public function testBuiltAtNullWhenNoBundle(): void
+    {
+        $this->assertNull((new DockerImageLocator($this->tmpDir()))->builtAt());
+    }
+
     public function testComposeYaml(): void
     {
         $dir = $this->tmpDir();

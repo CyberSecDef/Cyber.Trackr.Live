@@ -63,6 +63,23 @@ class DockerImageLocator
         ];
     }
 
+    /**
+     * Build date of the bundle, derived from the tarball's mtime (UTC), or null
+     * when no bundle is present. Used by the footer Status section.
+     */
+    public function builtAt(): ?\DateTimeImmutable
+    {
+        $latest = $this->latest();
+        if ($latest === null) {
+            return null;
+        }
+        $mtime = @filemtime($latest['path']);
+        if ($mtime === false) {
+            return null;
+        }
+        return (new \DateTimeImmutable('@' . $mtime))->setTimezone(new \DateTimeZone('UTC'));
+    }
+
     /** Raw docker-compose.yml so the instructions page can show it verbatim. */
     public function composeYaml(): string
     {

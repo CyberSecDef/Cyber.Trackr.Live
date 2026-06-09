@@ -277,6 +277,9 @@
                             {% if sync_status.cisa %}
                                 <li>CISA sync &middot; {{ sync_status.cisa|date("d M Y") }}</li>
                             {% endif %}
+                            {% if docker_image.builtAt %}
+                                <li>Docker image &middot; {{ docker_image.builtAt|date("d M Y") }}</li>
+                            {% endif %}
                             <li>v{{ app_version }}</li>
                         </ul>
                     </div>
