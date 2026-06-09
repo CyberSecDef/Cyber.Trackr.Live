@@ -30,6 +30,7 @@ RUN composer install --no-dev --no-scripts --prefer-dist --no-progress \
 COPY . .
 RUN export APP_SECRET=build-time-placeholder \
     && composer dump-autoload --no-dev --classmap-authoritative \
+    && composer dump-env prod \
     && php bin/console cache:clear --env=prod --no-debug \
     && php bin/console assets:install public --env=prod --no-debug \
     && rm -rf var/log/* var/cache/dev var/cache/test

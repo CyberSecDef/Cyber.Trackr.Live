@@ -13,9 +13,9 @@ services:
       # Pin a stable secret to keep CSRF tokens valid across restarts.
       # If unset, the container generates a throwaway one on each start.
       # APP_SECRET: "change-me"
-    volumes:
-      - cyber_var:/app/var
+    # No volume needed: the app's only runtime writes are the Symfony cache,
+    # logs, and CSRF/session scratch under /app/var — all ephemeral. They land
+    # in the container's writable layer (var/ is created + chowned in the
+    # image), and the build-time-warmed prod cache stays intact. A volume would
+    # only add persistence we don't want and would mask the warmed cache.
     restart: unless-stopped
-
-volumes:
-  cyber_var:
