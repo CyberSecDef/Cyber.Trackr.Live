@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Docker Image &mdash; Cyber Trackr{% endblock %}
+{% block og_title %}Run Cyber Trackr offline (Docker image){% endblock %}
+{% block og_description %}Download the self-contained, air-gap-ready Cyber Trackr Docker image and run the whole reference site offline with one command.{% endblock %}
+{% block og_image_name %}home{% endblock %}
+
+{% block body %}
+    <style>
+        .docker-cmd {
+            margin: .75rem 0;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            border: 1px solid rgba(128, 128, 128, .35);
+            border-radius: 6px;
+            font-size: .85rem;
+            line-height: 1.55;
+            white-space: pre;
+        }
+        .docker-cmd code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+    </style>
+
+    <section class="lib-page lib-page--prose mission" aria-labelledby="docker-page-title">
+        <div class="rule-text">&sect; Offline deployment</div>
+
+        <header class="lib-page__header">
+            <span class="eyebrow">Air-gapped &middot; self-contained</span>
+            <h1 id="docker-page-title" class="lib-page__title-large">
+                Run the whole site<br>
+                <em>with no network.</em>
+            </h1>
+            <p class="lib-page__lede">
+                The entire Cyber Trackr application &mdash; every STIG, SCAP benchmark, CCI, NIST 800-53 catalog, and the tools &mdash; packaged as a single Docker image with all data baked in. Load it on any host with Docker and browse it completely offline.
+            </p>
+        </header>
+
+        <div class="mission__grid">
+            <article class="mission__section">
+                <span class="rule-text">&sect; I &middot; Download</span>
+                <h2 class="mission__heading">Grab the bundle.</h2>
+                <p class="mission__prose">
+                    <a href="{{ path('docker_image_download') }}" class="cta-primary">
+                        Download {{ image.filename }}
+                        <i class="bi bi-download" aria-hidden="true"></i>
+                    </a>
+                </p>
+                <p class="mission__prose">
+                    Compressed image archive &middot; <strong>{{ image.size }}</strong>. It&rsquo;s a <code>docker save</code> tarball of <code>{{ image.image }}</code>. Large file &mdash; resume-friendly downloads recommended.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; II &middot; Load</span>
+                <h2 class="mission__heading">Import it into Docker.</h2>
+                <p class="mission__prose">
+                    Decompress and load in a single pipe &mdash; no need to unzip to disk first:
+                </p>
+                <pre class="docker-cmd"><code>gunzip -c {{ image.filename }} | docker load</code></pre>
+                <p class="mission__prose">
+                    Docker registers it as <code>{{ image.image }}</code> (and <code>cyber-trackr:latest</code>). Confirm with <code>docker images | grep cyber-trackr</code>.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; III &middot; Run with Docker Compose</span>
+                <h2 class="mission__heading">One file, one command.</h2>
+                <p class="mission__prose">
+                    Save the following as <code>docker-compose.yml</code> next to wherever you run it, then bring it up:
+                </p>
+                <pre class="docker-cmd"><code>{{ compose_yaml }}</code></pre>
+                <pre class="docker-cmd"><code>docker compose up -d</code></pre>
+                <p class="mission__prose">
+                    The site comes up on <a href="http://localhost:8080" target="_blank" rel="noopener noreferrer">http://localhost:8080</a>. Stop it with <code>docker compose down</code>.
+                </p>
+            </article>
+
+            <article class="mission__section">
+                <span class="rule-text">&sect; IV &middot; Run without Compose</span>
+                <h2 class="mission__heading">Plain Docker CLI.</h2>
+                <p class="mission__prose">
+                    Prefer a single command with no extra file? This is the Compose definition&rsquo;s exact equivalent:
+                </p>
+                <pre class="docker-cmd"><code>docker run -d \
+  --name cyber-trackr \
+  -p 8080:80 \
+  -e APP_ENV=prod \
+  -e APP_DEBUG=0 \
+  --restart unless-stopped \
+  {{ image.image }}</code></pre>
+                <p class="mission__prose">
+                    Then browse <a href="http://localhost:8080" target="_blank" rel="noopener noreferrer">http://localhost:8080</a>. No volumes are required &mdash; the app only writes ephemeral cache and logs inside the container. To keep CSRF tokens valid across restarts, pin a secret by adding <code>-e APP_SECRET=your-fixed-value</code>; otherwise a throwaway one is generated on each start.
+                </p>
+            </article>
+        </div>
+    </section>
+{% endblock %}

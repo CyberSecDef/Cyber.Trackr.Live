@@ -244,6 +244,9 @@
                             <li><a href="{{ path('ckl_viewer') }}">CKL Viewer</a></li>
                             <li><a href="{{ path('plans') }}">Plan Generator</a></li>
                             <li><a href="{{ path('api_summary') }}">REST API</a></li>
+                            {% if docker_image.latest %}
+                                <li><a href="{{ path('docker_image') }}">Docker Image</a></li>
+                            {% endif %}
                         </ul>
                     </div>
 

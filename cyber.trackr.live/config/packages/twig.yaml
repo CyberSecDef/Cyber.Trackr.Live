@@ -3,6 +3,7 @@ twig:
     globals:
         sync_status: '@App\Service\SyncStatus'
         app_version: '@App\Service\AppVersion'
+        docker_image: '@App\Service\DockerImageLocator'
 
 when@test:
     twig:
