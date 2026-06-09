@@ -1,6 +1,168 @@
 {
-    "frozen_at": "2026-05-30T18:49:07+00:00",
+    "frozen_at": "2026-06-09T01:07:48+00:00",
     "entries": [
+        {
+            "hash": "a11bc5be8212b7661f8b1ae9b2fae3ef2c08f7bf",
+            "short_hash": "a11bc5b",
+            "subject": "feat(docker): offer the air-gap image bundle for download from the site",
+            "summary": "When a *.tar.gz bundle exists in dist/, surface a \"Docker Image\" link in the footer that leads to a /docker-image page with: a download link (name + human size), `gunzip -c … | docker load`, the site's docker-compose.yml verbatim with `docker compose up -d`, and the equivalent plain `docker run` command.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T20:58:57-04:00",
+            "date_human": "Jun 08, 2026 · 20:58"
+        },
+        {
+            "hash": "66526facea78d4b8c1f84f310283873c3140ca32",
+            "short_hash": "66526fa",
+            "subject": "fix(docker): boot via dump-env and drop the unnecessary var volume",
+            "summary": "Two fixes for the air-gap image:",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T20:58:42-04:00",
+            "date_human": "Jun 08, 2026 · 20:58"
+        },
+        {
+            "hash": "0ece16bf56038d5fe12c5ff93c974d05ae4ead88",
+            "short_hash": "0ece16b",
+            "subject": "test: add unit tests for overlay, search, plans, and sync-status services",
+            "summary": "Covers the remaining cleanly-testable services (39 tests):",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T20:11:34-04:00",
+            "date_human": "Jun 08, 2026 · 20:11"
+        },
+        {
+            "hash": "6342f49ce7eecf7fdc24c4b2d3cab1df0a7d9a23",
+            "short_hash": "6342f49",
+            "subject": "refactor: inject data dir into Cci/Api/Rmf controllers; test 503 guards",
+            "summary": "The global-data 503 guards (missing CCI list / RMF catalogs) were untestable because the data paths were hardcoded as __DIR__ . \"/../../resources/data\".",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T20:04:19-04:00",
+            "date_human": "Jun 08, 2026 · 20:04"
+        },
+        {
+            "hash": "985b90a36bdf013f44225f7b5fc4dba20db8cbcf",
+            "short_hash": "985b90a",
+            "subject": "test: add functional smoke coverage for the remaining controllers",
+            "summary": "Tier 3 (controllers): WebTestCase coverage for the six previously-untested controllers, so every controller now has at least smoke coverage. 25 tests.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T19:56:48-04:00",
+            "date_human": "Jun 08, 2026 · 19:56"
+        },
+        {
+            "hash": "15d5cceac545655c1ca21041b53c92dae0c1b85e",
+            "short_hash": "15d5cce",
+            "subject": "test: add file-backed service unit tests (mapper, digest, version, changelog, KEV)",
+            "summary": "Second batch of service-layer unit tests (32 tests), covering the deterministic file-backed services.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T19:21:25-04:00",
+            "date_human": "Jun 08, 2026 · 19:21"
+        },
+        {
+            "hash": "faaa7a32a9a2e66ae71c28e064e4ea1ec2dd46ca",
+            "short_hash": "faaa7a3",
+            "subject": "test: add pure unit tests for tokenizer, query parser, ODV, twig, bulk planner",
+            "summary": "First batch of service-layer unit tests (no kernel, ~instant): 44 tests covering the pure-logic services where regressions are most likely.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T19:11:17-04:00",
+            "date_human": "Jun 08, 2026 · 19:11"
+        },
+        {
+            "hash": "66336a2c46e089f1d5d1a9d054c1e8eca4d60ed5",
+            "short_hash": "66336a2",
+            "subject": "test: add Api/Stig controller tests; fix current()-on-object + null 404s",
+            "summary": "Add functional coverage for ApiController and StigController (happy paths for /api, CCI, RMF v4/v5, STIG list/summary/vuln, plus unknown-version 404s).",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T18:56:00-04:00",
+            "date_human": "Jun 08, 2026 · 18:56"
+        },
+        {
+            "hash": "8710c31b9910ea9fc3a3c7f4482457a0155ef200",
+            "short_hash": "8710c31",
+            "subject": "fix: guard data-file loads in controllers against missing/corrupt files",
+            "summary": "The controllers loaded XML/JSON data behind an `if (file_exists(...))` guard but then dereferenced the result unconditionally. When a data file was missing, realpath() returned false, or simplexml_load_file() failed to parse, the variable was never set and the next line fataled with HTTP 500.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-06-08T18:34:11-04:00",
+            "date_human": "Jun 08, 2026 · 18:34"
+        },
+        {
+            "hash": "0e81f1e4efea3dc365e3c1c433faac9e9a0079b4",
+            "short_hash": "0e81f1e",
+            "subject": "docs(readme): cover STIG Wizard, Docker air-gap image, tests + CI",
+            "summary": "Bring the README up to date with late-May work: - STIG Wizard (issue #15): intro bullet, route table, \"at a glance\" section, data-source + src/ + frontend entries - Docker / air-gapped deployment section + repo-layout entries - Rewrite t…",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T19:08:54-04:00",
+            "date_human": "May 31, 2026 · 19:08"
+        },
+        {
+            "hash": "2ddb65f5cf844bce298014086b1c58f796a6ed02",
+            "short_hash": "2ddb65f",
+            "subject": "Add air-gapped Docker image (nginx + PHP-FPM, data baked in)",
+            "summary": "Self-contained image for offline/air-gapped deployment with all of resources/data/ bundled. The app makes no external calls at runtime, so the container needs no network.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T19:04:36-04:00",
+            "date_human": "May 31, 2026 · 19:04"
+        },
+        {
+            "hash": "72ccbd7dc5892db2553036c193420a3e6e5e78d8",
+            "short_hash": "72ccbd7",
+            "subject": "Bump codeql-action/upload-sarif to v4",
+            "summary": "v3 is slated for deprecation (Dec 2026) and runs on Node 20; v4 is the recommended replacement.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T17:26:56-04:00",
+            "date_human": "May 31, 2026 · 17:26"
+        },
+        {
+            "hash": "3a728d4085b49da98952311d0f8c7add0a26701b",
+            "short_hash": "3a728d4",
+            "subject": "Fix Psalm security scan workflow for subdirectory layout",
+            "summary": "The app lives in cyber.trackr.live/, so composer/psalm crashed with \"could not find composer.json\" when run from the repo root.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T17:25:13-04:00",
+            "date_human": "May 31, 2026 · 17:25"
+        },
+        {
+            "hash": "179837823b39c82369ea8f82bd631fdd1b8fea81",
+            "short_hash": "1798378",
+            "subject": "Update Psalm workflow for main branch and PHP 8.4",
+            "summary": "Signed-off-by: Robert Weber <wwwdaze2000@gmail.com>",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T17:13:24-04:00",
+            "date_human": "May 31, 2026 · 17:13"
+        },
+        {
+            "hash": "933da4cef6939f69733741dc8e4389e37efb5b7e",
+            "short_hash": "933da4c",
+            "subject": "Add Psalm security scan workflow",
+            "summary": "This workflow configures a Psalm security scan for the repository, including triggers for push, pull request, and scheduled runs.",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T17:09:42-04:00",
+            "date_human": "May 31, 2026 · 17:09"
+        },
+        {
+            "hash": "f58ba47044300f946de27e6a786bcf2dc7123a84",
+            "short_hash": "f58ba47",
+            "subject": "Delete .github/workflows/psalm.yml",
+            "summary": "Signed-off-by: Robert Weber <wwwdaze2000@gmail.com>",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T17:09:13-04:00",
+            "date_human": "May 31, 2026 · 17:09"
+        },
+        {
+            "hash": "73d661287e3a436c419548dee8211f040290e7a5",
+            "short_hash": "73d6612",
+            "subject": "Update Psalm workflow for main branch and PHP 8.4",
+            "summary": "Signed-off-by: Robert Weber <wwwdaze2000@gmail.com>",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T17:00:30-04:00",
+            "date_human": "May 31, 2026 · 17:00"
+        },
+        {
+            "hash": "ba769930809ba30300fcf572eb040c1319c86f4b",
+            "short_hash": "ba76993",
+            "subject": "Added ASD Wiard",
+            "summary": "",
+            "author_name": "Robert Weber",
+            "date_iso": "2026-05-31T16:56:19-04:00",
+            "date_human": "May 31, 2026 · 16:56"
+        },
         {
             "hash": "3328f0677fb3b352d7dd26c31a085233fb073182",
             "short_hash": "3328f06",
