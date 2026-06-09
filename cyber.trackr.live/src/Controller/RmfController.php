@@ -12,6 +12,14 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class RmfController extends AbstractController
 {
+    private readonly string $dataDir;
+
+    public function __construct(?string $dataDir = null)
+    {
+        // Base path for resources/data. Null in production -> bundled location;
+        // tests pass a dir missing the global files to exercise the 503 guards.
+        $this->dataDir = $dataDir ?? __DIR__ . '/../../resources/data';
+    }
 
     #[Route('/rmf/5', name: 'rmf_v5_view')]
     public function rmf_v5_view(OverlayLoader $overlays): Response
@@ -19,13 +27,13 @@ class RmfController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
 
-        $rmf_json_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
+        $rmf_json_path = realpath($this->dataDir . "/800-53r4.json");
         $rmfs_json = [];
         if($rmf_json_path !== false && is_file($rmf_json_path)){
             $rmfs_json = json_decode(file_get_contents($rmf_json_path)) ?: [];
         }
         
-        $rmf_v5_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
+        $rmf_v5_filename = realpath($this->dataDir . "/rmf/800-53v5-controls.xml");
         if ($rmf_v5_filename === false || !is_file($rmf_v5_filename)) {
             throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev5 control catalog is not available.');
         }
@@ -44,7 +52,7 @@ class RmfController extends AbstractController
         $rmf_v5_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/2.0");
         $rmf_v5_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
-        $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
+        $cci_filename = realpath($this->dataDir . "/cci/U_CCI_List.xml");
         if ($cci_filename === false || !is_file($cci_filename)) {
             throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
         }
@@ -100,13 +108,13 @@ class RmfController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
         
-        $rmf_json_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
+        $rmf_json_path = realpath($this->dataDir . "/800-53r4.json");
         $rmfs_json = [];
         if($rmf_json_path !== false && is_file($rmf_json_path)){
             $rmfs_json = json_decode(file_get_contents($rmf_json_path)) ?: [];
         }
 
-        $rmf_v4_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v4-controls.xml");
+        $rmf_v4_filename = realpath($this->dataDir . "/rmf/800-53v4-controls.xml");
         if ($rmf_v4_filename === false || !is_file($rmf_v4_filename)) {
             throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev4 control catalog is not available.');
         }
@@ -125,7 +133,7 @@ class RmfController extends AbstractController
         $rmf_v4_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/feed/2.0");
         $rmf_v4_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
-        $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
+        $cci_filename = realpath($this->dataDir . "/cci/U_CCI_List.xml");
         if ($cci_filename === false || !is_file($cci_filename)) {
             throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
         }

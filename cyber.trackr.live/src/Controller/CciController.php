@@ -9,14 +9,22 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class CciController extends AbstractController
 {
+    private readonly string $dataDir;
+
+    public function __construct(?string $dataDir = null)
+    {
+        // Base path for resources/data. Null in production -> bundled location;
+        // tests pass a dir missing the global files to exercise the 503 guards.
+        $this->dataDir = $dataDir ?? __DIR__ . '/../../resources/data';
+    }
 
     #[Route('/cci', name: 'cci')]
     public function cci(): Response
     {
         $results = [];
 
-        $cci_path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        $rmf_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
+        $cci_path = realpath($this->dataDir . "/cci/U_CCI_List.xml");
+        $rmf_path = realpath($this->dataDir . "/800-53r4.json");
 
         // CCI data is required to render this page. realpath() returns false
         // when the file is missing, and simplexml_load_file() returns false on

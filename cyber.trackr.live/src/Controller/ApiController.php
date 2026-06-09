@@ -14,6 +14,14 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class ApiController extends AbstractController
 {
+    private readonly string $dataDir;
+
+    public function __construct(?string $dataDir = null)
+    {
+        // Base path for resources/data. Null in production -> bundled location;
+        // tests pass a dir missing the global files to exercise the 503 guards.
+        $this->dataDir = $dataDir ?? __DIR__ . '/../../resources/data';
+    }
 
     #[Route('/api', name: 'api_summary')]
     public function api_summary(Request $request): Response
@@ -121,7 +129,7 @@ class ApiController extends AbstractController
     #[Route('/api/rmf/4', name: 'api_rmfv4_list')]
     public function api_rmfv4_list(): Response
     {
-        $rmf_v4_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v4-controls.xml");
+        $rmf_v4_filename = realpath($this->dataDir . "/rmf/800-53v4-controls.xml");
         if ($rmf_v4_filename === false || !is_file($rmf_v4_filename)) {
             throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev4 control catalog is not available.');
         }
@@ -154,14 +162,14 @@ class ApiController extends AbstractController
     {
         $con = strtoupper(trim((string) $con));
 
-        $rmf_json_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
+        $rmf_json_path = realpath($this->dataDir . "/800-53r4.json");
         if (file_exists($rmf_json_path)) {
             $rmfs_json = json_decode(file_get_contents($rmf_json_path));
         } else {
             $rmfs_json = [];
         }
 
-        $rmf_v4_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v4-controls.xml");
+        $rmf_v4_filename = realpath($this->dataDir . "/rmf/800-53v4-controls.xml");
 
         $feed = file_get_contents($rmf_v4_filename);
         $feed = preg_replace('/(<\/|<)[a-zA-Z]+:([a-zA-Z0-9]+[ =>])/', '$1$2', $feed);
@@ -262,7 +270,7 @@ class ApiController extends AbstractController
     #[Route('/api/rmf/5', name: 'api_rmf_list')]
     public function api_rmf_list(): Response
     {
-        $rmf_v5_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
+        $rmf_v5_filename = realpath($this->dataDir . "/rmf/800-53v5-controls.xml");
         if ($rmf_v5_filename === false || !is_file($rmf_v5_filename)) {
             throw new ServiceUnavailableHttpException(null, 'RMF 800-53 rev5 control catalog is not available.');
         }
@@ -295,14 +303,14 @@ class ApiController extends AbstractController
     {
         $con = strtoupper(trim((string) $con));
 
-        $rmf_json_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
+        $rmf_json_path = realpath($this->dataDir . "/800-53r4.json");
         if (file_exists($rmf_json_path)) {
             $rmfs_json = json_decode(file_get_contents($rmf_json_path));
         } else {
             $rmfs_json = [];
         }
 
-        $rmf_v5_filename = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
+        $rmf_v5_filename = realpath($this->dataDir . "/rmf/800-53v5-controls.xml");
 
         $feed = file_get_contents($rmf_v5_filename);
         $feed = preg_replace('/(<\/|<)[a-zA-Z]+:([a-zA-Z0-9]+[ =>])/', '$1$2', $feed);
@@ -402,7 +410,7 @@ class ApiController extends AbstractController
     #[Route('/api/cci', name: 'api_cci_list')]
     public function api_cci_list(): Response
     {
-        $cci_path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
+        $cci_path = realpath($this->dataDir . "/cci/U_CCI_List.xml");
         if ($cci_path === false || !is_file($cci_path)) {
             throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
         }
@@ -435,8 +443,8 @@ class ApiController extends AbstractController
 
         $item = sprintf("CCI-%06d", (int)(preg_replace("/[^0-9]/", "", (string) $item)));
 
-        $cci_path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        $rmf_path = realpath(__DIR__ . "/../../resources/data/800-53r4.json");
+        $cci_path = realpath($this->dataDir . "/cci/U_CCI_List.xml");
+        $rmf_path = realpath($this->dataDir . "/800-53r4.json");
 
         if ($cci_path === false || !is_file($cci_path)) {
             throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
@@ -486,7 +494,7 @@ class ApiController extends AbstractController
     public function api_stig_list(): Response
     {
 
-        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
+        $toc_path = realpath($this->dataDir . "/stig_toc.json");
         $results = (array)json_decode(file_get_contents($toc_path));
         foreach (array_keys($results) as $stig_name) {
             foreach ($results[$stig_name] as $stig) {
@@ -501,7 +509,7 @@ class ApiController extends AbstractController
     #[Route('/api/stig/tip', name: 'api_stig_tip')]
     public function api_stig_tip(): Response
     {
-        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
+        $toc_path = realpath($this->dataDir . "/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
         $collection = [];
         foreach (array_keys($stigs) as $stig_name) {
@@ -518,7 +526,7 @@ class ApiController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
 
-        $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $collection[$key]->filename);
+        $stig_filename = realpath($this->dataDir . "/stig/" . $collection[$key]->filename);
         if ($stig_filename === false || !is_file($stig_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
         }
@@ -563,7 +571,7 @@ class ApiController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
 
-        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
+        $toc_path = realpath($this->dataDir . "/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
         $stig = array_filter($stigs[$title], function ($obj) use ($version, $release) {
@@ -576,7 +584,7 @@ class ApiController extends AbstractController
         if ($stig === null) {
             throw $this->createNotFoundException('The STIG does not exist');
         }
-        $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
+        $stig_filename = realpath($this->dataDir . "/stig/" . $stig->filename);
         if ($stig_filename === false || !is_file($stig_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
         }
@@ -627,7 +635,7 @@ class ApiController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
 
-        $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
+        $toc_path = realpath($this->dataDir . "/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
         $stig = array_filter($stigs[$title], function ($obj) use ($version, $release) {
@@ -640,7 +648,7 @@ class ApiController extends AbstractController
         if ($stig === null) {
             throw $this->createNotFoundException('The STIG does not exist');
         }
-        $stig_filename = realpath(__DIR__ . "/../../resources/data/stig/" . $stig->filename);
+        $stig_filename = realpath($this->dataDir . "/stig/" . $stig->filename);
         if ($stig_filename === false || !is_file($stig_filename)) {
             throw $this->createNotFoundException('The STIG does not exist');
         }
@@ -699,7 +707,7 @@ class ApiController extends AbstractController
     public function api_scap_list(): Response
     {
 
-        $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
+        $toc_path = realpath($this->dataDir . "/scap_toc.json");
         $results = (array)json_decode(file_get_contents($toc_path));
         foreach (array_keys($results) as $scap_name) {
             foreach ($results[$scap_name] as $scap) {
@@ -721,7 +729,7 @@ class ApiController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
 
-        $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
+        $toc_path = realpath($this->dataDir . "/scap_toc.json");
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
@@ -734,7 +742,7 @@ class ApiController extends AbstractController
         if ($scap === null) {
             throw $this->createNotFoundException('The SCAP does not exist');
         }
-        $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
+        $scap_filename = realpath($this->dataDir . "/scap/" . $scap->filename);
         if ($scap_filename === false || !is_file($scap_filename)) {
             throw $this->createNotFoundException('The SCAP does not exist');
         }
@@ -785,7 +793,7 @@ class ApiController extends AbstractController
         $filesystem = new Filesystem();
         $finder = new Finder();
 
-        $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
+        $toc_path = realpath($this->dataDir . "/scap_toc.json");
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
@@ -798,7 +806,7 @@ class ApiController extends AbstractController
         if ($scap === null) {
             throw $this->createNotFoundException('The SCAP does not exist');
         }
-        $scap_filename = realpath(__DIR__ . "/../../resources/data/scap/" . $scap->filename);
+        $scap_filename = realpath($this->dataDir . "/scap/" . $scap->filename);
         if ($scap_filename === false || !is_file($scap_filename)) {
             throw $this->createNotFoundException('The SCAP does not exist');
         }
