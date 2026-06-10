@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\MitigationGenerator;
 use App\Service\Vulns\VulnsRegistry;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,10 +17,14 @@ class ApiController extends AbstractController
 {
     private readonly string $dataDir;
 
-    public function __construct(?string $dataDir = null)
-    {
+    public function __construct(
+        ?string $dataDir = null,
+        private readonly ?MitigationGenerator $mitigations = null,
+    ) {
         // Base path for resources/data. Null in production -> bundled location;
         // tests pass a dir missing the global files to exercise the 503 guards.
+        // $mitigations is autowired in the container; null when constructed
+        // directly in unit tests, which simply disables the AI branch.
         $this->dataDir = $dataDir ?? __DIR__ . '/../../resources/data';
     }
 
@@ -681,9 +686,29 @@ class ApiController extends AbstractController
         $results["requirement-title"] = (string)$vuln->Rule->title;
         $results["requirement-description"] =  preg_replace("/<[^>]*>/is", "", str_replace("<Documentable>false</Documentable>", "", (string)$vuln->Rule->description));
 
-        if( $request->query->get('m','') == sha1($results['requirement-title'])){
-	    $results["mitigation-statement"] = shell_exec("/usr/bin/python3 /home/dh_t7zn6y/bin/google-ai.py $title $version $release {$results['id']} ");
-	}
+        // Optional AI mitigation statement (bounded, public on-demand). The `m`
+        // marker keeps the existing front-end button working and cheaply rejects
+        // drive-by calls, but it is NOT a security boundary: requirement-title is
+        // public, so the value is publicly derivable. Real protection lives in
+        // MitigationGenerator — argument-vector invocation (no shell), strict
+        // input validation, result caching, a per-client rate limit, and a hard
+        // process timeout. hash_equals avoids timing/type-juggling issues.
+        $marker = (string) $request->query->get('m', '');
+        if ($marker !== ''
+            && hash_equals(sha1($results['requirement-title']), $marker)
+            && $this->mitigations?->isEnabled()
+        ) {
+            $statement = $this->mitigations->generate(
+                (string) $title,
+                (string) $version,
+                (string) $release,
+                (string) $results['id'],
+                (string) $request->getClientIp(),
+            );
+            if ($statement !== null) {
+                $results["mitigation-statement"] = $statement;
+            }
+        }
 
         $results["identifiers"] = [];
         foreach ((array)$vuln->Rule->ident as $k => $ident) {

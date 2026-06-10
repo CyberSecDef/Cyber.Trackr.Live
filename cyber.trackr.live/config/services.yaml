@@ -23,3 +23,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # AI mitigation-statement generator. Path/python come from env; empty
+    # MITIGATION_SCRIPT (dev/test/CI) disables the feature entirely. $cache,
+    # timeout and rate-limit use autowiring / constructor defaults.
+    App\Service\MitigationGenerator:
+        arguments:
+            $scriptPath: '%env(MITIGATION_SCRIPT)%'
+            $pythonBin: '%env(MITIGATION_PYTHON)%'
