@@ -1,0 +1,14 @@
+framework:
+    rate_limiter:
+        # Per-client-IP limit for the public JSON API. 120 req/min sustained
+        # (~2/sec) is invisible to humans and normal API clients but throttles
+        # bulk crawlers hard. Enforced by App\EventSubscriber\ApiRateLimitSubscriber.
+        api:
+            policy: 'sliding_window'
+            limit: 120
+            interval: '1 minute'
+            # Single-VPS deployment: use the filesystem app cache for counters,
+            # and no lock factory (avoids a hard dep on symfony/lock; the slight
+            # imprecision under concurrency is irrelevant at this scale).
+            cache_pool: 'cache.app'
+            lock_factory: null
