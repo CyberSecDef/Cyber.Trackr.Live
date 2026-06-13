@@ -7,6 +7,17 @@
 {% block og_image_name %}cci{% endblock %}
 
 {% block body %}
+    <style>
+      /* Revision-aware CCI rows: Rev 5 is the default. Rev-4-only / deprecated rows
+         are dimmed, and controls superseded or dropped in Rev 5 are struck through. */
+      .cci-row.is-dropped td, .cci-row.is-deprecated td { opacity: .6; }
+      .cci-table del { text-decoration: line-through; opacity: .7; }
+      .cci-table del .ident { text-decoration: line-through; }
+      /* Align every cell to the top of the row (long pre-wrap cells read better). */
+      #ccis td, #ccis th { vertical-align: top; }
+      /* "Not available" placeholder: muted, so empty-by-design reads as intentional. */
+      #ccis .cell-na { color: #8a8f98; font-style: italic; }
+    </style>
     <section class="lib-page" aria-labelledby="cci-page-title">
         <div class="rule-text">&sect; Library &middot; CCIs</div>
 
@@ -16,11 +27,13 @@
                 Common Control <em>Identifiers</em>
             </h1>
             <p class="lib-page__lede">
-                {{ results|length|number_format }} CCIs &mdash; the atomic compliance statements behind every STIG rule, mapped to NIST 800-53 controls.
+                <span id="cci-count">&hellip;</span> CCIs &mdash; the atomic compliance statements behind every STIG rule, mapped to NIST 800-53 controls. Defaults to Rev&nbsp;5; Rev-4-only mappings are struck and superseded controls shown alongside.
             </p>
         </header>
 
         <div id="cci_container">
+        {# Rows are loaded client-side from /cci/data (DataTables ajax + deferRender):
+           ~5,100 CCIs are too many to server-render into the page DOM. #}
         <table id="ccis" class="cci-table compact w-100">
             <thead>
                 <tr>
@@ -35,47 +48,100 @@
                     <th>Control Definition</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for r in results %}
-                    <tr>
-                        <td>{{ ui.ident(r.cci) }}</td>
-                        <td class="pre-wrap">{{r.cci_definition|default()}}</td>
-                        <td class="pre-wrap">{{r.cci_auditor|default()}}</td>
-                        <td class="pre-wrap">{{r.cci_guidance|default()}}</td>
-                        <td>{{r.name|default()}}</td>
-                        <td>{% if r.rmf|default %}{{ ui.rmf_link(r.rmf) }}{% endif %}</td>
-                        <td>{{r.ap_acronym|default()}}</td>
-                        <td class="pre-wrap">{{r.rmf_guidance|default()}}</td>
-                        <td class="pre-wrap">{{r.rmf_definition|default()}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            <tbody></tbody>
         </table>
         </div>
     </section>
     <script>
+        // Deep link to the Rev 5 control page, and the row-data endpoint.
+        const RMF5 = "{{ path('rmf_v5_view') }}";
+        const CCI_DATA = "{{ path('cci_data') }}";
+        // Per-control text (name/definition/guidance), keyed by control id. Populated
+        // once from /cci/data instead of being repeated on every CCI row.
+        let CTRL = {};
+
+        function esc(s){
+            s = (s == null ? '' : String(s));
+            return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function pill(t){ return '<span class="ident">' + esc(t) + '</span>'; }
+        function rmf(id){
+            return '<a class="ident ident--link" href="' + RMF5 + '#rmf_' + encodeURIComponent(id) +
+                   '" title="View ' + esc(id) + ' on the 800-53 Rev 5 page">' + esc(id) + '</a>';
+        }
+        function ctrlOf(row){ return (row.ctrl && CTRL[row.ctrl]) ? CTRL[row.ctrl] : {}; }
+        // Plain-text column: escape for display, raw for sort/filter/export.
+        function txt(data, type){ return type === 'display' ? esc(data || '') : (data || ''); }
+        // Muted "not available" placeholder with an explanatory tooltip (empty by design).
+        function na(note){ return '<span class="cell-na" title="' + esc(note) + '">&mdash;</span>'; }
+        const NOTE_DOD = "No public per-CCI assessment guidance — DoD's assessment text (eMASS) is not public.";
+        const NOTE_CTRL = "No control text available — the referenced control has no Rev 5 / Rev 4 entry.";
+        // DoD assessment column: the value if present, else the placeholder note.
+        function dodCell(data, type){
+            if (type !== 'display') return data || '';
+            return (data && String(data).trim() !== '') ? esc(data) : na(NOTE_DOD);
+        }
+
         const cci_app = {
             init(){
-                // Single toolbar at top: filter, length, info, pagination, export buttons.
-                // No bottom controls — they only duplicate what's already at top.
                 const dt = $('#ccis').DataTable({
-                    // Top toolbar: filter | length + export buttons.
-                    // Bottom: row count info + pagination (where the eye lands after scrolling).
+                    ajax: {
+                        url: CCI_DATA,
+                        // Capture the deduped control map; return the row array to DataTables.
+                        dataSrc: json => { CTRL = json.controls || {}; return json.data || []; }
+                    },
+                    deferRender: true,   // only build DOM nodes for the visible page
                     dom: '<"cci-toolbar"<"cci-toolbar__left"f><"cci-toolbar__right"lB>>rt<"cci-foot"<"cci-foot__info"i>p>',
                     pageLength: 10,
                     order: [[ 0, "asc" ]],
                     colReorder: true,
-                    // Mobile: collapse low-priority columns into a per-row expand chevron.
-                    // CCI id (col 0) always stays visible; the Definition (col 1) and
-                    // Control (col 5) drop in next as width allows; everything else
-                    // hides first into the child row.
                     responsive: true,
+                    columns: [
+                        // CCI id pill (+ deprecated badge).
+                        { data: 'cci', render: (d, type, row) => {
+                            if (type !== 'display') return d;
+                            return pill(d) + (row.deprecated ? ' ' + pill('deprecated') : '');
+                        }},
+                        { data: 'cci_definition', className: 'pre-wrap', render: txt },
+                        { data: 'cci_auditor',    className: 'pre-wrap', render: dodCell },
+                        { data: 'cci_guidance',   className: 'pre-wrap', render: dodCell },
+                        // Control name (Rev 5 by default) + revision / withdrawn badge.
+                        { data: null, render: (d, type, row) => {
+                            const c = ctrlOf(row);
+                            if (type !== 'display') return c.name || '';
+                            let h = c.name ? esc(c.name) : na(NOTE_CTRL);
+                            if (row.rev === '4') h += ' ' + pill('Rev 4 only');
+                            else if (row.rev === '3') h += ' ' + pill('Rev 3 (legacy)');
+                            else if (c.withdrawn) h += ' ' + pill('withdrawn');
+                            return h;
+                        }},
+                        // Control links: Rev 5 live, any differing/dropped Rev 4 struck.
+                        { data: null, render: (d, type, row) => {
+                            const live = row.controls || [], struck = row.controls_struck || [];
+                            if (type !== 'display') return live.concat(struck).join(' ');
+                            let h = live.map(rmf).join(' ');
+                            if (struck.length) {
+                                h += (h ? ' ' : '') + struck.map(c =>
+                                    '<del title="Mapped under Rev 4; superseded or dropped in Rev 5">' + rmf(c) + '</del>'
+                                ).join(' ');
+                            }
+                            return h;
+                        }},
+                        { data: 'ap_acronym', render: dodCell },
+                        { data: null, className: 'pre-wrap', render: (d, type, row) => txt(ctrlOf(row).guidance, type) },
+                        { data: null, className: 'pre-wrap', render: (d, type, row) => txt(ctrlOf(row).definition, type) },
+                    ],
                     columnDefs: [
                         { responsivePriority: 1,     targets: 0 },
                         { responsivePriority: 2,     targets: 1 },
                         { responsivePriority: 3,     targets: 5 },
                         { responsivePriority: 10001, targets: '_all' },
                     ],
+                    createdRow: (tr, data) => {
+                        tr.classList.add('cci-row');
+                        if (data.deprecated) tr.classList.add('is-deprecated');
+                        else if (data.rev === '4') tr.classList.add('is-dropped');
+                    },
                     buttons: [
                         { extend: 'copyHtml5',  text: '<i class="bi bi-copy"></i>',          titleAttr: 'Copy'  },
                         { extend: 'excelHtml5', text: '<i class="bi bi-file-excel"></i>',    titleAttr: 'Excel' },
@@ -84,17 +150,18 @@
                           orientation: 'landscape', pageSize: 'LEGAL' },
                         { extend: 'print',      text: '<i class="bi bi-printer"></i>',       titleAttr: 'Print' },
                     ],
+                    initComplete: function(){
+                        const api = this.api();
+                        $('#cci-count').text(api.page.info().recordsTotal.toLocaleString());
+                        cci_app.applyHashFilter(api);
+                        $(window).on('hashchange', () => cci_app.applyHashFilter(api));
+                    }
                 });
-
-                // Deep-link support: /cci#CCI-000366 pre-filters the table to that
-                // CCI. Used by ui.cci_link from STIG/SCAP detail pages.
-                cci_app.applyHashFilter(dt);
-                $(window).on('hashchange', () => cci_app.applyHashFilter(dt));
             },
-            applyHashFilter(dt) {
+            applyHashFilter(api) {
                 const hash = (window.location.hash || '').replace(/^#/, '').trim();
                 if (/^CCI-\d{6}$/i.test(hash)) {
-                    dt.search(hash).draw();
+                    api.search(hash).draw();
                 }
             }
         };

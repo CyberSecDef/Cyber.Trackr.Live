@@ -22,9 +22,11 @@ class MissingGlobalDataTest extends TestCase
 {
     private const MISSING = '/nonexistent/cyber-trackr-data-dir';
 
-    public function testCciPageReturns503WhenCciCatalogMissing(): void
+    public function testCciDataReturns503WhenCciCatalogMissing(): void
     {
-        $this->assertServiceUnavailable(fn() => (new CciController(self::MISSING))->cci());
+        // The CCI page shell is always available; the data endpoint (/cci/data) is
+        // what guards the reference data, so the 503 lives there now.
+        $this->assertServiceUnavailable(fn() => (new CciController(self::MISSING))->cciData());
     }
 
     public function testApiCciListReturns503(): void
