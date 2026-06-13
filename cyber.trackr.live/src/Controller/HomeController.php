@@ -45,7 +45,9 @@ class HomeController extends AbstractController
 
     private function countCciItems(): int
     {
-        $path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
+        // Use the current 2024 CCI list — the same file the /cci page parses, so the
+        // homepage count agrees with the table instead of trailing the older list.
+        $path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List_2024.xml");
         if ($path === false) return 0;
         $raw = @file_get_contents($path);
         return $raw === false ? 0 : substr_count($raw, '<cci_item ');

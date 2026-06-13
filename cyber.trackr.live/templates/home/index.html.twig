@@ -22,7 +22,7 @@
         <form class="hero-search rise delay-4" onsubmit="return window.app.heroSubmit(event)" role="search">
             <i class="bi bi-search hero-search__icon" aria-hidden="true"></i>
             <input id="hero-search-input" type="search" class="hero-search__input"
-                   placeholder="Search {{ stig_count|number_format }} STIGs, {{ controls_count|number_format }} controls, {{ cci_count|number_format }} CCIs&hellip;"
+                   placeholder="Search {{ stig_count|number_format }} STIGs, {{ (controls_count // 100) * 100 }}+ controls, {{ cci_count|number_format }} CCIs&hellip;"
                    aria-label="Search the library" autocomplete="off">
             <button type="button"
                     id="hero-bookmark-trigger"
@@ -63,7 +63,7 @@
                 API operational
             </span>
             <span class="hero__trust-item">
-                {{ stig_count|number_format }} STIGs &middot; {{ controls_count|number_format }} controls &middot; {{ cci_count|number_format }} CCIs
+                {{ stig_count|number_format }} STIGs &middot; {{ (controls_count // 100) * 100 }}+ controls &middot; {{ cci_count|number_format }} CCIs
             </span>
         </div>
     </section>
@@ -170,7 +170,7 @@
             <a href="{{ path('rmf_v5_view') }}" class="tile span-5">
                 <span class="eyebrow">NIST Controls</span>
                 <h2 class="tile-title">800-53 <em>r5</em></h2>
-                <p class="tile-meta">{{ controls_count|number_format }} controls &middot; current revision</p>
+                <p class="tile-meta">{{ (controls_count // 100) * 100 }}+ controls &middot; current revision</p>
                 <i class="tile-arrow bi bi-arrow-up-right" aria-hidden="true"></i>
             </a>
 
