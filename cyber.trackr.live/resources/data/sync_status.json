@@ -1,4 +1,0 @@
-{
-    "_comment": "Last attempted DISA STIG/SCAP refresh. Stamped automatically by App\\Service\\SyncStatus::markDisaSyncedNow() from the /stig/disa_download and /scap/disa_download endpoints \u2014 do not hand-edit. NIST freshness is derived from the newest mtime among OSCAL files in resources/data/overlays/ and is not stored here.",
-    "disa": "2026-06-09T01:02:33Z"
-}
