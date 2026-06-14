@@ -37,7 +37,17 @@
 #                                       the prod host. -a preserves
 #                                       perms / mtimes; -v prints each
 #                                       transferred file; -z compresses
-#                                       on the wire.
+#                                       on the wire; -h prints sizes
+#                                       human-readable; --progress shows
+#                                       per-file transfer progress (handy
+#                                       for the multi-GB docker tarball);
+#                                       --partial keeps a partially-sent
+#                                       file so an interrupted transfer
+#                                       resumes instead of restarting.
+#                                       NOTE: no --delete — this is an
+#                                       additive sync, not a mirror, so
+#                                       files removed locally are NOT
+#                                       pruned from prod (they orphan).
 #
 # After this finishes, SSH to prod and run ./bin/deploy.sh to clear
 # caches, rebuild the search index, and ping IndexNow.
@@ -85,7 +95,7 @@ echo "[6/7] Freezing changelog from git log …"
 
 echo
 echo "[7/7] Rsyncing to prod (--exclude .env) …"
-rsync -avz \
+rsync -avz -h --partial --progress \
     --exclude '.env' \
     /home/rweber/Git/Cyber.Trackr.Live/cyber.trackr.live/ \
     dh_t7zn6y@vps30818.dreamhostps.com:/home/dh_t7zn6y/cyber.trackr.live/
