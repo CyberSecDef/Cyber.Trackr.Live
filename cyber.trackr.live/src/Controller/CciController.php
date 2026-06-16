@@ -56,6 +56,10 @@ class CciController extends AbstractController
      * auditor/org guidance) has no public Rev 5 equivalent, so the Rev 4 text is carried
      * forward for any CCI still mapped under Rev 4.
      *
+     * The Assessment Procedure column shows the full 800-53A (version 1) reference index
+     * when the CCI carries one (e.g. "AC-16 (5).1 (iii)"); otherwise it falls back to the
+     * Rev 5, then Rev 4, then Rev 3 control reference index, flagged with its source rev.
+     *
      * @return array{data: array<int, array<string, mixed>>, controls: array<string, array<string, mixed>>}
      */
     private function buildRows(): array
@@ -100,9 +104,17 @@ class CciController extends AbstractController
             $r5ctrls = [];
             $r4ctrls = [];
             $r3ctrls = [];
+            // Full reference index strings per version, kept verbatim (e.g.
+            // "AC-16 (5).1 (iii)"). Version 1 is the 800-53A assessment procedure;
+            // 5/4/3 are the 800-53 control references. Drives the Assessment column.
+            $rawByVer = ['1' => [], '5' => [], '4' => [], '3' => []];
             if (isset($cci->references)) {
                 foreach ($cci->references->reference as $ref) {
                     $ver = (string) $ref->attributes()['version'];
+                    $indexRaw = trim((string) $ref->attributes()['index']);
+                    if (isset($rawByVer[$ver]) && $indexRaw !== '') {
+                        $rawByVer[$ver][$indexRaw] = true;
+                    }
                     $base = $this->baseControlFromIndex((string) $ref->attributes()['index']);
                     if ($base === null) {
                         continue;
@@ -114,6 +126,19 @@ class CciController extends AbstractController
                     } elseif ($ver === '3') {
                         $r3ctrls[$base] = true;
                     }
+                }
+            }
+
+            // Assessment Procedure: prefer the full 800-53A (version 1) reference
+            // index(es); when absent, fall back to the Rev 5, then Rev 4, then Rev 3
+            // control reference index — in that order.
+            $assessment = [];
+            $assessment_src = null;
+            foreach (['1', '5', '4', '3'] as $v) {
+                if (!empty($rawByVer[$v])) {
+                    $assessment = array_keys($rawByVer[$v]);
+                    $assessment_src = $v;
+                    break;
                 }
             }
             $r5ctrls = array_keys($r5ctrls);
@@ -171,6 +196,8 @@ class CciController extends AbstractController
                 'cci_auditor' => isset($r4_dod[$id]) ? ($r4_dod[$id]->guidance_auditor ?? '') : '',
                 'cci_guidance' => isset($r4_dod[$id]) ? ($r4_dod[$id]->guidance_org ?? '') : '',
                 'ap_acronym' => isset($r4_dod[$id]) ? ($r4_dod[$id]->ap_acronym ?? '') : '',
+                'assessment' => $assessment,         // full 800-53A ref(s), else control-ref fallback
+                'assessment_src' => $assessment_src, // '1'=800-53A, else '5'/'4'/'3' control-ref rev
                 'rev' => $rev,
                 'deprecated' => ($status === 'deprecated'),
                 'controls' => $live,        // Rev 5 controls (linked, live)
