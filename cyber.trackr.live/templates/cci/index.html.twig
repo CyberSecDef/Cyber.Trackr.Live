@@ -27,6 +27,11 @@
         padding: .5rem .625rem; border-radius: 6px;
         font-size: .8rem; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,.28);
       }
+      /* Assessment Procedure cell: one labeled line per source — the 800-53A
+         reference and (when present) the DoD AP acronym, stacked. */
+      #ccis .ap-line { display: block; }
+      #ccis .ap-line + .ap-line { margin-top: .3rem; }
+      #ccis .ap-label { color: #8a8f98; font-size: .78rem; font-weight: 600; margin-right: .2rem; }
     </style>
     <section class="lib-page" aria-labelledby="cci-page-title">
         <div class="rule-text">&sect; Library &middot; CCIs</div>
@@ -102,18 +107,35 @@
             if (type !== 'display') return data || '';
             return (data && String(data).trim() !== '') ? esc(data) : na(NOTE_DOD);
         }
-        // Assessment Procedure: full 800-53A ref(s) when present, else the control-ref
-        // fallback (Rev 5 -> 4 -> 3) flagged with a "from Rev N" badge. The DoD AP acronym
-        // (when known) rides along as a tooltip for cross-reference.
+        // Assessment Procedure: a labeled line for the 800-53A reference(s) — or the
+        // control-ref fallback (Rev 5 -> 4 -> 3) flagged with a "from Rev N" badge — and,
+        // when the CCI carries a DoD assessment procedure, a second "DoD AP:" line below it.
         function apCell(data, type, row){
             const a = row.assessment || [];
-            if (type !== 'display') return a.join(', ');
-            if (!a.length) return na(NOTE_AP);
-            let h = a.map(pill).join(' ');
-            const label = { '5': 'from Rev 5', '4': 'from Rev 4', '3': 'from Rev 3' }[row.assessment_src];
-            if (label) h += ' ' + pill(label);
-            if (row.ap_acronym) h = '<span title="DoD AP acronym: ' + esc(row.ap_acronym) + '">' + h + '</span>';
-            return h;
+            // Excel export (orthogonal 'export'): clean labeled text, one item per line.
+            if (type === 'export') {
+                const parts = [];
+                if (a.length) parts.push((row.assessment_src === '1' ? '800-53A: ' : '') + a.join(', '));
+                if (row.ap_acronym) parts.push('DoD AP: ' + row.ap_acronym);
+                return parts.join('\n');
+            }
+            // Sort/filter/type: refs plus the DoD AP so the column stays searchable by both.
+            if (type !== 'display') return a.join(', ') + (row.ap_acronym ? ' ' + row.ap_acronym : '');
+            const lines = [];
+            if (a.length) {
+                const refs = a.map(pill).join(' ');
+                if (row.assessment_src === '1') {
+                    lines.push('<span class="ap-label">800-53A:</span>' + refs);
+                } else {
+                    const label = { '5': 'from Rev 5', '4': 'from Rev 4', '3': 'from Rev 3' }[row.assessment_src];
+                    lines.push(refs + (label ? ' ' + pill(label) : ''));
+                }
+            }
+            if (row.ap_acronym) {
+                lines.push('<span class="ap-label">DoD AP:</span>' + pill(row.ap_acronym));
+            }
+            if (!lines.length) return na(NOTE_AP);
+            return lines.map(l => '<span class="ap-line">' + l + '</span>').join('');
         }
 
         const cci_app = {
