@@ -26556,18 +26556,7 @@
             <title>ROOT CAUSE ANALYSIS</title>
             <privacy-impact>NO</privacy-impact>
             <statement>
-               <statement>
-                  <number>SI-2(7)a.</number>
-                  <description>Conduct root cause analysis to identify underlying causes of issues or failures.</description>
-               </statement>
-               <statement>
-                  <number>SI-2(7)b.</number>
-                  <description>Develop actions to address the root cause of the issue or failure.</description>
-               </statement>
-               <statement>
-                  <number>SI-2(7)c.</number>
-                  <description>Implement the actions and monitor the implementation for effectiveness.</description>
-               </statement>
+               <description>a. Conduct root cause analysis to identify underlying causes of issues or failures. b. Develop actions to address the root cause of the issue or failure. c. Implement the actions and monitor the implementation for effectiveness.</description>
             </statement>
             <discussion>
                <description>
