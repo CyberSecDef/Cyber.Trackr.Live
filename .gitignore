@@ -77,3 +77,7 @@
 /cyber.trackr.live/resources/data/bulk_download_index.json
 /cyber.trackr.live/resources/data/companion_zip_index.json
 /cyber.trackr.live/resources/data/kev/*.json
+
+# Local dev convenience router for `php -S` (not used in prod; Apache/.htaccess
+# handles routing there). Kept out of the repo so the dev serve helper doesn't ship.
+/cyber.trackr.live/router.php
