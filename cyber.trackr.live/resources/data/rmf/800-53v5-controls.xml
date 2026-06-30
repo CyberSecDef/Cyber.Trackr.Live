@@ -20053,11 +20053,12 @@
             <description>Acceptance criteria.</description>
          </statement>
       </statement>
-      <discussion>
+            <discussion>
          <description>
-            <p>Security and privacy functional requirements are typically derived from the high-level security and privacy requirements described in <a href="#sa-2">SA-2</a>. The derived requirements include security and privacy capabilities, functions, and mechanisms. Strength requirements associated with such capabilities, functions, and mechanisms include degree of correctness, completeness, resistance to tampering or bypass, and resistance to direct attack. Assurance requirements include development processes, procedures, and methodologies as well as the evidence from development and assessment activities that provide grounds for confidence that the required functionality is implemented and possesses the required strength of mechanism. <a href="https://doi.org/10.6028/NIST.SP.800-160v1">SP 800-160-1</a> describes the process of requirements engineering as part of the system development life cycle.</p>
+            <p>Security and privacy functional requirements are typically derived from the high-level security and privacy requirements described in [SA-2](#sa-2) . The derived requirements include security and privacy capabilities, functions, and mechanisms. Strength requirements associated with such capabilities, functions, and mechanisms include degree of correctness, completeness, resistance to tampering or bypass, and resistance to direct attack. Assurance requirements include development processes, procedures, and methodologies as well as the evidence from development and assessment activities that provide grounds for confidence that the required functionality is implemented and possesses the required strength of mechanism. [SP 800-160-1](#e3cc0520-a366-4fc9-abc2-5272db7e3564) describes the process of requirements engineering as part of the system development life cycle.</p>
             <p>Controls can be viewed as descriptions of the safeguards and protection capabilities appropriate for achieving the particular security and privacy objectives of the organization and for reflecting the security and privacy requirements of stakeholders. Controls are selected and implemented in order to satisfy system requirements and include developer and organizational responsibilities. Controls can include technical, administrative, and physical aspects. In some cases, the selection and implementation of a control may necessitate additional specification by the organization in the form of derived requirements or instantiated control parameter values. The derived requirements and control parameter values may be necessary to provide the appropriate level of implementation detail for controls within the system development life cycle.</p>
             <p>Security and privacy documentation requirements address all stages of the system development life cycle. Documentation provides user and administrator guidance for the implementation and operation of controls. The level of detail required in such documentation is based on the security categorization or classification level of the system and the degree to which organizations depend on the capabilities, functions, or mechanisms to meet risk response expectations. Requirements can include mandated configuration settings that specify allowed functions, ports, protocols, and services. Acceptance criteria for systems, system components, and system services are defined in the same manner as the criteria for any organizational acquisition or procurement.</p>
+            <p>Organizations can determine other requirements that support security and operations, to include responsibilities for the organization and developer, and notification and timing requirements for support, maintenance and updates.</p>
          </description>
       </discussion>
       <related>CM-6</related>
@@ -20476,9 +20477,9 @@
             <description>Distribute documentation to [Assignment: organization-defined personnel or roles].</description>
          </statement>
       </statement>
-      <discussion>
+            <discussion>
          <description>
-            <p>System documentation helps personnel understand the implementation and operation of controls. Organizations consider establishing specific measures to determine the quality and completeness of the content provided. System documentation may be used to support the management of supply chain risk, incident response, and other functions. Personnel or roles that require documentation include system owners, system security officers, and system administrators. Attempts to obtain documentation include contacting manufacturers or suppliers and conducting web-based searches. The inability to obtain documentation may occur due to the age of the system or component or the lack of support from developers and contractors. When documentation cannot be obtained, organizations may need to recreate the documentation if it is essential to the implementation or operation of the controls. The protection provided for the documentation is commensurate with the security category or classification of the system. Documentation that addresses system vulnerabilities may require an increased level of protection. Secure operation of the system includes initially starting the system and resuming secure system operation after a lapse in system operation.</p>
+            <p>System artifacts and documentation created by the developer helps organizational personnel understand the implementation and operation of controls. Organizations consider establishing specific measures to determine the quality and completeness of the content provided. System documentation may be used to delineate roles, responsibilities and expectations of the developer and organization, support the management of supply chain risk, incident response, flaw remediation, and other functions. Personnel or roles that require documentation include system owners, system security officers, and system administrators. Attempts to obtain documentation include contacting manufacturers or suppliers and conducting web-based searches. The inability to obtain documentation may occur due to the age of the system or component or the lack of support from developers and contractors. When documentation cannot be obtained, organizations may need to recreate the documentation if it is essential to the implementation or operation of the controls. The protection provided for the documentation is commensurate with the security category or classification of the system. Documentation that addresses system vulnerabilities may require an increased level of protection. Secure operation of the system includes initially starting the system and resuming secure system operation after a lapse in system operation. An example of least privilege in software development is minimizing the functions that operate with elevated privileges (e.g., limiting the tools and functionality that operate in kernel mode)</p>
          </description>
       </discussion>
       <related>CM-4</related>
@@ -20602,9 +20603,9 @@
       <statement>
          <description>Apply the following systems security and privacy engineering principles in the specification, design, development, implementation, and modification of the system and system components: [Assignment: organization-defined systems security and privacy engineering principles].</description>
       </statement>
-      <discussion>
+            <discussion>
          <description>
-            <p>Systems security and privacy engineering principles are closely related to and implemented throughout the system development life cycle (see <a href="#sa-3">SA-3</a>). Organizations can apply systems security and privacy engineering principles to new systems under development or to systems undergoing upgrades. For existing systems, organizations apply systems security and privacy engineering principles to system upgrades and modifications to the extent feasible, given the current state of hardware, software, and firmware components within those systems.</p>
+            <p>Systems security and privacy engineering principles are closely related to and implemented throughout the system development life cycle (see [SA-3](#sa-3) ). Organizations can apply systems security and privacy engineering principles to new systems under development or to systems undergoing upgrades. For existing systems, organizations apply systems security and privacy engineering principles to system upgrades and modifications to the extent feasible, given the current state of hardware, software, and firmware components within those systems.</p>
             <p>The application of systems security and privacy engineering principles helps organizations develop trustworthy, secure, and resilient systems and reduces the susceptibility to disruptions, hazards, threats, and the creation of privacy problems for individuals. Examples of system security engineering principles include: developing layered protections; establishing security and privacy policies, architecture, and controls as the foundation for design and development; incorporating security and privacy requirements into the system development life cycle; delineating physical and logical security boundaries; ensuring that developers are trained on how to build secure software; tailoring controls to meet organizational needs; and performing threat modeling to identify use cases, threat agents, attack vectors and patterns, design patterns, and compensating controls needed to mitigate risk.</p>
             <p>Organizations that apply systems security and privacy engineering concepts and principles can facilitate the development of trustworthy, secure systems, system components, and system services; reduce risk to acceptable levels; and make informed risk management decisions. System security engineering principles can also be used to protect against certain supply chain risks, including incorporating tamper-resistant hardware into a design.</p>
          </description>
@@ -22282,6 +22283,28 @@
             <related>SA-3</related>
             <related>SA-8</related>
          </control-enhancement>
+         <!-- NIST SP 800-53 Release 5.2.0 data anomaly: the published statement below
+              (PII minimization) is inconsistent with this enhancement's title 'Logging Syntax',
+              its discussion, and its parameters (all logging-related). Mirrored verbatim from
+              NIST's OSCAL catalog; correct if/when NIST issues an erratum. -->
+         <control-enhancement>
+            <number>SA-15(13)</number>
+            <title>LOGGING SYNTAX</title>
+            <privacy-impact>NO</privacy-impact>
+            <statement>
+               <description>Require the developer of the system or system component to minimize the use of personally identifiable information in development and test environments.</description>
+            </statement>
+            <discussion>
+               <description>
+                  <p>In support of better incident response and the ability to more quickly reconstruct security-related actions, identifying specific requirements for secure logging facilitates the ability to connect application-produced audit event logs with operational data. Event types are consistent with the event types defined in AU-02.</p>
+               </description>
+            </discussion>
+            <related>AU-2</related>
+            <related>AU-3</related>
+            <related>IR-4</related>
+            <related>IR-8</related>
+            <related>SA-5</related>
+         </control-enhancement>
       </control-enhancements>
       <references>
          <reference>
@@ -22795,6 +22818,141 @@
       <related>RA-9</related>
       <related>SA-8</related>
       <references>
+         <reference>
+            <item href="https://doi.org/10.6028/NIST.SP.800-160v1" xml:lang="en-US">
+               <text>Ross RS, Oren JC, McEvilley M (2016) Systems Security Engineering: Considerations for a Multidisciplinary Approach in the Engineering of Trustworthy Secure Systems. (National Institute of Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-160, Vol. 1, Includes updates as of March 21, 2018.</text>
+            </item>
+            <short_name>SP 800-160-1</short_name>
+         </reference>
+         <reference>
+            <item href="https://doi.org/10.6028/NIST.SP.800-160v2" xml:lang="en-US">
+               <text>Ross RS, Pillitteri VY, Graubart R, Bodeau D, McQuaid R (2019) Developing Cyber Resilient Systems: A Systems Security Engineering Approach. (National Institute of Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-160, Vol. 2.</text>
+            </item>
+            <short_name>SP 800-160-2</short_name>
+         </reference>
+      </references>
+   </controls:control>
+   <controls:control>
+      <family>SYSTEM AND SERVICES ACQUISITION</family>
+      <number>SA-24</number>
+      <title>DESIGN FOR CYBER RESILIENCY</title>
+      <baseline>NOT SELECTED</baseline>
+      <statement>
+         <statement>
+            <number>SA-24a.</number>
+            <description>Design organizational systems, system components, or system services to achieve cyber resiliency by:</description>
+            <statement>
+               <number>SA-24a.1.</number>
+               <description>Defining the following cyber resiliency goals: [Assignment: organization-defined cyber resiliency goals].</description>
+            </statement>
+            <statement>
+               <number>SA-24a.2.</number>
+               <description>Defining the following cyber resiliency objectives: [Assignment: organization-defined cyber resiliency objectives].</description>
+            </statement>
+            <statement>
+               <number>SA-24a.3.</number>
+               <description>Defining the following cyber resiliency techniques: [Assignment: organization-defined cyber resiliency techniques].</description>
+            </statement>
+            <statement>
+               <number>SA-24a.4.</number>
+               <description>Defining the following cyber resiliency implementation approaches: [Assignment: organization-defined cyber resiliency implementation approaches].</description>
+            </statement>
+            <statement>
+               <number>SA-24a.5.</number>
+               <description>Defining the following cyber resiliency design principles: [Assignment: organization-defined cyber resiliency design principles].</description>
+            </statement>
+         </statement>
+         <statement>
+            <number>SA-24b.</number>
+            <description>Implement the selected cyber resiliency goals, objectives, techniques, implementation approaches, and design principles as part of an organizational risk management process or systems security engineering process.</description>
+         </statement>
+      </statement>
+      <discussion>
+         <description>
+            <p>Cyber resiliency is critical to ensuring the survivability of mission critical systems and high value assets. Cyber resiliency focuses on limiting the damage from adversity or the conditions that can cause a loss of assets. Damage can affect: (1) organizations (e.g., loss of reputation, increased existential risk); (2) missions or business functions (e.g., decreased capability to complete current missions and to accomplish future missions); (3) security (e.g., decreased capability to achieve security objectives or to prevent, detect, and respond to cyber incidents); (4) systems (e.g., unauthorized use of system resources or decreased capability to meet system requirements); or (5) specific system elements (e.g., physical destruction; corruption, modification, or fabrication of information).</p>
+            <p>Cyber resiliency goals are intended to help organizations maintain a state of informed preparedness for adversity, continue essential mission or business functions despite adversity, restore mission or business functions during and after adversity, and modify mission or business functions and their supporting capabilities in response to predicted changes in technical, operational, or threat environments.</p>
+            <p>NIST SP 800-160, Volume 2 provides additional information on the Cyber Resiliency Engineering Framework to include detailed descriptions of cyber resiliency goals, objectives, techniques, implementation approaches, and design principles. NIST SP 800-160, Vol 1 provides additional information on achieving cyber resiliency as an emergent property of an engineered system.</p>
+         </description>
+      </discussion>
+      <related>CA-7</related>
+      <related>CP-2</related>
+      <related>CP-4</related>
+      <related>CP-9</related>
+      <related>CP-10</related>
+      <related>CP-11</related>
+      <related>CP-12</related>
+      <related>CP-13</related>
+      <related>IA-10</related>
+      <related>IR-4</related>
+      <related>IR-5</related>
+      <related>PE-11</related>
+      <related>PE-17</related>
+      <related>PL-8</related>
+      <related>PM-7</related>
+      <related>PM-16</related>
+      <related>PM-30</related>
+      <related>PM-31</related>
+      <related>RA-3</related>
+      <related>RA-5</related>
+      <related>RA-9</related>
+      <related>RA-10</related>
+      <related>SA-3</related>
+      <related>SA-8</related>
+      <related>SA-9</related>
+      <related>SA-17</related>
+      <related>SC-3</related>
+      <related>SC-5</related>
+      <related>SC-7</related>
+      <related>SC-10</related>
+      <related>SC-11</related>
+      <related>SC-29</related>
+      <related>SC-30</related>
+      <related>SC-34</related>
+      <related>SC-35</related>
+      <related>SC-36</related>
+      <related>SC-37</related>
+      <related>SC-39</related>
+      <related>SC-44</related>
+      <related>SC-47</related>
+      <related>SC-48</related>
+      <related>SC-49</related>
+      <related>SC-50</related>
+      <related>SC-51</related>
+      <related>SI-3</related>
+      <related>SI-4</related>
+      <related>SI-6</related>
+      <related>SI-7</related>
+      <related>SI-10</related>
+      <related>SI-14</related>
+      <related>SI-15</related>
+      <related>SI-16</related>
+      <related>SI-19</related>
+      <related>SI-20</related>
+      <related>SI-21</related>
+      <related>SI-22</related>
+      <related>SI-23</related>
+      <related>SR-3</related>
+      <related>SR-4</related>
+      <related>SR-5</related>
+      <related>SR-6</related>
+      <related>SR-7</related>
+      <related>SR-9</related>
+      <related>SR-10</related>
+      <related>SR-11</related>
+      <references>
+         <reference>
+            <item href="https://www.whitehouse.gov/sites/whitehouse.gov/files/omb/circulars/A130/a130revised.pdf"
+                  xml:lang="en-US">
+               <text>Office of Management and Budget Memorandum Circular A-130, <i>Managing Information as a Strategic Resource</i>, July 2016.</text>
+            </item>
+            <short_name>OMB A-130</short_name>
+         </reference>
+         <reference>
+            <item href="https://doi.org/10.6028/NIST.SP.800-30r1" xml:lang="en-US">
+               <text>Joint Task Force Transformation Initiative (2012) Guide for Conducting Risk Assessments. (National Institute of Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-30, Rev. 1.</text>
+            </item>
+            <short_name>SP 800-30</short_name>
+         </reference>
          <reference>
             <item href="https://doi.org/10.6028/NIST.SP.800-160v1" xml:lang="en-US">
                <text>Ross RS, Oren JC, McEvilley M (2016) Systems Security Engineering: Considerations for a Multidisciplinary Approach in the Engineering of Trustworthy Secure Systems. (National Institute of Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-160, Vol. 1, Includes updates as of March 21, 2018.</text>
@@ -26284,10 +26442,11 @@
             <description>Incorporate flaw remediation into the organizational configuration management process.</description>
          </statement>
       </statement>
-      <discussion>
+            <discussion>
          <description>
-            <p>The need to remediate system flaws applies to all types of software and firmware. Organizations identify systems affected by software flaws, including potential vulnerabilities resulting from those flaws, and report this information to designated organizational personnel with information security and privacy responsibilities. Security-relevant updates include patches, service packs, and malicious code signatures. Organizations also address flaws discovered during assessments, continuous monitoring, incident response activities, and system error handling. By incorporating flaw remediation into configuration management processes, required remediation actions can be tracked and verified.</p>
-            <p>Organization-defined time periods for updating security-relevant software and firmware may vary based on a variety of risk factors, including the security category of the system, the criticality of the update (i.e., severity of the vulnerability related to the discovered flaw), the organizational risk tolerance, the mission supported by the system, or the threat environment. Some types of flaw remediation may require more testing than other types. Organizations determine the type of testing needed for the specific type of flaw remediation activity under consideration and the types of changes that are to be configuration-managed. In some situations, organizations may determine that the testing of software or firmware updates is not necessary or practical, such as when implementing simple malicious code signature updates. In testing decisions, organizations consider whether security-relevant software or firmware updates are obtained from authorized sources with appropriate digital signatures.</p>
+            <p>The need to remediate system flaws applies to all types of software and firmware. Organizations identify systems affected by software flaws, including potential vulnerabilities resulting from those flaws, and report this information to designated organizational personnel with information security and privacy responsibilities. Organizations consider establishing a controlled patching environment for mission-critical systems. Security-relevant updates include patches, service packs, and malicious code signatures. Organizations also address flaws discovered during assessments, continuous monitoring, incident response activities, and system error handling. By incorporating flaw remediation into configuration management processes, required remediation actions can be tracked and verified.</p>
+            <p>Organization-defined time periods for updating security-relevant software and firmware may vary based on a variety of risk factors, including the security category of the system, the criticality of the update (i.e., severity of the vulnerability related to the discovered flaw), the organizational risk tolerance, the mission supported by the system, or the threat environment. Some types of flaw remediation may require more testing than other types. Organizations determine the type of testing needed for the specific type of flaw remediation activity under consideration and the types of changes that are to be configuration-managed. Flaw remediation testing addresses both effectiveness of addressing security issues and for potential side effects on functionality, system and system component performance and operations. When implementing remediation activities, organizations consider the order and timing of updates to validate correct execution within the system environment, and to support system and component availability needs (i.e., implementing a staggered deployment strategy). In some situations, organizations may determine that the testing of software or firmware updates is not necessary or practical, such as when implementing simple malicious code signature updates. In testing decisions, organizations consider whether security-relevant software or firmware updates are obtained from authorized sources with appropriate digital signatures.</p>
+            <p>When implementing remediation activities, organizations consider the order and timing of updates to validate correct execution within the system environment, and to support system and component availability needs (i.e., implementing a staggered deployment strategy). Organizations verify that software and firmware updates come from authorized sources prior to downloading.</p>
          </description>
       </discussion>
       <related>CA-5</related>
@@ -26373,9 +26532,9 @@
             <statement>
                <description>Install [Assignment: organization-defined security-relevant software and firmware updates] automatically to [Assignment: organization-defined system components].</description>
             </statement>
-            <discussion>
+                        <discussion>
                <description>
-                  <p>Due to system integrity and availability concerns, organizations consider the methodology used to carry out automatic updates. Organizations balance the need to ensure that the updates are installed as soon as possible with the need to maintain configuration management and control with any mission or operational impacts that automatic updates might impose.</p>
+                  <p>Due to system integrity and availability concerns, organizations consider the methodology used to carry out automatic updates. Organizations balance the need to ensure that the updates are installed as soon as possible with the need to maintain configuration management and control with any mission or operational impacts that automatic updates might impose (i.e., implementing a staggered deployment strategy).</p>
                </description>
             </discussion>
          </control-enhancement>
@@ -26391,6 +26550,59 @@
                   <p>Previous versions of software or firmware components that are not removed from the system after updates have been installed may be exploited by adversaries. Some products may automatically remove previous versions of software and firmware from the system.</p>
                </description>
             </discussion>
+         </control-enhancement>
+         <control-enhancement>
+            <number>SI-2(7)</number>
+            <title>ROOT CAUSE ANALYSIS</title>
+            <privacy-impact>NO</privacy-impact>
+            <statement>
+               <statement>
+                  <number>SI-2(7)a.</number>
+                  <description>Conduct root cause analysis to identify underlying causes of issues or failures.</description>
+               </statement>
+               <statement>
+                  <number>SI-2(7)b.</number>
+                  <description>Develop actions to address the root cause of the issue or failure.</description>
+               </statement>
+               <statement>
+                  <number>SI-2(7)c.</number>
+                  <description>Implement the actions and monitor the implementation for effectiveness.</description>
+               </statement>
+            </statement>
+            <discussion>
+               <description>
+                  <p>Root cause analysis includes a wide range of approaches, tools, and techniques to systematically identify the underlying cause of issues or failures to systems and systems components (hardware, software, and firmware). Organizations consider the severity of the incident to determine what root cause analysis method is used and how quickly implementation of the remediation actions. The root cause analysis includes a timeline, missed warning signs, key decisions, gaps, mitigations, and verification of effectiveness. The actions identified to address the source of the issue are implemented and integrated into applicable organizational policy, procedures, and control implementation.</p>
+               </description>
+            </discussion>
+            <related>AC-1</related>
+            <related>AT-1</related>
+            <related>AU-1</related>
+            <related>AU-2</related>
+            <related>CA-1</related>
+            <related>CA-7</related>
+            <related>CM-1</related>
+            <related>CP-1</related>
+            <related>IA-1</related>
+            <related>IR-1</related>
+            <related>IR-6</related>
+            <related>IR-8</related>
+            <related>MA-1</related>
+            <related>MA-3</related>
+            <related>MP-1</related>
+            <related>PE-1</related>
+            <related>PL-1</related>
+            <related>PM-1</related>
+            <related>PS-1</related>
+            <related>PT-1</related>
+            <related>RA-1</related>
+            <related>RA-5</related>
+            <related>SA-1</related>
+            <related>SA-11</related>
+            <related>SA-15</related>
+            <related>SC-1</related>
+            <related>SI-1</related>
+            <related>SR-1</related>
+            <related>SR-8</related>
          </control-enhancement>
       </control-enhancements>
       <references>
@@ -27550,10 +27762,11 @@
             </statement>
             <discussion>
                <description>
-                  <p>Organizations verify the integrity of user-installed software prior to execution to reduce the likelihood of executing malicious code or programs that contains errors from unauthorized modifications. Organizations consider the practicality of approaches to verifying software integrity, including the availability of trustworthy checksums from software developers and vendors.</p>
+                  <p>Organizations verify the integrity of user-installed software prior to execution to reduce the likelihood of executing malicious code or programs that contains errors from unauthorized modifications. Organizations consider the source of the software, ensuring the software and updates come from authorized sources and/or sites, and the practicality of approaches to verifying software integrity, including the availability of trustworthy checksums from software developers and vendors.</p>
                </description>
             </discussion>
             <related>CM-11</related>
+            <related>SI-2</related>
          </control-enhancement>
          <control-enhancement>
             <number>SI-7(13)</number>
