@@ -52,7 +52,7 @@ class ApiController extends AbstractController
                 ]
             ],
             "/cci" => [
-                "summary" => "The list of tracked Common Control Identifiers (CCIs)."
+                "summary" => "The list of tracked Control Correlation Identifiers (CCIs)."
             ],
             "/cci/{item}" => [
                 "summary" => "The details on the selected CCI",

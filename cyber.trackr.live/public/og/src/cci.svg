@@ -21,7 +21,7 @@
   <line x1="60" y1="125" x2="200" y2="125" stroke="#7a1e1e" stroke-width="2"/>
 
   <!-- title -->
-  <text x="60" y="305" font-family="Georgia, serif" font-size="76" font-weight="500" fill="#ffffff">Common Control</text>
+  <text x="60" y="305" font-family="Georgia, serif" font-size="76" font-weight="500" fill="#ffffff">Control Correlation</text>
   <text x="60" y="385" font-family="Georgia, serif" font-size="76" font-weight="500" font-style="italic" fill="#ffffff">Identifiers.</text>
 
   <!-- subtitle -->
