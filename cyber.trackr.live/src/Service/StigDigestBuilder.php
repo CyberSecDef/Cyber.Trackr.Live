@@ -18,20 +18,25 @@ namespace App\Service;
  * ident as a fallback (matching the strategy used by the existing
  * compare.html.twig template).
  *
- * Cache invalidation is based on source-file mtimes: the cached JSON stores
- * the mtimes of both current and previous XMLs at write time and is
- * recomputed on read if either source has since changed.
+ * Cache invalidation is based on source-file mtimes plus the identity of the
+ * previous file: the cached JSON stores the previous XML's filename and the
+ * mtimes of both XMLs at write time, and is recomputed on read if either
+ * source has since changed or the TOC now resolves a different previous
+ * version (e.g. a release that was pulled late or a duplicate entry removed).
  */
 class StigDigestBuilder
 {
     private const XCCDF_NS = 'http://checklists.nist.gov/xccdf/1.1';
-    private const SCHEMA_VERSION = 1;
+    private const SCHEMA_VERSION = 2;
 
     /**
      * Resolve the previous TOC entry for the given title + version + release.
      * The TOC entries are date-sorted descending; "previous" is the entry
-     * immediately after the current one in that order. Returns null if the
-     * current entry is the only one or the oldest.
+     * immediately after the current one in that order, skipping duplicate
+     * entries that share the current version + release (DISA sometimes ships
+     * the same release under two filenames, which would otherwise produce a
+     * self-diff). Returns null if the current entry is the only one or the
+     * oldest.
      *
      * @param array<int,object|array> $tocEntries  TOC entries for this title
      * @return array{version:string,release:string,filename:string,date:string,released:string}|null
@@ -50,8 +55,13 @@ class StigDigestBuilder
             }
         }
         if ($currentIdx === null) return null;
-        if (!isset($entries[$currentIdx + 1])) return null;
-        return $entries[$currentIdx + 1];
+        for ($i = $currentIdx + 1; isset($entries[$i]); $i++) {
+            if ((string) $entries[$i]['version'] !== (string) $version
+                || (string) $entries[$i]['release'] !== (string) $release) {
+                return $entries[$i];
+            }
+        }
+        return null;
     }
 
     /**
@@ -78,6 +88,7 @@ class StigDigestBuilder
             $cached = @json_decode(@file_get_contents($cachePath), true);
             if (is_array($cached)
                 && ($cached['schema_version'] ?? 0) === self::SCHEMA_VERSION
+                && ($cached['previous_filename'] ?? '') === $previous['filename']
                 && ($cached['source_mtime'] ?? 0) >= filemtime($currentPath)
                 && ($cached['previous_mtime'] ?? 0) >= filemtime($previousPath)) {
                 return $cached['digest'];
@@ -88,10 +99,11 @@ class StigDigestBuilder
         $digest = $this->compute($currentPath, $previousPath, $current, $previous);
 
         @file_put_contents($cachePath, json_encode([
-            'schema_version' => self::SCHEMA_VERSION,
-            'source_mtime'   => filemtime($currentPath),
-            'previous_mtime' => filemtime($previousPath),
-            'digest'         => $digest,
+            'schema_version'    => self::SCHEMA_VERSION,
+            'previous_filename' => $previous['filename'],
+            'source_mtime'      => filemtime($currentPath),
+            'previous_mtime'    => filemtime($previousPath),
+            'digest'            => $digest,
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return $digest;
