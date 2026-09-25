@@ -25,6 +25,14 @@
 #   4. app:bulk-download:rebuild-index — refresh per-row XML/ZIP presence
 #                                       + sizes that drive /stig/bulk.
 #                                       Depends on step 2.
+#                                       Steps 2-4 are for dev's own site
+#                                       and to fail fast on a bad XML
+#                                       before shipping. Their outputs
+#                                       are NOT shipped: prod's cron pulls
+#                                       STIG/SCAP bundles dev never has,
+#                                       so dev's indexes would drop those
+#                                       from prod. deploy.sh rebuilds them
+#                                       on prod from prod's own XML.
 #   5. app:version:freeze             — bake the version string into
 #                                       /VERSION so prod doesn't try to
 #                                       compute it from .git (which
@@ -46,11 +54,26 @@
 #                                       resumes instead of restarting.
 #                                       NOTE: no --delete — this is an
 #                                       additive sync, not a mirror, so
-#                                       files removed locally are NOT
-#                                       pruned from prod (they orphan).
+#                                       prod-only data (cron-pulled STIG /
+#                                       SCAP XML + zips) survives.
+#                                       Excluded, because prod builds or
+#                                       owns its own copy:
+#                                         var/ (caches, logs, share pools)
+#                                         resources/data/search/ (index)
+#                                         the generated toc / sidecar
+#                                           indexes from steps 2-4
+#                                         resources/data/sync_status.json
+#                                         *.digest.json (STIG digests)
+#   8. rsync --delete (code dirs)     — mirror bin/ config/ src/
+#                                       templates/ translations/ vendor/
+#                                       so files deleted on dev (a removed
+#                                       service, an uninstalled package's
+#                                       config) don't orphan on prod and
+#                                       break the container compile.
 #
-# After this finishes, SSH to prod and run ./bin/deploy.sh to clear
-# caches, rebuild the search index, and ping IndexNow.
+# After this finishes, SSH to prod and run ./bin/deploy.sh to rebuild
+# the toc / sidecar indexes and search index from prod's data, clear
+# caches, and ping IndexNow.
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -70,35 +93,52 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/7] Refreshing CISA KEV catalog …"
+echo "[1/8] Refreshing CISA KEV catalog …"
 "$PHP" bin/console app:kev:refresh
 
 echo
-echo "[2/7] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
+echo "[2/8] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
 "$PHP" bin/console app:stig:rebuild
 
 echo
-echo "[3/7] Rebuilding companion-ZIP index for STIG pages …"
+echo "[3/8] Rebuilding companion-ZIP index for STIG pages …"
 "$PHP" bin/console app:companion-zip:rebuild-index
 
 echo
-echo "[4/7] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
+echo "[4/8] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
 "$PHP" bin/console app:bulk-download:rebuild-index
 
 echo
-echo "[5/7] Freezing version string …"
+echo "[5/8] Freezing version string …"
 "$PHP" bin/console app:version:freeze
 
 echo
-echo "[6/7] Freezing changelog from git log …"
+echo "[6/8] Freezing changelog from git log …"
 "$PHP" bin/console app:changelog:freeze
 
 echo
-echo "[7/7] Rsyncing to prod (--exclude .env) …"
+SRC=/home/rweber/Git/Cyber.Trackr.Live/cyber.trackr.live
+DEST=dh_t7zn6y@vps30818.dreamhostps.com:/home/dh_t7zn6y/cyber.trackr.live
+
+echo "[7/8] Rsyncing to prod (additive; prod-owned data excluded) …"
 rsync -avz -h --partial --progress \
     --exclude '.env' \
-    /home/rweber/Git/Cyber.Trackr.Live/cyber.trackr.live/ \
-    dh_t7zn6y@vps30818.dreamhostps.com:/home/dh_t7zn6y/cyber.trackr.live/
+    --exclude '/var/' \
+    --exclude '/resources/data/search/' \
+    --exclude '/resources/data/stig_toc.json' \
+    --exclude '/resources/data/scap_toc.json' \
+    --exclude '/resources/data/vulns_toc.json' \
+    --exclude '/resources/data/companion_zip_index.json' \
+    --exclude '/resources/data/bulk_download_index.json' \
+    --exclude '/resources/data/sync_status.json' \
+    --exclude '*.digest.json' \
+    "$SRC/" "$DEST/"
+
+echo
+echo "[8/8] Mirroring code dirs to prod (prunes files deleted on dev) …"
+for dir in bin config src templates translations vendor; do
+    rsync -az -h --delete --exclude '.env' "$SRC/$dir/" "$DEST/$dir/"
+done
 
 echo
 echo "──────────────────────────────────────────"

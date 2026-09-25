@@ -341,7 +341,7 @@ The site is "git is the database" by design. To add or refresh content:
 4. **800-53** — replace the `rmf/800-53v[45]-controls.xml` files. Same — read on demand.
 5. **Baselines** — drop a new `*_profile.json` into `resources/data/overlays/`. The chip strip on `/rmf/5`, the wizard dropdown on every plan, and the baseline heat map all pick it up automatically.
 6. **Plan families** — drop a new `<family>.json` into `resources/data/plans/`. The plan-generator landing page and wizard machinery handle it.
-7. **Daily cron (`bin/refresh-data.sh`)** — pulls everything that changes on its own and rebuilds every dependent index, in order: CISA KEV (`app:kev:refresh`), new STIG / SCAP bundles from cyber.mil (`app:disa:sync-stig`, `app:disa:sync-scap`), the stig / scap / vulns tocs (`app:stig:rebuild` meta), the XML→ZIP companion map (`app:companion-zip:rebuild-index`), the bulk-download presence/size index (`app:bulk-download:rebuild-index`), the inverted search index (`app:search:rebuild`, incremental), and an IndexNow ping for new STIGs + the vulns landing pages. `bin/ship.sh` runs the same content-side set at deploy time. Run any individually with `bin/console <name>` for a one-off rebuild.
+7. **Daily cron (`bin/refresh-data.sh`)** — pulls everything that changes on its own and rebuilds every dependent index, in order: CISA KEV (`app:kev:refresh`), new STIG / SCAP bundles from cyber.mil (`app:disa:sync-stig`, `app:disa:sync-scap`), the stig / scap / vulns tocs (`app:stig:rebuild` meta), the XML→ZIP companion map (`app:companion-zip:rebuild-index`), the bulk-download presence/size index (`app:bulk-download:rebuild-index`), the inverted search index (`app:search:rebuild`, incremental), and an IndexNow ping for new STIGs + the vulns landing pages. `bin/deploy.sh` runs the same toc / sidecar / search rebuilds at deploy time. Run any individually with `bin/console <name>` for a one-off rebuild.
 8. **Sync timestamps** — edit `resources/data/sync_status.json`.
 9. Commit and push. Production deploy is `git pull` followed by `./bin/deploy.sh` on prod.
 
@@ -355,8 +355,8 @@ Three scripts under `cyber.trackr.live/bin/` form the end-to-end content + code 
 
 | Script | Where it runs | When | What |
 | --- | --- | --- | --- |
-| `bin/ship.sh` | dev | when shipping new code or data | Refreshes KEV; rebuilds the stig / scap / vulns tocs, companion-ZIP index, and bulk-download index from current XML; freezes version + changelog; rsyncs everything (except `.env`) to prod. |
-| `bin/deploy.sh` | prod, after rsync | every deploy | Full rebuild of the inverted search index; clears the prod + dev caches so Symfony picks up the new compiled container; best-effort IndexNow ping for recently-changed pages; runs `fix-perms.sh` last to normalise file modes. |
+| `bin/ship.sh` | dev | when shipping new code or data | Refreshes KEV; rebuilds the tocs + sidecar indexes on dev (fail-fast check only, not shipped); freezes version + changelog; rsyncs to prod additively, excluding `.env`, `var/`, the search index, the generated tocs / sidecar indexes, `sync_status.json`, and `*.digest.json` (prod builds or owns those); then mirrors `bin/ config/ src/ templates/ translations/ vendor/` with `--delete` so files removed on dev don't orphan on prod. |
+| `bin/deploy.sh` | prod, after rsync | every deploy | Rebuilds the tocs + sidecar indexes from prod's own XML (which includes cron-pulled bundles dev never has); full rebuild of the inverted search index; clears the prod cache so Symfony picks up the new compiled container; best-effort IndexNow ping; runs `fix-perms.sh`. An `EXIT` trap runs `cache:pool:clear cache.app` on success or failure: since Symfony 7.4 the app pool lives in `var/share/`, which `cache:clear` does not touch. |
 | `bin/refresh-data.sh` | prod cron, 04:00 daily | nightly | Pulls the CISA KEV catalog + any new STIG / SCAP bundles from cyber.mil; rebuilds every toc + sidecar index; incremental search-index sync; IndexNow ping for new STIGs + vulns landing pages. Network-dependent steps are wrapped in `\|\| true` so a cyber.mil / CISA outage can't kill the cron and skip the downstream rebuilds. |
 
 A typical dev → prod deploy:
@@ -366,7 +366,7 @@ A typical dev → prod deploy:
 ssh prod 'cd /path/to/cyber.trackr.live && ./bin/deploy.sh'
 ```
 
-Out-of-band utility: `bin/fix-perms.sh` resets directory / file modes to the standard PHP-site pattern (755 / 644, with `.env` files at 600). Already wired into `deploy.sh` step 5, but safe to re-run any time prod starts returning 403/500 from permission-denied errors.
+Out-of-band utility: `bin/fix-perms.sh` resets directory / file modes to the standard PHP-site pattern (755 / 644, with `.env` files at 600). Already wired into `deploy.sh` step 7, but safe to re-run any time prod starts returning 403/500 from permission-denied errors.
 
 ---
 

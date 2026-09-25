@@ -7,20 +7,30 @@
 #   ./bin/deploy.sh
 #
 # Order matters here. Things to know:
-#   1. app:search:rebuild --full goes first because it can take a while
-#      and we'd rather have a stale cache while it runs than have it
-#      blow up halfway through against a freshly-cleared cache that's
-#      missing compiled services.
-#   2. cache:clear --env=prod has to run BEFORE any prod request hits
+#   1. The toc / sidecar indexes (stig, scap, vulns, companion-ZIP,
+#      bulk-download) are rebuilt HERE from prod's XML, not shipped from
+#      dev: prod's nightly cron pulls STIG/SCAP bundles dev never has,
+#      and dev's indexes would drop them from the site until the next
+#      cron. Same commands, same order as refresh-data.sh steps 4-6.
+#   2. app:search:rebuild --full runs next because it reads
+#      stig_toc.json to pick the latest release per title, and because
+#      it can take a while — we'd rather have a stale cache while it
+#      runs than have it blow up halfway through against a freshly-
+#      cleared cache that's missing compiled services.
+#   3. cache:clear --env=prod has to run BEFORE any prod request hits
 #      the new code, otherwise Symfony serves from the old compiled
 #      container and crashes when it can't resolve a new service.
-#   3. cache:clear --env=dev is included so that future tail-of-the-log
-#      debugging from a `console --env=dev` session doesn't fight an
-#      old dev container either.
-#   4. The IndexNow ping is best-effort — any failure (no key file,
+#   4. cache:clear does NOT clear the app cache pool. Since Symfony 7.4
+#      cache.app lives in var/share/prod/pools/app, outside the cache
+#      dir cache:clear swaps out. The search index caches its postings
+#      and shards there (IndexStore), so a stale entry would pair an old
+#      posting map with new shards and return the wrong documents.
+#      cache:pool:clear cache.app runs from an EXIT trap so it happens
+#      even when a step above fails and `set -e` aborts the deploy.
+#   5. The IndexNow ping is best-effort — any failure (no key file,
 #      network blip, IndexNow service hiccup) MUST NOT fail the
 #      deploy. We wrap it in `|| true`.
-#   5. fix-perms.sh runs LAST, after cache:clear has regenerated the
+#   6. fix-perms.sh runs LAST, after cache:clear has regenerated the
 #      cache files with whatever umask the deploy user has. It must
 #      be invoked from the site root (the dir containing ./bin/) —
 #      this script's `cd "$(dirname "$0")/.."` above guarantees that.
@@ -39,29 +49,45 @@ if ! command -v "$PHP" >/dev/null 2>&1; then
     exit 1
 fi
 
+# Runs on every exit, success or failure (see note 4 above).
+clear_app_pool() {
+    echo
+    echo "[trap] Clearing the app cache pool (search postings + shards) …"
+    "$PHP" bin/console cache:pool:clear cache.app --env=prod || true
+}
+trap clear_app_pool EXIT
+
 echo "──────────────────────────────────────────"
 echo "  Cyber Trackr deploy"
 echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/5] Rebuilding the inverted search index (this takes a minute) …"
+echo "[1/7] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
+"$PHP" bin/console app:stig:rebuild
+
+echo
+echo "[2/7] Rebuilding companion-ZIP index for STIG pages …"
+"$PHP" bin/console app:companion-zip:rebuild-index
+
+echo
+echo "[3/7] Rebuilding bulk-download index (XML/ZIP presence + sizes) …"
+"$PHP" bin/console app:bulk-download:rebuild-index
+
+echo
+echo "[4/7] Rebuilding the inverted search index (this takes a minute) …"
 "$PHP" bin/console app:search:rebuild --full
 
 echo
-echo "[2/5] Clearing the prod cache …"
+echo "[5/7] Clearing the prod cache …"
 "$PHP" bin/console cache:clear --env=prod
 
 echo
-echo "[3/5] Clearing the dev cache …"
-"$PHP" bin/console cache:clear --env=dev
-
-echo
-echo "[4/5] Pinging IndexNow about recently-changed pages (best-effort) …"
+echo "[6/7] Pinging IndexNow about recently-changed pages (best-effort) …"
 "$PHP" bin/console app:indexnow:ping --recent --within=30 || true
 
 echo
-echo "[5/5] Resetting PHP-site permissions …"
+echo "[7/7] Resetting PHP-site permissions …"
 ./bin/fix-perms.sh
 
 echo
