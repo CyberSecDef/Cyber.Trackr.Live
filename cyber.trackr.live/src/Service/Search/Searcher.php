@@ -13,6 +13,9 @@ namespace App\Service\Search;
  *   - If at least one bare token matches no doc directly, it falls back
  *     to fuzzy: trigram lookup against the vocabulary, edit-distance <= 1
  *     verification, then re-runs AND with the closest substitute.
+ *     Structured identifiers (V-253254, SV-...r1_rule, CCI-000366, AC-2(3))
+ *     never fuzz: a near-miss ID is a different requirement, so an unknown
+ *     ID returns nothing rather than its nearest neighbour.
  *   - Results are bucketed by doc.type into the same five-section shape
  *     the existing search.html.twig template renders.
  */
@@ -138,7 +141,8 @@ class Searcher
     /**
      * For each token absent from the postings, find the closest replacement
      * via trigrams + edit-distance <= 1. Returns the substituted token list,
-     * or null if any token has no viable replacement.
+     * or null if any token has no viable replacement. Structured IDs are
+     * exact-only and always count as having no replacement.
      */
     private function fuzzySubstitutions(array $tokens, array $postings): ?array
     {
@@ -150,6 +154,10 @@ class Searcher
             if (isset($postings[$tok])) {
                 $out[] = $tok;
                 continue;
+            }
+            // V-253258 -> V-25325 is a different STIG entirely, not a typo fix.
+            if ($tokenizer->isStructuredId($tok)) {
+                return null;
             }
             // Candidate set: tokens sharing >= half of the query token's trigrams.
             $tris = $tokenizer->trigrams($tok);

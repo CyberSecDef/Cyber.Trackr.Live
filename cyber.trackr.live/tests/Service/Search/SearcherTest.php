@@ -91,6 +91,73 @@ class SearcherTest extends TestCase
         $this->assertCount(0, $out['vulns']);
     }
 
+    /**
+     * Index with real trigrams so the fuzzy fallback is exercised. V-25325 is
+     * one edit away from V-253258 and V-253253 (the production bug: both
+     * returned a Mac OS X 10.5 rule).
+     */
+    private function fuzzySearcher(): Searcher
+    {
+        $dir = $this->tmpDir();
+        $store = new IndexStore($dir, new ArrayAdapter());
+        $tokenizer = new Tokenizer();
+
+        $docs = [
+            0 => ['type' => 'vulns', 'id' => 'V-25325',  'text' => 'V-25325 mac filevault',   'released' => '2010-01-01', 'stig_title' => 'MAC_OSX_10.5'],
+            1 => ['type' => 'vulns', 'id' => 'V-253254', 'text' => 'V-253254 windows defender', 'released' => '2026-08-10', 'stig_title' => 'Windows_11'],
+            2 => ['type' => 'ccis',  'id' => 'CCI-000366', 'text' => 'CCI-000366 configuration settings'],
+        ];
+        $postings = [];
+        foreach ($docs as $i => $d) {
+            foreach ($tokenizer->tokenize($d['text']) as $t) {
+                $postings[$t][] = $i;
+            }
+        }
+        $trigrams = [];
+        foreach (array_keys($postings) as $t) {
+            foreach ($tokenizer->trigrams($t) as $tri) {
+                $trigrams[$tri][] = $t;
+            }
+        }
+        $store->save(IndexStore::FILE_POSTINGS, $postings);
+        $store->save(IndexStore::FILE_TRIGRAMS, $trigrams);
+        $store->saveAllShards($docs);
+
+        return new Searcher($store, new QueryParser($tokenizer));
+    }
+
+    public function testExactVulnIdMatchesOnlyThatRequirement(): void
+    {
+        $out = $this->fuzzySearcher()->search('V-253254');
+        $this->assertSame(['V-253254'], array_column($out['vulns'], 'id'));
+        $this->assertSame('Windows_11', $out['vulns'][0]['stig_title']);
+    }
+
+    public function testUnknownVulnIdDoesNotFuzzToANeighbour(): void
+    {
+        $searcher = $this->fuzzySearcher();
+        foreach (['V-253258', 'V-253253', 'v-25326', 'SV-253258r1_rule'] as $q) {
+            $this->assertSame([], $searcher->search($q)['vulns'], $q);
+        }
+    }
+
+    public function testUnknownCciDoesNotFuzzToANeighbour(): void
+    {
+        $this->assertSame([], $this->fuzzySearcher()->search('CCI-000367')['ccis']);
+    }
+
+    public function testUnknownIdAlongsideWordsStillReturnsNothing(): void
+    {
+        // AND semantics: the unknown ID can't be satisfied, so no results.
+        $this->assertSame([], $this->fuzzySearcher()->search('windows V-253258')['vulns']);
+    }
+
+    public function testWordTyposStillFuzz(): void
+    {
+        $out = $this->fuzzySearcher()->search('defnder');
+        $this->assertSame(['V-253254'], array_column($out['vulns'], 'id'));
+    }
+
     // ---- helpers ------------------------------------------------------------
 
     private function tmpDir(): string

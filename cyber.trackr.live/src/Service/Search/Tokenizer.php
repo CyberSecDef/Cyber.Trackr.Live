@@ -66,9 +66,10 @@ class Tokenizer
 
     /**
      * "ac-2", "cm-6(1)", "cci-000366", "v-12345", "sv-67890r1_rule" all match.
-     * "windows-server" doesn't.
+     * "windows-server" doesn't. Also used by Searcher to keep identifiers out
+     * of fuzzy matching.
      */
-    private function isStructuredId(string $tok): bool
+    public function isStructuredId(string $tok): bool
     {
         return (bool) preg_match('/^[a-z]+-[\d(]/', $tok);
     }
