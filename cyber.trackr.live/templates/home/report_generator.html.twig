@@ -1358,6 +1358,9 @@ let scansToPoam = {
                 oTblReport.DataTable ({
                     "data" : res,
                     pageLength : 25,
+                    // Cells come from uploaded files (HOST_NAME, HOST_IP, file name, OS);
+                    // render them as text so a crafted scan can't inject markup (S4).
+                    columnDefs : [ { targets : '_all', render : $.fn.dataTable.render.text() } ],
                     "columns" : [
                         { "data" : "Type" },
                         { "data" : "Hostname" },
