@@ -22,17 +22,29 @@ class StigControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    /** @return iterable<string, array{string, string, string}> */
+    public static function ruleControlLinks(): iterable
+    {
+        // Unchanged mapping: CCI-000054 -> AC-10.
+        yield 'existing link' => ['/stig/' . self::TITLE . '/4/8', 'V-69239', 'AC-10'];
+        // CCI-001321: Rev 3 SI-13 (2) was renumbered; Rev 5 maps it to SI-7 (16).
+        yield 'corrected to Rev 5' => ['/stig/Riverbed_NetIM_OS/1/1', 'V-275600', 'SI-7'];
+        // CCI-004066 is only in the 2024 CCI list; it used to render no link.
+        yield 'newly linked' => ['/stig/AAA_Services_Security_Requirements_Guide/2/2', 'V-204664', 'IA-5'];
+    }
+
     // P1: the RMF Control column comes from CciControlMap, not per-rule XPath.
-    // V-69239 cites CCI-000054, which maps to AC-10.
-    public function testStigViewLinksRuleToItsRmfControl(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('ruleControlLinks')]
+    public function testStigViewLinksRuleToItsRev5Control(string $url, string $vuln, string $control): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/stig/' . self::TITLE . '/4/8');
+        $crawler = $client->request('GET', $url);
         $this->assertResponseIsSuccessful();
 
-        $link = $crawler->filter('a[name="req_V-69239"] + div.title-details a.ident--link')->first();
-        $this->assertSame('/rmf/5#rmf_AC-10', $link->attr('href'));
-        $this->assertSame('AC-10', trim($link->text()));
+        $link = $crawler->filter('a[name="req_' . $vuln . '"] + div.title-details a[href^="/rmf/5#"]');
+        $this->assertCount(1, $link, "$vuln should show an RMF control link");
+        $this->assertSame('/rmf/5#rmf_' . $control, $link->attr('href'));
+        $this->assertSame($control, trim($link->text()));
     }
 
     public function testStigCompareRenders(): void
