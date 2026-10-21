@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use ZipStream\CompressionMethod;
 use ZipStream\ZipStream;
 
 /**
@@ -153,7 +154,21 @@ class BulkDownloadPlanner
                 // Prefix XML and ZIP into separate subfolders so a mixed
                 // selection extracts tidily on the user's end.
                 $arcName = ($f['kind'] === self::KIND_XML ? 'stig/' : 'zips/') . $f['name'];
-                $zip->addFileFromStream(fileName: $arcName, stream: $fh);
+                if ($f['kind'] === self::KIND_ZIP) {
+                    // DISA bundles are already deflated; re-deflating burns
+                    // CPU for ~0% gain. STORE them, with a real local header
+                    // (one cheap CRC pre-pass over the seekable file) so
+                    // extractors that can't handle stored entries with data
+                    // descriptors still open the archive.
+                    $zip->addFileFromStream(
+                        fileName: $arcName,
+                        stream: $fh,
+                        compressionMethod: CompressionMethod::STORE,
+                        enableZeroHeader: false,
+                    );
+                } else {
+                    $zip->addFileFromStream(fileName: $arcName, stream: $fh);
+                }
                 fclose($fh);
             }
             $zip->finish();

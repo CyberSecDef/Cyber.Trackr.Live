@@ -236,6 +236,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ files: c.files, index: c.index, of: c.of }),
             });
+            if (resp.status === 429) {
+                const wait = parseInt(resp.headers.get('Retry-After') || '', 10);
+                const minutes = wait > 0 ? Math.ceil(wait / 60) : null;
+                throw new Error('download limit reached for this hour' +
+                    (minutes ? ' — try again in about ' + minutes + ' minute' + (minutes === 1 ? '' : 's') : ''));
+            }
             if (!resp.ok) throw new Error('chunk HTTP ' + resp.status);
             const blob = await resp.blob();
 

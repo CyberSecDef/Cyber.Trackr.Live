@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class StigController extends AbstractController
@@ -190,6 +191,13 @@ class StigController extends AbstractController
         $resolved = $planner->resolve($files);
         if (empty($resolved)) {
             throw $this->createNotFoundException('No valid files in chunk.');
+        }
+        // CHUNK_LIMIT_BYTES used to be enforced only by /plan, so one POST
+        // listing every id streamed the whole corpus from a single worker
+        // (review S5). Re-pack with the same rules: a real chunk from /plan
+        // always fits in one, including a lone oversized file.
+        if (count($planner->plan($resolved)['chunks']) > 1) {
+            throw new BadRequestHttpException('Chunk exceeds the 500 MB limit; request a plan from /stig/bulk-download/plan first.');
         }
 
         $stamp = date('Ymd-His');

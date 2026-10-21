@@ -12,3 +12,21 @@ framework:
             # imprecision under concurrency is irrelevant at this scale).
             cache_pool: 'cache.app'
             lock_factory: null
+        # Per-client-IP limits on the heavy download routes (review S5).
+        # Enforced by App\EventSubscriber\DownloadRateLimitSubscriber.
+        # A full-corpus bulk download is ~7-10 chunks, so 30/hour leaves room
+        # for retries and a second selection.
+        bulk_download:
+            policy: 'sliding_window'
+            limit: 30
+            interval: '1 hour'
+            cache_pool: 'cache.app'
+            lock_factory: null
+        # The air-gap image is ~3 GB. 10/hour rather than lower so download
+        # managers that resume or split the file into Range requests still work.
+        docker_image:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 hour'
+            cache_pool: 'cache.app'
+            lock_factory: null
