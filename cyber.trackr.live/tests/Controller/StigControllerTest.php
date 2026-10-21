@@ -22,6 +22,19 @@ class StigControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    // P1: the RMF Control column comes from CciControlMap, not per-rule XPath.
+    // V-69239 cites CCI-000054, which maps to AC-10.
+    public function testStigViewLinksRuleToItsRmfControl(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/stig/' . self::TITLE . '/4/8');
+        $this->assertResponseIsSuccessful();
+
+        $link = $crawler->filter('a[name="req_V-69239"] + div.title-details a.ident--link')->first();
+        $this->assertSame('/rmf/5#rmf_AC-10', $link->attr('href'));
+        $this->assertSame('AC-10', trim($link->text()));
+    }
+
     public function testStigCompareRenders(): void
     {
         $client = static::createClient();

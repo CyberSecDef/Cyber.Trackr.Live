@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\BulkDownloadIndex;
 use App\Service\BulkDownloadPlanner;
+use App\Service\CciControlMap;
 use App\Service\StigCompanionZipFinder;
 use App\Service\StigDigestBuilder;
 use App\Service\StigTocBuilder;
@@ -284,7 +285,7 @@ class StigController extends AbstractController
     }
 
     #[Route('/stig/{title}/{version}/{release}', name: 'stig_view')]
-    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder, StigCompanionZipFinder $companionFinder, \App\Service\Stig\StigWizardRegistry $wizardRegistry): Response
+    public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder, StigCompanionZipFinder $companionFinder, \App\Service\Stig\StigWizardRegistry $wizardRegistry, CciControlMap $cciControlMap): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -319,23 +320,6 @@ class StigController extends AbstractController
         }
         $stig_xml->registerXPathNamespace("xmlns", "http://checklists.nist.gov/xccdf/1.1");
 
-        $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if ($cci_filename === false || !is_file($cci_filename)) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
-        }
-        $cci_xml = simplexml_load_file($cci_filename);
-        if ($cci_xml === false) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
-        }
-
-        foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
-            if (strlen((string) $strPrefix) == 0) {
-                $strPrefix = "a"; //Assign an arbitrary namespace prefix.
-            }
-            $cci_xml->registerXPathNamespace($strPrefix, $strNamespace);
-        }
-        $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
-
         // Resolve previous version + build/load the digest. Returns null if
         // there's no previous version on this title — the template
         // conditionally renders the section only when digest is present.
@@ -351,7 +335,7 @@ class StigController extends AbstractController
 
         return $this->render('stig/view.html.twig', [
             'controller_name' => 'StigController',
-            'cci' => $cci_xml,
+            'cci_controls' => $cciControlMap->all(),
             'stig' => $stig_xml,
             'stigs' => $stigs[$title],
             'title' => $title,

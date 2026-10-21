@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\CciControlMap;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -94,7 +95,7 @@ class ScapController extends AbstractController
 
 
     #[Route('/scap/{title}/{version}/{release}', name: 'scap_view')]
-    public function scap_view($title, $version, $release): Response
+    public function scap_view($title, $version, $release, CciControlMap $cciControlMap): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -132,26 +133,9 @@ class ScapController extends AbstractController
         $scap_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/scap/source/1.2");
         $scap_xml->registerXPathNamespace("xccdf", "http://checklists.nist.gov/xccdf/1.2");
 
-        $cci_filename = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List.xml");
-        if ($cci_filename === false || !is_file($cci_filename)) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
-        }
-        $cci_xml = simplexml_load_file($cci_filename);
-        if ($cci_xml === false) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
-        }
-
-        foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
-            if (strlen((string) $strPrefix) == 0) {
-                $strPrefix = "a"; //Assign an arbitrary namespace prefix.
-            }
-            $cci_xml->registerXPathNamespace($strPrefix, $strNamespace);
-        }
-        $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
-
         return $this->render('scap/view.html.twig', [
             'controller_name' => 'ScapController',
-            'cci' => $cci_xml,
+            'cci_controls' => $cciControlMap->all(),
             'scap' => $scap_xml,
             'scaps' => $scaps[$title],
             'title' => $title,
