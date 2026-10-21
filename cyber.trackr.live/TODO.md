@@ -2,20 +2,17 @@
 
 ## Active backlog
 
-- **Decide the fate of the 7 non-CCI og:images.** The 2026-09-14
-  toolchain fix regenerated all eight cards, so `home`, `stig`,
-  `scap`, `rmf`, `baselines`, `plans`, and `ckl` now render in the
-  navy/serif design their SVGs actually describe rather than the
-  black/sans output the old renderer produced. Keep them, or
-  `git checkout` those seven to ship the CCI terminology fix alone.
-- **Georgia is not installed on the build host**, so card titles
-  resolve to Noto Serif. Fine as-is; `ttf-mscorefonts-installer`
+- **Georgia is not installed on the build host**, so og:image card
+  titles resolve to Noto Serif. Fine as-is; `ttf-mscorefonts-installer`
   would get literal Georgia but is EULA-interactive.
 
 ---
 
 ## Shipped 2026-09-14
 
+- **DISA/CISA data refresh** — first since the June ship: 99 new STIG
+  XMLs, 23 SCAP benchmarks, 112 companion ZIPs. All additions; no
+  existing XML or ZIP changed.
 - **CCI terminology corrected site-wide.** Reader feedback flagged
   "Common Control Identifier" as wrong; DISA's term — and what
   `README.md` and `NOTICE.md` already said — is **Control
