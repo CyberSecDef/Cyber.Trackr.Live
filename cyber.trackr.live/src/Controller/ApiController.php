@@ -162,7 +162,7 @@ class ApiController extends AbstractController
     }
 
     #list all rmf 5 controls
-    #[Route('/api/rmf/4/{con}', name: 'api_rmfv4_show')]
+    #[Route('/api/rmf/4/{con}', name: 'api_rmfv4_show', requirements: ['con' => '[A-Za-z]{2}-\d{1,3}'])]
     public function api_rmfv4_show($con): Response
     {
         $con = strtoupper(trim((string) $con));
@@ -183,7 +183,11 @@ class ApiController extends AbstractController
         $rmf_v4_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/feed/2.0");
         $rmf_v4_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
-        $controls_xml = $rmf_v4_xml->xpath("/aaa:controls/aaa:control[./aaa:number='{$con}']")[0];
+        $matches = $rmf_v4_xml->xpath("/aaa:controls/aaa:control[./aaa:number='{$con}']");
+        if (empty($matches)) {
+            throw $this->createNotFoundException('The control does not exist');
+        }
+        $controls_xml = $matches[0];
         $controls_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/feed/2.0");
         $controls_xml->registerXPathNamespace("aaa",   "http://scap.nist.gov/schema/sp800-53/2.0");
 
@@ -303,7 +307,7 @@ class ApiController extends AbstractController
     }
 
     #list all rmf 5 controls
-    #[Route('/api/rmf/5/{con}', name: 'api_rmf_show')]
+    #[Route('/api/rmf/5/{con}', name: 'api_rmf_show', requirements: ['con' => '[A-Za-z]{2}-\d{1,3}'])]
     public function api_rmf_show($con): Response
     {
         $con = strtoupper(trim((string) $con));
@@ -322,7 +326,11 @@ class ApiController extends AbstractController
 
         $rmf_v5_xml = simplexml_load_string((string) $feed);
         $rmf_v5_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/2.0");
-        $controls_xml = $rmf_v5_xml->xpath("/xmlns:controls/xmlns:control[./xmlns:number='{$con}']")[0];
+        $matches = $rmf_v5_xml->xpath("/xmlns:controls/xmlns:control[./xmlns:number='{$con}']");
+        if (empty($matches)) {
+            throw $this->createNotFoundException('The control does not exist');
+        }
+        $controls_xml = $matches[0];
         $controls_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/2.0");
 
         $results = [];
@@ -632,7 +640,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/stig/{title}/{version}/{release}/{vuln}', name: 'api_stig_vuln')]
+    #[Route('/api/stig/{title}/{version}/{release}/{vuln}', name: 'api_stig_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'])]
     public function api_stig_vuln(Request $request, $title, $version, $release, $vuln): Response
     {
         $results = [];
@@ -678,6 +686,9 @@ class ApiController extends AbstractController
         $results["stig-published"] = (string)current($stig_xml->xpath('/xmlns:Benchmark/xmlns:status/@date'));
 
         $vuln = current($stig_xml->xpath("/xmlns:Benchmark/xmlns:Group[@id='{$vuln}']"));
+        if ($vuln === false) {
+            throw $this->createNotFoundException('The vulnerability does not exist');
+        }
         $results["id"] = (string)$vuln->attributes()['id'];
         $results["group"] = (string)$vuln->title;
         $results["rule"] = (string)$vuln->Rule->attributes()['id'];
@@ -810,7 +821,7 @@ class ApiController extends AbstractController
     }
 
 
-    #[Route('/api/scap/{title}/{version}/{release}/{vuln}', name: 'api_scap_vuln')]
+    #[Route('/api/scap/{title}/{version}/{release}/{vuln}', name: 'api_scap_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'])]
     public function api_scap_vuln($title, $version, $release, $vuln): Response
     {
         $results = [];
@@ -860,6 +871,9 @@ class ApiController extends AbstractController
         $results["requirements"] = [];
 
         $vuln = current($scap_xml->xpath("//xccdf:Benchmark/xccdf:Group[@id='xccdf_mil.disa.stig_group_{$vuln}']"));
+        if ($vuln === false) {
+            throw $this->createNotFoundException('The vulnerability does not exist');
+        }
 
         $results["id"] = (string)$vuln->attributes()['id'];
         $results["group"] = (string)current($vuln->xpath("./xccdf:title"));

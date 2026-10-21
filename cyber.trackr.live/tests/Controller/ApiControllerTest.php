@@ -108,4 +108,39 @@ class ApiControllerTest extends WebTestCase
         $client->request('GET', sprintf('/api/stig/%s/99/99', self::STIG_TITLE));
         $this->assertResponseStatusCodeSame(404);
     }
+
+    // S3: {vuln} and {con} were interpolated into XPath unescaped. A nested
+    // count() payload ran for minutes inside libxml; route requirements now
+    // reject anything that isn't an ID before the controller runs.
+    private const XPATH_PAYLOAD = "x' or count(//*[count(//*)>0])>0 or @id='x";
+
+    /** @return iterable<string, array{string}> */
+    public static function rejectedIdUrls(): iterable
+    {
+        $stig = sprintf('/api/stig/%s/%s/%s/', self::STIG_TITLE, self::STIG_VERSION, self::STIG_RELEASE);
+
+        yield 'stig vuln injection' => [$stig . rawurlencode(self::XPATH_PAYLOAD)];
+        yield 'stig vuln unknown'   => [$stig . 'V-999999999'];
+        yield 'rmf 4 injection'     => ['/api/rmf/4/' . rawurlencode(self::XPATH_PAYLOAD)];
+        yield 'rmf 5 injection'     => ['/api/rmf/5/' . rawurlencode(self::XPATH_PAYLOAD)];
+        yield 'rmf 5 unknown'       => ['/api/rmf/5/ZZ-999'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('rejectedIdUrls')]
+    public function testMalformedOrUnknownIdIs404(string $url): void
+    {
+        $client = static::createClient();
+        $client->request('GET', $url);
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testRmfV5ShowAcceptsLowercaseControl(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/rmf/5/ac-2');
+
+        $this->assertResponseIsSuccessful();
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
+        $this->assertSame('AC-2', $data['number'] ?? null);
+    }
 }
