@@ -7,10 +7,11 @@ use ZipArchive;
 
 /**
  * Pulls the DISA cyber.mil download catalog and mirrors fresh STIG /
- * SCAP bundles into resources/data/{stig,scap}/. Replaces the
- * /stig/disa_download and /scap/disa_download controller actions'
- * hand-rolled scrapers with a single reusable engine that the
- * controllers AND the daily refresh-data.sh cron both call.
+ * SCAP bundles into resources/data/{stig,scap}/. Called only by the
+ * app:disa:sync-{stig,scap} console commands, which the daily
+ * refresh-data.sh cron runs. (The old /stig/disa_download and
+ * /scap/disa_download web routes were removed: any anonymous GET
+ * could start a 15-minute sync.)
  *
  * The catalog API is a Salesforce Apex endpoint that returns a flat
  * list of {DownloadLink}; we client-side filter for STIGs vs SCAPs

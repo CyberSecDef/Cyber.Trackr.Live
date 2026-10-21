@@ -6,7 +6,7 @@ namespace App\Service;
  * Exposes the DISA / NIST / CISA refresh timestamps to templates.
  *
  * DISA is sourced from resources/data/sync_status.json (stamped by the
- * stig/scap disa_download endpoints via markDisaSyncedNow()).
+ * app:disa:sync-{stig,scap} console commands via markDisaSyncedNow()).
  *
  * NIST is derived dynamically from the newest mtime among the OSCAL
  * profile/catalog files in resources/data/overlays/ — when a new OSCAL

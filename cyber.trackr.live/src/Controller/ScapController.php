@@ -159,44 +159,4 @@ class ScapController extends AbstractController
             'release' => $release,
         ]);
     }
-
-    #[Route('/scap/disa', name: 'scap_disa')]
-    public function scap_disa(): Response
-    {
-        return $this->render('scap/download.html.twig', [
-            'controller_name' => 'ScapController',
-        ]);
-    }
-
-
-    /**
-     * Admin-triggered DISA mirror — same engine as
-     * `app:disa:sync-scap` (run nightly via bin/refresh-data.sh).
-     * Streams progress to the browser so the operator can watch the
-     * sync proceed.
-     */
-    #[Route('/scap/disa_download', name: 'scap_disa_download')]
-    public function scap_disa_download(\App\Service\DisaCatalogSyncer $syncer): Response
-    {
-        set_time_limit(60 * 15);
-        $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($syncer) {
-            echo "<pre style='color:rgb(236, 226, 200);'>\n";
-            @ob_flush(); flush();
-            try {
-                $stats = $syncer->sync(
-                    \App\Service\DisaCatalogSyncer::KIND_SCAP,
-                    function (string $line) { echo $line . "\n"; @ob_flush(); flush(); },
-                );
-                printf("\nDone. downloaded=%d skipped=%d xml=%d errors=%d\n",
-                    $stats['downloaded'], $stats['skipped'], $stats['xml_extracted'], $stats['errors']);
-            } catch (\Throwable $e) {
-                echo "\nERROR: " . htmlspecialchars($e->getMessage()) . "\n";
-            }
-            echo "</pre>";
-        });
-        $response->headers->set('Content-Type', 'text/html; charset=utf-8');
-        $response->headers->set('X-Accel-Buffering', 'no');
-        return $response;
-    }
 }
-

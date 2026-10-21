@@ -175,10 +175,9 @@ The API mirrors the browseable library at `/api/...` and returns JSON. No auth, 
 
 ### DISA refresh
 
-The cyber.mil download catalog is scraped via a single `DisaCatalogSyncer` service exposed three ways:
+The cyber.mil download catalog is scraped via a single `DisaCatalogSyncer` service, run from the console only:
 
 - **Console:** `bin/console app:disa:sync-stig` and `bin/console app:disa:sync-scap` (the daily `bin/refresh-data.sh` cron calls both).
-- **Web routes:** `/stig/disa_download` and `/scap/disa_download` for interactive admin runs — stream live progress to the browser as the sync proceeds.
 - **Dry-run:** both console commands accept `--dry-run` to fetch the catalog and report what *would* be downloaded without writing anything to disk. Useful for verifying the API hasn't changed.
 
 New ZIPs land in `resources/data/zips/` and any XCCDF XML inside is extracted into `resources/data/{stig,scap}/`. Existing files are skipped, so the steady-state cron cost is small (only new bundles).
@@ -335,8 +334,8 @@ bash cyber.trackr.live/public/og/src/build.sh
 
 The site is "git is the database" by design. To add or refresh content:
 
-1. **STIGs** — drop new `U_*_STIG.xml` files into `cyber.trackr.live/resources/data/stig/` (or run `bin/console app:disa:sync-stig` / hit `/stig/disa_download` to pull from DISA), then `bin/console app:stig:rebuild-toc`. After a bulk drop, prefer `bin/console app:stig:rebuild` so the SCAP toc and `vulns_toc.json` refresh too.
-2. **SCAP** — drop new `U_*_Benchmark.xml` files into `cyber.trackr.live/resources/data/scap/` (or `bin/console app:disa:sync-scap` / `/scap/disa_download`), then `bin/console app:scap:rebuild-toc` (or `app:stig:rebuild` for the bundled refresh).
+1. **STIGs** — drop new `U_*_STIG.xml` files into `cyber.trackr.live/resources/data/stig/` (or run `bin/console app:disa:sync-stig` to pull from DISA), then `bin/console app:stig:rebuild-toc`. After a bulk drop, prefer `bin/console app:stig:rebuild` so the SCAP toc and `vulns_toc.json` refresh too.
+2. **SCAP** — drop new `U_*_Benchmark.xml` files into `cyber.trackr.live/resources/data/scap/` (or `bin/console app:disa:sync-scap`), then `bin/console app:scap:rebuild-toc` (or `app:stig:rebuild` for the bundled refresh).
 3. **CCIs** — replace `cyber.trackr.live/resources/data/cci/U_CCI_List_2024.xml`. No rebuild needed; reads happen on every request.
 4. **800-53** — replace the `rmf/800-53v[45]-controls.xml` files. Same — read on demand.
 5. **Baselines** — drop a new `*_profile.json` into `resources/data/overlays/`. The chip strip on `/rmf/5`, the wizard dropdown on every plan, and the baseline heat map all pick it up automatically.
@@ -426,7 +425,7 @@ The image is nginx + PHP-FPM 8.4 under supervisor, with `resources/data/` (~4 GB
 | `Service/ScapTocBuilder.php` | Same shape, for SCAP benchmarks |
 | `Service/BulkDownloadIndex.php` | Sidecar `bulk_download_index.json` reader + builder — per-version XML/ZIP presence + size for the bulk-download table |
 | `Service/BulkDownloadPlanner.php` | Validates a user's selection, dedupes shared-bundle paths, greedy-packs into ≤500 MB chunks, streams each chunk as a ZIP via ZipStream-PHP |
-| `Service/DisaCatalogSyncer.php` | Single engine behind both `/{stig,scap}/disa_download` web routes and the `app:disa:sync-{stig,scap}` console commands — pulls the cyber.mil catalog, filters for STIG vs SCAP, downloads new ZIPs, extracts XCCDF XML, marks `sync_status.json` |
+| `Service/DisaCatalogSyncer.php` | Engine behind the `app:disa:sync-{stig,scap}` console commands — pulls the cyber.mil catalog, filters for STIG vs SCAP, downloads new ZIPs, extracts XCCDF XML, marks `sync_status.json` |
 | `Service/SyncStatus.php` | Reads `sync_status.json`; exposed as Twig global |
 | `Service/Plans/PlanRegistry.php` | Discovers plan schema files, exposes `availablePlans()` |
 | `Service/Plans/ControlResolver.php` | Family + baseline → ordered list of controls + enhancements with `in_baseline` flags |
