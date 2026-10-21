@@ -16,6 +16,11 @@
 /playwright-report/
 /blob-report/
 /.playwright/
+# The e2e suite runs from cyber.trackr.live/, so the root-anchored rules
+# above miss its output (e.g. test-results/.last-run.json).
+/cyber.trackr.live/test-results/
+/cyber.trackr.live/playwright-report/
+/cyber.trackr.live/.playwright/
 ###< playwright ###
 
 ###> phpunit/phpunit ###
