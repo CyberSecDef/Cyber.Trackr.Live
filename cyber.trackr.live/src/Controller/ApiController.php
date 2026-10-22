@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\MitigationGenerator;
 use App\Service\MitigationRateLimitedException;
+use App\Service\ScapTocBuilder;
 use App\Service\Vulns\VulnsRegistry;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -788,7 +789,7 @@ class ApiController extends AbstractController
 
 
     #[Route('/api/scap/{title}/{version}/{release}', name: 'api_scap_summary')]
-    public function api_scap_summary($title, $version, $release): Response
+    public function api_scap_summary($title, $version, $release, ?ScapTocBuilder $tocBuilder = null): Response
     {
         $results = [];
 
@@ -799,6 +800,11 @@ class ApiController extends AbstractController
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
         if (!isset($scaps[$title])) {
+            // Firefox titles retired by the platform split (ScapTocBuilder).
+            $moved = $tocBuilder?->platformRedirect((string) $title, (string) $version, (string) $release, $scaps);
+            if ($moved !== null) {
+                return $this->redirectToRoute('api_scap_summary', ['title' => $moved, 'version' => $version, 'release' => $release], 301);
+            }
             throw $this->createNotFoundException('The SCAP does not exist');
         }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
@@ -855,7 +861,7 @@ class ApiController extends AbstractController
 
 
     #[Route('/api/scap/{title}/{version}/{release}/{vuln}', name: 'api_scap_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'])]
-    public function api_scap_vuln($title, $version, $release, $vuln): Response
+    public function api_scap_vuln($title, $version, $release, $vuln, ?ScapTocBuilder $tocBuilder = null): Response
     {
         $results = [];
 
@@ -866,6 +872,11 @@ class ApiController extends AbstractController
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
         if (!isset($scaps[$title])) {
+            // Firefox titles retired by the platform split (ScapTocBuilder).
+            $moved = $tocBuilder?->platformRedirect((string) $title, (string) $version, (string) $release, $scaps);
+            if ($moved !== null) {
+                return $this->redirectToRoute('api_scap_vuln', ['title' => $moved, 'version' => $version, 'release' => $release, 'vuln' => $vuln], 301);
+            }
             throw $this->createNotFoundException('The SCAP does not exist');
         }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {

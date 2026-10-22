@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\CciControlMap;
+use App\Service\ScapTocBuilder;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -34,7 +35,7 @@ class ScapController extends AbstractController
     }
 
     #[Route('/scap/{title}/{version}/{release}/download', name: 'scap_download')]
-    public function scap_download($title, $version, $release): Response
+    public function scap_download($title, $version, $release, ScapTocBuilder $tocBuilder): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -43,6 +44,11 @@ class ScapController extends AbstractController
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
         if (!isset($scaps[$title])) {
+            // Firefox titles retired by the platform split (ScapTocBuilder).
+            $moved = $tocBuilder->platformRedirect((string) $title, (string) $version, (string) $release, $scaps);
+            if ($moved !== null) {
+                return $this->redirectToRoute('scap_download', ['title' => $moved, 'version' => $version, 'release' => $release], 301);
+            }
             throw $this->createNotFoundException('The SCAP does not exist');
         }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
@@ -74,7 +80,7 @@ class ScapController extends AbstractController
 
 
     #[Route('/scap/{title}/{version}/{release}', name: 'scap_view')]
-    public function scap_view($title, $version, $release, CciControlMap $cciControlMap): Response
+    public function scap_view($title, $version, $release, CciControlMap $cciControlMap, ScapTocBuilder $tocBuilder): Response
     {
         $filesystem = new Filesystem();
         $finder = new Finder();
@@ -83,6 +89,11 @@ class ScapController extends AbstractController
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
         if (!isset($scaps[$title])) {
+            // Firefox titles retired by the platform split (ScapTocBuilder).
+            $moved = $tocBuilder->platformRedirect((string) $title, (string) $version, (string) $release, $scaps);
+            if ($moved !== null) {
+                return $this->redirectToRoute('scap_view', ['title' => $moved, 'version' => $version, 'release' => $release], 301);
+            }
             throw $this->createNotFoundException('The SCAP does not exist');
         }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {

@@ -24,6 +24,24 @@ class ScapTocBuilder
     private string $scapDir;
     private string $tocPath;
 
+    /**
+     * Until V6R4, DISA published Firefox's Linux/RHEL and Windows SCAP
+     * benchmarks under one title ("Mozilla Firefox"; V6R3 Windows even under
+     * "for Linux"), so one title held both platforms for a release and the
+     * page could only show one. Every Firefox SCAP file is re-filed, by the
+     * platform in its filename, into the titles DISA has used since V6R4.
+     */
+    private const PLATFORM_SPLIT_TITLES = [
+        'Mozilla_FireFox',
+        'Mozilla_Firefox',
+        'Mozilla_Firefox_for_Linux_STIG_SCAP_Benchmark',
+        'Mozilla_Firefox_for_Windows_STIG_SCAP_Benchmark',
+    ];
+    private const PLATFORM_TITLE = 'Mozilla_Firefox_for_%s_STIG_SCAP_Benchmark';
+
+    /** Titles that no longer exist after the split; old links redirect (platformRedirect()). */
+    private const RETIRED_TITLES = ['Mozilla_FireFox', 'Mozilla_Firefox'];
+
     public function __construct(string $projectDir)
     {
         $this->scapDir = $projectDir . '/resources/data/scap';
@@ -139,7 +157,7 @@ class ScapTocBuilder
         foreach ($finder as $file) {
             $parsed = $this->parseScap($file->getRealPath());
             if ($parsed !== null) {
-                $scaps[$parsed['title']][] = $parsed['entry'];
+                $scaps[$this->platformTitle($parsed['title'], $parsed['entry']['filename'])][] = $parsed['entry'];
             }
             if ($onFile !== null) {
                 $onFile($file);
@@ -150,19 +168,53 @@ class ScapTocBuilder
         // Newest first: by date, then by version + release, so releases that
         // share a date (Windows 10 V3R4 and V3R5 are both 2025-02-25) list in
         // release order; the version list sorts by date alone.
-        //
-        // Firefox's Linux/RHEL and Windows benchmarks declare the same title
-        // and release, so a title can hold two rows for one release and the
-        // page shows the LAST. Filename descending keeps that the Linux/RHEL
-        // variant, which is what prod shows today, until the platforms are
-        // split into their own titles.
+        // Then filename, so the order is the same on every host.
         foreach ($scaps as $title => $entries) {
             usort($entries, fn($a, $b) => (strtotime((string) $b['date']) ?: 0) <=> (strtotime((string) $a['date']) ?: 0)
                 ?: version_compare($b['version'] . '.' . $b['release'], $a['version'] . '.' . $a['release'])
-                ?: strcmp((string) $b['filename'], (string) $a['filename']));
+                ?: strcmp((string) $a['filename'], (string) $b['filename']));
             $scaps[$title] = $entries;
         }
         return $scaps;
+    }
+
+    /** The title a parsed file is listed under (see PLATFORM_SPLIT_TITLES). */
+    private function platformTitle(string $title, string $filename): string
+    {
+        if (!in_array($title, self::PLATFORM_SPLIT_TITLES, true)) {
+            return $title;
+        }
+        if (preg_match('/_(Linux|RHEL)_/i', $filename)) {
+            return sprintf(self::PLATFORM_TITLE, 'Linux');
+        }
+        if (preg_match('/_Windows_/i', $filename)) {
+            return sprintf(self::PLATFORM_TITLE, 'Windows');
+        }
+        return $title;
+    }
+
+    /**
+     * For a link to a title retired by the platform split, the title that now
+     * holds that release: Linux first (the variant those pages showed), then
+     * Windows. Null when it isn't a retired title or no platform has it.
+     *
+     * @param array<string, array<int,array|object>> $scaps the decoded toc
+     */
+    public function platformRedirect(string $title, string $version, string $release, array $scaps): ?string
+    {
+        if (!in_array($title, self::RETIRED_TITLES, true)) {
+            return null;
+        }
+        foreach (['Linux', 'Windows'] as $platform) {
+            $target = sprintf(self::PLATFORM_TITLE, $platform);
+            foreach ($scaps[$target] ?? [] as $row) {
+                $row = (array) $row;
+                if ((string) $row['version'] === $version && (string) $row['release'] === $release) {
+                    return $target;
+                }
+            }
+        }
+        return null;
     }
 
     public function writeToc(array $scaps): void
