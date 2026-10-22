@@ -1149,6 +1149,9 @@ let scansToPoam = {
     acas_control : {"AIX Local Security Checks" : "SI-2", "Amazon Linux Local Security Checks" : "SI-2", "Backdoors" : "SC-5", "Brute force attacks" : "SC-5", "CGI abuses" : "CM-6", "CGI abuses : XSS" : "CM-6", "CISCO" : "CM-6", "CentOS Local Security Checks" : "SI-2", "DNS" : "CM-6", "Databases" : "SI-2", "Debian Local Security Checks" : "SI-2", "Default Unix Accounts" : "AC-2", "Denial of Service" : "SC-5", "F5 Networks Local Security Checks" : "SI-2", "FTP" : "CM-6", "Fedora Local Security Checks" : "SI-2", "Firewalls" : "CM-6", "FreeBSD Local Security Checks" : "SI-2", "Gain a shell remotely" : "SI-3", "General" : "SI-2", "Gentoo Local Security Checks" : "SI-2", "HP-UX Local Security Checks" : "SI-2", "Huawei Local Security Checks" : "SI-2", "Junos Local Security Checks" : "SI-2", "MacOS X Local Security Checks" : "SI-2", "Mandriva Local Security Checks" : "SI-2", "Misc." : "SI-2", "Mobile Devices" : "CM-6", "Netware" : "CM-6", "Oracle Linux Local Security Checks" : "SI-2", "OracleVM Local Security Checks" : "SI-2", "Palo Alto Local Security Checks" : "SI-2", "Peer-To-Peer File Sharing" : "SC-38", "PhotonOS Local Security Checks" : "SI-2", "Policy Compliance" : "CA-2", "Port scanners" : "CM-6", "RPC" : "CM-6", "Red Hat Local Security Checks" : "SI-2", "SCADA" : "CM-6", "SMTP problems" : "CM-6", "SNMP" : "CM-6", "Scientific Linux Local Security Checks" : "SI-2", "Service detection" : "CM-7", "Settings" : "CM-6", "Slackware Local Security Checks" : "SI-2", "Solaris Local Security Checks" : "SI-2", "SuSE Local Security Checks" : "SI-2", "Ubuntu Local Security Checks" : "SI-2", "VMware ESX Local Security Checks" : "SI-2", "Virtuozzo Local Security Checks" : "SI-2", "Web Servers" : "CM-6", "Windows" : "CM-6", "Windows : Microsoft Bulletins" : "SI-2", "Windows : User management" : "AC-2"},
     dropArea : document.getElementById("drop-area"),
     fileArray : new Array(),
+    // Parse-button state (see actions.refreshParseButton).
+    readsInFlight : 0,
+    parsing : false,
     results : new Array(),
     scans: {
       scap: [],
@@ -1281,6 +1284,9 @@ let scansToPoam = {
     async parse(){
         //only execute if all the files have been ingested
         if( $("table#scanFiles tbody tr td:nth-child(6):not(:contains('Pending')) ").length == 0){
+          scansToPoam.parsing = true;
+          scansToPoam.actions.refreshParseButton();
+          try {
             //reset incase the same scans are run twice
             scansToPoam.scans = { scap : [], ckl : [], acas : [] }
             
@@ -1381,7 +1387,10 @@ let scansToPoam = {
                 oTblReport.DataTable().rows.add(res);
                 oTblReport.DataTable().draw();
             }
-            
+          } finally {
+            scansToPoam.parsing = false;
+            scansToPoam.actions.refreshParseButton();
+          }
         }
     },
     utils : {
@@ -1461,7 +1470,22 @@ let scansToPoam = {
         },
         handleFiles(files) {
             files = [...files]
+            scansToPoam.readsInFlight += files.length;
+            scansToPoam.actions.refreshParseButton();
             files.forEach(scansToPoam.io.preview);
+        },
+        // Parse is clickable only when a click will parse: no file still being
+        // read, no parse running, and every listed file "Pending" (the same
+        // condition parse() checks). Before, the button was enabled once and
+        // never disabled, so a second batch could be parsed mid-read, and a
+        // click after a parse silently did nothing.
+        refreshParseButton() {
+            const status = $('table#scanFiles tbody tr td:nth-child(6)');
+            const ready = scansToPoam.readsInFlight === 0
+                && !scansToPoam.parsing
+                && status.length > 0
+                && status.filter(":not(:contains('Pending'))").length === 0;
+            $('#scans2poamParse').prop('disabled', !ready);
         },
         preventDefaults(e) {
             e.preventDefault();
@@ -1490,6 +1514,7 @@ let scansToPoam = {
                                 scansToPoam.fileArray.splice(i,1);
                             }
                         }
+                        scansToPoam.actions.refreshParseButton();
                     })
                 ).append(
                     $('<span></span>').text('   ')
@@ -1509,15 +1534,23 @@ let scansToPoam = {
                 reader.readAsDataURL(file)
             
                 reader.onloadend = () => {
-                    file.data = reader.result;
-                    file.fileId = fileId;
-                    $('table#scanFiles tbody tr#' + fileId + ' td:nth-child(6)').text('Pending')
-                    file.parsed = false;
-                    scansToPoam.fileArray.push(file);
-                    
-                    if($("table#scanFiles tbody tr td:nth-child(6):not(:contains('Pending')) ").length == 0){
-                        $('#scans2poamParse').attr('disabled', false);
+                    scansToPoam.readsInFlight--;
+                    const row = $('table#scanFiles tbody tr#' + fileId);
+                    if (row.length === 0) {
+                        // Removed with [X] while it was still being read: don't queue it.
+                    } else if (reader.result === null) {
+                        // Unreadable (e.g. permissions): drop it rather than crash parse().
+                        row.remove();
+                        $('table#scanFiles tbody tr').each((index,item)=>{ $(item).find("td:nth-child(1)").text(index+1)});
+                        $('#alertWindow').append( $('<p></p>').text("Could not read " + file.name + "; it was removed from the list.") );
+                    } else {
+                        file.data = reader.result;
+                        file.fileId = fileId;
+                        row.find('td:nth-child(6)').text('Pending')
+                        file.parsed = false;
+                        scansToPoam.fileArray.push(file);
                     }
+                    scansToPoam.actions.refreshParseButton();
                     resolve(reader.result )
                 }
                 

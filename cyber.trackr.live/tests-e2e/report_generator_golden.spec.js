@@ -46,8 +46,8 @@ async function parse(page, files) {
     await page.clock.setFixedTime(NOW);
     await page.goto('/report_generator');
     await page.locator('#fileElem').setInputFiles(stage(files));
-    // Parse enables after the first file is read; clicking before every file
-    // is queued parses only some of them (the rest stay "Pending"). Wait for all.
+    // Belt and braces: Parse only enables once every file is read, but make
+    // the precondition explicit (see report_generator_upload.spec.js).
     await page.waitForFunction((n) => scansToPoam.fileArray.length === n, files.length);
     await expect(page.locator('#scans2poamParse')).toBeEnabled();
     const started = Date.now();
