@@ -99,33 +99,33 @@
         <link rel="preload" href="/fonts/fraunces-300_900-normal.woff2" as="font" type="font/woff2" crossorigin>
 
         {% block stylesheets %}
-            <link rel="stylesheet" href="/css/bootstrap.min.css" />
-            <link rel="stylesheet" href="/css/bootstrap-icons.css" />
+            <link rel="stylesheet" href="{{ asset_v('/css/bootstrap.min.css') }}" />
+            <link rel="stylesheet" href="{{ asset_v('/css/bootstrap-icons.css') }}" />
             {# DataTables (2.7 MB JS, 1.1 MB gzipped, with pdfmake + JSZip) is
                only loaded by the pages that build a table; they fill these
                two blocks (review P6). Order is unchanged: its CSS before
                app.css, its JS right after Bootstrap. #}
             {% block datatables_css %}{% endblock %}
-            <link rel="stylesheet" href="/css/app.css?v={{ app_version }}" />
+            <link rel="stylesheet" href="{{ asset_v('/css/app.css') }}" />
         {% endblock %}
 
         {# Feed-reader auto-discovery — the STIG updates Atom feed. #}
         <link rel="alternate" type="application/atom+xml" title="Cyber Trackr — STIG updates" href="{{ path('stig_feed') }}" />
 
         {% block javascripts %}
-            <script src="/js/jquery-3.7.1.min.js"></script>
-            <script src="/js/bootstrap.bundle.min.js"></script>
+            <script src="{{ asset_v('/js/jquery-3.7.1.min.js') }}"></script>
+            <script src="{{ asset_v('/js/bootstrap.bundle.min.js') }}"></script>
             {% block datatables_js %}{% endblock %}
-            <script src="/js/diff_match_patch.js"></script>
-            <script src="/js/dist_masonry.pkgd.min.js"></script>
-            <script src="/js/js.cookie.min.js"></script>
+            <script src="{{ asset_v('/js/diff_match_patch.js') }}"></script>
+            <script src="{{ asset_v('/js/dist_masonry.pkgd.min.js') }}"></script>
+            <script src="{{ asset_v('/js/js.cookie.min.js') }}"></script>
             <script>
                 window.routes = {
                     search: "{{ path('search', {query: 'REPLACE_THIS'}) }}"
                 };
             </script>
-            <script src="/js/app.js?v={{ app_version }}"></script>
-            <script src="/js/saved_searches.js?v={{ app_version }}"></script>
+            <script src="{{ asset_v('/js/app.js') }}"></script>
+            <script src="{{ asset_v('/js/saved_searches.js') }}"></script>
         {% endblock %}
 
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">

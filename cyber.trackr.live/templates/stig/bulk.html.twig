@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
-{% block datatables_css %}<link rel="stylesheet" href="/css/datatables.min.css" />{% endblock %}
-{% block datatables_js %}<script src="/js/datatables.min.js"></script>{% endblock %}
+{% block datatables_css %}<link rel="stylesheet" href="{{ asset_v('/css/datatables.min.css') }}" />{% endblock %}
+{% block datatables_js %}<script src="{{ asset_v('/js/datatables.min.js') }}"></script>{% endblock %}
 
 {% block title %}Bulk download &mdash; STIGs &mdash; Cyber Trackr{% endblock %}
 {% block og_title %}Bulk download STIG library — XML + DISA companion ZIPs{% endblock %}
@@ -27,7 +27,7 @@
         {% include 'stig/_bulk_table.html.twig' with {entries: entries} only %}
     </section>
 
-    <script src="/js/bulk_download.js?v={{ app_version }}"></script>
+    <script src="{{ asset_v('/js/bulk_download.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             window.bulkDownload.init(document.querySelector('[data-bulk-root]'));

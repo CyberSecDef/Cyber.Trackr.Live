@@ -84,5 +84,5 @@
             viewerUrl:   {{ path('ckl_viewer')|json_encode|raw }},
         };
     </script>
-    <script src="/js/stig_wizard.js"></script>
+    <script src="{{ asset_v('/js/stig_wizard.js') }}"></script>
 {% endblock %}

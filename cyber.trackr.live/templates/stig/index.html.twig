@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
-{% block datatables_css %}<link rel="stylesheet" href="/css/datatables.min.css" />{% endblock %}
-{% block datatables_js %}<script src="/js/datatables.min.js"></script>{% endblock %}
+{% block datatables_css %}<link rel="stylesheet" href="{{ asset_v('/css/datatables.min.css') }}" />{% endblock %}
+{% block datatables_js %}<script src="{{ asset_v('/js/datatables.min.js') }}"></script>{% endblock %}
 {% import 'macros.html.twig' as ui %}
 
 {% block title %}STIGs &mdash; Cyber Trackr{% endblock %}
@@ -120,7 +120,7 @@
         </div>
     </section>
 
-    <script src="/js/bulk_download.js?v={{ app_version }}"></script>
+    <script src="{{ asset_v('/js/bulk_download.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const panel = document.querySelector('[data-bulk-panel]');

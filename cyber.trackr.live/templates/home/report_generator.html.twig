@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
-{% block datatables_css %}<link rel="stylesheet" href="/css/datatables.min.css" />{% endblock %}
-{% block datatables_js %}<script src="/js/datatables.min.js"></script>{% endblock %}
+{% block datatables_css %}<link rel="stylesheet" href="{{ asset_v('/css/datatables.min.css') }}" />{% endblock %}
+{% block datatables_js %}<script src="{{ asset_v('/js/datatables.min.js') }}"></script>{% endblock %}
 {% block title %}Scans To Reports{% endblock %}
 {% block og_title %}Scans → Reports — POAM and RAR generator{% endblock %}
 {% block og_description %}Drop ACAS, SCAP, or CKL scan output and export an eMASS-ready POAM and RAR. No reconciliation, no Excel gymnastics. Browser-only — scan data stays local.{% endblock %}
@@ -150,12 +150,12 @@
         <div id="alertWindow" class="rg-alerts"></div>
     </section>
 
-<script src="/js/jmespath.js" type="text/javascript"></script>
-<script src="/js/moment-2.30.1.js" type="text/javascript"></script>
-<script src="/js/zip.js" type="text/javascript"></script>
-<script src="/js/inflate.js" type="text/javascript"></script>
-<script src="/js/deflate.js" type="text/javascript"></script>
-<script src="/js/xlsx.full.min.js" type="text/javascript"></script>
+<script src="{{ asset_v('/js/jmespath.js') }}" type="text/javascript"></script>
+<script src="{{ asset_v('/js/moment-2.30.1.js') }}" type="text/javascript"></script>
+<script src="{{ asset_v('/js/zip.js') }}" type="text/javascript"></script>
+<script src="{{ asset_v('/js/inflate.js') }}" type="text/javascript"></script>
+<script src="{{ asset_v('/js/deflate.js') }}" type="text/javascript"></script>
+<script src="{{ asset_v('/js/xlsx.full.min.js') }}" type="text/javascript"></script>
 
 <script type="text/js-worker">
 webWorker = {
@@ -1191,7 +1191,7 @@ let scansToPoam = {
         if (!scansToPoam.referenceData) {
             scansToPoam.referenceData = new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = '/js/report-generator-data.js?v={{ app_version }}';
+                script.src = '{{ asset_v('/js/report-generator-data.js') }}';
                 script.onload = () => {
                     const data = window.scansToPoamData;
                     if (!data) { reject(new Error('reference data script loaded but defined nothing')); return; }

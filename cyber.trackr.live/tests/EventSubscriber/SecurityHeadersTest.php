@@ -54,6 +54,7 @@ class SecurityHeadersTest extends WebTestCase
             $this->assertStringContainsString(sprintf('add_header %s "%s" always;', $name, $value), $nginx, "$name in nginx.conf");
         }
         $this->assertSame(count(SecurityHeadersSubscriber::HEADERS), substr_count($htaccess, 'Header always set'), 'no extra or stale .htaccess headers');
-        $this->assertSame(count(SecurityHeadersSubscriber::HEADERS), substr_count($nginx, 'add_header'), 'no extra or stale nginx headers');
+        // The one other add_header is the long cache for versioned assets (P16).
+        $this->assertSame(count(SecurityHeadersSubscriber::HEADERS), substr_count($nginx, 'add_header') - substr_count($nginx, 'add_header Cache-Control $asset_cache_control;'), 'no extra or stale nginx headers');
     }
 }

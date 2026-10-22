@@ -79,3 +79,32 @@ RewriteRule . - [L]
         Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; form-action 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
     </FilesMatch>
 </IfModule>
+
+# Compress JSON too: DreamHost's server config only covers html/css/js/xml/
+# rss, so /cci/data went out as 4.8 MB (0.6 MB gzipped) and /api/stig as
+# 1.4 MB (77 KB) (review P16). AddOutputFilterByType here REPLACES the
+# server's list for this directory rather than adding to it, so the first
+# two lines repeat DreamHost's mods-available/deflate.conf; without them
+# pages, css and js lose compression. The "-gzip" ETag suffix this adds is
+# accepted by App\EventSubscriber\HttpCacheSubscriber.
+<IfModule mod_filter.c>
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/ecmascript
+        AddOutputFilterByType DEFLATE application/xml application/rss+xml application/wasm
+        AddOutputFilterByType DEFLATE application/json application/manifest+json application/atom+xml image/svg+xml
+    </IfModule>
+</IfModule>
+
+# Versioned first-party assets (/js and /css with ?v=, see the asset_v() Twig
+# function) change URL whenever the file changes, so browsers may keep them
+# for a year without asking again. Matching on the URI keeps a missing file,
+# rewritten to index.php for its 404 page, out of this. Everything else keeps
+# the server defaults (DreamHost: 30 days for js/css/images).
+<If "%{QUERY_STRING} =~ /(^|&)v=/ && %{REQUEST_URI} =~ m#^/(js|css)/#">
+    <IfModule mod_expires.c>
+        ExpiresActive Off
+    </IfModule>
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </IfModule>
+</If>

@@ -181,7 +181,7 @@
             controlsUrlTemplate: {{ path('plans_controls', {family: family, baseline: 'baseline-placeholder'})|json_encode|raw }},
         };
     </script>
-    <script src="/js/plans.js"></script>
+    <script src="{{ asset_v('/js/plans.js') }}"></script>
 {% endblock %}
 
 {# ----- field rendering macro -----

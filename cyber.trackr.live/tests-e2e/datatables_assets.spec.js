@@ -17,7 +17,7 @@ async function visit(page, url) {
     const errors = [];
     const loaded = [];
     page.on('pageerror', (e) => errors.push(e.message));
-    page.on('request', (r) => { if (/datatables\.min\.(js|css)/.test(r.url())) loaded.push(r.url().split('/').pop()); });
+    page.on('request', (r) => { if (/datatables\.min\.(js|css)/.test(r.url())) loaded.push(new URL(r.url()).pathname.split('/').pop()); });
     await page.goto(url, { waitUntil: 'networkidle' });
     return { errors, loaded };
 }

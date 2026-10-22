@@ -2,9 +2,31 @@
 namespace App\Twig;
 
 use Twig\Attribute\AsTwigFilter;
+use Twig\Attribute\AsTwigFunction;
 
 class AppExtension
 {
+    /** @var array<string,string> */
+    private array $versioned = [];
+
+    /**
+     * A first-party /js or /css URL with ?v=<file mtime> appended (review
+     * P16). Versioned URLs are cached for a year as immutable (public/.htaccess,
+     * docker/nginx.conf), so the version must change whenever the file does:
+     * a deploy that edits stig_wizard.js changes its mtime and so its URL,
+     * while untouched files keep theirs. Unversioned they got DreamHost's
+     * 30-day max-age, so an edit could reach returning visitors a month late.
+     */
+    #[AsTwigFunction(name: 'asset_v')]
+    public function assetV(string $path): string
+    {
+        if (!isset($this->versioned[$path])) {
+            $mtime = @filemtime(dirname(__DIR__, 2) . '/public' . $path);
+            $this->versioned[$path] = $mtime === false ? $path : $path . '?v=' . $mtime;
+        }
+        return $this->versioned[$path];
+    }
+
     #[AsTwigFilter(name: 'regex_replace')]
     public function regex_replace($string, $pattern = '', $replacement = '')
     {

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
-{% block datatables_css %}<link rel="stylesheet" href="/css/datatables.min.css" />{% endblock %}
-{% block datatables_js %}<script src="/js/datatables.min.js"></script>{% endblock %}
+{% block datatables_css %}<link rel="stylesheet" href="{{ asset_v('/css/datatables.min.css') }}" />{% endblock %}
+{% block datatables_js %}<script src="{{ asset_v('/js/datatables.min.js') }}"></script>{% endblock %}
 {% import 'macros.html.twig' as ui %}
 
 {% block title %}CISA KEV catalog &mdash; Cyber Trackr{% endblock %}
