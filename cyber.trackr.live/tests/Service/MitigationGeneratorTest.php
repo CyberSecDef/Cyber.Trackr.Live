@@ -3,9 +3,12 @@
 namespace App\Tests\Service;
 
 use App\Service\MitigationGenerator;
+use App\Service\MitigationRateLimitedException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 /**
  * Security-focused tests for the hardened mitigation generator. The process
@@ -75,12 +78,17 @@ class MitigationGeneratorTest extends TestCase
 
     public function testPerClientRateLimitBlocksSecondDistinctVuln(): void
     {
-        $gen = $this->generator(rateLimitPerHour: 1);
+        $gen = $this->generator(perClient: 1);
 
         // First (cache-miss) request from this IP consumes the only token.
         $this->assertSame('STUB MITIGATION', $gen->generate('App_Sec', '4', '8', 'V-1', '198.51.100.9'));
-        // A different vuln (also a cache miss) from the same IP is now blocked.
-        $this->assertNull($gen->generate('App_Sec', '4', '8', 'V-2', '198.51.100.9'));
+        // A different vuln (also a cache miss) from the same IP is now refused, with a retry hint.
+        try {
+            $gen->generate('App_Sec', '4', '8', 'V-2', '198.51.100.9');
+            $this->fail('expected MitigationRateLimitedException');
+        } catch (MitigationRateLimitedException $e) {
+            $this->assertGreaterThan(0, $e->retryAfterSeconds);
+        }
         $this->assertSame(1, $gen->calls);
 
         // A different client still gets through.
@@ -89,25 +97,62 @@ class MitigationGeneratorTest extends TestCase
 
     public function testCacheHitDoesNotConsumeRateLimit(): void
     {
-        $gen = $this->generator(rateLimitPerHour: 1);
+        $gen = $this->generator(perClient: 1);
         $gen->generate('App_Sec', '4', '8', 'V-1', '198.51.100.20');          // miss -> spends the token
         $this->assertSame('STUB MITIGATION', $gen->generate('App_Sec', '4', '8', 'V-1', '198.51.100.20')); // hit
         $this->assertSame(1, $gen->calls);
     }
 
-    private function generator(?string $scriptPath = null, int $rateLimitPerHour = 30): TestableMitigationGenerator
+    /**
+     * S8: the old counter only set its expiry on the first save, so once a
+     * second request landed it never expired and the IP stayed locked out
+     * until the cache was cleared. The window must actually reset.
+     */
+    public function testLimitResetsWhenTheWindowEnds(): void
+    {
+        $gen = $this->generator(perClient: 2, interval: '2 seconds');
+        $ip = '198.51.100.30';
+        $gen->generate('App_Sec', '4', '8', 'V-1', $ip);
+        $gen->generate('App_Sec', '4', '8', 'V-2', $ip);
+        try {
+            $gen->generate('App_Sec', '4', '8', 'V-3', $ip);
+            $this->fail('third miss in the window should be refused');
+        } catch (MitigationRateLimitedException) {
+        }
+
+        sleep(3);
+        $this->assertSame('STUB MITIGATION', $gen->generate('App_Sec', '4', '8', 'V-3', $ip));
+        $this->assertSame(3, $gen->calls);
+    }
+
+    public function testGlobalCapAppliesAcrossClients(): void
+    {
+        $gen = $this->generator(perClient: 30, global: 2);
+        $gen->generate('App_Sec', '4', '8', 'V-1', '198.51.100.41');
+        $gen->generate('App_Sec', '4', '8', 'V-2', '198.51.100.42');
+
+        $this->expectException(MitigationRateLimitedException::class);
+        $gen->generate('App_Sec', '4', '8', 'V-3', '198.51.100.43'); // a fresh IP, but the site is at its cap
+    }
+
+    private function generator(?string $scriptPath = null, int $perClient = 30, int $global = 200, string $interval = '1 hour'): TestableMitigationGenerator
     {
         if ($scriptPath === null) {
             $scriptPath = tempnam(sys_get_temp_dir(), 'mitgen_') ?: '';
             $this->tmpFiles[] = $scriptPath;
         }
+        $limiter = fn (string $id, int $limit) => new RateLimiterFactory(
+            ['id' => $id, 'policy' => 'fixed_window', 'limit' => $limit, 'interval' => $interval],
+            new InMemoryStorage(),
+        );
 
         return new TestableMitigationGenerator(
             new ArrayAdapter(),
+            $limiter('mitigation', $perClient),
+            $limiter('mitigation_global', $global),
             $scriptPath,
             '/usr/bin/python3',
             25,
-            $rateLimitPerHour,
         );
     }
 }

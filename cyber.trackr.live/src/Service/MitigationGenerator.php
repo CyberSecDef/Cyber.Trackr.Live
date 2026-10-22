@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Process\Process;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 /**
  * Generates an AI "mitigation statement" for a STIG vulnerability by invoking a
@@ -19,9 +20,14 @@ use Symfony\Component\Process\Process;
  *   - every value that becomes an argument is validated against a strict
  *     allowlist and may not look like a CLI flag — closes argument injection;
  *   - results are cached per (title, version, release, id) so each vulnerability
- *     is generated at most once;
- *   - a per-client fixed-window limiter caps how often generation can be
- *     triggered, bounding Gemini spend and process spawning;
+ *     is generated at most once; callers pass the toc's canonical version and
+ *     release so "2" and "02" share an entry. The pool is cache.mitigation,
+ *     which deploys don't clear;
+ *   - symfony/rate-limiter caps cache-miss generations per client IP and
+ *     site-wide, bounding Gemini spend and process spawning. (The old
+ *     hand-rolled counter only set its expiry on the first save, so after a
+ *     second request it never expired: review S8.) A limited call throws
+ *     MitigationRateLimitedException so the UI can say "try later";
  *   - the process has a hard timeout so a hung helper can't pin a PHP worker;
  *   - the whole feature is a no-op unless MITIGATION_SCRIPT points at a real
  *     file, so dev / test / CI never shell out.
@@ -30,10 +36,11 @@ class MitigationGenerator
 {
     public function __construct(
         private readonly CacheItemPoolInterface $cache,
+        private readonly RateLimiterFactoryInterface $mitigationLimiter,
+        private readonly RateLimiterFactoryInterface $mitigationGlobalLimiter,
         private readonly string $scriptPath = '',
         private readonly string $pythonBin = '/usr/bin/python3',
         private readonly int $timeoutSeconds = 25,
-        private readonly int $rateLimitPerHour = 30,
         private readonly int $cacheTtlSeconds = 2592000, // 30 days; STIG vulns are static
     ) {
     }
@@ -46,7 +53,9 @@ class MitigationGenerator
 
     /**
      * Cached-or-generated mitigation text, or null when the feature is disabled,
-     * the input is invalid, the caller is rate-limited, or the helper failed.
+     * the input is invalid, or the helper failed.
+     *
+     * @throws MitigationRateLimitedException when a cache miss is over a limit
      */
     public function generate(string $title, string $version, string $release, string $id, string $clientIp): ?string
     {
@@ -61,9 +70,8 @@ class MitigationGenerator
         }
 
         // Only spend a rate-limit token on real work (a cache miss). Hits are free.
-        if (!$this->allowRequest($clientIp)) {
-            return null;
-        }
+        $this->consumeOrThrow($this->mitigationLimiter, $clientIp);
+        $this->consumeOrThrow($this->mitigationGlobalLimiter, 'global');
 
         $output = $this->runProcess([$this->pythonBin, $this->scriptPath, $title, $version, $release, $id]);
         if ($output === null || $output === '') {
@@ -95,27 +103,12 @@ class MitigationGenerator
             && preg_match('/^V-[0-9]{1,9}$/', $id) === 1;
     }
 
-    /**
-     * Fixed-window per-client limiter backed by the shared cache pool. Counts
-     * the request and returns false once the window's budget is spent.
-     */
-    private function allowRequest(string $clientIp): bool
+    private function consumeOrThrow(RateLimiterFactoryInterface $factory, string $key): void
     {
-        $key = 'mitigation.rl.' . hash('sha256', $clientIp);
-        $item = $this->cache->getItem($key);
-        $isNewWindow = !$item->isHit();
-        $count = $isNewWindow ? 0 : (int) $item->get();
-        if ($count >= $this->rateLimitPerHour) {
-            return false;
+        $limit = $factory->create($key)->consume(1);
+        if (!$limit->isAccepted()) {
+            throw new MitigationRateLimitedException(max(1, $limit->getRetryAfter()->getTimestamp() - time()));
         }
-
-        $item->set($count + 1);
-        if ($isNewWindow) {
-            $item->expiresAfter(3600);
-        }
-        $this->cache->save($item);
-
-        return true;
     }
 
     /**

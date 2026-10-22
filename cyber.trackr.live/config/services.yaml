@@ -25,9 +25,11 @@ services:
     # please note that last definitions always *replace* previous ones
 
     # AI mitigation-statement generator. Path/python come from env; empty
-    # MITIGATION_SCRIPT (dev/test/CI) disables the feature entirely. $cache,
-    # timeout and rate-limit use autowiring / constructor defaults.
+    # MITIGATION_SCRIPT (dev/test/CI) disables the feature entirely. Results
+    # go in their own pool (survives deploys); the 'mitigation' and
+    # 'mitigation_global' limiters autowire by argument name.
     App\Service\MitigationGenerator:
         arguments:
+            $cache: '@cache.mitigation'
             $scriptPath: '%env(MITIGATION_SCRIPT)%'
             $pythonBin: '%env(MITIGATION_PYTHON)%'

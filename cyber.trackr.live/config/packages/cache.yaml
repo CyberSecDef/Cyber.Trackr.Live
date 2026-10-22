@@ -15,5 +15,9 @@ framework:
         #app: cache.adapter.apcu
 
         # Namespaced pools use the above "app" backend by default
-        #pools:
-            #my.dedicated.cache: null
+        pools:
+            # Generated AI mitigation statements (30-day TTL, each one costs a
+            # Gemini call). Kept out of cache.app because bin/deploy.sh runs
+            # `cache:pool:clear cache.app` on every ship (review S8).
+            cache.mitigation:
+                adapter: cache.adapter.filesystem

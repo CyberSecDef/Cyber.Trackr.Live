@@ -30,6 +30,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *  - /api/stig/tip returns a RANDOM tip per call, so it must never be cached.
  *  - Non-200 responses (errors, and the 429 from ApiRateLimitSubscriber) are
  *    marked no-store so a stale error or throttle notice is never served back.
+ *  - A controller that already set no-store keeps it (e.g. a STIG vuln reply
+ *    whose AI mitigation was rate-limited: a 200, but not reusable).
  */
 final class ApiCacheSubscriber implements EventSubscriberInterface
 {
@@ -54,6 +56,7 @@ final class ApiCacheSubscriber implements EventSubscriberInterface
         if ('/api/stig/tip' === $request->getPathInfo()
             || 200 !== $response->getStatusCode()
             || !$request->isMethodCacheable()
+            || $response->headers->hasCacheControlDirective('no-store')
         ) {
             $response->headers->set('Cache-Control', 'no-store');
             return;

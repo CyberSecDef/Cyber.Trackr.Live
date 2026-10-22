@@ -485,21 +485,31 @@
                 window.open( window.location.href + '/download' );
             },
             mitigate(elem, vuln_id, m){
-                console.log(elem);
-                console.log(vuln_id);
-                console.log(m);
                 let mit = $( elem ).parent().next( 'p' );
-                $( elem ).prop('disabled',true); 
+                $( elem ).prop('disabled',true);
                 $( mit ).addClass(" border border-secondary ");
 		$( mit ).text("Please wait....generating statement")
-                $.getJSON( "https://cyber.trackr.live/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id + "?m=" + m)
+                // Relative URL so dev and the air-gap image call their own API.
+                $.getJSON( "/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id + "?m=" + m)
   .done(function( json ) {
-    $(mit).html( stig_app.md.render( json['mitigation-statement'] ) );
+    const status = json['mitigation-status'];
+    if (status === 'ok' && json['mitigation-statement']) {
+      $(mit).html( stig_app.md.render( json['mitigation-statement'] ) );
+      return;
+    }
+    if (status === 'rate_limited') {
+      const minutes = Math.max(1, Math.ceil((json['mitigation-retry-after'] || 60) / 60));
+      $(mit).text("The mitigation statement limit has been reached. Try again in about " + minutes + " minute" + (minutes === 1 ? "" : "s") + ".");
+    } else {
+      $(mit).text("A mitigation statement isn't available for this rule right now.");
+    }
+    $( elem ).prop('disabled', false);
   })
   .fail(function( jqxhr, textStatus, error ) {
-    var err = textStatus + ", " + error;
-    console.log( "Request Failed: " + err );
-}); 
+    console.log( "Request Failed: " + textStatus + ", " + error );
+    $(mit).text("Couldn't reach the server. Try again in a moment.");
+    $( elem ).prop('disabled', false);
+});
                 //$( elem ).parent().next( 'p' ).text( "https://cyber.trackr.live/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id)
             },
             toggleFilter(elem, level){

@@ -30,3 +30,19 @@ framework:
             interval: '1 hour'
             cache_pool: 'cache.app'
             lock_factory: null
+        # AI mitigation statements (review S8). Only cache misses spend a
+        # token. Per client IP, plus a site-wide cap that bounds Gemini spend
+        # no matter how many addresses ask (prod saw ~70 requests in two
+        # weeks, so 200/hour never touches real use).
+        mitigation:
+            policy: 'fixed_window'
+            limit: 30
+            interval: '1 hour'
+            cache_pool: 'cache.app'
+            lock_factory: null
+        mitigation_global:
+            policy: 'fixed_window'
+            limit: 200
+            interval: '1 hour'
+            cache_pool: 'cache.app'
+            lock_factory: null

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\MitigationGenerator;
+use App\Service\MitigationRateLimitedException;
 use App\Service\Vulns\VulnsRegistry;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -705,19 +706,31 @@ class ApiController extends AbstractController
         // input validation, result caching, a per-client rate limit, and a hard
         // process timeout. hash_equals avoids timing/type-juggling issues.
         $marker = (string) $request->query->get('m', '');
-        if ($marker !== ''
-            && hash_equals(sha1($results['requirement-title']), $marker)
-            && $this->mitigations?->isEnabled()
-        ) {
-            $statement = $this->mitigations->generate(
-                (string) $title,
-                (string) $version,
-                (string) $release,
-                (string) $results['id'],
-                (string) $request->getClientIp(),
-            );
-            if ($statement !== null) {
-                $results["mitigation-statement"] = $statement;
+        $mitigationRequested = $marker !== ''
+            && hash_equals(sha1($results['requirement-title']), $marker);
+        if ($mitigationRequested) {
+            // Tells the page why there's no statement (ok | rate_limited |
+            // unavailable) instead of leaving it on "Please wait" forever.
+            $results["mitigation-status"] = 'unavailable';
+            if ($this->mitigations?->isEnabled()) {
+                try {
+                    // The toc's version/release, not the URL's: "02" and "2"
+                    // resolve to the same STIG and must share a cache entry.
+                    $statement = $this->mitigations->generate(
+                        (string) $title,
+                        (string) $stig->version,
+                        (string) $stig->release,
+                        (string) $results['id'],
+                        (string) $request->getClientIp(),
+                    );
+                    if ($statement !== null) {
+                        $results["mitigation-statement"] = $statement;
+                        $results["mitigation-status"] = 'ok';
+                    }
+                } catch (MitigationRateLimitedException $e) {
+                    $results["mitigation-status"] = 'rate_limited';
+                    $results["mitigation-retry-after"] = $e->retryAfterSeconds;
+                }
             }
         }
 
@@ -734,7 +747,12 @@ class ApiController extends AbstractController
         $results["fix-id"] = (string)$vuln->Rule->fix->attributes()['id'];
         $results["fix-text"] = (string)$vuln->Rule->fixtext;
 
-	return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
+	$response = new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
+        if ($mitigationRequested && $results["mitigation-status"] !== 'ok') {
+            // Don't let ApiCacheSubscriber make "try later" a public, hour-long answer.
+            $response->headers->set('Cache-Control', 'no-store');
+        }
+        return $response;
         //return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
