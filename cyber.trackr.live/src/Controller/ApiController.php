@@ -758,7 +758,7 @@ class ApiController extends AbstractController
 
 	$response = new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
         if ($mitigationRequested && $results["mitigation-status"] !== 'ok') {
-            // Don't let ApiCacheSubscriber make "try later" a public, hour-long answer.
+            // Don't let HttpCacheSubscriber make "try later" a public, hour-long answer.
             $response->headers->set('Cache-Control', 'no-store');
         }
         return $response;

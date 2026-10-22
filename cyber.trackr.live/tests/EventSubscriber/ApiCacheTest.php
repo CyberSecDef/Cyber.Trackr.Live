@@ -5,7 +5,7 @@ namespace App\Tests\EventSubscriber;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * HTTP caching on the public JSON API (App\EventSubscriber\ApiCacheSubscriber).
+ * HTTP caching on the public JSON API (App\EventSubscriber\HttpCacheSubscriber; pages: HttpCacheTest).
  */
 class ApiCacheTest extends WebTestCase
 {

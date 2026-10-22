@@ -145,6 +145,10 @@
                 const dt = $('#ccis').DataTable({
                     ajax: {
                         url: CCI_DATA,
+                        // DataTables defaults to jQuery's cache:false, which appends
+                        // ?_=<timestamp> so the 4.8 MB response could never be reused.
+                        // The server revalidates it by ETag instead.
+                        cache: true,
                         // Capture the deduped control map; return the row array to DataTables.
                         dataSrc: json => { CTRL = json.controls || {}; return json.data || []; }
                     },

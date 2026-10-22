@@ -5,8 +5,10 @@ namespace App\Tests\Controller;
 use App\Controller\ApiController;
 use App\Controller\CciController;
 use App\Controller\RmfController;
+use App\Service\DataVersion;
 use App\Service\OverlayLoader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
@@ -26,7 +28,7 @@ class MissingGlobalDataTest extends TestCase
     {
         // The CCI page shell is always available; the data endpoint (/cci/data) is
         // what guards the reference data, so the 503 lives there now.
-        $this->assertServiceUnavailable(fn() => (new CciController(self::MISSING))->cciData());
+        $this->assertServiceUnavailable(fn() => (new CciController(self::MISSING))->cciData(new ArrayAdapter(), new DataVersion(self::MISSING, self::MISSING, 'None')));
     }
 
     public function testApiCciListReturns503(): void

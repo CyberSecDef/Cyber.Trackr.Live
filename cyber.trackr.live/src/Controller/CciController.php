@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Service\DataVersion;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,9 +38,19 @@ class CciController extends AbstractController
      * by each row's `ctrl` id, rather than repeated on every CCI that maps to it.
      */
     #[Route('/cci/data', name: 'cci_data')]
-    public function cciData(): JsonResponse
+    public function cciData(CacheItemPoolInterface $cache, DataVersion $version): JsonResponse
     {
-        return new JsonResponse($this->buildRows());
+        // Building the rows parses the 2024 CCI list and both 800-53 catalogs
+        // (4.8 MB of JSON out). Keep the encoded result under ONE key, tagged
+        // with the data version, so a refresh replaces it instead of piling up.
+        $item = $cache->getItem('cci_data_json');
+        $hit = $item->isHit() ? $item->get() : null;
+        if (is_array($hit) && ($hit['version'] ?? null) === $version->data()) {
+            return JsonResponse::fromJsonString($hit['json']);
+        }
+        $json = (string) (new JsonResponse($this->buildRows()))->getContent();
+        $cache->save($item->set(['version' => $version->data(), 'json' => $json]));
+        return JsonResponse::fromJsonString($json);
     }
 
     /**
