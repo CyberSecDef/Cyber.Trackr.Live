@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<NessusClientData_v2>
+<Report name="Fixture Scan">
+<ReportHost name="10.0.0.21">
+<HostProperties>
+<tag name="host-ip">10.0.0.21</tag>
+<tag name="host-fqdn">acas-win.example.mil</tag>
+<tag name="HOST_START">Tue Jan 13 10:20:30 2026</tag>
+<tag name="HOST_END">Tue Jan 13 10:45:00 2026</tag>
+<tag name="Credentialed_Scan">true</tag>
+<tag name="operating-system">Microsoft Windows Server 2022 Standard</tag>
+</HostProperties>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="0" pluginID="19506" pluginName="Nessus Scan Information" pluginFamily="Settings">
+<synopsis>This plugin displays information about the Nessus scan.</synopsis>
+<solution>n/a</solution>
+<plugin_output>Information about this scan : 
+
+Nessus version : 10.6.1
+Nessus build : 20005
+Plugin feed version : 202601130000
+Scanner edition used : Nessus
+Scan type : Normal
+Scan name : Fixture Scan
+Scan policy used : Fixture Policy
+Credentialed checks : yes
+Scan duration : 1470 sec
+</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="3" pluginID="66334" pluginName="Patch Report" pluginFamily="General">
+<synopsis>The remote host is missing several patches.</synopsis>
+<solution>Install the patches listed below.</solution>
+<plugin_output>
+. You need to take the following 2 actions :
+
+[ Microsoft Edge (Chromium-based) 121.0 ]
+
++ Action to take : Upgrade to Microsoft Edge version 121.0.2277.83 or later.
+
+[ Security Updates for Windows Server 2022 ]
+
++ Action to take : Apply KB5034129
+- KB5034129
+</plugin_output>
+</ReportItem>
+<ReportItem port="445" svc_name="cifs" protocol="tcp" severity="0" pluginID="10860" pluginName="SMB Use Host SID to Enumerate Local Users" pluginFamily="Windows : User management">
+<synopsis>Local users can be enumerated.</synopsis>
+<solution>n/a</solution>
+<plugin_output>
+  - Administrator (id 500, Administrator account)
+  - svcbackup (id 1001)
+</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="0" pluginID="20811" pluginName="Microsoft Windows Installed Software Enumeration (credentialed check)" pluginFamily="Windows">
+<synopsis>Lists installed software.</synopsis>
+<solution>n/a</solution>
+<plugin_output>The following software are installed on the remote host :
+
+Mozilla Firefox (x64 en-US)  [version 115.6.0]  [installed on 2025/12/01]
+7-Zip 23.01 (x64)  [version 23.01]  [installed on 2025/11/15]
+Microsoft Visual C++ 2022 Redistributable  [version 14.38.33130]  [installed on 2025/10/02]
+</plugin_output>
+</ReportItem>
+<ReportItem port="3389" svc_name="msrdp" protocol="tcp" severity="0" pluginID="11219" pluginName="Nessus SYN scanner" pluginFamily="Port scanners">
+<synopsis>It is possible to determine which TCP ports are open.</synopsis>
+<solution>n/a</solution>
+<plugin_output>Port 3389/tcp was found to be open</plugin_output>
+</ReportItem>
+<ReportItem port="445" svc_name="cifs" protocol="tcp" severity="0" pluginID="11219" pluginName="Nessus SYN scanner" pluginFamily="Port scanners">
+<synopsis>It is possible to determine which TCP ports are open.</synopsis>
+<solution>n/a</solution>
+<plugin_output>Port 445/tcp was found to be open</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="2" pluginID="57608" pluginName="SMB Signing not required" pluginFamily="Misc.">
+<synopsis>Signing is not required on the remote SMB server.</synopsis>
+<solution>Enforce message signing in the host's configuration.</solution>
+<stig_severity>II</stig_severity>
+<plugin_output>SMB signing is disabled.</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="4" pluginID="187000" pluginName="Microsoft Edge (Chromium) &lt; 121.0.2277.83 Multiple Vulnerabilities" pluginFamily="Windows">
+<synopsis>The remote host has a browser that is affected by multiple vulnerabilities.</synopsis>
+<solution>Upgrade to Microsoft Edge version 121.0.2277.83 or later.</solution>
+<iava>2024-A-0042</iava>
+<cve>CVE-2024-0517</cve>
+<plugin_output>Installed version : 120.0.2210.144</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="1" pluginID="10114" pluginName="ICMP Timestamp Request Remote Date Disclosure" pluginFamily="General">
+<synopsis>It is possible to determine the exact time set on the remote host.</synopsis>
+<solution>Filter out the ICMP timestamp requests.</solution>
+<plugin_output>The difference between the local and remote clocks is 1 second.</plugin_output>
+</ReportItem>
+</ReportHost>
+<ReportHost name="10.0.0.22">
+<HostProperties>
+<tag name="host-ip">10.0.0.22</tag>
+<tag name="hostname">acas-rhel</tag>
+<tag name="HOST_START">Tue Jan 13 11:02:09 2026</tag>
+<tag name="Credentialed_Scan">true</tag>
+<tag name="operating-system">Red Hat Enterprise Linux 8.9</tag>
+</HostProperties>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="0" pluginID="19506" pluginName="Nessus Scan Information" pluginFamily="Settings">
+<synopsis>This plugin displays information about the Nessus scan.</synopsis>
+<solution>n/a</solution>
+<plugin_output>Information about this scan : 
+
+Nessus version : 10.6.1
+Plugin feed version : 202601130000
+Scanner edition used : Nessus
+Scan type : Normal
+Credentialed checks : yes
+</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="0" pluginID="22869" pluginName="Software Enumeration (SSH)" pluginFamily="General">
+<synopsis>Lists installed packages.</synopsis>
+<solution>n/a</solution>
+<plugin_output>Here is the list of packages installed on the remote Red Hat Linux system : 
+
+  bash-4.4.20-4.el8_6.x86_64|(none) Mon 01 Dec 2025
+  openssh-server-8.0p1-19.el8_8.x86_64|(none) Mon 01 Dec 2025
+  sudo-1.9.5p2-1.el8_9.x86_64|(none) Mon 01 Dec 2025
+</plugin_output>
+</ReportItem>
+<ReportItem port="0" svc_name="general" protocol="tcp" severity="0" pluginID="95928" pluginName="Linux User List Enumeration" pluginFamily="General">
+<synopsis>Lists local users.</synopsis>
+<solution>n/a</solution>
+<plugin_output>
+----------[ User Accounts ]----------
+
+User         : root
+Home folder  : /root
+
+User         : appsvc
+Home folder  : /home/appsvc
+</plugin_output>
+</ReportItem>
+<ReportItem port="22" svc_name="ssh" protocol="tcp" severity="0" pluginID="14272" pluginName="Netstat Portscanner (SSH)" pluginFamily="Port scanners">
+<synopsis>Remote open ports are enumerated via SSH.</synopsis>
+<solution>n/a</solution>
+<plugin_output>Port 22/tcp was found to be open</plugin_output>
+</ReportItem>
+<ReportItem port="22" svc_name="ssh" protocol="tcp" severity="2" pluginID="90317" pluginName="SSH Weak Algorithms Supported" pluginFamily="Misc.">
+<synopsis>The remote SSH server is configured to allow weak encryption algorithms.</synopsis>
+<solution>Remove the weak algorithms.</solution>
+<plugin_output>arcfour is enabled.</plugin_output>
+</ReportItem>
+</ReportHost>
+</Report>
+</NessusClientData_v2>

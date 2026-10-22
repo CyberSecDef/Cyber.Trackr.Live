@@ -1,0 +1,18 @@
+{
+  "title": "Fixture CKLB",
+  "id": "00000000-0000-0000-0000-000000000001",
+  "target_data": { "host_name": "cklb-host", "ip_address": "10.0.0.12" },
+  "stigs": [{
+    "stig_name": "Fixture Web Server Security Technical Implementation Guide",
+    "stig_id": "Fixture_Web_STIG",
+    "release_info": "Release: 4 Benchmark Date: 15 Jan 2026",
+    "rules": [
+      { "group_id": "V-200001", "rule_id": "SV-200001r1_rule", "group_title": "SRG-APP-000014", "rule_title": "The web server must use TLS 1.2 or later.",
+        "discussion": "Old protocols are weak.", "fix_text": "Disable TLS 1.0 and 1.1.", "stig_ref": "Fixture Web STIG", "severity": "high",
+        "status": "open", "comments": "", "finding_details": "TLS 1.0 enabled.", "ccis": ["CCI-000068"], "ia_controls": "", "responsibility": "" },
+      { "group_id": "V-200002", "rule_id": "SV-200002r1_rule", "group_title": "SRG-APP-000015", "rule_title": "The web server must log requests.",
+        "discussion": "Logs support investigations.", "fix_text": "Enable access logging.", "stig_ref": "Fixture Web STIG", "severity": "medium",
+        "status": "not_applicable", "comments": "Logging is upstream.", "finding_details": "", "ccis": ["CCI-000130"], "ia_controls": "", "responsibility": "" }
+    ]
+  }]
+}

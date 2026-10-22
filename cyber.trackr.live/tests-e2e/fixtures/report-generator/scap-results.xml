@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="style.xsl" style="SCAP_1.2"?>
+<cdf:Benchmark xmlns:cdf="http://checklists.nist.gov/xccdf/1.2" xmlns:dc="http://purl.org/dc/elements/1.1/" id="xccdf_mil.disa.stig_benchmark_Fixture_OS_STIG" style="SCAP_1.2">
+  <cdf:title>Fixture Operating System Security Technical Implementation Guide</cdf:title>
+  <cdf:version>1.5</cdf:version>
+  <cdf:Group id="xccdf_mil.disa.stig_group_V-300001">
+    <cdf:title>SRG-OS-000021-GPOS-00005</cdf:title>
+    <cdf:Rule id="xccdf_mil.disa.stig_rule_SV-300001r1_rule" severity="medium">
+      <cdf:title>The OS must lock accounts after three failed logons.</cdf:title>
+      <cdf:description>Prevents brute force.</cdf:description>
+      <cdf:reference><dc:publisher>DISA</dc:publisher></cdf:reference>
+      <cdf:ident system="http://cyber.mil/cci">CCI-000044</cdf:ident>
+      <cdf:fixtext>Set the lockout threshold to 3.</cdf:fixtext>
+      <cdf:fix id="F-300001r1_fix"/>
+    </cdf:Rule>
+  </cdf:Group>
+  <cdf:Group id="xccdf_mil.disa.stig_group_V-300002">
+    <cdf:title>SRG-OS-000480-GPOS-00227</cdf:title>
+    <cdf:Rule id="xccdf_mil.disa.stig_rule_SV-300002r1_rule" severity="high">
+      <cdf:title>The OS must not allow blank passwords.</cdf:title>
+      <cdf:description>Blank passwords allow unauthenticated access.</cdf:description>
+      <cdf:reference><dc:publisher>DISA</dc:publisher></cdf:reference>
+      <cdf:ident system="http://cyber.mil/cci">CCI-000366</cdf:ident>
+      <cdf:fixtext>Require passwords on all accounts.</cdf:fixtext>
+      <cdf:fix id="F-300002r1_fix"/>
+    </cdf:Rule>
+  </cdf:Group>
+  <cdf:TestResult id="xccdf_mil.disa.stig_testresult_fixture" start-time="2026-01-13T09:00:00" end-time="2026-01-13T09:07:30" test-system="cpe:/a:spawar:scc:5.10">
+    <cdf:profile idref="xccdf_mil.disa.stig_profile_MAC-1_Classified"/>
+    <cdf:target>scap-host</cdf:target>
+    <cdf:target-address>10.0.0.31</cdf:target-address>
+    <cdf:target-facts>
+      <cdf:fact name="urn:scap:fact:asset:identifier:os_name" type="string">Fixture OS 9</cdf:fact>
+    </cdf:target-facts>
+    <cdf:rule-result idref="xccdf_mil.disa.stig_rule_SV-300001r1_rule" severity="medium" time="2026-01-13T09:01:00">
+      <cdf:result>fail</cdf:result>
+      <cdf:ident system="http://iase.disa.mil/cci">CCI-000044</cdf:ident>
+    </cdf:rule-result>
+    <cdf:rule-result idref="xccdf_mil.disa.stig_rule_SV-300002r1_rule" severity="high" time="2026-01-13T09:02:00">
+      <cdf:result>pass</cdf:result>
+      <cdf:ident system="http://iase.disa.mil/cci">CCI-000366</cdf:ident>
+    </cdf:rule-result>
+  </cdf:TestResult>
+</cdf:Benchmark>

@@ -72,3 +72,11 @@ the active backlog is empty.
 - **PDF output for plans** — alongside DOCX.
 - **General RSS feed for STIG/SCAP version publication** — broader
   than the digest-RSS already shipped.
+- **SheetJS 0.14.1 in Scans to Reports** — scanners flag CVE-2023-30533
+  and CVE-2024-22363, both in *reading* spreadsheets. Not reachable: the
+  page only writes (`book_new`, `json_to_sheet`, `book_append_sheet`,
+  `writeFile`), the workers don't load it, and the `.xls/.xlsx` upload
+  branch calls a `parse.Excel` that doesn't exist. Upgrading means 0.14.1 →
+  0.20.x from SheetJS's own CDN (npm stops at 0.18.5, still vulnerable) on
+  the code that writes the deliverable XLSX. If it's ever done, gate it on
+  `tests-e2e/report_generator_golden.spec.js` (cell-for-cell workbook diff).
