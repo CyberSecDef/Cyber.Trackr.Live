@@ -255,6 +255,13 @@ class StigController extends AbstractController
             'controller_name' => 'StigController',
             'stig1' => $stig1_xml,
             'stig2' => $stig2_xml,
+            // Lookups the template used to recompute per rule (review P9).
+            'stig1_groups_by_id' => $this->groupsById($stig1_xml),
+            'stig2_groups_by_id' => $this->groupsById($stig2_xml),
+            'stig2_top_ids' => array_map(
+                fn (\SimpleXMLElement $g) => trim((string) $g['id']),
+                $stig2_xml->xpath('/xmlns:Benchmark/xmlns:Group') ?: []
+            ),
             'stigs' => $stigs[$title],
             'title' => $title,
             'v1' => $v1,
@@ -436,5 +443,21 @@ class StigController extends AbstractController
         }
 
         return $response;
+    }
+
+    /**
+     * Every Group in the document by exact @id, all matches in document
+     * order: the same array `xpath("//xmlns:Group[@id='X']")` returned, which
+     * the compare template ran once per rule (review P9).
+     *
+     * @return array<string, list<\SimpleXMLElement>>
+     */
+    private function groupsById(\SimpleXMLElement $xml): array
+    {
+        $map = [];
+        foreach ($xml->xpath('//xmlns:Group') ?: [] as $group) {
+            $map[(string) $group['id']][] = $group;
+        }
+        return $map;
     }
 }

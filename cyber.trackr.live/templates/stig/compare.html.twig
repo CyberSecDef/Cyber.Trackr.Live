@@ -70,7 +70,7 @@
     {% for group in stig2.xpath("/xmlns:Benchmark/xmlns:Group") %}
         {% set stig2_vuln = group.attributes.id %}
         {% set stig2_leg_vuln = group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first : '' %}
-        {% set stig1_group = stig1.xpath("//xmlns:Group[@id='" ~ stig2_vuln ~ "']") %}
+        {% set stig1_group = stig1_groups_by_id[stig2_vuln ~ ''] ?? [] %}
 
         {% if stig1_group is not defined or stig1_group is null %}
             {% set stig1_group = stig1.xpath("//xmlns:Group[@id='" ~ stig2_leg_vuln ~ "']") %}
@@ -115,11 +115,11 @@
 
     <!-- this is to show items in stig 1 that aren't in stig 2 -->
     {% for group in stig1.xpath("/xmlns:Benchmark/xmlns:Group") %}
-        {% if group.attributes.id|trim() not in stig2.xpath("/xmlns:Benchmark/xmlns:Group")|map( r => r.attributes.id|trim()) %}
+        {% if group.attributes.id|trim() not in stig2_top_ids %}
             
             {% set stig1_vuln = group.attributes.id %}
             {% set stig1_leg_vuln = group.Rule.ident is defined ? group.Rule.ident|filter( v => v.__toString() starts with 'V-')|first : '' %}
-            {% set stig2_group = stig2.xpath("//xmlns:Group[@id='" ~ stig1_vuln|trim() ~ "']") %}
+            {% set stig2_group = stig2_groups_by_id[stig1_vuln|trim() ~ ''] ?? [] %}
 
             {% if stig2_group is not defined or stig2_group is null %}
                 {% set stig2_group = stig2.xpath("//xmlns:Group[@id='" ~ stig1_leg_vuln ~ "']") %}

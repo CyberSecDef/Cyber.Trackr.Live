@@ -87,6 +87,14 @@ class StigControllerTest extends WebTestCase
         // Compare V4R8 against V6R4 — both present in the toc for this title.
         $client->request('GET', '/stig/' . self::TITLE . '/4/8/6/4');
         $this->assertResponseIsSuccessful();
+
+        // P9: group lookups now come from maps built in the controller. DISA
+        // renumbered every rule between these releases, so all 286 V6R4 rules
+        // show, plus all 289 V4R8 rules in the removed section (the path that
+        // used to be O(n^2)).
+        $html = (string) $client->getResponse()->getContent();
+        $this->assertSame(286 + 289, substr_count($html, 'class="compare-container'));
+        $this->assertStringContainsString('V-69239', $html);
     }
 
     // Guard from commit 8710c31: valid title, unknown version/release -> 404.
