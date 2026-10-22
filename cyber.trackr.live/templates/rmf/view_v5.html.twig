@@ -119,13 +119,9 @@
 <div class="sec-header">Assessment Procedures</div>
 <div class="container">
 <dl>
-{% for r in rmfs_json%}
-{% if r.id == control.number %}
-{% for ap in r.ccis %}
+{% for ap in aps_by_control[control.number ~ ''] ?? [] %}
 <dt >{{ ui.ident(ap.ap_acronym) }} - {{ ui.cci_link(ap.id) }}</dt>
 <dd class="text-sm">{{ ap.definition }}</dd>
-{% endfor %}
-{% endif %}
 {% endfor %}
 </dl>
 </div>
@@ -139,9 +135,9 @@
             {{ ui.ident(r) }}
         </a>
         -
-        {% set related_control = rmf.xpath("/controls:controls/controls:control[aaa:number='" ~ r ~ "']")|first %}
-        {% if related_control %}
-            {{ related_control.title|title }}
+        {% set related_title = control_titles[r ~ ''] ?? null %}
+        {% if related_title is not null %}
+            {{ related_title|title }}
         {% endif %}
     </li>
 

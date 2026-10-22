@@ -52,22 +52,6 @@ class RmfController extends AbstractController
         $rmf_v5_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/2.0");
         $rmf_v5_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
-        $cci_filename = realpath($this->dataDir . "/cci/U_CCI_List.xml");
-        if ($cci_filename === false || !is_file($cci_filename)) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
-        }
-        $cci_xml = simplexml_load_file($cci_filename);
-        if ($cci_xml === false) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
-        }
-
-        foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
-            if (strlen((string) $strPrefix) == 0) {
-                $strPrefix = "a"; //Assign an arbitrary namespace prefix.
-            }
-            $cci_xml->registerXPathNamespace($strPrefix, $strNamespace);
-        }
-        $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
 
         // Pre-compute control → overlays once per request so the template doesn't
         // call OverlayLoader on every <controls:control> iteration.
@@ -94,9 +78,10 @@ class RmfController extends AbstractController
 
         return $this->render('rmf/view_v5.html.twig', [
             'controller_name' => 'RmfController',
-            'cci' => $cci_xml,
             'rmf' => $rmf_v5_xml,
-            'rmfs_json' => $rmfs_json,
+            'aps_by_control' => $this->apsByControl($rmfs_json),
+            // Same value the template's `related_control.title` used to read.
+            'control_titles' => $this->controlTitles($rmf_v5_xml, fn (\SimpleXMLElement $c) => (string) $c->title),
             'overlays' => $overlay_meta,
             'overlay_map' => $overlay_map,
         ]);
@@ -133,28 +118,13 @@ class RmfController extends AbstractController
         $rmf_v4_xml->registerXPathNamespace("xmlns", "http://scap.nist.gov/schema/sp800-53/feed/2.0");
         $rmf_v4_xml->registerXPathNamespace("aaa", "http://scap.nist.gov/schema/sp800-53/2.0");
 
-        $cci_filename = realpath($this->dataDir . "/cci/U_CCI_List.xml");
-        if ($cci_filename === false || !is_file($cci_filename)) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file is not available.');
-        }
-        $cci_xml = simplexml_load_file($cci_filename);
-        if ($cci_xml === false) {
-            throw new ServiceUnavailableHttpException(null, 'CCI data file could not be parsed.');
-        }
-
-        foreach ($cci_xml->getDocNamespaces() as $strPrefix => $strNamespace) {
-            if (strlen((string) $strPrefix) == 0) {
-                $strPrefix = "a"; //Assign an arbitrary namespace prefix.
-            }
-            $cci_xml->registerXPathNamespace($strPrefix, $strNamespace);
-        }
-        $cci_xml->registerXPathNamespace("xmlns", "http://iase.disa.mil/cci");
 
         return $this->render('rmf/view_v4.html.twig', [
             'controller_name' => 'RmfController',
-            'cci' => $cci_xml,
             'rmf' => $rmf_v4_xml,
-            'rmfs_json' => $rmfs_json,
+            'aps_by_control' => $this->apsByControl($rmfs_json),
+            // Same value the template's `xpath(.../aaa:title)|first` used to read.
+            'control_titles' => $this->controlTitles($rmf_v4_xml, fn (\SimpleXMLElement $c) => (string) ($c->xpath('./aaa:title')[0] ?? '')),
         ]);
     }
 
@@ -205,5 +175,44 @@ class RmfController extends AbstractController
         return $this->render('rmf/baselines.html.twig', array_merge($matrix, [
             'family_names' => $familyNames,
         ]));
+    }
+
+    /**
+     * Assessment procedures per control id, in 800-53r4.json order. The
+     * templates used to scan every row of that file for every control
+     * (323 x 858 Twig iterations on /rmf/5; review P8).
+     *
+     * @return array<string, list<object>>
+     */
+    private function apsByControl(array $rmfs_json): array
+    {
+        $map = [];
+        foreach ($rmfs_json as $row) {
+            foreach ($row->ccis ?? [] as $ap) {
+                $map[(string) ($row->id ?? '')][] = $ap;
+            }
+        }
+        return $map;
+    }
+
+    /**
+     * Control number => title, for the Related Controls lists. Replaces a
+     * full-document XPath per related link (1,073 on /rmf/4). Keyed by every
+     * aaa:number of a control, first match in document order wins, exactly
+     * as the old `control[aaa:number='X']` lookup resolved.
+     *
+     * @param callable(\SimpleXMLElement): string $title
+     * @return array<string, string>
+     */
+    private function controlTitles(\SimpleXMLElement $rmf, callable $title): array
+    {
+        $map = [];
+        foreach ($rmf->xpath('/controls:controls/controls:control') ?: [] as $control) {
+            $control->registerXPathNamespace('aaa', 'http://scap.nist.gov/schema/sp800-53/2.0');
+            foreach ($control->xpath('./aaa:number') ?: [] as $number) {
+                $map[(string) $number] ??= $title($control);
+            }
+        }
+        return $map;
     }
 }
