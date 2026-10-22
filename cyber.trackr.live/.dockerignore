@@ -21,5 +21,17 @@ Dockerfile.*
 docker-compose.yml
 *.tar
 *.tar.gz
+# Built image tarballs (bin/build-image.sh writes ~3 GB here). The root-level
+# *.tar.gz above doesn't reach into dist/, so each build used to copy the
+# previous tarball into the new image (review P4).
+dist/
+# Host-specific env files. .env supplies every default the image needs
+# (MITIGATION_SCRIPT empty = feature off); .env.prod only carried the prod
+# host's helper path.
+.env.prod
+.env.dev
+# Local tooling and caches that aren't part of the app.
+.phpunit.result.cache
+router.php
 README.md
 DOCKER.md
