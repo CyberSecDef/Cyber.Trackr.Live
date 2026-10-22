@@ -482,6 +482,9 @@ class ApiController extends AbstractController
         }
 
         $cci = current($cci_xml->xpath("//xmlns:cci_item[@id='$item']"));
+        if ($cci === false) {
+            throw $this->createNotFoundException('The CCI does not exist');
+        }
         $results['cci'] = (string)$cci->attributes()['id'];
         $results["cci_definition"] = (string)$cci->definition;
         foreach ($rmfs_json as $item) {
@@ -588,6 +591,9 @@ class ApiController extends AbstractController
         $toc_path = realpath($this->dataDir . "/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($stigs[$title])) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig = array_filter($stigs[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;
@@ -652,6 +658,9 @@ class ApiController extends AbstractController
         $toc_path = realpath($this->dataDir . "/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($stigs[$title])) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig = array_filter($stigs[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;
@@ -786,6 +795,9 @@ class ApiController extends AbstractController
         $toc_path = realpath($this->dataDir . "/scap_toc.json");
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($scaps[$title])) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;
@@ -850,6 +862,9 @@ class ApiController extends AbstractController
         $toc_path = realpath($this->dataDir . "/scap_toc.json");
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($scaps[$title])) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;

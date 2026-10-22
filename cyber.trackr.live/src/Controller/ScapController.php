@@ -42,6 +42,9 @@ class ScapController extends AbstractController
         $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($scaps[$title])) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;
@@ -79,6 +82,9 @@ class ScapController extends AbstractController
         $toc_path = realpath(__DIR__ . "/../../resources/data/scap_toc.json");
         $scaps = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($scaps[$title])) {
+            throw $this->createNotFoundException('The SCAP does not exist');
+        }
         $scap = array_filter($scaps[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;

@@ -191,6 +191,9 @@ class StigController extends AbstractController
         $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($stigs[$title])) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig1 = array_filter($stigs[$title], function ($obj) use ($v1, $r1) {
             if ($obj->version == $v1  && $obj->release == $r1) {
                 return true;
@@ -269,6 +272,9 @@ class StigController extends AbstractController
         $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($stigs[$title])) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig = array_filter($stigs[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;
@@ -404,6 +410,9 @@ class StigController extends AbstractController
         $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
         $stigs = (array)json_decode(file_get_contents($toc_path));
 
+        if (!isset($stigs[$title])) {
+            throw $this->createNotFoundException('The STIG does not exist');
+        }
         $stig = array_filter($stigs[$title], function ($obj) use ($version, $release) {
             if ($obj->version == $version  && $obj->release == $release) {
                 return true;
