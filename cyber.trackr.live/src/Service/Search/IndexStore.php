@@ -2,42 +2,65 @@
 
 namespace App\Service\Search;
 
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Service\AtomicFile;
 
 /**
- * Loads and saves the search index files under resources/data/search/.
+ * Reads and writes the search index under resources/data/search/. Plain
+ * files only — no database, no cache layer.
  *
- *   postings.json   - {token: [doc_idx, doc_idx, ...]} sorted, deduped.
- *   trigrams.json   - {trigram: [token, ...]} for fuzzy fallback.
- *   sources.json    - {source_path: {sha256, mtime, doc_indexes: [...]}}
- *                     used by IndexBuilder for delta detection.
- *   docs/####.json  - sharded docs, SHARD_SIZE per file. Each file is
- *                     a 0-based array; doc index N lives at local
- *                     position N % SHARD_SIZE in shard floor(N/SHARD_SIZE).
+ * Each build is an immutable directory; a one-line `current` file names the
+ * live one and is swapped atomically, so a request never sees postings from
+ * one build and docs from another:
  *
- * Sharding lets a search load only the shard slices that actually
- * contain matched docs (~30 MB resident on a typical query) instead
- * of the full ~150 MB docs file. Reads route through Symfony's app
- * cache so the parsed structures are deserialized once per worker;
- * writes invalidate the affected key(s).
+ *   current                      - name of the live build directory
+ *   build-<stamp>/
+ *     postings/XX.json           - {token: [doc_idx, ...]} for tokens whose
+ *                                  md5 starts with XX (256 buckets)
+ *     trigrams/XX.json           - {trigram: [token, ...]}, same bucketing
+ *     docs.ndjson                - one JSON doc per line (null = dropped)
+ *     docmeta.bin                - per doc, fixed 19 bytes: byte offset and
+ *                                  length in docs.ndjson, type code,
+ *                                  release timestamp, title index
+ *     titles.json                - STIG titles referenced by docmeta
+ *     sources.json               - {source_path: {sha256, mtime,
+ *                                  doc_indexes}} for IndexBuilder deltas
+ *
+ * A query reads only the buckets for its tokens (review P2: the old single
+ * postings.json was 27 MB and cost ~190 ms / ~300 MB on every search), ranks
+ * matches from docmeta without touching documents, and then reads just the
+ * documents it will show, each with one fseek/fread.
  */
 class IndexStore
 {
-    private const CACHE_KEY = 'app.search.';
-    public const FILE_POSTINGS = 'postings.json';
-    public const FILE_TRIGRAMS = 'trigrams.json';
-    public const FILE_SOURCES = 'sources.json';
-    public const SHARD_SIZE = 1000;
-    public const SHARDS_DIR = 'docs';
+    public const TYPES = ['rmfv4' => 1, 'rmfv5' => 2, 'ccis' => 3, 'aps' => 4, 'vulns' => 5];
+
+    private const POINTER = 'current';
+    private const META_FORMAT = 'Voffset/Vlength/Ctype/qts/vtitle';
+    private const META_SIZE = 19; // V4 + V4 + C1 + q8 + v2
+
+    /** Pre-build-directory layout, removed after the first new build. */
+    private const LEGACY = ['postings.json', 'trigrams.json', 'sources.json', 'docs'];
 
     private string $dir;
 
-    public function __construct(
-        string $projectDir,
-        private CacheInterface $cache,
-    ) {
+    // Per-request memo of the build in use (resolved once per instance).
+    private ?string $build = null;
+    private ?string $meta = null;
+    /** @var list<string>|null */
+    private ?array $titles = null;
+    /** @var resource|null */
+    private $docsHandle = null;
+
+    public function __construct(string $projectDir)
+    {
         $this->dir = $projectDir . '/resources/data/search';
+    }
+
+    public function __destruct()
+    {
+        if (is_resource($this->docsHandle)) {
+            fclose($this->docsHandle);
+        }
     }
 
     public function dir(): string
@@ -47,184 +70,324 @@ class IndexStore
 
     public function exists(): bool
     {
-        return is_dir($this->dir . '/' . self::SHARDS_DIR);
+        return $this->build() !== null;
     }
 
-    public function postings(): array { return $this->load(self::FILE_POSTINGS); }
-    public function trigrams(): array { return $this->load(self::FILE_TRIGRAMS); }
-    public function sources(): array  { return $this->load(self::FILE_SOURCES); }
+    /** Name of the live build directory, or null if there is none. */
+    public function currentBuild(): ?string
+    {
+        $build = $this->build();
+        return $build === null ? null : basename($build);
+    }
 
     /**
-     * Loads only the shards that contain the requested doc indexes.
+     * Posting lists for the given tokens, reading only their buckets.
+     * Tokens with no postings are absent from the result.
      *
-     * @param int[] $indexes
-     * @return array<int, array> map of doc-index -> doc record (excludes nulls)
+     * @param list<string|int> $tokens
+     * @return array<string|int, list<int>>
+     */
+    public function postingsFor(array $tokens): array
+    {
+        return $this->lookup('postings', $tokens);
+    }
+
+    /**
+     * @param list<string> $trigrams
+     * @return array<string, list<string>>
+     */
+    public function trigramsFor(array $trigrams): array
+    {
+        return $this->lookup('trigrams', $trigrams);
+    }
+
+    /** Every posting list (IndexBuilder deltas only). */
+    public function allPostings(): array
+    {
+        return $this->allBuckets('postings');
+    }
+
+    public function sources(): array
+    {
+        $build = $this->build();
+        return $build === null ? [] : $this->readJson($build . '/sources.json');
+    }
+
+    public function docCount(): int
+    {
+        return intdiv(strlen($this->metaBytes()), self::META_SIZE);
+    }
+
+    /**
+     * Type, release timestamp and title of a doc, without reading it.
+     *
+     * @return array{type: ?string, ts: int, title: string}
+     */
+    public function meta(int $idx): array
+    {
+        static $names = null;
+        $names ??= array_flip(self::TYPES);
+        $raw = substr($this->metaBytes(), $idx * self::META_SIZE, self::META_SIZE);
+        if (strlen($raw) !== self::META_SIZE) {
+            return ['type' => null, 'ts' => 0, 'title' => ''];
+        }
+        $m = unpack(self::META_FORMAT, $raw);
+        return [
+            'type'  => $names[$m['type']] ?? null,
+            'ts'    => $m['ts'],
+            // Only vulns carry a title; others store index 0 as filler.
+            'title' => $m['type'] === self::TYPES['vulns'] ? ($this->titles()[$m['title']] ?? '') : '',
+        ];
+    }
+
+    /**
+     * @param list<int> $indexes
+     * @return array<int, array> doc index => doc record (dropped docs omitted)
      */
     public function getDocs(array $indexes): array
     {
-        if (empty($indexes)) return [];
-
-        $byShard = [];
+        $meta = $this->metaBytes();
+        $located = [];
         foreach ($indexes as $idx) {
-            $byShard[intdiv($idx, self::SHARD_SIZE)][] = $idx;
+            $raw = substr($meta, $idx * self::META_SIZE, self::META_SIZE);
+            if (strlen($raw) !== self::META_SIZE) continue;
+            $m = unpack(self::META_FORMAT, $raw);
+            if ($m['length'] > 0) $located[$idx] = $m;
+        }
+        if (!$located) return [];
+
+        // Read in file order; return in the order asked for.
+        $byOffset = $located;
+        uasort($byOffset, fn($a, $b) => $a['offset'] <=> $b['offset']);
+        $fh = $this->docsHandle();
+        $read = [];
+        foreach ($byOffset as $idx => $m) {
+            fseek($fh, $m['offset']);
+            $doc = json_decode((string) fread($fh, $m['length']), true);
+            if (is_array($doc)) $read[$idx] = $doc;
+        }
+        $out = [];
+        foreach ($indexes as $idx) {
+            if (isset($read[$idx])) $out[$idx] = $read[$idx];
+        }
+        return $out;
+    }
+
+    /** Every doc, nulls included, in index order (IndexBuilder deltas only). */
+    public function loadAllDocs(): array
+    {
+        $build = $this->build();
+        if ($build === null || !is_file($build . '/docs.ndjson')) return [];
+        $docs = [];
+        $fh = fopen($build . '/docs.ndjson', 'rb');
+        while (($line = fgets($fh)) !== false) {
+            $docs[] = json_decode($line, true);
+        }
+        fclose($fh);
+        return $docs;
+    }
+
+    /**
+     * Write a complete build to a fresh directory, then make it live.
+     *
+     * @param list<array|null> $docs
+     * @return string the new build directory's name
+     */
+    public function writeBuild(array $docs, array $postings, array $trigrams, array $sources): string
+    {
+        if (!is_dir($this->dir)) @mkdir($this->dir, 0755, true);
+        $name = 'build-' . date('Ymd\THis') . '-' . bin2hex(random_bytes(3));
+        $path = $this->dir . '/' . $name;
+        if (!@mkdir($path, 0755) || !@mkdir($path . '/postings', 0755) || !@mkdir($path . '/trigrams', 0755)) {
+            throw new \RuntimeException("Could not create $path");
         }
 
+        $this->writeBuckets($path . '/postings', $postings);
+        $this->writeBuckets($path . '/trigrams', $trigrams);
+
+        // docs.ndjson + docmeta.bin, written in one pass.
+        $titles = [];
+        $fh = fopen($path . '/docs.ndjson', 'wb');
+        $meta = '';
+        $offset = 0;
+        foreach ($docs as $doc) {
+            $line = json_encode($doc, JSON_UNESCAPED_SLASHES);
+            if ($line === false) {
+                fclose($fh);
+                throw new \RuntimeException('Could not encode a search doc: ' . json_last_error_msg());
+            }
+            fwrite($fh, $line . "\n");
+            $type = is_array($doc) ? (self::TYPES[$doc['type'] ?? ''] ?? 0) : 0;
+            $ts = 0;
+            $titleIdx = 0;
+            if ($type === self::TYPES['vulns']) {
+                // Same key the old request-time sort computed with strtotime().
+                $ts = strtotime((string) ($doc['released'] ?? '')) ?: 0;
+                $title = (string) ($doc['stig_title'] ?? '');
+                $titles[$title] ??= count($titles);
+                $titleIdx = $titles[$title];
+            }
+            $meta .= pack('VVCqv', $offset, is_array($doc) ? strlen($line) : 0, $type, $ts, $titleIdx);
+            $offset += strlen($line) + 1;
+        }
+        fclose($fh);
+        if (count($titles) > 65535) {
+            throw new \RuntimeException('Too many STIG titles for docmeta (max 65535)');
+        }
+        $this->writeFile($path . '/docmeta.bin', $meta);
+        $this->writeFile($path . '/titles.json', (string) json_encode(array_keys($titles), JSON_UNESCAPED_SLASHES));
+        $this->writeFile($path . '/sources.json', (string) json_encode($sources, JSON_UNESCAPED_SLASHES));
+
+        if (!AtomicFile::write($this->dir . '/' . self::POINTER, $name . "\n")) {
+            throw new \RuntimeException('Could not switch the search index to ' . $name);
+        }
+        $this->resetMemo();
+        $this->prune($name);
+
+        return $name;
+    }
+
+    /** Keep the live build and the one before it (for requests in flight). */
+    private function prune(string $live): void
+    {
+        $builds = glob($this->dir . '/build-*', GLOB_ONLYDIR) ?: [];
+        rsort($builds); // names sort by timestamp
+        $keep = [$this->dir . '/' . $live];
+        foreach ($builds as $b) {
+            if (count($keep) < 2 && !in_array($b, $keep, true)) $keep[] = $b;
+        }
+        foreach ($builds as $b) {
+            if (!in_array($b, $keep, true)) $this->removeTree($b);
+        }
+        foreach (self::LEGACY as $old) {
+            $p = $this->dir . '/' . $old;
+            is_dir($p) ? $this->removeTree($p) : @unlink($p);
+        }
+    }
+
+    public static function bucket(string|int $key): string
+    {
+        return substr(md5((string) $key), 0, 2);
+    }
+
+    private function lookup(string $kind, array $keys): array
+    {
+        $build = $this->build();
+        if ($build === null || !$keys) return [];
+        $byBucket = [];
+        foreach ($keys as $k) {
+            $byBucket[self::bucket($k)][] = $k;
+        }
         $out = [];
-        foreach ($byShard as $shardId => $idxs) {
-            $shard = $this->loadShard($shardId);
-            foreach ($idxs as $idx) {
-                $local = $idx % self::SHARD_SIZE;
-                if (isset($shard[$local]) && $shard[$local] !== null) {
-                    $out[$idx] = $shard[$local];
-                }
+        foreach ($byBucket as $bucket => $wanted) {
+            $data = $this->readJson("$build/$kind/$bucket.json");
+            foreach ($wanted as $k) {
+                if (isset($data[$k])) $out[$k] = $data[$k];
             }
         }
         return $out;
     }
 
-    public function loadShard(int $shardId): array
+    private function allBuckets(string $kind): array
     {
-        $key = self::CACHE_KEY . 'shard_' . $shardId;
-        return $this->cache->get($key, function (ItemInterface $item) use ($shardId) {
-            $item->expiresAfter(86400);
-            return $this->loadShardFromDisk($shardId);
-        });
-    }
-
-    /**
-     * Loads every shard back into one flat docs array. Used by
-     * IndexBuilder during a delta to mutate before re-writing only
-     * the shards it touched.
-     */
-    public function loadAllShards(): array
-    {
-        $shardsDir = $this->dir . '/' . self::SHARDS_DIR;
-        if (!is_dir($shardsDir)) return [];
-
-        $files = glob($shardsDir . '/*.json') ?: [];
-        sort($files);
+        $build = $this->build();
+        if ($build === null) return [];
         $all = [];
-        foreach ($files as $f) {
-            $shard = json_decode((string) @file_get_contents($f), true) ?: [];
-            foreach ($shard as $doc) {
-                $all[] = $doc;
-            }
+        foreach (glob("$build/$kind/*.json") ?: [] as $f) {
+            $all += $this->readJson($f);
         }
         return $all;
     }
 
-    public function saveShard(int $shardId, array $shard): void
+    private function writeBuckets(string $dir, array $map): void
     {
-        $shardsDir = $this->dir . '/' . self::SHARDS_DIR;
-        if (!is_dir($shardsDir)) @mkdir($shardsDir, 0755, true);
-
-        $path = $this->shardPath($shardId);
-        $tmp = $path . '.tmp';
-        $encoded = json_encode($shard, JSON_UNESCAPED_SLASHES);
-        if ($encoded === false) {
-            throw new \RuntimeException("Could not encode shard $shardId");
+        $buckets = [];
+        foreach ($map as $key => $value) {
+            $buckets[self::bucket($key)][$key] = $value;
         }
-        if (@file_put_contents($tmp, $encoded, LOCK_EX) === false) {
-            throw new \RuntimeException("Could not write shard $shardId");
-        }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new \RuntimeException("Could not rename shard $shardId");
-        }
-        $this->cache->delete(self::CACHE_KEY . 'shard_' . $shardId);
-    }
-
-    /**
-     * Wipes existing shard files and writes a fresh set from the given
-     * dense docs array. Used by full rebuilds.
-     */
-    public function saveAllShards(array $docs): void
-    {
-        // Clean up any pre-shard docs.json from older versions of this code.
-        @unlink($this->dir . '/docs.json');
-
-        $shardsDir = $this->dir . '/' . self::SHARDS_DIR;
-        if (is_dir($shardsDir)) {
-            foreach (glob($shardsDir . '/*.json') ?: [] as $f) {
-                @unlink($f);
+        foreach ($buckets as $bucket => $data) {
+            $json = json_encode($data, JSON_UNESCAPED_SLASHES);
+            if ($json === false) {
+                throw new \RuntimeException("Could not encode bucket $bucket: " . json_last_error_msg());
             }
-        } else {
-            @mkdir($shardsDir, 0755, true);
-        }
-
-        $total = count($docs);
-        $shardCount = (int) ceil($total / self::SHARD_SIZE);
-        for ($s = 0; $s < $shardCount; $s++) {
-            $shard = array_slice($docs, $s * self::SHARD_SIZE, self::SHARD_SIZE);
-            $this->saveShard($s, $shard);
+            $this->writeFile("$dir/$bucket.json", $json);
         }
     }
 
-    public function save(string $file, array $data): void
+    private function writeFile(string $path, string $contents): void
     {
-        if (!is_dir($this->dir)) {
-            @mkdir($this->dir, 0755, true);
-        }
-        $path = $this->dir . '/' . $file;
-        $tmp = $path . '.tmp';
-        $encoded = json_encode($data, JSON_UNESCAPED_SLASHES);
-        if ($encoded === false) {
-            throw new \RuntimeException("Could not encode $file");
-        }
-        if (@file_put_contents($tmp, $encoded, LOCK_EX) === false) {
-            throw new \RuntimeException("Could not write $tmp");
-        }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new \RuntimeException("Could not rename $tmp -> $path");
-        }
-        $this->cache->delete($this->cacheKey($file));
-    }
-
-    /** Drops the cached non-shard structures. Shard cache invalidation
-     *  happens per-shard in saveShard(). */
-    public function invalidate(): void
-    {
-        foreach ([self::FILE_POSTINGS, self::FILE_TRIGRAMS, self::FILE_SOURCES] as $f) {
-            $this->cache->delete($this->cacheKey($f));
+        if (@file_put_contents($path, $contents) === false) {
+            throw new \RuntimeException("Could not write $path");
         }
     }
 
-    private function shardPath(int $shardId): string
+    private function build(): ?string
     {
-        return sprintf('%s/%s/%04d.json', $this->dir, self::SHARDS_DIR, $shardId);
+        if ($this->build === null) {
+            $name = trim((string) @file_get_contents($this->dir . '/' . self::POINTER));
+            if ($name !== '' && preg_match('/^build-[A-Za-z0-9-]+$/', $name) && is_dir($this->dir . '/' . $name)) {
+                $this->build = $this->dir . '/' . $name;
+            }
+        }
+        return $this->build;
     }
 
-    private function loadShardFromDisk(int $shardId): array
+    private function metaBytes(): string
     {
-        $path = $this->shardPath($shardId);
-        if (!is_file($path)) return [];
+        if ($this->meta === null) {
+            $build = $this->build();
+            $this->meta = $build === null ? '' : (string) @file_get_contents($build . '/docmeta.bin');
+        }
+        return $this->meta;
+    }
+
+    /** @return list<string> */
+    private function titles(): array
+    {
+        if ($this->titles === null) {
+            $build = $this->build();
+            $this->titles = $build === null ? [] : $this->readJson($build . '/titles.json');
+        }
+        return $this->titles;
+    }
+
+    /** @return resource */
+    private function docsHandle()
+    {
+        if (!is_resource($this->docsHandle)) {
+            $h = @fopen($this->build() . '/docs.ndjson', 'rb');
+            if ($h === false) {
+                throw new \RuntimeException('Search index docs are missing; run app:search:rebuild --full');
+            }
+            $this->docsHandle = $h;
+        }
+        return $this->docsHandle;
+    }
+
+    private function resetMemo(): void
+    {
+        if (is_resource($this->docsHandle)) fclose($this->docsHandle);
+        $this->build = $this->meta = $this->titles = $this->docsHandle = null;
+    }
+
+    private function readJson(string $path): array
+    {
         $raw = @file_get_contents($path);
         if ($raw === false) return [];
         $decoded = json_decode($raw, true);
         return is_array($decoded) ? $decoded : [];
     }
 
-    private function load(string $file): array
+    private function removeTree(string $path): void
     {
-        return $this->cache->get($this->cacheKey($file), function (ItemInterface $item) use ($file) {
-            $item->expiresAfter(86400);
-            return $this->loadFromDisk($file);
-        });
-    }
-
-    private function loadFromDisk(string $file): array
-    {
-        $path = $this->dir . '/' . $file;
-        if (!is_file($path)) return [];
-        $raw = @file_get_contents($path);
-        if ($raw === false) return [];
-        $decoded = json_decode($raw, true);
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    private function cacheKey(string $file): string
-    {
-        return self::CACHE_KEY . str_replace('.', '_', $file);
+        if (!is_dir($path)) return;
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $f) {
+            $f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname());
+        }
+        @rmdir($path);
     }
 }

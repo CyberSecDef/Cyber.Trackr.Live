@@ -40,7 +40,7 @@
                 {{ results.rmfv5|length|number_format }} 800-53 r5 controls &middot;
                 {{ results.ccis|length|number_format }} CCIs &middot;
                 {{ results.aps|length|number_format }} APs &middot;
-                {{ results.vulns|length|number_format }} vulnerability requirements
+                {{ results.counts.vulns|number_format }} vulnerability requirements
             </p>
         </header>
 
@@ -129,7 +129,7 @@
                     <div class="search-section">
                         <div class="search-section__header" onclick="$('#vuln_results').toggle();" role="button" aria-expanded="false">
                             <span>Vulnerability Requirements</span>
-                            <span class="search-section__count">{{ (results.vulns|length < 500) ? results.vulns|length : '500+' }}</span>
+                            <span class="search-section__count">{{ (results.counts.vulns < 500) ? results.counts.vulns : '500+' }}</span>
                         </div>
                         <div class="collapse search-section__body" id="vuln_results">
                             {% for c in results.vulns|slice(0,500) %}

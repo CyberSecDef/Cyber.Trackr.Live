@@ -22,9 +22,9 @@
 #      container and crashes when it can't resolve a new service.
 #   4. cache:clear does NOT clear the app cache pool. Since Symfony 7.4
 #      cache.app lives in var/share/prod/pools/app, outside the cache
-#      dir cache:clear swaps out. The search index caches its postings
-#      and shards there (IndexStore), so a stale entry would pair an old
-#      posting map with new shards and return the wrong documents.
+#      dir cache:clear swaps out, so derived data cached there (e.g. the
+#      CCI -> control map) would survive a deploy. (The search index no
+#      longer uses it: it reads its own build files directly.)
 #      cache:pool:clear cache.app runs from an EXIT trap so it happens
 #      even when a step above fails and `set -e` aborts the deploy.
 #   5. The IndexNow ping is best-effort — any failure (no key file,
@@ -57,7 +57,7 @@ fi
 # Runs on every exit, success or failure (see note 4 above).
 clear_app_pool() {
     echo
-    echo "[trap] Clearing the app cache pool (search postings + shards) …"
+    echo "[trap] Clearing the app cache pool …"
     "$PHP" bin/console cache:pool:clear cache.app --env=prod || true
 }
 trap clear_app_pool EXIT

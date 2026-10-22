@@ -4,7 +4,6 @@ namespace App\Tests\Service\Search;
 
 use App\Service\Search\IndexStore;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class IndexStoreTest extends TestCase
 {
@@ -19,85 +18,117 @@ class IndexStoreTest extends TestCase
         $this->tmpDirs = [];
     }
 
-    private function store(string $projectDir): IndexStore
+    private function docs(): array
     {
-        // ArrayAdapter is an in-memory Symfony CacheInterface — no kernel needed.
-        return new IndexStore($projectDir, new ArrayAdapter());
+        return [
+            ['type' => 'ccis', 'id' => 'CCI-000001', 'text' => 'one'],
+            null, // dropped by a delta
+            ['type' => 'vulns', 'id' => 'V-1', 'stig_title' => 'Windows_11', 'released' => '2026-08-10', 'text' => 'two'],
+            ['type' => 'vulns', 'id' => 'V-2', 'stig_title' => 'RHEL_9', 'released' => '', 'text' => 'three'],
+        ];
     }
 
-    public function testDirPath(): void
+    public function testNothingBeforeTheFirstBuild(): void
     {
-        $dir = $this->tmpDir();
-        $this->assertSame($dir . '/resources/data/search', $this->store($dir)->dir());
-    }
-
-    public function testExistsReflectsShardsDir(): void
-    {
-        $dir = $this->tmpDir();
-        $store = $this->store($dir);
+        $store = new IndexStore($this->tmpDir());
         $this->assertFalse($store->exists());
-        $store->saveAllShards([['id' => 'a']]);
-        $this->assertTrue($store->exists());
-    }
-
-    public function testSaveAndLoadRoundTrip(): void
-    {
-        $dir = $this->tmpDir();
-        $store = $this->store($dir);
-        $store->save(IndexStore::FILE_POSTINGS, ['windows' => [0, 1], 'server' => [0]]);
-
-        $this->assertSame(['windows' => [0, 1], 'server' => [0]], $store->postings());
-    }
-
-    public function testMissingFileLoadsAsEmpty(): void
-    {
-        $store = $this->store($this->tmpDir());
-        $this->assertSame([], $store->postings());
-        $this->assertSame([], $store->trigrams());
+        $this->assertSame([], $store->postingsFor(['windows']));
+        $this->assertSame([], $store->trigramsFor(['_wi']));
         $this->assertSame([], $store->sources());
+        $this->assertSame(0, $store->docCount());
     }
 
-    public function testGetDocsLoadsOnlyRequestedAcrossShards(): void
+    public function testWriteThenReadRoundTrips(): void
     {
-        $dir = $this->tmpDir();
-        $store = $this->store($dir);
+        $store = new IndexStore($this->tmpDir());
+        $store->writeBuild($this->docs(), ['windows' => [0, 2], 'rhel' => [3], '2024' => [2]], ['_wi' => ['windows']], ['src.xml' => ['sha256' => 'x']]);
 
-        // 1500 docs spans two shards (SHARD_SIZE = 1000).
-        $docs = [];
-        for ($i = 0; $i < 1500; $i++) {
-            $docs[] = ['id' => 'doc-' . $i];
-        }
-        $store->saveAllShards($docs);
-
-        $got = $store->getDocs([0, 1000, 1499]);
-        $this->assertSame('doc-0', $got[0]['id']);
-        $this->assertSame('doc-1000', $got[1000]['id']);   // shard 1, local 0
-        $this->assertSame('doc-1499', $got[1499]['id']);   // shard 1, local 499
-        $this->assertCount(3, $got);
+        $this->assertTrue($store->exists());
+        $this->assertSame(['windows' => [0, 2], 'rhel' => [3]], $store->postingsFor(['windows', 'rhel', 'absent']));
+        $this->assertSame([2], $store->postingsFor(['2024'])['2024'] ?? null, 'numeric-looking tokens');
+        $this->assertSame(['_wi' => ['windows']], $store->trigramsFor(['_wi', '_zz']));
+        $this->assertSame(['src.xml' => ['sha256' => 'x']], $store->sources());
+        $this->assertSame(4, $store->docCount());
+        $this->assertSame($this->docs(), $store->loadAllDocs());
     }
 
-    public function testGetDocsEmptyAndMissing(): void
+    public function testGetDocsKeepsRequestOrderAndSkipsDroppedOrUnknown(): void
     {
-        $dir = $this->tmpDir();
-        $store = $this->store($dir);
-        $store->saveAllShards([['id' => 'only']]);
+        $store = new IndexStore($this->tmpDir());
+        $store->writeBuild($this->docs(), [], [], []);
 
+        $got = $store->getDocs([3, 1, 0, 99]);
+        $this->assertSame([3, 0], array_keys($got));
+        $this->assertSame('V-2', $got[3]['id']);
         $this->assertSame([], $store->getDocs([]));
-        $this->assertSame([], $store->getDocs([99999]));
     }
 
-    public function testLoadAllShardsReturnsFlatArray(): void
+    public function testMetaGivesTypeTimestampAndTitleWithoutReadingDocs(): void
+    {
+        $store = new IndexStore($this->tmpDir());
+        $store->writeBuild($this->docs(), [], [], []);
+
+        $this->assertSame(['type' => 'ccis', 'ts' => 0, 'title' => ''], $store->meta(0));
+        $this->assertSame(['type' => null, 'ts' => 0, 'title' => ''], $store->meta(1));
+        $this->assertSame(['type' => 'vulns', 'ts' => strtotime('2026-08-10'), 'title' => 'Windows_11'], $store->meta(2));
+        $this->assertSame(['type' => 'vulns', 'ts' => 0, 'title' => 'RHEL_9'], $store->meta(3), 'unparseable date sorts last');
+        $this->assertSame(['type' => null, 'ts' => 0, 'title' => ''], $store->meta(42));
+    }
+
+    public function testTokensAreSplitIntoBucketFiles(): void
     {
         $dir = $this->tmpDir();
-        $store = $this->store($dir);
-        $store->saveAllShards([['id' => 'a'], ['id' => 'b'], ['id' => 'c']]);
+        $store = new IndexStore($dir);
+        $postings = [];
+        foreach (range(1, 2000) as $i) {
+            $postings["tok$i"] = [$i];
+        }
+        $store->writeBuild([], $postings, [], []);
 
-        $all = $store->loadAllShards();
-        $this->assertCount(3, $all);
-        $this->assertSame(['a', 'b', 'c'], array_column($all, 'id'));
+        $build = $dir . '/resources/data/search/' . $store->currentBuild();
+        $files = glob($build . '/postings/*.json');
+        $this->assertGreaterThan(200, count($files), 'spread over many buckets');
+        $this->assertSame([7], $store->postingsFor(['tok7'])['tok7']);
     }
 
-    // ---- helpers ------------------------------------------------------------
+    public function testNewBuildIsAtomicForReadersAlreadyInFlight(): void
+    {
+        $dir = $this->tmpDir();
+        (new IndexStore($dir))->writeBuild([['type' => 'ccis', 'id' => 'OLD', 'text' => '']], ['x' => [0]], [], []);
+
+        $reader = new IndexStore($dir);
+        $this->assertSame('OLD', $reader->getDocs([0])[0]['id']); // reader is now bound to build 1
+
+        (new IndexStore($dir))->writeBuild([['type' => 'ccis', 'id' => 'NEW', 'text' => '']], ['x' => [0]], [], []);
+
+        $this->assertSame('OLD', $reader->getDocs([0])[0]['id'], 'an in-flight request keeps a consistent build');
+        $this->assertSame('NEW', (new IndexStore($dir))->getDocs([0])[0]['id'], 'new requests see the new build');
+    }
+
+    public function testKeepsLiveAndPreviousBuildAndRemovesLegacyFiles(): void
+    {
+        $dir = $this->tmpDir();
+        $search = $dir . '/resources/data/search';
+        mkdir($search . '/docs', 0777, true);
+        foreach (['postings.json', 'trigrams.json', 'sources.json', 'docs/0000.json'] as $legacy) {
+            file_put_contents("$search/$legacy", '{}');
+        }
+
+        $store = new IndexStore($dir);
+        $names = [];
+        foreach (range(1, 3) as $i) {
+            $names[] = $store->writeBuild([], ['x' => [$i]], [], []);
+            usleep(1100000); // build names sort by second
+        }
+
+        $left = array_map('basename', glob($search . '/build-*', GLOB_ONLYDIR));
+        sort($left);
+        $this->assertSame([$names[1], $names[2]], $left);
+        $this->assertSame($names[2], trim(file_get_contents($search . '/current')));
+        foreach (['postings.json', 'trigrams.json', 'sources.json', 'docs'] as $legacy) {
+            $this->assertFileDoesNotExist("$search/$legacy");
+        }
+    }
 
     private function tmpDir(): string
     {

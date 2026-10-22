@@ -17,7 +17,10 @@ namespace App\Service\Search;
  *     never fuzz: a near-miss ID is a different requirement, so an unknown
  *     ID returns nothing rather than its nearest neighbour.
  *   - Results are bucketed by doc.type into the same five-section shape
- *     the existing search.html.twig template renders.
+ *     the existing search.html.twig template renders, plus `counts`.
+ *     Vulns are ranked newest-first from IndexStore's docmeta and only the
+ *     first VULN_LIMIT are read and returned (the page shows 500); counts
+ *     carry the full totals (review P2).
  */
 class Searcher
 {
@@ -25,7 +28,13 @@ class Searcher
     public const MAX_QUERY_CHARS = 200;
     public const MAX_TERMS = 10;
 
-    public const EMPTY = ['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []];
+    /** The search page lists at most this many vulnerability rows. */
+    public const VULN_LIMIT = 500;
+
+    public const EMPTY = [
+        'rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => [],
+        'counts' => ['rmfv4' => 0, 'rmfv5' => 0, 'ccis' => 0, 'aps' => 0, 'vulns' => 0],
+    ];
 
     public function __construct(
         private IndexStore $store,
@@ -54,10 +63,9 @@ class Searcher
      */
     public function search(string $query): array
     {
-        // Defensive bump: a typical search now touches only the shard slices
-        // containing matched docs (~30-50 MB resident), but a query that
-        // matches across many shards could still spike. 512M leaves plenty
-        // of headroom on shared hosts. Hosts that disable ini_set no-op.
+        // Ordinary queries now stay small, but a quoted phrase over a very
+        // broad word still reads every candidate doc to verify the phrase.
+        // Hosts that disable ini_set no-op.
         @ini_set('memory_limit', '512M');
 
         $empty = self::EMPTY;
@@ -70,7 +78,8 @@ class Searcher
             return $empty;
         }
 
-        $postings = $this->store->postings();
+        // Only the buckets holding the query's tokens are read.
+        $postings = $this->store->postingsFor($parsed['tokens']);
 
         // Token-level AND set.
         $matchedDocSet = $this->andDocs($parsed['tokens'], $postings);
@@ -81,7 +90,7 @@ class Searcher
             if ($tokens === null) {
                 return $empty;
             }
-            $matchedDocSet = $this->andDocs($tokens, $postings);
+            $matchedDocSet = $this->andDocs($tokens, $this->store->postingsFor($tokens));
             if ($matchedDocSet === null) {
                 return $empty;
             }
@@ -91,13 +100,13 @@ class Searcher
             return $empty;
         }
 
-        // Now pull only the matched docs from their respective shards.
-        $matchedDocs = $this->store->getDocs($matchedDocSet);
-
-        // Phrase verification on docs.text.
+        // Phrase verification needs each candidate's text, so phrase queries
+        // read every candidate; everything else is decided from docmeta.
+        $docs = [];
         if (!empty($parsed['phrases'])) {
-            $matchedDocSet = array_filter($matchedDocSet, function ($idx) use ($matchedDocs, $parsed) {
-                $doc = $matchedDocs[$idx] ?? null;
+            $docs = $this->store->getDocs($matchedDocSet);
+            $matchedDocSet = array_filter($matchedDocSet, function ($idx) use ($docs, $parsed) {
+                $doc = $docs[$idx] ?? null;
                 if (!$doc) return false;
                 $hay = strtolower((string) ($doc['text'] ?? ''));
                 foreach ($parsed['phrases'] as $p) {
@@ -107,29 +116,44 @@ class Searcher
             });
         }
 
-        // Bucket results.
-        $out = $empty;
+        // Bucket by type without reading docs.
+        $byType = ['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []];
+        $vulnMeta = [];
         foreach ($matchedDocSet as $idx) {
-            $doc = $matchedDocs[$idx] ?? null;
-            if (!$doc) continue;
-            $type = $doc['type'] ?? null;
-            if (!isset($out[$type])) continue;
-            $out[$type][] = $doc;
+            $meta = $this->store->meta($idx);
+            if ($meta['type'] === null || !isset($byType[$meta['type']])) continue;
+            $byType[$meta['type']][] = $idx;
+            if ($meta['type'] === 'vulns') $vulnMeta[$idx] = $meta;
+        }
+
+        // Vulns: most recent STIG/SCAP release first (timestamp precomputed at
+        // build time), ties broken on stig_title, stable otherwise. Only the
+        // rows the page shows are read.
+        usort($byType['vulns'], function ($a, $b) use ($vulnMeta) {
+            $ta = $vulnMeta[$a]['ts'];
+            $tb = $vulnMeta[$b]['ts'];
+            if ($tb !== $ta) return $tb <=> $ta;
+            return strcmp($vulnMeta[$a]['title'], $vulnMeta[$b]['title']);
+        });
+        $counts = array_map('count', $byType);
+        $byType['vulns'] = array_slice($byType['vulns'], 0, self::VULN_LIMIT);
+
+        // RMF / CCI / AP sections list every match.
+        $want = array_merge(...array_values($byType));
+        $docs += $this->store->getDocs(array_values(array_diff($want, array_keys($docs))));
+
+        $out = $empty;
+        foreach ($byType as $type => $idxs) {
+            foreach ($idxs as $idx) {
+                if (isset($docs[$idx])) $out[$type][] = $docs[$idx];
+            }
         }
 
         // Sort id-keyed buckets alphabetically (matches legacy behavior).
         foreach (['rmfv4', 'rmfv5', 'ccis', 'aps'] as $b) {
             usort($out[$b], fn($a, $b2) => strcmp((string)($a['id'] ?? ''), (string)($b2['id'] ?? '')));
         }
-        // Vulns: most recent STIG/SCAP release first, so the 500-row cap
-        // surfaces the freshest content. Empty/unparseable dates sink to
-        // the bottom; ties break on stig_title for stable ordering.
-        usort($out['vulns'], function ($a, $b) {
-            $ta = strtotime((string) ($a['released'] ?? '')) ?: 0;
-            $tb = strtotime((string) ($b['released'] ?? '')) ?: 0;
-            if ($tb !== $ta) return $tb <=> $ta;
-            return strcmp((string)($a['stig_title'] ?? ''), (string)($b['stig_title'] ?? ''));
-        });
+        $out['counts'] = $counts;
 
         return $out;
     }
@@ -170,7 +194,6 @@ class Searcher
      */
     private function fuzzySubstitutions(array $tokens, array $postings): ?array
     {
-        $trigrams = $this->store->trigrams();
         $tokenizer = new Tokenizer();
         $out = [];
 
@@ -185,6 +208,7 @@ class Searcher
             }
             // Candidate set: tokens sharing >= half of the query token's trigrams.
             $tris = $tokenizer->trigrams($tok);
+            $trigrams = $this->store->trigramsFor($tris);
             $candCounts = [];
             foreach ($tris as $tri) {
                 foreach ($trigrams[$tri] ?? [] as $cand) {
@@ -198,7 +222,8 @@ class Searcher
             $bestDist = PHP_INT_MAX;
             foreach ($candCounts as $cand => $shared) {
                 if ($shared < $threshold) break;
-                if (!isset($postings[$cand])) continue;
+                // No postings check needed: trigrams are built from the
+                // final postings vocabulary, so every candidate has postings.
                 $d = levenshtein($tok, $cand);
                 if ($d < $bestDist) {
                     $bestDist = $d;

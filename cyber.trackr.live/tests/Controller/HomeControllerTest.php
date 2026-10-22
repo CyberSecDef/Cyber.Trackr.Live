@@ -38,9 +38,9 @@ class HomeControllerTest extends WebTestCase
     {
         // The inverted index under resources/data/search/ is generated (and
         // gitignored), so skip cleanly on a checkout that hasn't built it.
-        $index = dirname(__DIR__, 2) . '/resources/data/search/postings.json';
+        $index = dirname(__DIR__, 2) . '/resources/data/search/current';
         if (!is_file($index)) {
-            $this->markTestSkipped('search index not built (resources/data/search/postings.json missing)');
+            $this->markTestSkipped('search index not built (run bin/console app:search:rebuild --full)');
         }
         $client = static::createClient();
         $client->request('GET', '/search/windows');

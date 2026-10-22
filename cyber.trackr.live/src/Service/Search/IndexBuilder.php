@@ -13,7 +13,9 @@ namespace App\Service\Search;
  *     Sources that no longer exist (e.g. when a STIG title's "latest" file
  *     advances to a newer release) get their docs dropped.
  *
- * Both produce the same on-disk shape. Auto-triggered after DISA pulls.
+ * Both produce the same on-disk shape and publish it as a new immutable
+ * build (IndexStore::writeBuild), so readers never see a half-written index.
+ * Auto-triggered after DISA pulls.
  */
 class IndexBuilder
 {
@@ -49,31 +51,25 @@ class IndexBuilder
 
         $stats = ['unchanged' => 0, 'changed' => 0, 'new' => 0, 'removed' => 0];
 
-        // Build still pulls all docs into a single array - the build is the
-        // memory-hungry path (we already raised memory_limit above) and the
-        // dedup/sort logic is simpler with one flat array. Per-shard write
-        // happens at the end so we don't pay the IO cost of rewriting every
-        // shard on a delta.
+        // The build holds every doc and posting list in memory (we raised
+        // memory_limit above); the dedup/sort logic is simplest that way.
+        // Doc indexes are stable across deltas: dropped docs become null.
         if ($isFull) {
             $docs = [];
             $postings = [];
             $sources = [];
         } else {
-            $docs = $this->store->loadAllShards();
-            $postings = $this->store->postings();
+            $docs = $this->store->loadAllDocs();
+            $postings = $this->store->allPostings();
             $sources = $existingSources;
         }
-
-        // Track which shards have been touched (had a doc dropped, mutated,
-        // or appended) so a delta only writes those shards back to disk.
-        $dirtyShards = [];
 
         $expected = $this->collectExpectedSources();
 
         // 1. Drop docs from sources that are gone (e.g. older STIG superseded).
         foreach ($sources as $path => $meta) {
             if (!isset($expected[$path])) {
-                $this->dropDocs($meta['doc_indexes'] ?? [], $docs, $postings, $dirtyShards);
+                $this->dropDocs($meta['doc_indexes'] ?? [], $docs, $postings);
                 unset($sources[$path]);
                 $stats['removed']++;
             }
@@ -89,7 +85,7 @@ class IndexBuilder
 
             if (isset($sources[$path])) {
                 // Changed: drop existing docs first.
-                $this->dropDocs($sources[$path]['doc_indexes'], $docs, $postings, $dirtyShards);
+                $this->dropDocs($sources[$path]['doc_indexes'], $docs, $postings);
                 $stats['changed']++;
             } else {
                 $stats['new']++;
@@ -101,7 +97,6 @@ class IndexBuilder
                 $idx = count($docs);
                 $docs[] = $doc;
                 $newIndexes[] = $idx;
-                $dirtyShards[intdiv($idx, IndexStore::SHARD_SIZE)] = true;
                 foreach ($this->tokenizer->tokenize($doc['text']) as $tok) {
                     $postings[$tok][] = $idx;
                 }
@@ -110,6 +105,18 @@ class IndexBuilder
                 'sha256' => $hash,
                 'mtime' => filemtime($path) ?: 0,
                 'doc_indexes' => $newIndexes,
+            ];
+        }
+
+        // Nothing changed since the live build: keep it rather than writing an
+        // identical ~200 MB copy every night.
+        if (!$isFull && $this->store->exists() && $stats['changed'] + $stats['new'] + $stats['removed'] === 0) {
+            return [
+                'docs' => count($docs),
+                'tokens' => count($postings),
+                'trigrams' => 0,
+                'build' => $this->store->currentBuild() . ' (unchanged)',
+                ...$stats,
             ];
         }
 
@@ -135,46 +142,30 @@ class IndexBuilder
             $trigrams[$tri] = array_values(array_unique($toks));
         }
 
-        // 5. Persist.
-        if ($isFull) {
-            $this->store->saveAllShards($docs);
-        } else {
-            // Delta: only re-write shards we actually mutated.
-            foreach (array_keys($dirtyShards) as $shardId) {
-                $start = $shardId * IndexStore::SHARD_SIZE;
-                $shard = array_slice($docs, $start, IndexStore::SHARD_SIZE);
-                $this->store->saveShard($shardId, $shard);
-            }
-        }
-        $this->store->save(IndexStore::FILE_POSTINGS, $postings);
-        $this->store->save(IndexStore::FILE_TRIGRAMS, $trigrams);
-        $this->store->save(IndexStore::FILE_SOURCES, $sources);
+        // 5. Persist as a new build and make it live.
+        $build = $this->store->writeBuild($docs, $postings, $trigrams, $sources);
 
         return [
             'docs' => count($docs),
             'tokens' => count($postings),
             'trigrams' => count($trigrams),
-            'shards_written' => $isFull
-                ? (int) ceil(count($docs) / IndexStore::SHARD_SIZE)
-                : count($dirtyShards),
+            'build' => $build,
             ...$stats,
         ];
     }
 
     /**
      * Marks the given doc indexes as null in $docs and removes them from
-     * every posting list. Each touched index also flags its containing
-     * shard as dirty so a delta knows which shard files to rewrite.
+     * every posting list.
      * Walking all postings is O(vocabulary) but the vocabulary is small
      * relative to total doc count, so this is cheaper than re-tokenizing
      * the dropped docs to find their token edges.
      */
-    private function dropDocs(array $indexes, array &$docs, array &$postings, array &$dirtyShards): void
+    private function dropDocs(array $indexes, array &$docs, array &$postings): void
     {
         $deadSet = array_flip($indexes);
         foreach ($indexes as $i) {
             $docs[$i] = null;
-            $dirtyShards[intdiv($i, IndexStore::SHARD_SIZE)] = true;
         }
         foreach ($postings as $tok => $idxs) {
             $kept = [];

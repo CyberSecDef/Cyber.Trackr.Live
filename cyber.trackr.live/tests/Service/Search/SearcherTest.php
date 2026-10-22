@@ -7,7 +7,6 @@ use App\Service\Search\QueryParser;
 use App\Service\Search\Searcher;
 use App\Service\Search\Tokenizer;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class SearcherTest extends TestCase
 {
@@ -26,14 +25,14 @@ class SearcherTest extends TestCase
     private function searcher(): Searcher
     {
         $dir = $this->tmpDir();
-        $store = new IndexStore($dir, new ArrayAdapter());
+        $store = new IndexStore($dir);
 
         $docs = [
             0 => ['type' => 'ccis',  'id' => 'CCI-000001', 'text' => 'windows server access control'],
             1 => ['type' => 'rmfv5', 'id' => 'AC-2',       'text' => 'account management'],
             2 => ['type' => 'vulns', 'id' => 'V-1',        'text' => 'windows defender', 'released' => '2024-01-01', 'stig_title' => 'X'],
         ];
-        $store->save(IndexStore::FILE_POSTINGS, [
+        $store->writeBuild($docs, [
             'windows'    => [0, 2],
             'server'     => [0],
             'access'     => [0],
@@ -41,9 +40,7 @@ class SearcherTest extends TestCase
             'account'    => [1],
             'management' => [1],
             'defender'   => [2],
-        ]);
-        $store->save(IndexStore::FILE_TRIGRAMS, []);
-        $store->saveAllShards($docs);
+        ], [], []);
 
         return new Searcher($store, new QueryParser(new Tokenizer()));
     }
@@ -68,13 +65,13 @@ class SearcherTest extends TestCase
     public function testNoMatchReturnsEmptyBuckets(): void
     {
         $out = $this->searcher()->search('zzznomatch');
-        $this->assertSame(['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []], $out);
+        $this->assertSame(Searcher::EMPTY, $out);
     }
 
     public function testEmptyQueryReturnsEmptyBuckets(): void
     {
         $out = $this->searcher()->search('');
-        $this->assertSame(['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []], $out);
+        $this->assertSame(Searcher::EMPTY, $out);
     }
 
     public function testPhraseMatchKeepsContiguousDoc(): void
@@ -99,7 +96,7 @@ class SearcherTest extends TestCase
     private function fuzzySearcher(): Searcher
     {
         $dir = $this->tmpDir();
-        $store = new IndexStore($dir, new ArrayAdapter());
+        $store = new IndexStore($dir);
         $tokenizer = new Tokenizer();
 
         $docs = [
@@ -119,9 +116,7 @@ class SearcherTest extends TestCase
                 $trigrams[$tri][] = $t;
             }
         }
-        $store->save(IndexStore::FILE_POSTINGS, $postings);
-        $store->save(IndexStore::FILE_TRIGRAMS, $trigrams);
-        $store->saveAllShards($docs);
+        $store->writeBuild($docs, $postings, $trigrams, []);
 
         return new Searcher($store, new QueryParser($tokenizer));
     }
