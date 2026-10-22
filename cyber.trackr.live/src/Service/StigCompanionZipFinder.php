@@ -181,17 +181,23 @@ class StigCompanionZipFinder
         }
         $toc = json_decode($tocRaw, true) ?: [];
 
-        // Build set of canonical XCCDF XML filenames from the toc.
+        // XCCDF XML filename -> the toc entry's filename. A byte-identical
+        // copy DISA shipped under another name (the entry's 'aliases') counts
+        // too, so a ZIP that bundles that name still reaches the entry.
         $known = [];
         foreach ($toc as $title => $rows) {
             foreach ($rows as $row) {
                 if (isset($row['filename'])) {
-                    $known[$row['filename']] = true;
+                    $known[$row['filename']] = $row['filename'];
+                    foreach ($row['aliases'] ?? [] as $alias) {
+                        $known[$alias] ??= $row['filename'];
+                    }
                 }
             }
         }
 
         $map = [];
+        $viaAlias = [];
         $scanned = 0;
         $matched = 0;
         $unmatched = 0;
@@ -209,8 +215,17 @@ class StigCompanionZipFinder
                 $name = basename($zip->getNameIndex($i));
                 if (isset($known[$name])) {
                     $hit = true;
-                    if (!isset($map[$name])) {
-                        $map[$name] = $file->getFilename();
+                    $entry = $known[$name];
+                    $alias = $name !== $entry;
+                    // A ZIP shipping the entry's own filename beats one
+                    // that only has an alias.
+                    if (!isset($map[$entry]) || (!$alias && isset($viaAlias[$entry]))) {
+                        $map[$entry] = $file->getFilename();
+                        if ($alias) {
+                            $viaAlias[$entry] = true;
+                        } else {
+                            unset($viaAlias[$entry]);
+                        }
                     }
                 }
             }
@@ -230,7 +245,7 @@ class StigCompanionZipFinder
             'zips_scanned'   => $scanned,
             'zips_matched'   => $matched,
             'zips_unmatched' => $unmatched,
-            'stigs_total'    => count($known),
+            'stigs_total'    => count(array_unique($known)),
             'stigs_covered'  => count($map),
         ];
     }

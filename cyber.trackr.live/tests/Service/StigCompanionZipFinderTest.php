@@ -64,6 +64,34 @@ class StigCompanionZipFinderTest extends TestCase
             $this->finder()->resolveZipPath('T', '1', '2', $this->rows()));
     }
 
+    /** A ZIP that ships a byte-identical alias's filename still serves the entry. */
+    public function testIndexMapsAliasZipsToTheTocEntryPreferringItsOwnName(): void
+    {
+        $zips = $this->dir . '/resources/data/zips';
+        file_put_contents($this->dir . '/resources/data/stig_toc.json', json_encode([
+            'A' => [['version' => '1', 'release' => '1', 'filename' => 'a.xml', 'aliases' => ['a-copy.xml']]],
+            'B' => [['version' => '1', 'release' => '1', 'filename' => 'b.xml', 'aliases' => ['b-copy.xml']]],
+        ]));
+        $this->zip("$zips/U_A_Y24M01_STIG.zip", 'a-copy.xml');   // only the alias
+        $this->zip("$zips/U_B_Y20M01_STIG.zip", 'b-copy.xml');   // alias ...
+        $this->zip("$zips/U_B_Y21M01_STIG.zip", 'b.xml');        // ... and own name: own wins
+        $this->zip("$zips/U_B_Y22M01_STIG.zip", 'b-copy.xml');
+
+        $finder = $this->finder();
+        $finder->rebuildIndex();
+        $index = json_decode(file_get_contents($finder->indexPath()), true);
+
+        $this->assertSame(['a.xml' => 'U_A_Y24M01_STIG.zip', 'b.xml' => 'U_B_Y21M01_STIG.zip'], $index);
+    }
+
+    private function zip(string $path, string $entry): void
+    {
+        $zip = new \ZipArchive();
+        $zip->open($path, \ZipArchive::CREATE);
+        $zip->addFromString($entry, '<x/>');
+        $zip->close();
+    }
+
     public function testInvalidParamsAreStillRejectedWithRows(): void
     {
         $this->assertNull($this->finder()->resolveZipPath('../etc', '1', '2', $this->rows()));

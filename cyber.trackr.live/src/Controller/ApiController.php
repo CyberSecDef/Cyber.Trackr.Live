@@ -515,7 +515,10 @@ class ApiController extends AbstractController
         $results = (array)json_decode(file_get_contents($toc_path));
         foreach (array_keys($results) as $stig_name) {
             foreach ($results[$stig_name] as $stig) {
-                unset($stig->filename);
+                // Internal toc fields: the XML filename and its byte-identical
+                // copies, and the release the XML itself declares when it was
+                // relisted under its filename's (StigTocBuilder::dedupeTitle()).
+                unset($stig->filename, $stig->aliases, $stig->xml_release);
                 $stig->link = "/stig/{$stig_name}/{$stig->version}/{$stig->release}";
             }
         }

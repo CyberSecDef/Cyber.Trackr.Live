@@ -111,13 +111,13 @@
                 <div class="versions-panel__controls">
                     <select id="compare_stig1" aria-label="Compare from version">
                         <option value="" selected>From&hellip;</option>
-                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                        {% for s in stigs|sort((a, b) => b.date <=> a.date) %}
                             <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
                         {% endfor %}
                     </select>
                     <select id="compare_stig2" aria-label="Compare to version">
                         <option value="" selected>To&hellip;</option>
-                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                        {% for s in stigs|sort((a, b) => b.date <=> a.date) %}
                             <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
                         {% endfor %}
                     </select>
@@ -130,7 +130,7 @@
                 <div class="versions-panel__controls">
                     <select id="view_stig" aria-label="Open version">
                         <option value="" selected>Choose&hellip;</option>
-                        {% for s in stigs|sort((a, b) => a.date <=> b.date)|reverse %}
+                        {% for s in stigs|sort((a, b) => b.date <=> a.date) %}
                             <option value="{{s.version}}|{{s.release}}">V{{s.version}}R{{s.release}}</option>
                         {% endfor %}
                     </select>

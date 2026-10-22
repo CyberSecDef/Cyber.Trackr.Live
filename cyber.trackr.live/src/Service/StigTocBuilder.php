@@ -12,11 +12,14 @@ use Symfony\Component\Finder\Finder;
  * render rows without re-parsing the underlying XML, including pre-computed
  * severity counts ({h, m, l}).
  *
- * Two callers:
- *   - StigController::stig() uses parseStig() to add newly-dropped XML files
- *     to the toc on the fly.
- *   - app:stig:rebuild-toc console command uses rebuildAll() to wipe and
- *     reconstruct the toc from scratch (e.g., for a sev-count backfill).
+ * app:stig:rebuild-toc uses rebuildAll() to wipe and reconstruct the toc
+ * from scratch; requests only read it.
+ *
+ * Each title lists a version + release at most once. DISA sometimes ships
+ * one release under two filenames, or re-issues it with edits, so the raw
+ * files can disagree; before this every page picked its own row (the view
+ * took the last match in directory order, which differed between hosts; the
+ * companion docs took the first) — see dedupeTitle().
  */
 class StigTocBuilder
 {
@@ -118,7 +121,8 @@ class StigTocBuilder
     public function rebuildAll(?callable $onFile = null): array
     {
         $stigs = [];
-        $finder = (new Finder())->files()->in($this->stigDir)->name('*.xml');
+        // Sorted, so the toc (and any tie below) is the same on every host.
+        $finder = (new Finder())->files()->in($this->stigDir)->name('*.xml')->sortByName();
 
         foreach ($finder as $file) {
             $parsed = $this->parseStig($file->getRealPath());
@@ -131,7 +135,95 @@ class StigTocBuilder
         }
 
         ksort($stigs);
+        foreach ($stigs as $title => $entries) {
+            $stigs[$title] = $this->dedupeTitle($entries);
+        }
         return $stigs;
+    }
+
+    /**
+     * Collapse duplicate version + release rows for one title:
+     *
+     *  1. A file whose NAME says a newer release than its XML declares
+     *     (U_Citrix_..._V1R4 whose XML still says 1.3) is listed under the
+     *     filename's release, when it shares its declared release with
+     *     different content and that release isn't already taken. The XML's
+     *     own label is kept as 'xml_release'. Only inside duplicate groups:
+     *     elsewhere filenames are wrong as often as the XML (..._V1R78 is 1.8).
+     *  2. Of what still shares a release, the newest by benchmark date wins
+     *     (then release date, then filename). Byte-identical copies are kept
+     *     as 'aliases' so a companion ZIP that ships the other name still
+     *     matches; re-issued older content is dropped.
+     *
+     * @param array<int,array> $entries in filename order
+     * @return array<int,array> newest first
+     */
+    public function dedupeTitle(array $entries): array
+    {
+        $key = static fn(array $e): string => $e['version'] . '|' . $e['release'];
+        $hash = fn(array $e): string => (string) @md5_file($this->stigDir . '/' . $e['filename']);
+
+        $groups = [];
+        foreach ($entries as $e) {
+            $groups[$key($e)][] = $e;
+        }
+
+        // 1. Relabel mislabelled newer releases.
+        $taken = array_fill_keys(array_keys($groups), true);
+        foreach ($groups as $k => $group) {
+            if (count($group) < 2) {
+                continue;
+            }
+            $hashes = array_map($hash, $group);
+            foreach ($group as $i => $e) {
+                if (!preg_match('/[_-]V(\d+)R(\d+)(?![\d-])/i', $e['filename'], $m)) {
+                    continue;
+                }
+                $named = $m[1] . '|' . $m[2];
+                $identical = count(array_keys($hashes, $hashes[$i], true)) > 1;
+                if ($named === $k || isset($taken[$named]) || $identical
+                    || !version_compare($m[1] . '.' . $m[2], $e['version'] . '.' . $e['release'], '>')) {
+                    continue;
+                }
+                $taken[$named] = true;
+                $e['xml_release'] = $e['version'] . '.' . $e['release'];
+                $e['version'] = $m[1];
+                $e['release'] = $m[2];
+                $groups[$named] = [$e];
+                unset($groups[$k][$i]);
+            }
+        }
+
+        // 2. One row per release.
+        $out = [];
+        foreach ($groups as $group) {
+            $group = array_values($group);
+            if (count($group) > 1) {
+                usort($group, fn($a, $b) => [strtotime((string) $b['date']) ?: 0, $this->sortKey($b), $a['filename']]
+                    <=> [strtotime((string) $a['date']) ?: 0, $this->sortKey($a), $b['filename']]);
+                $winner = $group[0];
+                $winnerHash = $hash($winner);
+                $aliases = [];
+                foreach (array_slice($group, 1) as $other) {
+                    if ($winnerHash !== '' && $hash($other) === $winnerHash) {
+                        $aliases[] = $other['filename'];
+                    }
+                }
+                if ($aliases !== []) {
+                    $winner['aliases'] = $aliases;
+                }
+                $group = [$winner];
+            }
+            $out[] = $group[0];
+        }
+
+        // Newest first: by benchmark date, then by version + release. Pages
+        // and findPreviousEntry() sort by date alone with a stable sort, so
+        // this decides releases that share a date (PowerPoint 2013 V1R2 and
+        // V1R3 are both 2014-04-03); directory order used to.
+        usort($out, fn($a, $b) => (strtotime((string) $b['date']) ?: 0) <=> (strtotime((string) $a['date']) ?: 0)
+            ?: version_compare($b['version'] . '.' . $b['release'], $a['version'] . '.' . $a['release']));
+        return $out;
     }
 
     public function writeToc(array $stigs): void
