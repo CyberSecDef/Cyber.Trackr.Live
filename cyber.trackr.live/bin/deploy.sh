@@ -49,6 +49,11 @@ if ! command -v "$PHP" >/dev/null 2>&1; then
     exit 1
 fi
 
+# Refuse to deploy unless the env files resolve to APP_ENV=prod with debug
+# off. The committed .env defaults to dev and vendor/ carries the dev
+# bundles, so a lost prod .env would otherwise go live with the profiler.
+"$PHP" bin/assert-prod-env.php
+
 # Runs on every exit, success or failure (see note 4 above).
 clear_app_pool() {
     echo
