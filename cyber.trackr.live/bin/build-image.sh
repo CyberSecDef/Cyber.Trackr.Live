@@ -40,6 +40,13 @@ echo ">> Freezing version + changelog…"
 php bin/console app:version:freeze
 php bin/console app:changelog:freeze
 
+# Bake in every STIG "what changed" digest. The container can't write them
+# (resources/data is root-owned, PHP runs as www-data), so any that are missing
+# would be recomputed on every view. Idempotent: current ones are skipped, and
+# --refresh above has already built them via app:stig:rebuild.
+echo ">> Writing STIG version digests…"
+php bin/console app:stig:rebuild-digests
+
 echo ">> Building ${IMAGE} (bundles ~4 GB of data — this takes a while)…"
 docker build -f Dockerfile -t "$IMAGE" -t "cyber-trackr:latest" .
 
