@@ -229,11 +229,19 @@ class StigCompanionZipFinder
         ];
     }
 
+    /**
+     * Cheap sanity check before the toc lookup. These values are only ever
+     * used as toc keys (the file path comes from the index's bare basename),
+     * so the sets match what toc titles and versions actually contain: the
+     * old [A-Za-z0-9_-] title / digits-only rule hid companion docs for 492
+     * STIG versions, e.g. APACHE_2.2_Server_for_UNIX, Apple_macOS_15_(Sequoia),
+     * BIND_9.x V3R0.1.
+     */
     private function validParams(string $title, string $version, string $release): bool
     {
-        if (!preg_match('/^[A-Za-z0-9_\-]+$/', $title)) return false;
-        if (!preg_match('/^\d+$/', $version))           return false;
-        if (!preg_match('/^\d+$/', $release))           return false;
+        if (!preg_match('/^[A-Za-z0-9_\-.&(),:]{1,200}$/', $title)) return false;
+        if (!preg_match('/^[A-Za-z0-9.]{1,20}$/', $version))       return false;
+        if (!preg_match('/^[A-Za-z0-9.]{1,20}$/', $release))       return false;
         return true;
     }
 
