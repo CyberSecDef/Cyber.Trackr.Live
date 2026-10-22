@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\CachedFileCount;
 use App\Service\Search\Searcher;
 use App\Service\StigTocBuilder;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,7 +15,7 @@ class HomeController extends AbstractController
 {
 
     #[Route('/', name: 'home')]
-    public function index(StigTocBuilder $tocBuilder): Response
+    public function index(StigTocBuilder $tocBuilder, CachedFileCount $counter): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
@@ -25,8 +26,8 @@ class HomeController extends AbstractController
             'controller_name' => 'HomeController',
             'recent_stigs'   => $recent_stigs,
             'stig_count'     => count($stigs),
-            'controls_count' => $this->countControlsV5(),
-            'cci_count'      => $this->countCciItems(),
+            'controls_count' => $this->countControlsV5($counter),
+            'cci_count'      => $this->countCciItems($counter),
         ]);
     }
 
@@ -35,22 +36,17 @@ class HomeController extends AbstractController
      * file is ~100x faster than parsing the full XML and accurate enough for
      * a decorative number. Returns 0 if the file is missing.
      */
-    private function countControlsV5(): int
+    private function countControlsV5(CachedFileCount $counter): int
     {
-        $path = realpath(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml");
-        if ($path === false) return 0;
-        $raw = @file_get_contents($path);
-        return $raw === false ? 0 : substr_count($raw, '<controls:control ') + substr_count($raw, '<controls:control>');
+        return $counter->count(__DIR__ . "/../../resources/data/rmf/800-53v5-controls.xml",
+            ['<controls:control ', '<controls:control>']);
     }
 
-    private function countCciItems(): int
+    private function countCciItems(CachedFileCount $counter): int
     {
         // Use the current 2024 CCI list — the same file the /cci page parses, so the
         // homepage count agrees with the table instead of trailing the older list.
-        $path = realpath(__DIR__ . "/../../resources/data/cci/U_CCI_List_2024.xml");
-        if ($path === false) return 0;
-        $raw = @file_get_contents($path);
-        return $raw === false ? 0 : substr_count($raw, '<cci_item ');
+        return $counter->count(__DIR__ . "/../../resources/data/cci/U_CCI_List_2024.xml", ['<cci_item ']);
     }
 
     #[Route('/search/{query}', name: 'search')]

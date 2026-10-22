@@ -319,7 +319,7 @@ class StigController extends AbstractController
             $stigs[$title]
         );
 
-        $companion = $companionFinder->find($title, $version, $release);
+        $companion = $companionFinder->find($title, $version, $release, $stigs[$title]);
 
         $wizard = $wizardRegistry->findForStig($title, $version);
 

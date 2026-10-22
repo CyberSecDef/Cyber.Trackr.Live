@@ -43,9 +43,14 @@ class StigCompanionZipFinder
      * Resolve metadata for the companion ZIP, including its PDF entries.
      * Returns null when no companion ZIP is indexed for this STIG.
      */
-    public function find(string $title, string $version, string $release): ?array
+    /**
+     * @param array<int,array|object>|null $tocRows this title's stig_toc.json
+     *        rows, when the caller has already decoded the TOC (review P15:
+     *        the STIG view used to decode the 1.4 MB file twice)
+     */
+    public function find(string $title, string $version, string $release, ?array $tocRows = null): ?array
     {
-        $path = $this->resolveZipPath($title, $version, $release);
+        $path = $this->resolveZipPath($title, $version, $release, $tocRows);
         if ($path === null || !is_file($path)) {
             return null;
         }
@@ -92,12 +97,13 @@ class StigCompanionZipFinder
      * filesystem, and validates the indexed basename so a corrupted index
      * file can't redirect us outside the zips directory.
      */
-    public function resolveZipPath(string $title, string $version, string $release): ?string
+    /** @param array<int,array|object>|null $tocRows see find() */
+    public function resolveZipPath(string $title, string $version, string $release, ?array $tocRows = null): ?string
     {
         if (!$this->validParams($title, $version, $release)) {
             return null;
         }
-        $xmlName = $this->lookupXmlFilename($title, $version, $release);
+        $xmlName = $this->lookupXmlFilename($title, $version, $release, $tocRows);
         if ($xmlName === null) {
             return null;
         }
@@ -245,13 +251,22 @@ class StigCompanionZipFinder
         return true;
     }
 
-    private function lookupXmlFilename(string $title, string $version, string $release): ?string
+    /**
+     * The FIRST row matching version + release exactly. A few titles list the
+     * same release twice under different XML filenames; the companion routes
+     * all resolve through here, so the view page must use the same rule.
+     */
+    private function lookupXmlFilename(string $title, string $version, string $release, ?array $tocRows = null): ?string
     {
-        $raw = @file_get_contents($this->tocPath);
-        if ($raw === false) return null;
-        $toc = json_decode($raw, true);
-        if (!is_array($toc) || !isset($toc[$title])) return null;
-        foreach ($toc[$title] as $row) {
+        if ($tocRows === null) {
+            $raw = @file_get_contents($this->tocPath);
+            if ($raw === false) return null;
+            $toc = json_decode($raw, true);
+            if (!is_array($toc) || !isset($toc[$title])) return null;
+            $tocRows = $toc[$title];
+        }
+        foreach ($tocRows as $row) {
+            $row = (array) $row;
             if ((string)($row['version'] ?? '') === $version && (string)($row['release'] ?? '') === $release) {
                 return $row['filename'] ?? null;
             }
