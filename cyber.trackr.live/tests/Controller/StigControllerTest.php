@@ -96,4 +96,26 @@ class StigControllerTest extends WebTestCase
         $client->request('GET', '/stig/' . self::TITLE . '/99/99');
         $this->assertResponseStatusCodeSame(404);
     }
+
+    // S19: values printed into JS strings must be JS- and URL-escaped. The one
+    // title with "&" used to come out as "&amp;" inside the script.
+    public function testTitleWithAmpersandIsEscapedForJavaScript(): void
+    {
+        $title = 'Intune_MDM_Service_Desktop_&_Mobile';
+        $client = static::createClient();
+        $client->request('GET', '/stig/' . rawurlencode($title) . '/1/1');
+        $this->assertResponseIsSuccessful();
+        $html = (string) $client->getResponse()->getContent();
+
+        // Decode the JS string literals the way a browser would (JSON shares
+        // JS's \uXXXX escapes): e('js') emits \u0025, which evaluates to "%".
+        preg_match_all('/\\.replace\\(\'XXXX\',("[^"]*")\\)/', $html, $replace);
+        preg_match('/\\$\\.getJSON\\( ("\\/api\\/stig\\/[^"]*")/', $html, $api);
+        $this->assertCount(2, $replace[1], 'view + compare URLs');
+        foreach ($replace[1] as $literal) {
+            $this->assertSame('Intune_MDM_Service_Desktop_%26_Mobile', json_decode($literal));
+            $this->assertSame($title, rawurldecode(json_decode($literal)));
+        }
+        $this->assertSame('/api/stig/Intune_MDM_Service_Desktop_%26_Mobile/1/1/', json_decode($api[1]));
+    }
 }

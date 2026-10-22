@@ -34,12 +34,16 @@ class DocxRenderer
     /** Returns the .docx bytes as a string (used for direct response bodies). */
     public function renderToString(array $plan): string
     {
-        $tmp = tempnam(sys_get_temp_dir(), 'plan_') . '.docx';
+        // tempnam() creates $base itself; we write to $base.docx, so both
+        // must go (only the .docx used to, leaking an empty file per render).
+        $base = tempnam(sys_get_temp_dir(), 'plan_');
+        $tmp = $base . '.docx';
         try {
             $this->save($plan, $tmp);
             return (string) file_get_contents($tmp);
         } finally {
             @unlink($tmp);
+            @unlink($base);
         }
     }
 

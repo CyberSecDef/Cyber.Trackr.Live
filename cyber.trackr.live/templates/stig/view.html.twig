@@ -464,7 +464,7 @@
                 if($('#view_stig').val().trim() != ''){
                     const info = $('#view_stig').val().trim().split('|');
                     window.location.href = "{{ path('stig_view', {title: 'XXXX', version: 9999, release: 8888}) }}"
-                        .replace('XXXX',"{{title}}")
+                        .replace('XXXX',"{{ title|url_encode|e('js') }}")
                         .replace('9999',info[0])
                         .replace('8888',info[1])
                 }
@@ -474,7 +474,7 @@
                     const compare_1 = $('#compare_stig1').val().trim().split('|');
                     const compare_2 = $('#compare_stig2').val().trim().split('|');
                     window.location.href = "{{ path('stig_compare', {title: 'XXXX', v1: 9999, r1: 8888, v2: 7777, r2: 6666}) }}"
-                            .replace('XXXX',"{{title}}")
+                            .replace('XXXX',"{{ title|url_encode|e('js') }}")
                             .replace('9999',compare_1[0])
                             .replace('8888',compare_1[1])
                             .replace('7777',compare_2[0])
@@ -490,7 +490,9 @@
                 $( mit ).addClass(" border border-secondary ");
 		$( mit ).text("Please wait....generating statement")
                 // Relative URL so dev and the air-gap image call their own API.
-                $.getJSON( "/api/stig/{{title}}/{{version}}/{{release}}/" + vuln_id + "?m=" + m)
+                // url_encode + e('js'): a title like Intune_MDM_Service_Desktop_&_Mobile
+                // was HTML-escaped to &amp; inside this JS string (review S19).
+                $.getJSON( "/api/stig/{{ title|url_encode|e('js') }}/{{ version|url_encode|e('js') }}/{{ release|url_encode|e('js') }}/" + vuln_id + "?m=" + m)
   .done(function( json ) {
     const status = json['mitigation-status'];
     if (status === 'ok' && json['mitigation-statement']) {

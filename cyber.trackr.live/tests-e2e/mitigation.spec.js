@@ -21,3 +21,18 @@ test('mitigation button reports "unavailable", re-enables, and calls the local A
     await expect(output).toHaveText("A mitigation statement isn't available for this rule right now.");
     await expect(button).toBeEnabled();
 });
+
+// S19: a title containing "&" was HTML-escaped to "&amp;" inside the page's
+// JS, so this STIG's mitigation call went to a URL that 404s.
+test('mitigation call works for a title containing "&"', async ({ page }) => {
+    await page.goto('/stig/' + encodeURIComponent('Intune_MDM_Service_Desktop_&_Mobile') + '/1/1');
+
+    const button = page.getByRole('button', { name: 'Generate Mitigation Statement' }).first();
+    const apiCall = page.waitForResponse((r) => r.url().includes('/api/stig/'));
+    await button.evaluate((b) => b.click());
+    const resp = await apiCall;
+
+    expect(decodeURIComponent(new URL(resp.url()).pathname)).toContain('/api/stig/Intune_MDM_Service_Desktop_&_Mobile/1/1/');
+    expect(resp.status()).toBe(200);
+    expect((await resp.json())['mitigation-status']).toBe('unavailable'); // e2e has no MITIGATION_SCRIPT
+});
