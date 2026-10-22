@@ -64,3 +64,18 @@ RewriteRule . - [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L] 
 </IfModule>
+
+# Security headers for static files (review S9). PHP responses get the same
+# set from App\EventSubscriber\SecurityHeadersSubscriber, so index.php is
+# excluded here to avoid sending each header twice. Keep in sync with that
+# class; SecurityHeadersTest checks.
+<IfModule mod_headers.c>
+    <FilesMatch "^(?!index\.php$)">
+        Header always set Strict-Transport-Security "max-age=31536000"
+        Header always set X-Content-Type-Options "nosniff"
+        Header always set Referrer-Policy "strict-origin-when-cross-origin"
+        Header always set X-Frame-Options "DENY"
+        Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), accelerometer=(), gyroscope=(), magnetometer=()"
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; form-action 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+    </FilesMatch>
+</IfModule>
