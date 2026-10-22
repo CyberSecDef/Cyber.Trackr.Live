@@ -49,6 +49,8 @@
 /cyber.trackr.live/.env.local.php
 /cyber.trackr.live/.env.*.local
 /cyber.trackr.live/config/secrets/prod/prod.decrypt.private.php
+# DreamHost's own PHP diagnostics; they live on prod only (review S10).
+/cyber.trackr.live/public/.dh-diag/
 
 # Air-gapped image tarballs produced by cyber.trackr.live/bin/build-image.sh
 # (multi-GB `docker save` output) — generated artifacts, never committed.

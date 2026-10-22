@@ -132,6 +132,7 @@ rsync -avz -h --partial --progress \
     --exclude '/resources/data/bulk_download_index.json' \
     --exclude '/resources/data/sync_status.json' \
     --exclude '*.digest.json' \
+    --exclude '/public/.dh-diag/' \
     "$SRC/" "$DEST/"
 
 echo
