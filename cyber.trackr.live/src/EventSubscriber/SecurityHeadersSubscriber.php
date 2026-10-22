@@ -18,13 +18,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * ~100 inline on*= handlers would have to move to addEventListener + nonces
  * first. It does stop injected code from loading other scripts, sending data
  * anywhere with fetch/XHR or image beacons, and the site from being framed.
- * cdn.jsdelivr.net is only there for markdown-it on the STIG view until it is
- * self-hosted (review S12).
+ * Every script is self-hosted (markdown-it moved off jsDelivr in S12), so
+ * script-src needs no third-party origin.
  */
 final class SecurityHeadersSubscriber implements EventSubscriberInterface
 {
     public const CSP = "default-src 'self'; "
-        . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        . "script-src 'self' 'unsafe-inline'; "
         . "style-src 'self' 'unsafe-inline'; "
         . "img-src 'self' data: blob:; "
         . "connect-src 'self'; "

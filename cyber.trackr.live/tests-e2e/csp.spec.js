@@ -37,9 +37,14 @@ for (const path of PAGES) {
     });
 }
 
-test('STIG view loads markdown-it from the allowed CDN', async ({ page }) => {
+test('STIG view loads markdown-it locally and talks to no other host', async ({ page }) => {
+    // S12: markdown-it is self-hosted, so the page works in the air-gap image.
+    const hosts = new Set();
+    page.on('request', (req) => hosts.add(new URL(req.url()).host));
     await page.goto(`/stig/${ASD}/6/4`, { waitUntil: 'networkidle' });
+
     expect(await page.evaluate(() => typeof window.markdownit)).toBe('function');
+    expect([...hosts]).toEqual(['127.0.0.1:8123']);
     await expectNoViolations(page);
 });
 
