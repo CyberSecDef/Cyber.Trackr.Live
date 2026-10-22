@@ -84,6 +84,29 @@ class StigCompanionZipFinderTest extends TestCase
         $this->assertSame(['a.xml' => 'U_A_Y24M01_STIG.zip', 'b.xml' => 'U_B_Y21M01_STIG.zip'], $index);
     }
 
+    /** An unchanged XML re-bundled into later quarterly ZIPs: the newest bundle wins. */
+    public function testIndexPrefersTheNewestBundle(): void
+    {
+        $zips = $this->dir . '/resources/data/zips';
+        file_put_contents($this->dir . '/resources/data/stig_toc.json', json_encode([
+            'A' => [['version' => '1', 'release' => '1', 'filename' => 'a.xml']],
+            'Z' => [['version' => '1', 'release' => '1', 'filename' => 'z.xml']],
+        ]));
+        foreach (['U_A_Y24M10_STIG.zip', 'U_A_Y25M04_STIG.zip', 'U_A_Y24M01_STIG.zip'] as $name) {
+            $this->zip("$zips/$name", 'a.xml');
+        }
+        foreach (['U_zOS_V6R9_Products.zip', 'U_zOS_V6R10_Products.zip'] as $name) {
+            $this->zip("$zips/$name", 'z.xml');
+        }
+
+        $finder = $this->finder();
+        $finder->rebuildIndex();
+        $index = json_decode(file_get_contents($finder->indexPath()), true);
+
+        $this->assertSame('U_A_Y25M04_STIG.zip', $index['a.xml']);
+        $this->assertSame('U_zOS_V6R10_Products.zip', $index['z.xml'], 'numbers compare as numbers');
+    }
+
     private function zip(string $path, string $entry): void
     {
         $zip = new \ZipArchive();

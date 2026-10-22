@@ -202,7 +202,11 @@ class StigCompanionZipFinder
         $matched = 0;
         $unmatched = 0;
 
-        $finder = (new Finder())->files()->in($this->zipDir)->name('*.zip');
+        // DISA re-bundles an unchanged XML into later quarterly ZIPs
+        // (_Y24M01_, _Y24M04_, ...). Newest bundle first, so it wins: it is
+        // the one DISA currently publishes, with the current documents.
+        // Unsorted directory order used to decide, differently per host.
+        $finder = (new Finder())->files()->in($this->zipDir)->name('*.zip')->sortByName(true)->reverseSorting();
         foreach ($finder as $file) {
             $scanned++;
             $zip = new ZipArchive();
