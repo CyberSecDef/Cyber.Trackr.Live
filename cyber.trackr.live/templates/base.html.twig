@@ -101,7 +101,11 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="/css/bootstrap.min.css" />
             <link rel="stylesheet" href="/css/bootstrap-icons.css" />
-            <link rel="stylesheet" href="/css/datatables.min.css" />
+            {# DataTables (2.7 MB JS, 1.1 MB gzipped, with pdfmake + JSZip) is
+               only loaded by the pages that build a table; they fill these
+               two blocks (review P6). Order is unchanged: its CSS before
+               app.css, its JS right after Bootstrap. #}
+            {% block datatables_css %}{% endblock %}
             <link rel="stylesheet" href="/css/app.css?v={{ app_version }}" />
         {% endblock %}
 
@@ -111,7 +115,7 @@
         {% block javascripts %}
             <script src="/js/jquery-3.7.1.min.js"></script>
             <script src="/js/bootstrap.bundle.min.js"></script>
-            <script src="/js/datatables.min.js"></script>
+            {% block datatables_js %}{% endblock %}
             <script src="/js/diff_match_patch.js"></script>
             <script src="/js/dist_masonry.pkgd.min.js"></script>
             <script src="/js/js.cookie.min.js"></script>

@@ -1,4 +1,6 @@
 {% extends 'base.html.twig' %}
+{% block datatables_css %}<link rel="stylesheet" href="/css/datatables.min.css" />{% endblock %}
+{% block datatables_js %}<script src="/js/datatables.min.js"></script>{% endblock %}
 {% import 'macros.html.twig' as ui %}
 
 {% block title %}STIGs &mdash; Cyber Trackr{% endblock %}
