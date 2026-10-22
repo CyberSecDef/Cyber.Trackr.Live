@@ -46,4 +46,19 @@ class HomeControllerTest extends WebTestCase
         $client->request('GET', '/search/windows');
         $this->assertResponseIsSuccessful();
     }
+
+    // S18: the contact form posts to a Formspree form-ID endpoint, so the
+    // recipient address no longer appears in the page.
+    public function testContactFormUsesFormIdEndpointAndHidesTheAddress(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/contactus');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->filter('form.form-stack');
+        $this->assertSame('https://formspree.io/f/mzednoja', $form->attr('action'));
+        $this->assertStringNotContainsString('@gmail.com', $client->getResponse()->getContent());
+        $this->assertCount(1, $form->filter('input[type="email"][name="email"]'), 'Formspree uses "email" as reply-to');
+        $this->assertCount(0, $form->filter('input[name="_token"]'));
+    }
 }

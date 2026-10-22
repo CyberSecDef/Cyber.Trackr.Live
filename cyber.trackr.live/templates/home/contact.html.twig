@@ -19,12 +19,13 @@
             </p>
         </header>
 
-        <form class="form-stack" method="POST" action="https://formspree.io/wwwdaze2000@gmail.com">
-            <input type="hidden" name="_token" value="YzQtfWv4DaYceDUVik3U2HxyE8h3efySuiu9Tazm">
+        {# Formspree form-ID endpoint (review S18); the old email-in-URL
+           endpoint published the recipient address in the page. #}
+        <form class="form-stack" method="POST" action="https://formspree.io/f/mzednoja">
 
             <div class="form-field">
                 <label for="inputEmail">Your email</label>
-                <input type="email" id="inputEmail" name="inputEmail" placeholder="you@example.com" required>
+                <input type="email" id="inputEmail" name="email" placeholder="you@example.com" required>
                 <span class="form-field__hint">Used only to reply &mdash; never stored or shared.</span>
             </div>
 
