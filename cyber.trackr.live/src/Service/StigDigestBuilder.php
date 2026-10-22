@@ -2,8 +2,9 @@
 namespace App\Service;
 
 /**
- * Builds a "what changed since the previous version" digest for a STIG and
- * caches the result alongside the source XML as `{xml_filename}.digest.json`.
+ * Builds a "what changed since the previous version" digest for a STIG. The
+ * app:stig:rebuild-digests command saves it alongside the source XML as
+ * `{xml_filename}.digest.json`; requests only read those sidecars.
  *
  * The digest detects four classes of change between a current version and its
  * immediately-prior version on the same STIG title:
@@ -65,14 +66,74 @@ class StigDigestBuilder
     }
 
     /**
-     * Get-or-build the digest for the given current entry against its
-     * immediately-prior version. Returns null if there is no previous version.
+     * The digest for the given current entry against its immediately-prior
+     * version, or null if there is no previous version. Read-only (review
+     * P12): a valid sidecar is returned as is; otherwise the digest is
+     * computed in memory (median 3 ms, worst ~30 ms) and NOT saved.
+     * Sidecars are written only by writeSidecar(), from the
+     * app:stig:rebuild-digests command. A write here would also change the
+     * stig/ directory mtime and with it DataVersion, re-keying every page's
+     * ETag whenever someone first opened a new release.
      *
      * @param string                                                              $stigDir   absolute path to the STIG xml dir
      * @param array{filename:string,version:string,release:string,date:string,released:string} $current
      * @param array<int,object|array>                                             $tocEntries TOC entries for this title (any shape — coerced to array)
      */
-    public function buildOrLoad(string $stigDir, array $current, array $tocEntries): ?array
+    public function digestFor(string $stigDir, array $current, array $tocEntries): ?array
+    {
+        $pair = $this->pair($stigDir, $current, $tocEntries);
+        if ($pair === null) return null;
+
+        return $this->cached($pair)
+            ?? $this->compute($pair['current_path'], $pair['previous_path'], $current, $pair['previous']);
+    }
+
+    /**
+     * Make sure the sidecar for this entry is current.
+     *
+     * @return 'none'|'fresh'|'built'|'failed' none = no previous version to diff against
+     */
+    public function writeSidecar(string $stigDir, array $current, array $tocEntries): string
+    {
+        $pair = $this->pair($stigDir, $current, $tocEntries);
+        if ($pair === null) return 'none';
+        if ($this->cached($pair) !== null) return 'fresh';
+
+        $digest = $this->compute($pair['current_path'], $pair['previous_path'], $current, $pair['previous']);
+        $ok = AtomicFile::write($pair['cache_path'], (string) json_encode([
+            'schema_version'    => self::SCHEMA_VERSION,
+            'previous_filename' => $pair['previous']['filename'],
+            'source_mtime'      => filemtime($pair['current_path']),
+            'previous_mtime'    => filemtime($pair['previous_path']),
+            'digest'            => $digest,
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        return $ok ? 'built' : 'failed';
+    }
+
+    /**
+     * Write every missing or stale sidecar for a whole TOC.
+     *
+     * @param array<string, array<int,object|array>> $toc stig_toc.json, decoded
+     * @return array{none:int,fresh:int,built:int,failed:int}
+     */
+    public function writeAllSidecars(string $stigDir, array $toc): array
+    {
+        $stats = ['none' => 0, 'fresh' => 0, 'built' => 0, 'failed' => 0];
+        foreach ($toc as $entries) {
+            foreach ($entries as $entry) {
+                $stats[$this->writeSidecar($stigDir, (array) $entry, $entries)]++;
+            }
+        }
+        return $stats;
+    }
+
+    /**
+     * Resolve the current/previous XML pair, or null if there's nothing to diff.
+     *
+     * @return array{previous:array,current_path:string,previous_path:string,cache_path:string}|null
+     */
+    private function pair(string $stigDir, array $current, array $tocEntries): ?array
     {
         $previous = $this->findPreviousEntry($tocEntries, (string) $current['version'], (string) $current['release']);
         if ($previous === null) return null;
@@ -81,39 +142,32 @@ class StigDigestBuilder
         $previousPath = rtrim($stigDir, '/') . '/' . $previous['filename'];
         if (!file_exists($currentPath) || !file_exists($previousPath)) return null;
 
-        $cachePath = $currentPath . '.digest.json';
+        return [
+            'previous'      => $previous,
+            'current_path'  => $currentPath,
+            'previous_path' => $previousPath,
+            'cache_path'    => $currentPath . '.digest.json',
+        ];
+    }
 
-        // Cache hit?
-        if (file_exists($cachePath)) {
-            $cached = @json_decode(@file_get_contents($cachePath), true);
-            if (is_array($cached)
-                && ($cached['schema_version'] ?? 0) === self::SCHEMA_VERSION
-                && ($cached['previous_filename'] ?? '') === $previous['filename']
-                && ($cached['source_mtime'] ?? 0) >= filemtime($currentPath)
-                && ($cached['previous_mtime'] ?? 0) >= filemtime($previousPath)) {
-                return $cached['digest'];
-            }
+    /** The sidecar's digest if it exists and still matches both sources. */
+    private function cached(array $pair): ?array
+    {
+        if (!file_exists($pair['cache_path'])) return null;
+        $cached = @json_decode(@file_get_contents($pair['cache_path']), true);
+        if (is_array($cached)
+            && ($cached['schema_version'] ?? 0) === self::SCHEMA_VERSION
+            && ($cached['previous_filename'] ?? '') === $pair['previous']['filename']
+            && ($cached['source_mtime'] ?? 0) >= filemtime($pair['current_path'])
+            && ($cached['previous_mtime'] ?? 0) >= filemtime($pair['previous_path'])
+            && is_array($cached['digest'] ?? null)) {
+            return $cached['digest'];
         }
-
-        // Cache miss / stale — rebuild.
-        $digest = $this->compute($currentPath, $previousPath, $current, $previous);
-
-        // Best effort: a failed write (e.g. read-only data dir in Docker) just
-        // means the next view recomputes.
-        AtomicFile::write($cachePath, (string) json_encode([
-            'schema_version'    => self::SCHEMA_VERSION,
-            'previous_filename' => $previous['filename'],
-            'source_mtime'      => filemtime($currentPath),
-            'previous_mtime'    => filemtime($previousPath),
-            'digest'            => $digest,
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-
-        return $digest;
+        return null;
     }
 
     /**
-     * Build the digest from two paths without caching. Public for use by the
-     * Atom-feed builder which manages its own iteration.
+     * Build the digest from two paths without caching.
      *
      * @param array{version:string,release:string,date:string,released:string} $current
      * @param array{version:string,release:string,date:string,released:string} $previous

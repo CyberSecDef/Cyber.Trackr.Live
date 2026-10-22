@@ -112,18 +112,113 @@ class StigDigestBuilderTest extends TestCase
 
             // v1r3 not in the TOC yet: previous resolves to v1r1 → V-2, V-3 added.
             $withoutV1r3 = array_values(array_filter($this->entries(), fn($e) => $e['filename'] !== 'v1r3.xml'));
-            $first = $builder->buildOrLoad($dir, $current, $withoutV1r3);
+            $this->assertSame('built', $builder->writeSidecar($dir, $current, $withoutV1r3));
+            $first = $builder->digestFor($dir, $current, $withoutV1r3);
             $this->assertSame('1', $first['previous']['release']);
             $this->assertCount(2, $first['added']);
 
             // v1r3 lands in the TOC (pulled late). The cache must not be reused.
-            $second = $builder->buildOrLoad($dir, $current, $this->entries());
+            $second = $builder->digestFor($dir, $current, $this->entries());
+            $this->assertSame('built', $builder->writeSidecar($dir, $current, $this->entries()));
             $this->assertSame('3', $second['previous']['release']);
             $this->assertCount(0, $second['added']);
         } finally {
             array_map('unlink', glob("$dir/*"));
             rmdir($dir);
         }
+    }
+
+    /** Review P12: a request never writes into the data directory. */
+    public function testDigestForComputesInMemoryWithoutWriting(): void
+    {
+        $dir = $this->corpus();
+        try {
+            $before = filemtime($dir);
+            touch($dir, $before - 100);
+            clearstatcache();
+            $digest = (new StigDigestBuilder())->digestFor($dir, $this->current(), $this->entries());
+
+            $this->assertSame(['V-2', 'V-3'], array_column($digest['added'], 'vuln_id'));
+            $this->assertFileDoesNotExist("$dir/v2r1.xml.digest.json");
+            clearstatcache();
+            $this->assertSame($before - 100, filemtime($dir), 'the directory was not touched');
+        } finally {
+            $this->cleanup($dir);
+        }
+    }
+
+    public function testDigestForReadsAValidSidecar(): void
+    {
+        $dir = $this->corpus();
+        try {
+            $builder = new StigDigestBuilder();
+            $inMemory = $builder->digestFor($dir, $this->current(), $this->entries());
+            $this->assertSame('built', $builder->writeSidecar($dir, $this->current(), $this->entries()));
+            $this->assertSame($inMemory, $builder->digestFor($dir, $this->current(), $this->entries()),
+                'sidecar and in-memory digests are the same');
+
+            // Prove the sidecar is what gets returned, not a recompute.
+            $sidecar = json_decode(file_get_contents("$dir/v2r1.xml.digest.json"), true);
+            $sidecar['digest']['marker'] = 'from-sidecar';
+            file_put_contents("$dir/v2r1.xml.digest.json", json_encode($sidecar));
+            $this->assertSame('from-sidecar', $builder->digestFor($dir, $this->current(), $this->entries())['marker']);
+        } finally {
+            $this->cleanup($dir);
+        }
+    }
+
+    public function testWriteSidecarSkipsFreshAndRebuildsStale(): void
+    {
+        $dir = $this->corpus();
+        try {
+            $builder = new StigDigestBuilder();
+            $this->assertSame('built', $builder->writeSidecar($dir, $this->current(), $this->entries()));
+            $this->assertSame('fresh', $builder->writeSidecar($dir, $this->current(), $this->entries()));
+
+            touch("$dir/v2r1.xml", 1_700_000_000); // the source XML changed
+            clearstatcache();
+            $this->assertSame('built', $builder->writeSidecar($dir, $this->current(), $this->entries()));
+
+            $oldest = $this->entries()[2];
+            $this->assertSame('none', $builder->writeSidecar($dir, $oldest, $this->entries()));
+        } finally {
+            $this->cleanup($dir);
+        }
+    }
+
+    public function testWriteAllSidecarsCoversTheWholeToc(): void
+    {
+        $dir = $this->corpus();
+        try {
+            $builder = new StigDigestBuilder();
+            $toc = ['Fixture' => $this->entries()];
+            $this->assertSame(['none' => 1, 'fresh' => 0, 'built' => 2, 'failed' => 0], $builder->writeAllSidecars($dir, $toc));
+            $this->assertSame(['none' => 1, 'fresh' => 2, 'built' => 0, 'failed' => 0], $builder->writeAllSidecars($dir, $toc));
+        } finally {
+            $this->cleanup($dir);
+        }
+    }
+
+    private function corpus(): string
+    {
+        $dir = sys_get_temp_dir() . '/stig_digest_' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        file_put_contents("$dir/v1r1.xml", $this->xccdf(['V-1']));
+        file_put_contents("$dir/v1r3.xml", $this->xccdf(['V-1']));
+        file_put_contents("$dir/v2r1.xml", $this->xccdf(['V-1', 'V-2', 'V-3']));
+        foreach (['v1r1', 'v1r3', 'v2r1'] as $f) touch("$dir/$f.xml", 1_600_000_000);
+        return $dir;
+    }
+
+    private function current(): array
+    {
+        return $this->entries()[0];
+    }
+
+    private function cleanup(string $dir): void
+    {
+        array_map('unlink', glob("$dir/*"));
+        rmdir($dir);
     }
 
     /** @param string[] $groupIds */

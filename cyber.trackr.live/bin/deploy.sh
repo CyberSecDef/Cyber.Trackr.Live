@@ -68,7 +68,7 @@ echo "  $(date -Iseconds)"
 echo "──────────────────────────────────────────"
 
 echo
-echo "[1/7] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
+echo "[1/7] Rebuilding stig_toc.json + STIG digests + scap_toc.json + vulns_toc.json …"
 "$PHP" bin/console app:stig:rebuild
 
 echo

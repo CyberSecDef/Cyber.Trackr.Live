@@ -16,9 +16,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * resources/data/stig/ or scap/) to bring every dependent index up to
  * date in one shot:
  *
- *   1. app:stig:rebuild-toc   — wipes + rebuilds stig_toc.json
- *   2. app:scap:rebuild-toc   — wipes + rebuilds scap_toc.json
- *   3. app:vulns:rebuild-toc  — re-scans the corpus for IAVM/CTO/CVE refs
+ *   1. app:stig:rebuild-toc     — wipes + rebuilds stig_toc.json
+ *   2. app:stig:rebuild-digests — writes missing/stale *.digest.json
+ *                                 sidecars (needs the fresh stig_toc.json)
+ *   3. app:scap:rebuild-toc     — wipes + rebuilds scap_toc.json
+ *   4. app:vulns:rebuild-toc    — re-scans the corpus for IAVM/CTO/CVE refs
  *
  * Search index rebuild and KEV refresh are deliberately NOT included
  * here — `app:search:rebuild --full` is much slower and has its own
@@ -26,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 #[AsCommand(
     name: 'app:stig:rebuild',
-    description: 'Run app:stig:rebuild-toc, app:scap:rebuild-toc, and app:vulns:rebuild-toc in order.'
+    description: 'Run app:stig:rebuild-toc, app:stig:rebuild-digests, app:scap:rebuild-toc, and app:vulns:rebuild-toc in order.'
 )]
 class StigRebuildCommand extends Command
 {
@@ -38,6 +40,7 @@ class StigRebuildCommand extends Command
         $start = microtime(true);
         $steps = [
             'app:stig:rebuild-toc',
+            'app:stig:rebuild-digests',
             'app:scap:rebuild-toc',
             'app:vulns:rebuild-toc',
         ];

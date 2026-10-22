@@ -26,15 +26,13 @@
 #                                       Steady-state cost is small
 #                                       (only fetches new ZIPs).
 #   4. app:stig:rebuild               — meta: rebuilds stig_toc.json,
+#                                       the per-version "what changed"
+#                                       digests (*.digest.json),
 #                                       scap_toc.json, and vulns_toc.json
-#                                       from the freshly-synced XML. The
-#                                       /stig and /scap controllers do
-#                                       lazy ADD of new files on request,
-#                                       but only a full rebuild detects
-#                                       changes to existing XMLs (e.g.
-#                                       updated severity counts) and
-#                                       refreshes the sidecar indexes
-#                                       below from current data.
+#                                       from the freshly-synced XML.
+#                                       Requests never write these, so
+#                                       new files only appear on the
+#                                       site after this step.
 #   5. app:companion-zip:rebuild-index — re-scans resources/data/zips/
 #                                       and rebuilds the XML→ZIP map
 #                                       used to surface DISA companion
@@ -93,7 +91,7 @@ echo "[3/8] Syncing new SCAP benchmarks from DISA (best-effort) …"
 "$PHP" bin/console app:disa:sync-scap || true
 
 echo
-echo "[4/8] Rebuilding stig_toc.json + scap_toc.json + vulns_toc.json …"
+echo "[4/8] Rebuilding stig_toc.json + STIG digests + scap_toc.json + vulns_toc.json …"
 "$PHP" bin/console app:stig:rebuild
 
 echo

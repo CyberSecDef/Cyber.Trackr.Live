@@ -101,7 +101,7 @@ class StigController extends AbstractController
         foreach ($versions as $v) {
             if (count($items) >= 25) break;
             $titleEntries = $stigs[$v['title']] ?? [];
-            $digest = $digestBuilder->buildOrLoad($tocBuilder->stigDir(), $v, $titleEntries);
+            $digest = $digestBuilder->digestFor($tocBuilder->stigDir(), $v, $titleEntries);
             if ($digest === null) continue;
             $items[] = ['entry' => $v, 'digest' => $digest];
         }
@@ -313,7 +313,7 @@ class StigController extends AbstractController
         // Resolve previous version + build/load the digest. Returns null if
         // there's no previous version on this title — the template
         // conditionally renders the section only when digest is present.
-        $digest = $digestBuilder->buildOrLoad(
+        $digest = $digestBuilder->digestFor(
             $tocBuilder->stigDir(),
             (array) $stig,
             $stigs[$title]
