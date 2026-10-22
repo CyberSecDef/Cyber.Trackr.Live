@@ -29,34 +29,10 @@ class StigController extends AbstractController
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
-        // Index every filename already in the toc so we only parse genuinely new files.
-        $existing_files = [];
-        foreach ($stigs as $instances) {
-            foreach ($instances as $instance) {
-                $existing_files[] = $instance['filename'];
-            }
-        }
-
-        $new = 0;
-        $finder = (new Finder())->files()->in($tocBuilder->stigDir())->name('*.xml');
-        foreach ($finder as $file) {
-            if (in_array($file->getFilename(), $existing_files, true)) {
-                continue;
-            }
-            $parsed = $tocBuilder->parseStig($file->getRealPath());
-            if ($parsed === null) {
-                continue;
-            }
-            if (!array_key_exists($parsed['title'], $stigs)) {
-                $stigs[$parsed['title']] = [];
-            }
-            $stigs[$parsed['title']][] = $parsed['entry'];
-            $new++;
-        }
-
-        if ($new > 0) {
-            $tocBuilder->writeToc($stigs);
-        }
+        // The toc is rebuilt by bin/refresh-data.sh and bin/deploy.sh
+        // (app:stig:rebuild). This page used to scan the data dir for
+        // files missing from it and rewrite the toc mid-request, racing the
+        // cron's rebuild (review S7, P7).
 
         // Roll up to one record per title (latest version), sorted by released desc.
         $stigs_latest = $tocBuilder->latestPerTitle($stigs);

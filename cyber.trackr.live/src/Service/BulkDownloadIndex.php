@@ -171,7 +171,7 @@ class BulkDownloadIndex
         });
 
         $json = json_encode($entries, JSON_UNESCAPED_SLASHES) . "\n";
-        if (file_put_contents($this->indexPath, $json, LOCK_EX) === false) {
+        if (!AtomicFile::write($this->indexPath, $json)) {
             throw new \RuntimeException("Cannot write bulk-download index to {$this->indexPath}");
         }
         $this->entries = $entries;

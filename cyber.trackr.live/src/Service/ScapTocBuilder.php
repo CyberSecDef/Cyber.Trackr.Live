@@ -151,10 +151,10 @@ class ScapTocBuilder
 
     public function writeToc(array $scaps): void
     {
-        file_put_contents(
-            $this->tocPath,
-            json_encode($scaps, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-        );
+        $json = json_encode($scaps, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($json === false || !AtomicFile::write($this->tocPath, $json)) {
+            throw new \RuntimeException("Cannot write toc to {$this->tocPath}");
+        }
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\AtomicFile;
 use App\Service\Vulns\KevLoader;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -71,11 +72,8 @@ class KevRefreshCommand extends Command
         }
 
         // Re-encode pretty so the on-disk file is diff-friendly under git.
-        $written = file_put_contents(
-            $target,
-            json_encode($parsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-        );
-        if ($written === false) {
+        $json = json_encode($parsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($json === false || !AtomicFile::write($target, $json)) {
             $io->error("Could not write to $target");
             return Command::FAILURE;
         }

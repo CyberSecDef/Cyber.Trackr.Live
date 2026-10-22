@@ -15,6 +15,40 @@ class StigControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    // S7/P7: /stig and /scap used to parse any XML missing from the toc and
+    // rewrite the toc mid-request, racing the cron's rebuild. Only the
+    // rebuild commands write it now.
+    public function testIndexPagesNeverRewriteTheToc(): void
+    {
+        $client = static::createClient();
+        $dataDir = static::getContainer()->getParameter('kernel.project_dir') . '/resources/data';
+        $stigToc = $dataDir . '/stig_toc.json';
+        $scapToc = $dataDir . '/scap_toc.json';
+        $before = [$stigToc => file_get_contents($stigToc), $scapToc => file_get_contents($scapToc)];
+
+        // An XML the toc doesn't know about: a copy of a real STIG under a new name.
+        $src = glob($dataDir . '/stig/U_ASD_STIG_V4R8_Manual-xccdf.xml')[0];
+        $stray = $dataDir . '/stig/U_Zz_S7_Test_STIG_V1R1_Manual-xccdf.xml';
+        copy($src, $stray);
+        try {
+            $client->request('GET', '/stig');
+            $this->assertResponseIsSuccessful();
+            $client->request('GET', '/scap');
+            $this->assertResponseIsSuccessful();
+
+            clearstatcache();
+            $this->assertSame($before[$stigToc], file_get_contents($stigToc), '/stig must not rewrite stig_toc.json');
+            $this->assertSame($before[$scapToc], file_get_contents($scapToc), '/scap must not rewrite scap_toc.json');
+        } finally {
+            @unlink($stray);
+            foreach ($before as $path => $contents) {
+                if (file_get_contents($path) !== $contents) {
+                    file_put_contents($path, $contents); // undo, so a failure can't leave the dev toc changed
+                }
+            }
+        }
+    }
+
     public function testStigViewRenders(): void
     {
         $client = static::createClient();

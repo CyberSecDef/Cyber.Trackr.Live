@@ -98,7 +98,9 @@ class StigDigestBuilder
         // Cache miss / stale — rebuild.
         $digest = $this->compute($currentPath, $previousPath, $current, $previous);
 
-        @file_put_contents($cachePath, json_encode([
+        // Best effort: a failed write (e.g. read-only data dir in Docker) just
+        // means the next view recomputes.
+        AtomicFile::write($cachePath, (string) json_encode([
             'schema_version'    => self::SCHEMA_VERSION,
             'previous_filename' => $previous['filename'],
             'source_mtime'      => filemtime($currentPath),

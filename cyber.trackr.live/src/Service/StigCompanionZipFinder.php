@@ -215,7 +215,7 @@ class StigCompanionZipFinder
         ksort($map, SORT_NATURAL | SORT_FLAG_CASE);
 
         $json = json_encode($map, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
-        if (file_put_contents($this->indexPath, $json, LOCK_EX) === false) {
+        if (!AtomicFile::write($this->indexPath, $json)) {
             throw new \RuntimeException("Cannot write companion index to {$this->indexPath}");
         }
         $this->index = $map;

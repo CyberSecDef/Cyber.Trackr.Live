@@ -136,10 +136,10 @@ class StigTocBuilder
 
     public function writeToc(array $stigs): void
     {
-        file_put_contents(
-            $this->tocPath,
-            json_encode($stigs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-        );
+        $json = json_encode($stigs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($json === false || !AtomicFile::write($this->tocPath, $json)) {
+            throw new \RuntimeException("Cannot write toc to {$this->tocPath}");
+        }
     }
 
     /**
