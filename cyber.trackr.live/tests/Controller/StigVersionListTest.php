@@ -30,6 +30,22 @@ class StigVersionListTest extends WebTestCase
         }
     }
 
+    /** SCAP: Cisco IOS XE Router RTR V3R4 and V3R5 share a date; the old order listed V3R4 first. */
+    public function testScapVersionsAreNewestFirst(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/scap/Cisco_IOS_XE_Router_RTR_STIG_SCAP_Benchmark/3/5');
+        if ($client->getResponse()->getStatusCode() === 404) {
+            $this->markTestSkipped('Cisco IOS XE Router RTR SCAP V3R5 not in the data set');
+        }
+        $options = array_values(array_filter(
+            $crawler->filter('select#view_scap option')->each(fn($o) => (string) $o->attr('value'))));
+        $i4 = array_search('3|4', $options, true);
+        $i5 = array_search('3|5', $options, true);
+        $this->assertNotFalse($i4);
+        $this->assertLessThan($i4, $i5, 'V3R5 is listed above V3R4');
+    }
+
     public function testApiListingKeepsItsPublicFields(): void
     {
         $client = static::createClient();

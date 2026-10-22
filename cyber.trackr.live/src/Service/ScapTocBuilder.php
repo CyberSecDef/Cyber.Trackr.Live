@@ -133,7 +133,8 @@ class ScapTocBuilder
     public function rebuildAll(?callable $onFile = null): array
     {
         $scaps = [];
-        $finder = (new Finder())->files()->in($this->scapDir)->name('*.xml');
+        // Sorted, so the toc is the same on every host.
+        $finder = (new Finder())->files()->in($this->scapDir)->name('*.xml')->sortByName();
 
         foreach ($finder as $file) {
             $parsed = $this->parseScap($file->getRealPath());
@@ -146,6 +147,21 @@ class ScapTocBuilder
         }
 
         ksort($scaps);
+        // Newest first: by date, then by version + release, so releases that
+        // share a date (Windows 10 V3R4 and V3R5 are both 2025-02-25) list in
+        // release order; the version list sorts by date alone.
+        //
+        // Firefox's Linux/RHEL and Windows benchmarks declare the same title
+        // and release, so a title can hold two rows for one release and the
+        // page shows the LAST. Filename descending keeps that the Linux/RHEL
+        // variant, which is what prod shows today, until the platforms are
+        // split into their own titles.
+        foreach ($scaps as $title => $entries) {
+            usort($entries, fn($a, $b) => (strtotime((string) $b['date']) ?: 0) <=> (strtotime((string) $a['date']) ?: 0)
+                ?: version_compare($b['version'] . '.' . $b['release'], $a['version'] . '.' . $a['release'])
+                ?: strcmp((string) $b['filename'], (string) $a['filename']));
+            $scaps[$title] = $entries;
+        }
         return $scaps;
     }
 
