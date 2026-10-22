@@ -118,4 +118,27 @@ class StigControllerTest extends WebTestCase
         }
         $this->assertSame('/api/stig/Intune_MDM_Service_Desktop_%26_Mobile/1/1/', json_decode($api[1]));
     }
+
+    // P3: companion ZIPs (up to 158 MB) are served by the web server.
+    public function testCompanionZipRedirectsToTheStaticFile(): void
+    {
+        $client = static::createClient();
+        $data = dirname(__DIR__, 2) . '/resources/data';
+        $index = json_decode((string) @file_get_contents("$data/companion_zip_index.json"), true) ?: [];
+        $found = null;
+        foreach (json_decode((string) file_get_contents("$data/stig_toc.json"), true) as $title => $versions) {
+            foreach ($versions as $v) {
+                if (isset($index[$v['filename']])) { $found = [$title, $v['version'], $v['release'], $index[$v['filename']]]; break 2; }
+            }
+        }
+        if ($found === null) {
+            $this->markTestSkipped('companion_zip_index.json has no entries; run app:companion-zip:rebuild-index');
+        }
+        [$title, $version, $release, $zip] = $found;
+        $path = $data . '/zips/' . $zip;
+
+        $client->request('GET', '/stig/' . rawurlencode($title) . "/$version/$release/companion.zip");
+        $this->assertResponseRedirects('/downloads/zips/' . rawurlencode(basename($path)), 302);
+        $this->assertFileExists(dirname(__DIR__, 2) . '/public/downloads/zips/' . basename($path));
+    }
 }

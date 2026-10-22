@@ -15,6 +15,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -336,13 +337,10 @@ class StigController extends AbstractController
         if ($path === null || !is_file($path)) {
             throw $this->createNotFoundException('Companion ZIP not found.');
         }
-        $response = new BinaryFileResponse($path);
-        $response->headers->set('Content-Type', 'application/zip');
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            basename($path)
-        );
-        return $response;
+        // Served by the web server via public/downloads/zips -> resources/data/zips
+        // (review P3): companion ZIPs reach 158 MB, and streaming them through
+        // PHP/mod_fcgid on prod failed mid-transfer.
+        return new RedirectResponse('/downloads/zips/' . rawurlencode(basename($path)), Response::HTTP_FOUND);
     }
 
     #[Route('/stig/{title}/{version}/{release}/companion.pdf', name: 'stig_companion_pdf')]

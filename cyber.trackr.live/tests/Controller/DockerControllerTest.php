@@ -5,7 +5,7 @@ namespace App\Tests\Controller;
 use App\Controller\DockerController;
 use App\Service\DockerImageLocator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DockerControllerTest extends WebTestCase
 {
@@ -43,11 +43,11 @@ class DockerControllerTest extends WebTestCase
     }
 
     /**
-     * Download headers are checked by invoking the controller directly against a
-     * tiny temp bundle — driving the real (multi-GB) file through the test client
-     * would materialize it into memory.
+     * P3: the bundle is handed to the web server via a redirect into
+     * public/downloads/docker (a symlink to dist/) instead of streaming
+     * through PHP, which mod_fcgid on prod cut off mid-transfer.
      */
-    public function testDownloadReturnsGzipAttachment(): void
+    public function testDownloadRedirectsToTheStaticFile(): void
     {
         $dir = sys_get_temp_dir() . '/dockerctl_' . uniqid('', true);
         mkdir($dir . '/dist', 0777, true);
@@ -56,17 +56,23 @@ class DockerControllerTest extends WebTestCase
         try {
             $response = (new DockerController())->download(new DockerImageLocator($dir));
 
-            $this->assertInstanceOf(BinaryFileResponse::class, $response);
-            $this->assertSame('application/gzip', $response->headers->get('Content-Type'));
-            $this->assertStringContainsString(
-                'cyber-trackr-2026-06.tar.gz',
-                (string) $response->headers->get('Content-Disposition')
-            );
-            $this->assertSame('cyber-trackr-2026-06.tar.gz', $response->getFile()->getFilename());
+            $this->assertInstanceOf(RedirectResponse::class, $response);
+            $this->assertSame(302, $response->getStatusCode());
+            $this->assertSame('/downloads/docker/cyber-trackr-2026-06.tar.gz', $response->getTargetUrl());
         } finally {
             @unlink($dir . '/dist/cyber-trackr-2026-06.tar.gz');
             @rmdir($dir . '/dist');
             @rmdir($dir);
         }
+    }
+
+    public function testDownloadSymlinksPointAtTheServedDirectories(): void
+    {
+        $public = dirname(__DIR__, 2) . '/public/downloads';
+        $this->assertTrue(is_link("$public/docker"));
+        $this->assertSame('../../dist', readlink("$public/docker"));
+        $this->assertTrue(is_link("$public/zips"));
+        $this->assertSame('../../resources/data/zips', readlink("$public/zips"));
+        $this->assertSame(realpath(dirname(__DIR__, 2) . '/resources/data/zips'), realpath("$public/zips"));
     }
 }
