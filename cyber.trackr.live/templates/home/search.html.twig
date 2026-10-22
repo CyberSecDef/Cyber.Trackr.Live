@@ -32,6 +32,9 @@
                 </button>
             </h1>
             <div id="search-bookmark-panel" class="saved-search-panel saved-search-panel--inline" hidden role="region" aria-label="Saved searches"></div>
+            {% if search_error|default(null) %}
+                <p class="lib-page__lede" role="alert"><strong>{{ search_error }}</strong> Try fewer or shorter terms.</p>
+            {% endif %}
             <p class="lib-page__lede">
                 {{ results.rmfv4|length|number_format }} 800-53 r4 controls &middot;
                 {{ results.rmfv5|length|number_format }} 800-53 r5 controls &middot;

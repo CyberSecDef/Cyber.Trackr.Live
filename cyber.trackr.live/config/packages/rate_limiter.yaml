@@ -13,7 +13,7 @@ framework:
             cache_pool: 'cache.app'
             lock_factory: null
         # Per-client-IP limits on the heavy download routes (review S5).
-        # Enforced by App\EventSubscriber\DownloadRateLimitSubscriber.
+        # Enforced by App\EventSubscriber\RouteRateLimitSubscriber.
         # A full-corpus bulk download is ~7-10 chunks, so 30/hour leaves room
         # for retries and a second selection.
         bulk_download:
@@ -34,6 +34,16 @@ framework:
         # token. Per client IP, plus a site-wide cap that bounds Gemini spend
         # no matter how many addresses ask (prod saw ~70 requests in two
         # weeks, so 200/hour never touches real use).
+        # /search/{query} (review S13). A broad term like "system" costs ~1 s
+        # and up to 512 MB; prod's busiest searcher made 30 searches in two
+        # weeks, so 30/minute never touches a person. Enforced by
+        # App\EventSubscriber\RouteRateLimitSubscriber.
+        search:
+            policy: 'sliding_window'
+            limit: 30
+            interval: '1 minute'
+            cache_pool: 'cache.app'
+            lock_factory: null
         mitigation:
             policy: 'fixed_window'
             limit: 30

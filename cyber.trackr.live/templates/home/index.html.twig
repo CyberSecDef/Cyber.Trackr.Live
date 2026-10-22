@@ -23,7 +23,7 @@
             <i class="bi bi-search hero-search__icon" aria-hidden="true"></i>
             <input id="hero-search-input" type="search" class="hero-search__input"
                    placeholder="Search {{ stig_count|number_format }} STIGs, {{ (controls_count // 100) * 100 }}+ controls, {{ cci_count|number_format }} CCIs&hellip;"
-                   aria-label="Search the library" autocomplete="off">
+                   aria-label="Search the library" autocomplete="off" maxlength="200">
             <button type="button"
                     id="hero-bookmark-trigger"
                     class="hero-search__bookmark saved-search-trigger"

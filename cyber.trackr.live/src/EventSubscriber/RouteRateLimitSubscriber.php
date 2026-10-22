@@ -9,23 +9,26 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 /**
- * Per-IP rate limiting for the routes that stream hundreds of MB to GBs.
+ * Per-IP rate limiting for the expensive page routes (the JSON API has its
+ * own ApiRateLimitSubscriber).
  *
- * - stig_bulk_chunk       → 'bulk_download' limiter (30/hour)
- * - docker_image_download → 'docker_image' limiter (10/hour)
+ * - stig_bulk_chunk       → 'bulk_download' limiter (30/hour; review S5)
+ * - docker_image_download → 'docker_image' limiter (10/hour; review S5)
+ * - search                → 'search' limiter (30/minute; review S13)
  *
- * See config/packages/rate_limiter.yaml. The chunk-size cap in
- * StigController::stig_bulk_chunk() bounds each request; this bounds how many
- * an IP can make (review S5). Returns 429 + Retry-After when exhausted.
+ * See config/packages/rate_limiter.yaml. Per-request caps (bulk chunk size,
+ * search length/terms) bound each request; this bounds how many an IP can
+ * make. Returns 429 + Retry-After when exhausted.
  *
  * Matches on the resolved route name, so it runs after the router (priority
  * 32). Same IP and loopback rules as ApiRateLimitSubscriber.
  */
-final class DownloadRateLimitSubscriber implements EventSubscriberInterface
+final class RouteRateLimitSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly RateLimiterFactoryInterface $bulkDownloadLimiter,
         private readonly RateLimiterFactoryInterface $dockerImageLimiter,
+        private readonly RateLimiterFactoryInterface $searchLimiter,
     ) {
     }
 
@@ -39,6 +42,7 @@ final class DownloadRateLimitSubscriber implements EventSubscriberInterface
         $factory = match ($request->attributes->get('_route')) {
             'stig_bulk_chunk'       => $this->bulkDownloadLimiter,
             'docker_image_download' => $this->dockerImageLimiter,
+            'search'                => $this->searchLimiter,
             default                 => null,
         };
         if (null === $factory) {
@@ -55,7 +59,7 @@ final class DownloadRateLimitSubscriber implements EventSubscriberInterface
         $limit = $factory->create($ip)->consume(1);
         if (!$limit->isAccepted()) {
             $retryAfter = max(1, $limit->getRetryAfter()->getTimestamp() - time());
-            throw new TooManyRequestsHttpException($retryAfter, 'Download rate limit exceeded — try again later.');
+            throw new TooManyRequestsHttpException($retryAfter, 'Rate limit exceeded — try again later.');
         }
     }
 

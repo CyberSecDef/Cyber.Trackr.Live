@@ -56,14 +56,18 @@ class HomeController extends AbstractController
     #[Route('/search/{query}', name: 'search')]
     public function search(Searcher $searcher, $query = ""): Response
     {
-        $results = $searcher->search((string) $query);
+        // Over-long or over-wide queries are refused before any index work
+        // (review S13); /search/* is also rate-limited per IP.
+        $error = $searcher->rejectionReason((string) $query);
+        $results = $error === null ? $searcher->search((string) $query) : Searcher::EMPTY;
 
         return $this->render('home/search.html.twig', [
             'controller_name' => 'HomeController',
             'query' => $query,
             'terms' => [],
             'results' => $results,
-        ]);
+            'search_error' => $error,
+        ], new Response(status: $error === null ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST));
     }
 
     #[Route('/report_generator', name: 'report_generator')]

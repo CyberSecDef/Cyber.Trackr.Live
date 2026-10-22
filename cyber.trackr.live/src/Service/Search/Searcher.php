@@ -21,10 +21,31 @@ namespace App\Service\Search;
  */
 class Searcher
 {
+    /** Review S13. Prod's real searches top out under 100 characters. */
+    public const MAX_QUERY_CHARS = 200;
+    public const MAX_TERMS = 10;
+
+    public const EMPTY = ['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []];
+
     public function __construct(
         private IndexStore $store,
         private QueryParser $parser,
     ) {}
+
+    /**
+     * Why a query is refused before any index work, or null if it's fine.
+     * Cheap: string length plus the tokenizer, no postings loaded.
+     */
+    public function rejectionReason(string $query): ?string
+    {
+        if (mb_strlen($query) > self::MAX_QUERY_CHARS) {
+            return sprintf('Search is limited to %d characters.', self::MAX_QUERY_CHARS);
+        }
+        if (count($this->parser->parse($query)['tokens']) > self::MAX_TERMS) {
+            return sprintf('Search is limited to %d terms.', self::MAX_TERMS);
+        }
+        return null;
+    }
 
     /**
      * @return array{
@@ -39,7 +60,10 @@ class Searcher
         // of headroom on shared hosts. Hosts that disable ini_set no-op.
         @ini_set('memory_limit', '512M');
 
-        $empty = ['rmfv4' => [], 'rmfv5' => [], 'ccis' => [], 'aps' => [], 'vulns' => []];
+        $empty = self::EMPTY;
+        if ($this->rejectionReason($query) !== null) {
+            return $empty;
+        }
         $parsed = $this->parser->parse($query);
 
         if (empty($parsed['tokens']) && empty($parsed['phrases'])) {
