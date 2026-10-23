@@ -26,7 +26,7 @@ class StigController extends AbstractController
 {
 
     #[Route('/stig', name: 'stig')]
-    public function stig(StigTocBuilder $tocBuilder, BulkDownloadIndex $bulkIndex): Response
+    public function stig(StigTocBuilder $tocBuilder): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
 
@@ -42,7 +42,6 @@ class StigController extends AbstractController
             'controller_name' => 'StigController',
             'stigs_latest' => $stigs_latest,
             'stig_count'   => count($stigs),
-            'bulk_entries' => $bulkIndex->entries(),
         ]);
     }
 
@@ -132,6 +131,20 @@ class StigController extends AbstractController
         return $this->render('stig/bulk.html.twig', [
             'entries' => $index->entries(),
         ]);
+    }
+
+    /**
+     * The bulk-download table alone, for the collapsed panel on /stig, which
+     * fetches it the first time it is opened. Embedding it made every /stig
+     * view carry 5.7 MB of hidden markup (4,031 rows, ~44,000 elements) and
+     * doubled the page's render time. Cached and revalidated like any page.
+     */
+    #[Route('/stig/bulk/table', name: 'stig_bulk_table', methods: ['GET'])]
+    public function stig_bulk_table(BulkDownloadIndex $index): Response
+    {
+        $response = $this->render('stig/_bulk_table.html.twig', ['entries' => $index->entries()]);
+        $response->headers->set('X-Robots-Tag', 'noindex'); // a fragment, not a page
+        return $response;
     }
 
     /**

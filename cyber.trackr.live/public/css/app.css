@@ -5490,6 +5490,7 @@ del {
     overflow: hidden;
 }
 .bulk-dl-panel[open] { box-shadow: 0 1px 0 var(--border); }
+.bulk-dl-panel__status { margin: 0; padding: 1rem 1.25rem; color: var(--text-muted); }
 .bulk-dl-panel__summary {
     list-style: none;
     cursor: pointer;

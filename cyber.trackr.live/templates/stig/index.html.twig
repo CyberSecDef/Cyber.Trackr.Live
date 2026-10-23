@@ -62,7 +62,9 @@
                     <a class="bulk-dl-panel__deeplink" href="{{ path('stig_bulk') }}" onclick="event.stopPropagation();">Open full page &rarr;</a>
                 </span>
             </summary>
-            {% include 'stig/_bulk_table.html.twig' with {entries: bulk_entries} only %}
+            {# The table (4,031 rows, 5.7 MB) is fetched the first time the panel
+               opens; embedding it made every /stig view carry it hidden. #}
+            <p class="bulk-dl-panel__status" data-bulk-slot data-src="{{ path('stig_bulk_table') }}" aria-live="polite">Loading the download list&hellip;</p>
         </details>
 
         <div class="data-table-wrap">
@@ -124,17 +126,33 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const panel = document.querySelector('[data-bulk-panel]');
-            const root  = panel ? panel.querySelector('[data-bulk-root]') : null;
-            if (!panel || !root) return;
-            // Lazy-init DataTables the first time the panel is opened.
-            let initialized = false;
+            if (!panel) return;
+            // The first time the panel opens, fetch the table, put it in
+            // place of the slot and initialise it (DataTables + selection).
+            let loading = null;
+            function load() {
+                const slot = panel.querySelector('[data-bulk-slot]');
+                if (!slot || loading) return;
+                loading = fetch(slot.dataset.src, { credentials: 'same-origin' })
+                    .then(function (r) {
+                        if (!r.ok) throw new Error('HTTP ' + r.status);
+                        return r.text();
+                    })
+                    .then(function (html) {
+                        const tpl = document.createElement('template');
+                        tpl.innerHTML = html;
+                        slot.replaceWith(tpl.content);
+                        window.bulkDownload.init(panel.querySelector('[data-bulk-root]'));
+                    })
+                    .catch(function () {
+                        slot.innerHTML = 'Could not load the download list. <a href="{{ path('stig_bulk') }}">Open the full page</a> or close and reopen this panel to retry.';
+                        loading = null;
+                    });
+            }
             panel.addEventListener('toggle', function () {
                 if (panel.open) {
                     document.querySelector('.data-table-wrap').classList.add('is-hidden');
-                    if (!initialized) {
-                        window.bulkDownload.init(root);
-                        initialized = true;
-                    }
+                    load();
                 } else {
                     document.querySelector('.data-table-wrap').classList.remove('is-hidden');
                 }
