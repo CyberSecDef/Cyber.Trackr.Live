@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class PlansController extends AbstractController
 {
-    #[Route('/plans', name: 'plans')]
+    #[Route('/plans', name: 'plans', methods: ['GET'])]
     public function index(PlanRegistry $registry): Response
     {
         return $this->render('plans/index.html.twig', [
@@ -30,7 +30,7 @@ class PlansController extends AbstractController
         ]);
     }
 
-    #[Route('/plans/{family}', name: 'plans_wizard', requirements: ['family' => '[a-z]{2,3}'])]
+    #[Route('/plans/{family}', name: 'plans_wizard', requirements: ['family' => '[a-z]{2,3}'], methods: ['GET'])]
     public function wizard(string $family, PlanRegistry $registry, OverlayLoader $overlays): Response
     {
         if (!$registry->has($family)) {
@@ -50,7 +50,7 @@ class PlansController extends AbstractController
      * uses it to drive conditional show_when logic and to validate
      * uploaded BYOJSON drafts.
      */
-    #[Route('/plans/{family}/schema.json', name: 'plans_schema', requirements: ['family' => '[a-z]{2,3}'])]
+    #[Route('/plans/{family}/schema.json', name: 'plans_schema', requirements: ['family' => '[a-z]{2,3}'], methods: ['GET'])]
     public function schema(string $family, PlanRegistry $registry): JsonResponse
     {
         if (!$registry->has($family)) {
@@ -69,7 +69,7 @@ class PlansController extends AbstractController
      * Heavy work (XML walk, CCI inverted-map build) lives in
      * ControlResolver; this is just a thin renderer.
      */
-    #[Route('/plans/{family}/controls/{baseline}', name: 'plans_controls', requirements: ['family' => '[a-z]{2,3}', 'baseline' => '[a-z0-9\-]+'])]
+    #[Route('/plans/{family}/controls/{baseline}', name: 'plans_controls', requirements: ['family' => '[a-z]{2,3}', 'baseline' => '[a-z0-9\-]+'], methods: ['GET'])]
     public function controls(
         string $family,
         string $baseline,

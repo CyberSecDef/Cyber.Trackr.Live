@@ -21,7 +21,7 @@ class RmfController extends AbstractController
         $this->dataDir = $dataDir ?? __DIR__ . '/../../resources/data';
     }
 
-    #[Route('/rmf/5', name: 'rmf_v5_view')]
+    #[Route('/rmf/5', name: 'rmf_v5_view', methods: ['GET'])]
     public function rmf_v5_view(OverlayLoader $overlays): Response
     {
         $filesystem = new Filesystem();
@@ -87,7 +87,7 @@ class RmfController extends AbstractController
         ]);
     }
 
-    #[Route('/rmf/4', name: 'rmf_v4_view')]
+    #[Route('/rmf/4', name: 'rmf_v4_view', methods: ['GET'])]
     public function rmf_v4_view(): Response
     {
         $filesystem = new Filesystem();
@@ -128,13 +128,13 @@ class RmfController extends AbstractController
         ]);
     }
 
-    #[Route('/rmf/4-to-5', name: 'rmf_4_to_5_view')]
+    #[Route('/rmf/4-to-5', name: 'rmf_4_to_5_view', methods: ['GET'])]
     public function rmf_4_to_5_view(R4ToR5Mapper $mapper): Response
     {
         return $this->render('rmf/view_4_to_5.html.twig', $mapper->map());
     }
 
-    #[Route('/baselines', name: 'baselines_view')]
+    #[Route('/baselines', name: 'baselines_view', methods: ['GET'])]
     public function baselines_view(OverlayLoader $overlays): Response
     {
         // Heat map covers the four NIST baselines published as OSCAL profiles.

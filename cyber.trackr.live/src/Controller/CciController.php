@@ -26,7 +26,7 @@ class CciController extends AbstractController
      * ajax + deferRender) — there are ~5,100 CCIs, so server-rendering every row into the
      * HTML produced a multi-megabyte page and a 5,100-node DOM. The shell is tiny.
      */
-    #[Route('/cci', name: 'cci')]
+    #[Route('/cci', name: 'cci', methods: ['GET'])]
     public function cci(): Response
     {
         return $this->render('cci/index.html.twig');
@@ -37,7 +37,7 @@ class CciController extends AbstractController
      * Per-control text (name/definition/guidance) is sent ONCE in `controls` and referenced
      * by each row's `ctrl` id, rather than repeated on every CCI that maps to it.
      */
-    #[Route('/cci/data', name: 'cci_data')]
+    #[Route('/cci/data', name: 'cci_data', methods: ['GET'])]
     public function cciData(CacheItemPoolInterface $cache, DataVersion $version): JsonResponse
     {
         // Building the rows parses the 2024 CCI list and both 800-53 catalogs

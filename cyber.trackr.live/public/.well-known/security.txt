@@ -1,0 +1,7 @@
+# Security contact for cyber.trackr.live (RFC 9116). Renew Expires yearly;
+# tests/Controller/WellKnownTest.php fails once it is less than 30 days away.
+Contact: mailto:wwwdaze2000@gmail.com
+Expires: 2027-10-22T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://cyber.trackr.live/.well-known/security.txt
+Policy: https://github.com/CyberSecDef/Cyber.Trackr.Live/security

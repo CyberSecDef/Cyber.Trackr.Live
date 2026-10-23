@@ -30,7 +30,7 @@ class ApiController extends AbstractController
         $this->dataDir = $dataDir ?? __DIR__ . '/../../resources/data';
     }
 
-    #[Route('/api', name: 'api_summary')]
+    #[Route('/api', name: 'api_summary', methods: ['GET'])]
     public function api_summary(Request $request): Response
     {
         $results = [
@@ -133,7 +133,7 @@ class ApiController extends AbstractController
         return new Response( json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/rmf/4', name: 'api_rmfv4_list')]
+    #[Route('/api/rmf/4', name: 'api_rmfv4_list', methods: ['GET'])]
     public function api_rmfv4_list(): Response
     {
         $rmf_v4_filename = realpath($this->dataDir . "/rmf/800-53v4-controls.xml");
@@ -164,7 +164,7 @@ class ApiController extends AbstractController
     }
 
     #list all rmf 5 controls
-    #[Route('/api/rmf/4/{con}', name: 'api_rmfv4_show', requirements: ['con' => '[A-Za-z]{2}-\d{1,3}'])]
+    #[Route('/api/rmf/4/{con}', name: 'api_rmfv4_show', requirements: ['con' => '[A-Za-z]{2}-\d{1,3}'], methods: ['GET'])]
     public function api_rmfv4_show($con): Response
     {
         $con = strtoupper(trim((string) $con));
@@ -278,7 +278,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/rmf/5', name: 'api_rmf_list')]
+    #[Route('/api/rmf/5', name: 'api_rmf_list', methods: ['GET'])]
     public function api_rmf_list(): Response
     {
         $rmf_v5_filename = realpath($this->dataDir . "/rmf/800-53v5-controls.xml");
@@ -309,7 +309,7 @@ class ApiController extends AbstractController
     }
 
     #list all rmf 5 controls
-    #[Route('/api/rmf/5/{con}', name: 'api_rmf_show', requirements: ['con' => '[A-Za-z]{2}-\d{1,3}'])]
+    #[Route('/api/rmf/5/{con}', name: 'api_rmf_show', requirements: ['con' => '[A-Za-z]{2}-\d{1,3}'], methods: ['GET'])]
     public function api_rmf_show($con): Response
     {
         $con = strtoupper(trim((string) $con));
@@ -422,7 +422,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/cci', name: 'api_cci_list')]
+    #[Route('/api/cci', name: 'api_cci_list', methods: ['GET'])]
     public function api_cci_list(): Response
     {
         $cci_path = realpath($this->dataDir . "/cci/U_CCI_List.xml");
@@ -451,7 +451,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/cci/{item}', name: 'api_cci_show')]
+    #[Route('/api/cci/{item}', name: 'api_cci_show', methods: ['GET'])]
     public function api_cci_show($item): Response
     {
         $results = [];
@@ -508,7 +508,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/stig', name: 'api_stig_list')]
+    #[Route('/api/stig', name: 'api_stig_list', methods: ['GET'])]
     public function api_stig_list(): Response
     {
 
@@ -527,7 +527,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/stig/tip', name: 'api_stig_tip')]
+    #[Route('/api/stig/tip', name: 'api_stig_tip', methods: ['GET'])]
     public function api_stig_tip(): Response
     {
         $toc_path = realpath($this->dataDir . "/stig_toc.json");
@@ -584,7 +584,7 @@ class ApiController extends AbstractController
 
 
 
-    #[Route('/api/stig/{title}/{version}/{release}', name: 'api_stig_summary')]
+    #[Route('/api/stig/{title}/{version}/{release}', name: 'api_stig_summary', methods: ['GET'])]
     public function api_stig_summary($title, $version, $release): Response
     {
         $results = [];
@@ -651,7 +651,7 @@ class ApiController extends AbstractController
         return new Response(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), Response::HTTP_OK, ['content-type' => 'application/json'] );
     }
 
-    #[Route('/api/stig/{title}/{version}/{release}/{vuln}', name: 'api_stig_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'])]
+    #[Route('/api/stig/{title}/{version}/{release}/{vuln}', name: 'api_stig_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'], methods: ['GET'])]
     public function api_stig_vuln(Request $request, $title, $version, $release, $vuln): Response
     {
         $results = [];
@@ -770,7 +770,7 @@ class ApiController extends AbstractController
     }
 
 
-    #[Route('/api/scap', name: 'api_scap_list')]
+    #[Route('/api/scap', name: 'api_scap_list', methods: ['GET'])]
     public function api_scap_list(): Response
     {
 
@@ -788,7 +788,7 @@ class ApiController extends AbstractController
     }
 
 
-    #[Route('/api/scap/{title}/{version}/{release}', name: 'api_scap_summary')]
+    #[Route('/api/scap/{title}/{version}/{release}', name: 'api_scap_summary', methods: ['GET'])]
     public function api_scap_summary($title, $version, $release, ?ScapTocBuilder $tocBuilder = null): Response
     {
         $results = [];
@@ -860,7 +860,7 @@ class ApiController extends AbstractController
     }
 
 
-    #[Route('/api/scap/{title}/{version}/{release}/{vuln}', name: 'api_scap_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'])]
+    #[Route('/api/scap/{title}/{version}/{release}/{vuln}', name: 'api_scap_vuln', requirements: ['vuln' => '[A-Za-z0-9-]{1,40}'], methods: ['GET'])]
     public function api_scap_vuln($title, $version, $release, $vuln, ?ScapTocBuilder $tocBuilder = null): Response
     {
         $results = [];
@@ -955,7 +955,7 @@ class ApiController extends AbstractController
        Returns the same data as the HTML pages, raw and parseable.
        ============================================================ */
 
-    #[Route('/api/vulns', name: 'api_vulns_summary')]
+    #[Route('/api/vulns', name: 'api_vulns_summary', methods: ['GET'])]
     public function api_vulns_summary(VulnsRegistry $registry): Response
     {
         return $this->jsonOk([
@@ -971,7 +971,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-    #[Route('/api/vulns/kev', name: 'api_vulns_kev_list')]
+    #[Route('/api/vulns/kev', name: 'api_vulns_kev_list', methods: ['GET'])]
     public function api_vulns_kev_list(VulnsRegistry $registry): Response
     {
         return $this->jsonOk([
@@ -980,7 +980,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-    #[Route('/api/vulns/kev/{cve}', name: 'api_vulns_kev_view', requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'])]
+    #[Route('/api/vulns/kev/{cve}', name: 'api_vulns_kev_view', requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'], methods: ['GET'])]
     public function api_vulns_kev_view(string $cve, VulnsRegistry $registry): Response
     {
         $entry = $registry->getKev($cve);
@@ -997,7 +997,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-    #[Route('/api/vulns/iavm', name: 'api_vulns_iavm_list')]
+    #[Route('/api/vulns/iavm', name: 'api_vulns_iavm_list', methods: ['GET'])]
     public function api_vulns_iavm_list(VulnsRegistry $registry): Response
     {
         return $this->jsonOk([
@@ -1012,7 +1012,8 @@ class ApiController extends AbstractController
     #[Route(
         '/api/vulns/iavm/{id}',
         name: 'api_vulns_iavm_view',
-        requirements: ['id' => '20\d{2}-[ABT]-\d{4}|CTO\d{4}']
+        requirements: ['id' => '20\d{2}-[ABT]-\d{4}|CTO\d{4}'],
+        methods: ['GET'],
     )]
     public function api_vulns_iavm_view(string $id, VulnsRegistry $registry): Response
     {
@@ -1026,7 +1027,8 @@ class ApiController extends AbstractController
     #[Route(
         '/api/vulns/cve/{cve}',
         name: 'api_vulns_cve_view',
-        requirements: ['cve' => 'CVE-\d{4}-\d{4,7}']
+        requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'],
+        methods: ['GET'],
     )]
     public function api_vulns_cve_view(string $cve, VulnsRegistry $registry): Response
     {

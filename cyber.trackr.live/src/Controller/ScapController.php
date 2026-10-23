@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class ScapController extends AbstractController
 {
-    #[Route('/scap', name: 'scap')]
+    #[Route('/scap', name: 'scap', methods: ['GET'])]
     public function scap(\App\Service\ScapTocBuilder $tocBuilder): Response
     {
         $scaps = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
@@ -34,7 +34,7 @@ class ScapController extends AbstractController
         ]);
     }
 
-    #[Route('/scap/{title}/{version}/{release}/download', name: 'scap_download')]
+    #[Route('/scap/{title}/{version}/{release}/download', name: 'scap_download', methods: ['GET'])]
     public function scap_download($title, $version, $release, ScapTocBuilder $tocBuilder): Response
     {
         $filesystem = new Filesystem();
@@ -79,7 +79,7 @@ class ScapController extends AbstractController
     }
 
 
-    #[Route('/scap/{title}/{version}/{release}', name: 'scap_view')]
+    #[Route('/scap/{title}/{version}/{release}', name: 'scap_view', methods: ['GET'])]
     public function scap_view($title, $version, $release, CciControlMap $cciControlMap, ScapTocBuilder $tocBuilder): Response
     {
         $filesystem = new Filesystem();

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class StigWizardController extends AbstractController
 {
-    #[Route('/stig-wizard/{title}/{version}/{release}', name: 'stig_wizard')]
+    #[Route('/stig-wizard/{title}/{version}/{release}', name: 'stig_wizard', methods: ['GET'])]
     public function wizard(string $title, string $version, string $release, StigWizardRegistry $registry): Response
     {
         $match = $registry->findForStig($title, $version);

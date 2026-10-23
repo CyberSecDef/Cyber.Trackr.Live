@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class VulnsController extends AbstractController
 {
-    #[Route('/vulnerabilities', name: 'vulns')]
+    #[Route('/vulnerabilities', name: 'vulns', methods: ['GET'])]
     public function landing(VulnsRegistry $registry): Response
     {
         return $this->render('vulns/index.html.twig', [
@@ -32,7 +32,7 @@ class VulnsController extends AbstractController
         ]);
     }
 
-    #[Route('/vulnerabilities/kev', name: 'vulns_kev_list')]
+    #[Route('/vulnerabilities/kev', name: 'vulns_kev_list', methods: ['GET'])]
     public function kevList(VulnsRegistry $registry): Response
     {
         $entries = $registry->listKev();
@@ -49,7 +49,7 @@ class VulnsController extends AbstractController
         ]);
     }
 
-    #[Route('/vulnerabilities/kev/{cve}', name: 'vulns_kev_view', requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'])]
+    #[Route('/vulnerabilities/kev/{cve}', name: 'vulns_kev_view', requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'], methods: ['GET'])]
     public function kevView(string $cve, VulnsRegistry $registry): Response
     {
         $entry = $registry->getKev($cve);
@@ -70,7 +70,7 @@ class VulnsController extends AbstractController
         ]);
     }
 
-    #[Route('/vulnerabilities/iavm', name: 'vulns_iavm_list')]
+    #[Route('/vulnerabilities/iavm', name: 'vulns_iavm_list', methods: ['GET'])]
     public function iavmList(VulnsRegistry $registry): Response
     {
         return $this->render('vulns/iavm_list.html.twig', [
@@ -85,7 +85,8 @@ class VulnsController extends AbstractController
     #[Route(
         '/vulnerabilities/iavm/{id}',
         name: 'vulns_iavm_view',
-        requirements: ['id' => '20\d{2}-[ABT]-\d{4}|CTO\d{4}']
+        requirements: ['id' => '20\d{2}-[ABT]-\d{4}|CTO\d{4}'],
+        methods: ['GET'],
     )]
     public function iavmView(string $id, VulnsRegistry $registry): Response
     {
@@ -102,7 +103,8 @@ class VulnsController extends AbstractController
     #[Route(
         '/vulnerabilities/cve/{cve}',
         name: 'vulns_cve_view',
-        requirements: ['cve' => 'CVE-\d{4}-\d{4,7}']
+        requirements: ['cve' => 'CVE-\d{4}-\d{4,7}'],
+        methods: ['GET'],
     )]
     public function cveView(string $cve, VulnsRegistry $registry): Response
     {

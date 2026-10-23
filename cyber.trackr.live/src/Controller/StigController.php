@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 class StigController extends AbstractController
 {
 
-    #[Route('/stig', name: 'stig')]
+    #[Route('/stig', name: 'stig', methods: ['GET'])]
     public function stig(StigTocBuilder $tocBuilder): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
@@ -55,7 +55,7 @@ class StigController extends AbstractController
      * collide with /stig/{title}/{version}/{release} (segment count differs
      * anyway, but being explicit avoids future routing drift).
      */
-    #[Route('/stig/index', name: 'stig_index_titles')]
+    #[Route('/stig/index', name: 'stig_index_titles', methods: ['GET'])]
     public function stig_index_titles(StigTocBuilder $tocBuilder): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
@@ -78,7 +78,7 @@ class StigController extends AbstractController
         ]);
     }
 
-    #[Route('/stig/feed.atom', name: 'stig_feed')]
+    #[Route('/stig/feed.atom', name: 'stig_feed', methods: ['GET'])]
     public function stig_feed(StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
@@ -125,7 +125,7 @@ class StigController extends AbstractController
      * historical STIG/SCAP they care about in one go, split across
      * ≤500MB ZIP chunks streamed sequentially by the client.
      */
-    #[Route('/stig/bulk', name: 'stig_bulk')]
+    #[Route('/stig/bulk', name: 'stig_bulk', methods: ['GET'])]
     public function stig_bulk(BulkDownloadIndex $index): Response
     {
         return $this->render('stig/bulk.html.twig', [
@@ -196,7 +196,7 @@ class StigController extends AbstractController
         return $planner->streamChunk($resolved, $zipName);
     }
 
-    #[Route('/stig/{title}/{v1}/{r1}/{v2}/{r2}', name: 'stig_compare')]
+    #[Route('/stig/{title}/{v1}/{r1}/{v2}/{r2}', name: 'stig_compare', methods: ['GET'])]
     public function stig_compare($title, $v1, $r1, $v2, $r2): Response
     {
         $filesystem = new Filesystem();
@@ -284,7 +284,7 @@ class StigController extends AbstractController
         ]);
     }
 
-    #[Route('/stig/{title}/{version}/{release}', name: 'stig_view')]
+    #[Route('/stig/{title}/{version}/{release}', name: 'stig_view', methods: ['GET'])]
     public function stig_view($title, $version, $release, StigDigestBuilder $digestBuilder, StigTocBuilder $tocBuilder, StigCompanionZipFinder $companionFinder, \App\Service\Stig\StigWizardRegistry $wizardRegistry, CciControlMap $cciControlMap): Response
     {
         $filesystem = new Filesystem();
@@ -350,7 +350,7 @@ class StigController extends AbstractController
         ]);
     }
 
-    #[Route('/stig/{title}/{version}/{release}/companion.zip', name: 'stig_companion_zip')]
+    #[Route('/stig/{title}/{version}/{release}/companion.zip', name: 'stig_companion_zip', methods: ['GET'])]
     public function stig_companion_zip(string $title, string $version, string $release, StigCompanionZipFinder $companionFinder): Response
     {
         $path = $companionFinder->resolveZipPath($title, $version, $release);
@@ -363,7 +363,7 @@ class StigController extends AbstractController
         return new RedirectResponse('/downloads/zips/' . rawurlencode(basename($path)), Response::HTTP_FOUND);
     }
 
-    #[Route('/stig/{title}/{version}/{release}/companion.pdf', name: 'stig_companion_pdf')]
+    #[Route('/stig/{title}/{version}/{release}/companion.pdf', name: 'stig_companion_pdf', methods: ['GET'])]
     public function stig_companion_pdf(string $title, string $version, string $release, Request $request, StigCompanionZipFinder $companionFinder): Response
     {
         $entry = (string) $request->query->get('file', '');
@@ -389,7 +389,7 @@ class StigController extends AbstractController
      * client-side, and hands the result to /ckl-viewer. Also a valid .cklb on
      * its own for DISA STIG Viewer 3.x.
      */
-    #[Route('/stig/{title}/{version}/{release}/skeleton.cklb', name: 'stig_skeleton_cklb')]
+    #[Route('/stig/{title}/{version}/{release}/skeleton.cklb', name: 'stig_skeleton_cklb', methods: ['GET'])]
     public function stig_skeleton_cklb($title, $version, $release, CklbSkeletonBuilder $builder): Response
     {
         $toc_path = realpath(__DIR__ . "/../../resources/data/stig_toc.json");
@@ -419,7 +419,7 @@ class StigController extends AbstractController
         ]);
     }
 
-    #[Route('/stig/{title}/{version}/{release}/download', name: 'stig_download')]
+    #[Route('/stig/{title}/{version}/{release}/download', name: 'stig_download', methods: ['GET'])]
     public function stig_download($title, $version, $release): Response
     {
         $filesystem = new Filesystem();

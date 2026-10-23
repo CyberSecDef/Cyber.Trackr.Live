@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class HomeController extends AbstractController
 {
 
-    #[Route('/', name: 'home')]
+    #[Route('/', name: 'home', methods: ['GET'])]
     public function index(StigTocBuilder $tocBuilder, CachedFileCount $counter): Response
     {
         $stigs = json_decode(file_get_contents($tocBuilder->tocPath()), true) ?: [];
@@ -49,7 +49,7 @@ class HomeController extends AbstractController
         return $counter->count(__DIR__ . "/../../resources/data/cci/U_CCI_List_2024.xml", ['<cci_item ']);
     }
 
-    #[Route('/search/{query}', name: 'search')]
+    #[Route('/search/{query}', name: 'search', methods: ['GET'])]
     public function search(Searcher $searcher, $query = ""): Response
     {
         // Over-long or over-wide queries are refused before any index work
@@ -66,7 +66,7 @@ class HomeController extends AbstractController
         ], new Response(status: $error === null ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST));
     }
 
-    #[Route('/report_generator', name: 'report_generator')]
+    #[Route('/report_generator', name: 'report_generator', methods: ['GET'])]
     public function report_generator(): Response
     {
         return $this->render('home/report_generator.html.twig', [
@@ -74,7 +74,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/contactus', name: 'contact_us')]
+    #[Route('/contactus', name: 'contact_us', methods: ['GET'])]
     public function contact_us(): Response
     {
         return $this->render('home/contact.html.twig', [
@@ -82,7 +82,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/mission', name: 'mission')]
+    #[Route('/mission', name: 'mission', methods: ['GET'])]
     public function mission(): Response
     {
         return $this->render('home/mission.html.twig', [
@@ -90,7 +90,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/ckl-viewer', name: 'ckl_viewer')]
+    #[Route('/ckl-viewer', name: 'ckl_viewer', methods: ['GET'])]
     public function ckl_viewer(): Response
     {
         return $this->render('home/ckl_viewer.html.twig', [
@@ -98,7 +98,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/changelog', name: 'changelog')]
+    #[Route('/changelog', name: 'changelog', methods: ['GET'])]
     public function changelog(\App\Service\Changelog $changelog): Response
     {
         return $this->render('home/changelog.html.twig', [
@@ -106,7 +106,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/terms', name: 'terms')]
+    #[Route('/terms', name: 'terms', methods: ['GET'])]
     public function terms(): Response
     {
         return $this->render('home/terms.html.twig', [

@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class DockerController extends AbstractController
 {
-    #[Route('/docker-image', name: 'docker_image')]
+    #[Route('/docker-image', name: 'docker_image', methods: ['GET'])]
     public function index(DockerImageLocator $locator): Response
     {
         $image = $locator->latest();
@@ -24,7 +24,7 @@ class DockerController extends AbstractController
         ]);
     }
 
-    #[Route('/docker-image/download', name: 'docker_image_download')]
+    #[Route('/docker-image/download', name: 'docker_image_download', methods: ['GET'])]
     public function download(DockerImageLocator $locator): Response
     {
         $image = $locator->latest();
